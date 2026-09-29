@@ -86,3 +86,30 @@ describe('workerd target', () => {
     expect(target.info.settings).toContain('compatibility data defaults');
   });
 });
+
+describe('workerd target with a deploy redirect', () => {
+  it('follows .wrangler/deploy/config.json to the generated config', () => {
+    const target = createWorkerdTarget(fixture('nitro-redirect'));
+    expect(target.info.settings).toBe(
+      'compatibility_date 2026-09-01, flags: nodejs_compat (from .output/server/wrangler.json)',
+    );
+  });
+
+  it('resolves main against the config it was written in', () => {
+    expect(createWorkerdTarget(fixture('nitro-redirect')).defaultEntry).toBe(
+      '.output/server/index.mjs',
+    );
+  });
+
+  it('resolves main of an explicit config against that config', () => {
+    const target = createWorkerdTarget(fixture('nitro-redirect'), {
+      wranglerConfig: '.output/server/wrangler.json',
+    });
+    expect(target.defaultEntry).toBe('.output/server/index.mjs');
+  });
+
+  it('is skipped when the wrangler config is turned off', () => {
+    const target = createWorkerdTarget(fixture('nitro-redirect'), { wranglerConfig: false });
+    expect(target.defaultEntry).toBeUndefined();
+  });
+});
