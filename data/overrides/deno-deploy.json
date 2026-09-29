@@ -1,0 +1,5 @@
+{
+  "description": "APIs Deno Deploy blocks on top of the Deno CLI, applied by the deno-deploy target. None are known: Deno Deploy runs the standard Deno runtime with --allow-all, including subprocesses and file system writes. The restrictions of Deno Deploy Classic (read-only file system, no subprocesses) no longer apply; Classic shut down on July 20, 2026. Deploy runs an older Deno than the matrix describes, which the target reports as a note.",
+  "modules": {},
+  "apis": {}
+}

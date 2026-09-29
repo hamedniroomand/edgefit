@@ -1,0 +1,318 @@
+{
+  "description": "APIs that exist on Deno but throw or silently do nothing when called, modules the compatibility matrix does not cover, and matrix differences that are values rather than behavior. Curated by reading Deno's ext/node polyfills at the release the matrix was generated with; stubs call notImplemented.",
+  "modules": {
+    "child_process": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:child_process",
+      "source": "child_process.ts",
+      "except": []
+    },
+    "cluster": {
+      "status": "unsupported",
+      "note": "is a stub on Deno: fork, disconnect, setupPrimary and the Worker constructor throw Not implemented",
+      "source": "cluster.ts",
+      "except": [
+        "isPrimary",
+        "isMaster",
+        "isWorker",
+        "settings",
+        "workers",
+        "worker",
+        "schedulingPolicy",
+        "SCHED_NONE",
+        "SCHED_RR"
+      ]
+    },
+    "domain": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:domain",
+      "source": "domain.ts",
+      "except": []
+    },
+    "inspector": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:inspector",
+      "source": "inspector.js",
+      "except": []
+    },
+    "inspector/promises": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:inspector/promises",
+      "source": "inspector/promises.js",
+      "except": []
+    },
+    "punycode": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:punycode",
+      "source": "punycode.ts",
+      "except": []
+    },
+    "readline": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:readline",
+      "source": "readline.ts",
+      "except": []
+    },
+    "readline/promises": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:readline/promises",
+      "source": "readline/promises.ts",
+      "except": []
+    },
+    "repl": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:repl",
+      "source": "repl.ts",
+      "except": []
+    },
+    "test": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:test",
+      "source": "testing.ts",
+      "except": []
+    },
+    "trace_events": {
+      "status": "mocked",
+      "note": "is a stub: createTracing returns an object without enable or disable, and getEnabledCategories always returns an empty string",
+      "source": "trace_events.ts",
+      "except": []
+    },
+    "tty": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:tty",
+      "source": "tty.js",
+      "except": []
+    },
+    "v8": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:v8",
+      "source": "v8.ts",
+      "except": []
+    },
+    "vm": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:vm",
+      "source": "vm.js",
+      "except": []
+    },
+    "wasi": {
+      "status": "unsupported",
+      "note": "is a stub on Deno: constructing WASI throws \"Context is currently not supported\"",
+      "source": "wasi.ts",
+      "except": []
+    },
+    "worker_threads": {
+      "status": "supported",
+      "note": "implemented; the compatibility matrix does not cover node:worker_threads",
+      "source": "worker_threads.ts",
+      "except": []
+    }
+  },
+  "apis": {
+    "v8.stopCoverage": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "v8.ts"
+    },
+    "v8.takeCoverage": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "v8.ts"
+    },
+    "v8.setFlagsFromString": {
+      "status": "mocked",
+      "note": "does nothing",
+      "source": "v8.ts"
+    },
+    "v8.getCppHeapStatistics": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "v8.ts"
+    },
+    "v8.promiseHooks": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "v8.ts"
+    },
+    "v8.queryObjects": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "v8.ts"
+    },
+    "v8.startupSnapshot": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "v8.ts"
+    },
+    "v8.setHeapSnapshotNearHeapLimit": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "v8.ts"
+    },
+    "v8.GCProfiler": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "v8.ts"
+    },
+    "v8.isStringOneByteRepresentation": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "v8.ts"
+    },
+    "vm.measureMemory": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "vm.js"
+    },
+    "worker_threads.moveMessagePortToContext": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "worker_threads.ts"
+    },
+    "worker_threads.isInternalThread": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "worker_threads.ts"
+    },
+    "worker_threads.markAsUncloneable": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "worker_threads.ts"
+    },
+    "worker_threads.isMarkedAsUntransferable": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "worker_threads.ts"
+    },
+    "worker_threads.postMessageToThread": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "worker_threads.ts"
+    },
+    "inspector.NetworkResources": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "inspector.js"
+    },
+    "inspector/promises.NetworkResources": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "inspector.js"
+    },
+    "repl.writer": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "repl.ts"
+    },
+    "repl.isValidSyntax": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "repl.ts"
+    },
+    "test.run": {
+      "status": "unsupported",
+      "note": "throws Not implemented; use Deno.test",
+      "source": "testing.ts"
+    },
+    "test.before": {
+      "status": "unsupported",
+      "note": "throws Not implemented; use Deno.test",
+      "source": "testing.ts"
+    },
+    "test.after": {
+      "status": "unsupported",
+      "note": "throws Not implemented; use Deno.test",
+      "source": "testing.ts"
+    },
+    "test.beforeEach": {
+      "status": "unsupported",
+      "note": "throws Not implemented; use Deno.test",
+      "source": "testing.ts"
+    },
+    "test.afterEach": {
+      "status": "unsupported",
+      "note": "throws Not implemented; use Deno.test",
+      "source": "testing.ts"
+    },
+    "test.mock.getter": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "testing.ts"
+    },
+    "test.mock.setter": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "testing.ts"
+    },
+    "test.mock.timers": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "testing.ts"
+    },
+    "test.snapshot": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "testing.ts"
+    },
+    "test.assert": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "testing.ts"
+    },
+    "tls.createSecurePair": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "tls.ts"
+    },
+    "crypto.secureHeapUsed": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/crypto/util.ts"
+    },
+    "crypto.setEngine": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/crypto/util.ts"
+    },
+    "process.setSourceMapsEnabled": {
+      "status": "mocked",
+      "note": "does nothing; source maps are always enabled",
+      "source": "process.ts"
+    },
+    "process.sourceMapsEnabled": {
+      "status": "supported",
+      "note": "always true, since source maps are always enabled",
+      "source": "process.ts"
+    },
+    "process.release": {
+      "status": "supported",
+      "note": "defined as a getter, which the compatibility matrix does not see",
+      "source": "process.ts"
+    },
+    "process.config": {
+      "status": "supported",
+      "note": "holds Node's build configuration; its keys are values, not APIs",
+      "source": "process.ts"
+    },
+    "process.versions": {
+      "status": "supported",
+      "note": "lists the versions of Node's bundled dependencies, which Deno does not have",
+      "source": "process.ts"
+    },
+    "process.stdin": {
+      "status": "supported",
+      "note": "the matrix recorded Node's stdio as sockets; Deno's are plain streams when not attached to a TTY",
+      "source": "_process/streams.mjs"
+    },
+    "process.stdout": {
+      "status": "supported",
+      "note": "the matrix recorded Node's stdio as sockets; Deno's are plain streams when not attached to a TTY",
+      "source": "_process/streams.mjs"
+    },
+    "process.stderr": {
+      "status": "supported",
+      "note": "the matrix recorded Node's stdio as sockets; Deno's are plain streams when not attached to a TTY",
+      "source": "_process/streams.mjs"
+    }
+  }
+}

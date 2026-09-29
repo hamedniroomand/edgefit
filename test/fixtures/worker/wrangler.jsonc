@@ -1,0 +1,7 @@
+{
+  // A Worker that pulls in a dev-only file watcher by accident.
+  "name": "fixture-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}

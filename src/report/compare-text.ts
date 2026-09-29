@@ -1,0 +1,78 @@
+import type { CheckResult } from '@/core/check.ts';
+
+import { compareRows } from './compare.ts';
+import type { CompareCell, CompareOptions, CompareRow } from './compare.ts';
+import { summaryLine } from './summary.ts';
+import { formatFinding, painter } from './text.ts';
+import type { Paint, TextOptions } from './text.ts';
+
+export interface CompareTextOptions extends TextOptions, CompareOptions {
+  /** List the findings behind each row. */
+  verbose: boolean;
+}
+
+const symbols: Record<CompareCell | 'unreached', { symbol: string; style: Parameters<Paint>[0] }> =
+  {
+    supported: { symbol: '✓', style: 'green' },
+    mismatch: { symbol: '~', style: 'yellow' },
+    mocked: { symbol: '~', style: 'yellow' },
+    web: { symbol: '!', style: 'yellow' },
+    unsupported: { symbol: '✗', style: 'red' },
+    unknown: { symbol: '?', style: 'yellow' },
+    unreached: { symbol: '–', style: 'dim' },
+  };
+
+const legend =
+  '✓ supported  ~ mismatch or mocked  ✗ unsupported  ! missing per Web API data  ? unknown  – not reached or ignored';
+
+const gap = '  ';
+
+function formatRow(
+  row: CompareRow,
+  keys: readonly string[],
+  apiWidth: number,
+  paint: Paint,
+): string {
+  const cells = keys.map(key => {
+    const { symbol, style } =
+      symbols[row.results[key as keyof CompareRow['results']] ?? 'unreached'];
+    return paint(style, symbol) + ' '.repeat(key.length - symbol.length);
+  });
+  return [row.api.padEnd(apiWidth), ...cells].join(gap).trimEnd();
+}
+
+function formatVerbose(row: CompareRow, paint: Paint): string[] {
+  const packages = paint('dim', `    reached by ${row.packages.join(', ')}`);
+  const findings = row.findings.flatMap(finding =>
+    formatFinding(finding, paint).map(line => `    ${line}`),
+  );
+  return [packages, ...findings];
+}
+
+/** One table of the reached APIs across targets. */
+export function formatCompareText(result: CheckResult, options: CompareTextOptions): string {
+  const paint = painter(options);
+  const keys = result.reports.map(report => report.target.key);
+  const entry = result.reports[0]?.entry ?? '';
+  const header = paint('bold', `edgefit compare · entry ${entry}`);
+  const rows = compareRows(result, options);
+  const notes = result.reports.flatMap(report =>
+    report.target.notes.map(note => paint('yellow', `note (${report.target.key}): ${note}`)),
+  );
+  if (rows.length === 0) {
+    const clean = paint('green', 'No known incompatible reachable APIs found.');
+    return [header, '', clean, ...notes, '', summaryLine(result), ''].join('\n');
+  }
+  const apiWidth = Math.max(...rows.map(row => row.api.length));
+  const heading = paint('dim', ['API'.padEnd(apiWidth), ...keys].join(gap));
+  const rowBlocks = rows.map(row =>
+    [formatRow(row, keys, apiWidth, paint)]
+      .concat(options.verbose ? formatVerbose(row, paint) : [])
+      .join('\n'),
+  );
+  // Verbose rows span several lines, so a blank line keeps them apart.
+  const table = [heading, ...rowBlocks].join(options.verbose ? '\n\n' : '\n');
+  return [header, '', table, '', paint('dim', legend), ...notes, '', summaryLine(result), ''].join(
+    '\n',
+  );
+}

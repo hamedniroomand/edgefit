@@ -1,0 +1,9 @@
+{
+  // Mapped the way `deno add` writes entries.
+  "imports": {
+    "multi": "npm:multi-runtime@^2.0.0",
+    "@std/path": "jsr:@std/path@^1.0.0",
+    "~/": "./src/",
+  },
+  "nodeModulesDir": "manual",
+}

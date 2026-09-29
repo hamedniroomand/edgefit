@@ -1,0 +1,27 @@
+import type { Node } from 'oxc-parser';
+
+import type { ApiRef } from '@/types.ts';
+
+import type { BindingContext } from './bindings.ts';
+import type { Scope } from './scope.ts';
+import type { UsageCollector } from './usage-collector.ts';
+
+export interface VisitContext extends BindingContext {
+  readonly collector: UsageCollector;
+  visit: (node: Node | null | undefined) => void;
+  visitAll: (nodes: readonly (Node | null)[]) => void;
+  visitChildren: (node: Node) => void;
+  visitPattern: (pattern: Node | null | undefined) => void;
+  /** Visits an expression whose value is bound to a name, so it is followed rather than escaping. */
+  visitBound: (init: Node) => void;
+  inScope: (scope: Scope, body: () => void) => void;
+  /** Runs `body` with `node` on the ancestor stack without dispatching it. */
+  withAncestor: (node: Node, body: () => void) => void;
+  /**
+   * Records a use of `ref` found at the top of the ancestor stack, extended through any
+   * member accesses around it. `recordBare` is false when the unextended ref was already recorded.
+   */
+  useRef: (ref: ApiRef, offset: number, recordBare?: boolean) => void;
+}
+
+export type Visitor<T extends Node = Node> = (node: T, context: VisitContext) => void;

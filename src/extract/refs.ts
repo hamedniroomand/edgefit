@@ -1,0 +1,123 @@
+import type { Node } from 'oxc-parser';
+
+import { displayApi } from '@/data/builtins.ts';
+import type { ApiRef } from '@/types.ts';
+
+const globalAliases = new Set(['global', 'globalThis', 'self']);
+
+// Helpers that wrap `require()` results in Babel, TypeScript, esbuild and Rollup output.
+const interopHelpers = new Set([
+  '__importDefault',
+  '__importStar',
+  '__toESM',
+  '_interopDefault',
+  '_interopDefaultCompat',
+  '_interopNamespace',
+  '_interopNamespaceCompat',
+  '_interopNamespaceDefault',
+  '_interopNamespaceDefaultOnly',
+  '_interopRequireDefault',
+  '_interopRequireWildcard',
+  '_interop_require_default',
+  '_interop_require_wildcard',
+  'interopRequireDefault',
+  'interopRequireWildcard',
+]);
+
+// Parents that use a value on the spot rather than pass it on.
+const consumingParents = new Set([
+  'ExpressionStatement',
+  'VariableDeclarator',
+  'MemberExpression',
+  'UnaryExpression',
+  'BinaryExpression',
+  'LogicalExpression',
+  'IfStatement',
+  'ConditionalExpression',
+  'SwitchStatement',
+  'NewExpression',
+  'TaggedTemplateExpression',
+]);
+
+export function moduleRef(module: string): ApiRef {
+  return { module, path: [] };
+}
+
+export function memberRef(ref: ApiRef, key: string): ApiRef {
+  return { module: ref.module, path: [...ref.path, key] };
+}
+
+export function globalRef(name: string): ApiRef {
+  return { module: '*globals*', path: [name] };
+}
+
+/** True for `globalThis` and its aliases on their own, which say nothing about the API used. */
+export function isGlobalRoot(ref: ApiRef): boolean {
+  return ref.module === '*globals*' && ref.path.every(segment => globalAliases.has(segment));
+}
+
+/** Maps `globalThis.process.env` to `process.env` and `global.Buffer` to `Buffer`. */
+export function normalizeRef(ref: ApiRef): ApiRef {
+  if (ref.module !== '*globals*') {
+    return ref;
+  }
+  let start = 0;
+  while (start < ref.path.length - 1 && globalAliases.has(ref.path[start] ?? '')) {
+    start += 1;
+  }
+  const path = ref.path.slice(start);
+  return path[0] === 'process'
+    ? { module: 'process', path: path.slice(1) }
+    : { module: '*globals*', path };
+}
+
+export function displayRef(ref: ApiRef): string {
+  const normalized = normalizeRef(ref);
+  return displayApi(normalized.module, normalized.path);
+}
+
+export function isInteropHelper(callee: Node): boolean {
+  if (callee.type === 'Identifier') {
+    return interopHelpers.has(callee.name);
+  }
+  if (callee.type === 'MemberExpression' && !callee.computed) {
+    return interopHelpers.has(callee.property.name);
+  }
+  if (callee.type === 'ParenthesizedExpression') {
+    return isInteropHelper(callee.expression);
+  }
+  if (callee.type === 'SequenceExpression') {
+    const last = callee.expressions.at(-1);
+    return last !== undefined && isInteropHelper(last);
+  }
+  return false;
+}
+
+const thisBinders = new Set(['apply', 'bind', 'call']);
+
+/** `fn.call(util, ...)` only sets `this`; the module's other members stay out of reach. */
+function isThisArgument(node: Node, call: Node): boolean {
+  return (
+    call.type === 'CallExpression' &&
+    call.arguments[0] === node &&
+    call.callee.type === 'MemberExpression' &&
+    !call.callee.computed &&
+    thisBinders.has(call.callee.property.name)
+  );
+}
+
+/** Whether a value flows somewhere edgefit does not follow, such as a call argument or a return. */
+export function escapes(node: Node, parent: Node): boolean {
+  if (parent.type === 'CallExpression') {
+    return parent.callee !== node && !isThisArgument(node, parent);
+  }
+  return !consumingParents.has(parent.type);
+}
+
+/** `typeof x.y` and `'y' in x` test for an API rather than use it. */
+export function isFeatureCheck(node: Node, parent: Node): boolean {
+  if (parent.type === 'UnaryExpression') {
+    return parent.operator === 'typeof';
+  }
+  return parent.type === 'BinaryExpression' && parent.operator === 'in' && parent.right === node;
+}

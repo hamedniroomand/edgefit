@@ -1,0 +1,561 @@
+{
+  "description": "APIs that exist on workerd but throw or silently do nothing when called. The compatibility matrix only records whether an API exists, so it reports these as supported. Curated by reading the workerd sources at the release the matrix was generated with.",
+  "modules": {
+    "child_process": {
+      "status": "unsupported",
+      "note": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes",
+      "source": "child_process.ts",
+      "except": []
+    },
+    "readline": {
+      "status": "mocked",
+      "note": "readline functions are no-ops and createInterface returns an interface that never emits input",
+      "source": "readline.ts",
+      "except": []
+    },
+    "readline/promises": {
+      "status": "mocked",
+      "note": "readline functions are no-ops and createInterface returns an interface that never emits input",
+      "source": "readline/promises.ts",
+      "except": []
+    },
+    "dgram": {
+      "status": "mocked",
+      "note": "dgram sockets accept calls but never send or receive; bind, connect and send are no-ops",
+      "source": "dgram.ts",
+      "except": []
+    }
+  },
+  "apis": {
+    "fs.watch": {
+      "status": "unsupported",
+      "note": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION",
+      "source": "internal/internal_fs_callback.ts"
+    },
+    "fs.watchFile": {
+      "status": "unsupported",
+      "note": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION",
+      "source": "internal/internal_fs_callback.ts"
+    },
+    "fs.unwatchFile": {
+      "status": "unsupported",
+      "note": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION",
+      "source": "internal/internal_fs_callback.ts"
+    },
+    "fs.promises.watch": {
+      "status": "unsupported",
+      "note": "file watching is not implemented; throws",
+      "source": "internal/internal_fs_promises.ts"
+    },
+    "fs/promises.watch": {
+      "status": "unsupported",
+      "note": "file watching is not implemented; throws",
+      "source": "internal/internal_fs_promises.ts"
+    },
+    "net.createServer": {
+      "status": "unsupported",
+      "note": "Workers cannot listen on sockets; throws",
+      "source": "internal/internal_net.ts"
+    },
+    "net.Server": {
+      "status": "unsupported",
+      "note": "Workers cannot listen on sockets; throws",
+      "source": "internal/internal_net.ts"
+    },
+    "tls.createServer": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_tls.ts"
+    },
+    "tls.Server": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_tls.ts"
+    },
+    "tls.createSecurePair": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "tls.ts"
+    },
+    "http.setMaxIdleHTTPParsers": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "http.ts"
+    },
+    "http2.connect": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "http2.ts"
+    },
+    "http2.createServer": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "http2.ts"
+    },
+    "http2.createSecureServer": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "http2.ts"
+    },
+    "http2.performServerHandshake": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "http2.ts"
+    },
+    "dns.lookupService": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_dns.ts"
+    },
+    "dns.resolveAny": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_dns.ts"
+    },
+    "dns.setServers": {
+      "status": "unsupported",
+      "note": "throws Not implemented; DNS servers cannot be configured on Workers",
+      "source": "internal/internal_dns.ts"
+    },
+    "dns.promises.lookupService": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_dns.ts"
+    },
+    "dns.promises.resolveAny": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_dns.ts"
+    },
+    "dns.promises.setServers": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_dns.ts"
+    },
+    "dns/promises.lookupService": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_dns.ts"
+    },
+    "dns/promises.resolveAny": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_dns.ts"
+    },
+    "dns/promises.setServers": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_dns.ts"
+    },
+    "crypto.createCipher": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED; use createCipheriv",
+      "source": "crypto.ts"
+    },
+    "crypto.createDecipher": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED; use createDecipheriv",
+      "source": "crypto.ts"
+    },
+    "crypto.setEngine": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "crypto.ts"
+    },
+    "crypto.setFips": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "crypto.ts"
+    },
+    "util.parseArgs": {
+      "status": "unsupported",
+      "note": "throws node:util parseArgs is not implemented",
+      "source": "util.ts"
+    },
+    "util.transferableAbortController": {
+      "status": "unsupported",
+      "note": "throws not implemented",
+      "source": "util.ts"
+    },
+    "util.transferableAbortSignal": {
+      "status": "unsupported",
+      "note": "throws not implemented",
+      "source": "util.ts"
+    },
+    "util.getSystemErrorMap": {
+      "status": "unsupported",
+      "note": "throws not implemented",
+      "source": "util.ts"
+    },
+    "util.getSystemErrorName": {
+      "status": "unsupported",
+      "note": "throws not implemented",
+      "source": "util.ts"
+    },
+    "util.getSystemErrorMessage": {
+      "status": "unsupported",
+      "note": "throws not implemented",
+      "source": "util.ts"
+    },
+    "util._errnoException": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "util.ts"
+    },
+    "util._exceptionWithHostPort": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "util.ts"
+    },
+    "timers.enroll": {
+      "status": "unsupported",
+      "note": "throws Not implemented; use setTimeout",
+      "source": "internal/internal_timers.ts"
+    },
+    "perf_hooks.createHistogram": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "perf_hooks.ts"
+    },
+    "perf_hooks.monitorEventLoopDelay": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "perf_hooks.ts"
+    },
+    "console.Console": {
+      "status": "unsupported",
+      "note": "the Console constructor throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "console.ts"
+    },
+    "module.register": {
+      "status": "unsupported",
+      "note": "module hooks are not available; throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module.registerHooks": {
+      "status": "unsupported",
+      "note": "module hooks are not available; throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module.runMain": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module.syncBuiltinESMExports": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module.wrap": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module.findSourceMap": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module.findPackageJSON": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module.setSourceMapsSupport": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module.stripTypeScriptTypes": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module.SourceMap": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module.Module": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module._load": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module._resolveFilename": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module._findPath": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module._nodeModulePaths": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "module._initPaths": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "module.ts"
+    },
+    "process.binding": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process._linkedBinding": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process.dlopen": {
+      "status": "unsupported",
+      "note": "native addons cannot load on Workers; throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process.kill": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process._kill": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process.execve": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process.cpuUsage": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process.threadCpuUsage": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process.getActiveResourcesInfo": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process.permission.has": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process.report.writeReport": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process.finalization.register": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "process.finalization.unregister": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "internal/public_process.ts"
+    },
+    "cluster.fork": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "cluster.ts"
+    },
+    "cluster.disconnect": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "cluster.ts"
+    },
+    "cluster.setupPrimary": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "cluster.ts"
+    },
+    "cluster.setupMaster": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "cluster.ts"
+    },
+    "worker_threads.Worker": {
+      "status": "unsupported",
+      "note": "the Worker constructor throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "worker_threads.ts"
+    },
+    "worker_threads.BroadcastChannel": {
+      "status": "unsupported",
+      "note": "the BroadcastChannel constructor throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "worker_threads.ts"
+    },
+    "vm.compileFunction": {
+      "status": "unsupported",
+      "note": "code generation from strings is not allowed; throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "vm.ts"
+    },
+    "vm.measureMemory": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "vm.ts"
+    },
+    "vm.runInThisContext": {
+      "status": "unsupported",
+      "note": "code generation from strings is not allowed; throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "vm.ts"
+    },
+    "vm.runInContext": {
+      "status": "unsupported",
+      "note": "code generation from strings is not allowed; throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "vm.ts"
+    },
+    "vm.runInNewContext": {
+      "status": "unsupported",
+      "note": "code generation from strings is not allowed; throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "vm.ts"
+    },
+    "vm.Script": {
+      "status": "unsupported",
+      "note": "a Script can be created but every run method throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "vm.ts"
+    },
+    "vm.createScript": {
+      "status": "unsupported",
+      "note": "a Script can be created but every run method throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "vm.ts"
+    },
+    "v8.serialize": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.deserialize": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.Serializer": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.Deserializer": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.DefaultSerializer": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.DefaultDeserializer": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.writeHeapSnapshot": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.getHeapSnapshot": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.setFlagsFromString": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.setHeapSnapshotNearHeapLimit": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.isStringOneByteRepresentation": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.queryObjects": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.takeCoverage": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.stopCoverage": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.GCProfiler": {
+      "status": "unsupported",
+      "note": "start and stop throw ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "v8.promiseHooks": {
+      "status": "unsupported",
+      "note": "every promiseHooks function throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "v8.ts"
+    },
+    "inspector.open": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "inspector.ts"
+    },
+    "inspector.close": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "inspector.ts"
+    },
+    "inspector.url": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "inspector.ts"
+    },
+    "inspector.waitForDebugger": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "inspector.ts"
+    },
+    "inspector.Session": {
+      "status": "unsupported",
+      "note": "connect and post throw ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "inspector.ts"
+    },
+    "repl.start": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "repl.ts"
+    },
+    "repl.REPLServer": {
+      "status": "unsupported",
+      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "repl.ts"
+    },
+    "wasi.WASI": {
+      "status": "unsupported",
+      "note": "the WASI constructor throws ERR_METHOD_NOT_IMPLEMENTED",
+      "source": "wasi.ts"
+    }
+  }
+}

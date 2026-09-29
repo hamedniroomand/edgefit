@@ -1,0 +1,109 @@
+import type { Node } from 'oxc-parser';
+
+import { childNodes } from './ast.ts';
+
+const functionTypes = new Set([
+  'FunctionDeclaration',
+  'FunctionExpression',
+  'ArrowFunctionExpression',
+]);
+
+export function patternNames(pattern: Node | null | undefined, names: string[] = []): string[] {
+  if (pattern === null || pattern === undefined) {
+    return names;
+  }
+  if (pattern.type === 'Identifier') {
+    names.push(pattern.name);
+  } else if (pattern.type === 'ObjectPattern') {
+    for (const property of pattern.properties) {
+      patternNames(property.type === 'RestElement' ? property.argument : property.value, names);
+    }
+  } else if (pattern.type === 'ArrayPattern') {
+    for (const element of pattern.elements) {
+      patternNames(element, names);
+    }
+  } else if (pattern.type === 'RestElement') {
+    patternNames(pattern.argument, names);
+  } else if (pattern.type === 'AssignmentPattern') {
+    patternNames(pattern.left, names);
+  } else if (pattern.type === 'TSParameterProperty') {
+    patternNames(pattern.parameter, names);
+  }
+  return names;
+}
+
+function isStatementLike(node: Node): boolean {
+  return (
+    node.type.endsWith('Statement') ||
+    node.type.endsWith('Declaration') ||
+    node.type === 'SwitchCase' ||
+    node.type === 'CatchClause'
+  );
+}
+
+/** `var` names hoisted to the enclosing function, without entering nested functions or classes. */
+export function collectVarNames(node: Node | null | undefined, names: string[]): string[] {
+  if (node === null || node === undefined) {
+    return names;
+  }
+  if (node.type === 'VariableDeclaration') {
+    if (node.kind === 'var') {
+      for (const declarator of node.declarations) {
+        patternNames(declarator.id, names);
+      }
+    }
+    return names;
+  }
+  if (node.type === 'ExportNamedDeclaration') {
+    return collectVarNames(node.declaration, names);
+  }
+  if (functionTypes.has(node.type) || node.type.startsWith('Class') || !isStatementLike(node)) {
+    return names;
+  }
+  for (const child of childNodes(node)) {
+    collectVarNames(child, names);
+  }
+  return names;
+}
+
+function declaredName(declaration: Node): string[] {
+  if (declaration.type === 'VariableDeclaration') {
+    return declaration.kind === 'var'
+      ? []
+      : declaration.declarations.flatMap(declarator => patternNames(declarator.id));
+  }
+  if (
+    declaration.type === 'FunctionDeclaration' ||
+    declaration.type === 'ClassDeclaration' ||
+    declaration.type === 'TSEnumDeclaration' ||
+    declaration.type === 'TSImportEqualsDeclaration'
+  ) {
+    return declaration.id === null ? [] : [declaration.id.name];
+  }
+  if (declaration.type === 'TSModuleDeclaration' && declaration.id.type === 'Identifier') {
+    return [declaration.id.name];
+  }
+  return [];
+}
+
+/** Names declared with `let`, `const`, `class` or `function` directly in a block. */
+export function collectLexicalNames(statements: readonly Node[], names: string[] = []): string[] {
+  for (const statement of statements) {
+    const declaration =
+      statement.type === 'ExportNamedDeclaration' || statement.type === 'ExportDefaultDeclaration'
+        ? statement.declaration
+        : statement;
+    if (declaration !== null) {
+      names.push(...declaredName(declaration));
+    }
+  }
+  return names;
+}
+
+export function collectBlockNames(statements: readonly Node[]): string[] {
+  const names: string[] = [];
+  for (const statement of statements) {
+    collectVarNames(statement, names);
+  }
+  return collectLexicalNames(statements, names);
+}

@@ -1,0 +1,6 @@
+{
+  "name": "fixture-bun-app",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.2.0"
+}

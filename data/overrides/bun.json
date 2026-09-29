@@ -1,0 +1,311 @@
+{
+  "description": "APIs that exist on Bun but throw or silently do nothing when called, and matrix differences that are values rather than behavior. The compatibility matrix only records whether an API exists. Curated by reading Bun's Node compatibility docs and sources at the release the matrix was generated with.",
+  "modules": {
+    "child_process": {
+      "status": "supported",
+      "note": "documented as implemented; the compatibility matrix does not cover node:child_process",
+      "source": "docs/runtime/nodejs-compat.mdx",
+      "except": []
+    },
+    "punycode": {
+      "status": "supported",
+      "note": "documented as implemented; the compatibility matrix does not cover node:punycode",
+      "source": "docs/runtime/nodejs-compat.mdx",
+      "except": []
+    },
+    "readline": {
+      "status": "supported",
+      "note": "documented as implemented; the compatibility matrix does not cover node:readline",
+      "source": "docs/runtime/nodejs-compat.mdx",
+      "except": []
+    },
+    "readline/promises": {
+      "status": "supported",
+      "note": "documented as implemented; the compatibility matrix does not cover node:readline/promises",
+      "source": "docs/runtime/nodejs-compat.mdx",
+      "except": []
+    },
+    "tty": {
+      "status": "supported",
+      "note": "documented as implemented; the compatibility matrix does not cover node:tty",
+      "source": "docs/runtime/nodejs-compat.mdx",
+      "except": []
+    },
+    "vm": {
+      "status": "supported",
+      "note": "documented as implemented; the compatibility matrix does not cover node:vm",
+      "source": "docs/runtime/nodejs-compat.mdx",
+      "except": []
+    },
+    "worker_threads": {
+      "status": "supported",
+      "note": "documented as implemented; the compatibility matrix does not cover node:worker_threads",
+      "source": "docs/runtime/nodejs-compat.mdx",
+      "except": []
+    },
+    "repl": {
+      "status": "unsupported",
+      "note": "node:repl is a stub: repl.start does not exist and the other members throws a NotImplementedError",
+      "source": "src/js/node/repl.ts",
+      "except": ["builtinModules"]
+    },
+    "trace_events": {
+      "status": "mocked",
+      "note": "is a stub: createTracing returns an object without enable or disable, and getEnabledCategories always returns an empty string",
+      "source": "src/js/node/trace_events.ts",
+      "except": []
+    }
+  },
+  "apis": {
+    "async_hooks.createHook": {
+      "status": "mocked",
+      "note": "hooks can be created and enabled but are never called",
+      "source": "src/js/node/async_hooks.ts"
+    },
+    "async_hooks.executionAsyncId": {
+      "status": "mocked",
+      "note": "always returns 0",
+      "source": "src/js/node/async_hooks.ts"
+    },
+    "async_hooks.triggerAsyncId": {
+      "status": "mocked",
+      "note": "always returns 0",
+      "source": "src/js/node/async_hooks.ts"
+    },
+    "async_hooks.executionAsyncResource": {
+      "status": "mocked",
+      "note": "always returns process.stdin",
+      "source": "src/js/node/async_hooks.ts"
+    },
+    "v8.cachedDataVersionTag": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.getHeapSpaceStatistics": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.getHeapCodeStatistics": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.setFlagsFromString": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.takeCoverage": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.stopCoverage": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.setHeapSnapshotNearHeapLimit": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.promiseHooks": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.startupSnapshot": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.Serializer": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.Deserializer": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.DefaultSerializer": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.DefaultDeserializer": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.GCProfiler": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.serialize": {
+      "status": "mismatch",
+      "note": "uses JavaScriptCore's serialization format, so data is not interchangeable with Node's",
+      "source": "src/js/node/v8.ts"
+    },
+    "v8.deserialize": {
+      "status": "mismatch",
+      "note": "uses JavaScriptCore's serialization format, so data is not interchangeable with Node's",
+      "source": "src/js/node/v8.ts"
+    },
+    "inspector.open": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/inspector.ts"
+    },
+    "inspector.close": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/inspector.ts"
+    },
+    "inspector.waitForDebugger": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/inspector.ts"
+    },
+    "inspector.url": {
+      "status": "mocked",
+      "note": "always returns undefined",
+      "source": "src/js/node/inspector.ts"
+    },
+    "inspector/promises.open": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/inspector.ts"
+    },
+    "inspector/promises.close": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/inspector.ts"
+    },
+    "inspector/promises.waitForDebugger": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/inspector.ts"
+    },
+    "inspector/promises.url": {
+      "status": "mocked",
+      "note": "always returns undefined",
+      "source": "src/js/node/inspector.ts"
+    },
+    "test.run": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError; use bun:test",
+      "source": "src/js/node/test.ts"
+    },
+    "test.mock": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError; use bun:test",
+      "source": "src/js/node/test.ts"
+    },
+    "test.snapshot": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError; use bun:test",
+      "source": "src/js/node/test.ts"
+    },
+    "timers.active": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError unless passed a timer from setTimeout or setInterval; legacy timer objects are not supported",
+      "source": "src/js/node/timers.ts"
+    },
+    "timers.enroll": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError unless passed a timer from setTimeout or setInterval; legacy timer objects are not supported",
+      "source": "src/js/node/timers.ts"
+    },
+    "timers.unenroll": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError unless passed a timer from setTimeout or setInterval; legacy timer objects are not supported",
+      "source": "src/js/node/timers.ts"
+    },
+    "vm.measureMemory": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/vm.ts"
+    },
+    "worker_threads.markAsUntransferable": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/worker_threads.ts"
+    },
+    "worker_threads.moveMessagePortToContext": {
+      "status": "unsupported",
+      "note": "throws a NotImplementedError",
+      "source": "src/js/node/worker_threads.ts"
+    },
+    "module.register": {
+      "status": "mocked",
+      "note": "does nothing; use Bun.plugin for loader hooks",
+      "source": "src/bun.js/modules/NodeModuleModule.cpp"
+    },
+    "module.syncBuiltinESMExports": {
+      "status": "mocked",
+      "note": "does nothing",
+      "source": "src/bun.js/modules/NodeModuleModule.cpp"
+    },
+    "process.getActiveResourcesInfo": {
+      "status": "mocked",
+      "note": "always returns an empty array",
+      "source": "src/bun.js/bindings/BunProcess.cpp"
+    },
+    "process._getActiveHandles": {
+      "status": "mocked",
+      "note": "always returns an empty array",
+      "source": "src/bun.js/bindings/BunProcess.cpp"
+    },
+    "process._getActiveRequests": {
+      "status": "mocked",
+      "note": "always returns an empty array",
+      "source": "src/bun.js/bindings/BunProcess.cpp"
+    },
+    "process.config": {
+      "status": "supported",
+      "note": "holds Node's build configuration; its keys are values, not APIs",
+      "source": "docs/runtime/nodejs-compat.mdx"
+    },
+    "process.versions": {
+      "status": "supported",
+      "note": "lists the versions of Node's bundled dependencies, which Bun does not ship",
+      "source": "docs/runtime/nodejs-compat.mdx"
+    },
+    "process.release": {
+      "status": "supported",
+      "note": "release.lts is undefined on non-LTS Node releases too",
+      "source": "docs/runtime/nodejs-compat.mdx"
+    },
+    "process.report.excludeEnv": {
+      "status": "supported",
+      "note": "a setting whose value type differs, not an API",
+      "source": "docs/runtime/nodejs-compat.mdx"
+    },
+    "process.stdin": {
+      "status": "supported",
+      "note": "the matrix recorded Node's stdio as sockets; Bun's are plain streams, so only socket-specific members differ",
+      "source": "docs/runtime/nodejs-compat.mdx"
+    },
+    "process.stdout": {
+      "status": "supported",
+      "note": "the matrix recorded Node's stdio as sockets; Bun's are plain streams, so only socket-specific members differ",
+      "source": "docs/runtime/nodejs-compat.mdx"
+    },
+    "process.stderr": {
+      "status": "supported",
+      "note": "the matrix recorded Node's stdio as sockets; Bun's are plain streams, so only socket-specific members differ",
+      "source": "docs/runtime/nodejs-compat.mdx"
+    },
+    "async_hooks.asyncWrapProviders": {
+      "status": "supported",
+      "note": "internal provider type constants, which differ with each runtime's resources",
+      "source": "docs/runtime/nodejs-compat.mdx"
+    }
+  }
+}
