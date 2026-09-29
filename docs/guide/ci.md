@@ -56,6 +56,7 @@ A comment is only created once there is something new or fixed. On a quiet pull 
 
 ### Good to know
 
+- The action also works on `push`, where it compares with the commit before the push, and on manual or scheduled runs, where every finding counts as new. Only pull requests get a comment. See [Other events](/reference/action#other-events).
 - Pull requests from forks get a read-only token. They still get annotations, but no comment.
 - If the base cannot be checked, for example because edgefit is being set up in this very pull request, every finding counts as new and the action logs a warning.
 - `fetch-depth: 0` is optional. Without it, the action fetches the history it needs itself.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2
+
+The GitHub Action works outside pull requests.
+
+### Fixed
+
+- The GitHub Action no longer fails on events other than `pull_request`. On a `push` it compares with the commit before the push, and on a manual or scheduled run, or a push that creates a branch, every finding counts as new. Only pull requests get a comment; every event gets annotations and a job summary.
+
 ## 0.3.1
 
 A fix for false errors on projects without `nodejs_compat`, and documentation.
