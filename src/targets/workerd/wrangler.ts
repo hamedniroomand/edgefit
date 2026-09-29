@@ -14,8 +14,39 @@ export interface WranglerConfig {
 
 const configNames = ['wrangler.jsonc', 'wrangler.json', 'wrangler.toml'];
 
+const redirectFile = path.join('.wrangler', 'deploy', 'config.json');
+
+/**
+ * The config a build wrote for deploying, which `.wrangler/deploy/config.json` points to. Wrangler
+ * prefers it to the project's own, and Nitro 3 writes one instead of a config in the root.
+ */
+function redirectedConfig(root: string): string | undefined {
+  const file = path.join(root, redirectFile);
+  if (!existsSync(file)) {
+    return undefined;
+  }
+  try {
+    const { configPath } = JSON.parse(readFileSync(file, 'utf8')) as { configPath?: unknown };
+    const target =
+      typeof configPath === 'string' ? path.resolve(path.dirname(file), configPath) : '';
+    return existsSync(target) ? target : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export function findWranglerConfig(root: string): string | undefined {
-  return configNames.map(name => path.join(root, name)).find(file => existsSync(file));
+  return (
+    redirectedConfig(root) ??
+    configNames.map(name => path.join(root, name)).find(file => existsSync(file))
+  );
+}
+
+/** `main` as a path from the root. Wrangler reads it relative to the config it is written in. */
+export function mainFrom(root: string, config: WranglerConfig): string | undefined {
+  return config.main === undefined
+    ? undefined
+    : path.relative(root, path.resolve(path.dirname(config.file), config.main));
 }
 
 export function readWranglerConfig(file: string): WranglerConfig {
