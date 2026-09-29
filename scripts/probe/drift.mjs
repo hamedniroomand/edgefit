@@ -33,7 +33,10 @@ function collect(base, target, path, overrides, found) {
     return;
   }
   for (const key of Object.keys(base)) {
-    const skip = key === '*self*' || (path.join('.') === '*globals*' && GLOBAL_ALIASES.has(key));
+    // `module.default` mirrors the module's own members, so listing it repeats every one.
+    const mirror = key === 'default' && path.length === 1 && path[0] !== '*globals*';
+    const skip =
+      key === '*self*' || mirror || (path.join('.') === '*globals*' && GLOBAL_ALIASES.has(key));
     if (!skip) {
       collect(base[key], child(target, key), [...path, key], overrides, found);
     }
@@ -80,6 +83,32 @@ export function driftFor({ runtime, pinned, latest, outcomes, mocked, overrides 
 export const hasDrift = drift =>
   drift.nowPresent.length + drift.stubsNowWork.length + drift.mocksImplemented.length > 0;
 
+const SHOWN_PER_MODULE = 12;
+
+/** `constants.ENGINE_METHOD_ALL` belongs to `constants`, and `*globals*.crypto.x` to `globals`. */
+function moduleOf(api) {
+  const [module, ...rest] = api.split('.');
+  return module === '*globals*'
+    ? { name: 'globals', member: rest.join('.') }
+    : { name: module, member: rest.join('.') || module };
+}
+
+/** One line per module, so a runtime that gained dozens of constants stays readable. */
+function groupedList(title, apis) {
+  const groups = new Map();
+  for (const api of apis) {
+    const { name, member } = moduleOf(api);
+    groups.set(name, [...(groups.get(name) ?? []), member]);
+  }
+  const lines = [...groups].map(([name, members]) => {
+    const shown = members.slice(0, SHOWN_PER_MODULE).map(member => `\`${member}\``);
+    const more =
+      members.length > SHOWN_PER_MODULE ? `, and ${members.length - SHOWN_PER_MODULE} more` : '';
+    return `- **${name}** (${members.length}): ${shown.join(', ')}${more}`;
+  });
+  return apis.length > 0 ? [`**${title}**`, ...lines, ''] : [];
+}
+
 const list = (title, apis) =>
   apis.length > 0 ? [`**${title}**`, ...apis.map(api => `- \`${api}\``), ''] : [];
 
@@ -92,7 +121,10 @@ export function renderIssue(drifts) {
   const sections = changed.flatMap(drift => [
     `### ${drift.runtime} (pinned ${drift.pinned}, latest ${drift.latest})`,
     '',
-    ...list('Marked missing in the data, but present in the latest release', drift.nowPresent),
+    ...groupedList(
+      'Marked missing in the data, but present in the latest release',
+      drift.nowPresent,
+    ),
     ...list('Curated stubs that now work', drift.stubsNowWork),
     ...list('Mocked entries that are now implemented', drift.mocksImplemented),
   ]);
@@ -101,6 +133,8 @@ export function renderIssue(drifts) {
     'The pinned compatibility data disagrees with the newest release of these runtimes, so some findings may be out of date. This list is refreshed every week, and the issue closes when the data catches up.',
     '',
     ...sections,
+    'The complete lists are in the `drift.json` artifacts of the latest Probe run.',
+    '',
     'To update the data, follow [Bumping a data source](https://hamedniroomand.github.io/edgefit/contributing/data#bumping-a-data-source).',
     '',
   ].join('\n');
