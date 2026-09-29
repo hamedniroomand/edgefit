@@ -16,7 +16,7 @@ Run `edgefit targets` to print this list along with the exact data versions:
 ```
 workerd  Cloudflare Workers
   conditions workerd, worker, browser
-  data workers-nodejs-compat-matrix@ee58120 (workerd 1.20260424.1), curated overrides from https://github.com/cloudflare/workerd/tree/v1.20260424.1/src/node, Web APIs from runtime-compat-data@b964f92 (npm 0.0.5)
+  data workers-nodejs-compat-matrix@ee58120 (workerd 1.20260929.1), curated overrides from https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node, Web APIs from runtime-compat-data@b964f92 (npm 0.0.5)
 ```
 
 ## The layers

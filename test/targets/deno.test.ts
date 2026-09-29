@@ -24,14 +24,19 @@ describe('deno lookups', () => {
     expect(target.lookup({ module: 'v8', path: ['takeCoverage'] })).toEqual({
       status: 'unsupported',
       note: 'throws Not implemented',
-      source: 'https://github.com/denoland/deno/tree/v2.7.13/ext/node/polyfills/v8.ts',
+      source: 'https://github.com/denoland/deno/tree/v2.9.7/ext/node/polyfills/v8.ts',
     });
-    expect(target.lookup({ module: 'v8', path: ['setFlagsFromString'] }).status).toBe('mocked');
+    expect(target.lookup({ module: 'process', path: ['setSourceMapsEnabled'] }).status).toBe(
+      'mocked',
+    );
   });
 
   it('treats implemented modules the matrix does not cover as supported', () => {
     expect(target.lookup({ module: 'child_process', path: ['spawn'] }).status).toBe('supported');
     expect(target.lookup({ module: 'worker_threads', path: ['isInternalThread'] }).status).toBe(
+      'supported',
+    );
+    expect(target.lookup({ module: 'v8', path: ['isStringOneByteRepresentation'] }).status).toBe(
       'unsupported',
     );
   });
@@ -47,21 +52,21 @@ describe('deno target info', () => {
     const { info } = createDenoTarget(fixture('deno-app'));
     expect(info.key).toBe('deno');
     expect(info.data).toBe(
-      'workers-nodejs-compat-matrix@ee58120 (deno 2.7.13), curated overrides from ' +
-        'https://github.com/denoland/deno/tree/v2.7.13/ext/node/polyfills, ' +
+      'workers-nodejs-compat-matrix@ee58120 (deno 2.9.7), curated overrides from ' +
+        'https://github.com/denoland/deno/tree/v2.9.7/ext/node/polyfills, ' +
         'Web APIs from runtime-compat-data@b964f92 (npm 0.0.5)',
     );
     expect(info.conditions).toEqual(['deno', 'node']);
-    expect(info.settings).toBe('Deno 2.7.13, import map from deno.jsonc');
+    expect(info.settings).toBe('Deno 2.9.7, import map from deno.jsonc');
     expect(info.notes).toEqual([]);
   });
 
   it('says when there is no import map', () => {
     expect(createDenoTarget(emptyProject).info.settings).toBe(
-      'Deno 2.7.13, no import map (no deno.json found)',
+      'Deno 2.9.7, no import map (no deno.json found)',
     );
     expect(createDenoTarget(fixture('deno-app'), { configFile: false }).info.settings).toBe(
-      'Deno 2.7.13, no import map (no deno.json found)',
+      'Deno 2.9.7, no import map (no deno.json found)',
     );
   });
 
@@ -72,7 +77,7 @@ describe('deno target info', () => {
     expect(info.data).toContain('and https://github.com/denoland/docs/tree/');
     expect(info.settings).toBe('Deno Deploy on Deno 2.5.0, import map from deno.jsonc');
     expect(info.notes).toEqual([
-      'Deno 2.5.0 is older than the data (2.7.13); APIs added to Deno since then are reported as supported.',
+      'Deno 2.5.0 is older than the data (2.9.7); APIs added to Deno since then are reported as supported.',
     ]);
   });
 });

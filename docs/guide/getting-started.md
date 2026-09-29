@@ -70,8 +70,8 @@ npx edgefit check --entry src/index.ts
 ```
 edgefit · workerd (Cloudflare Workers)
   entry src/index.ts · 5 modules · conditions workerd, worker, browser
-  data workers-nodejs-compat-matrix@ee58120 (workerd 1.20260424.1), ...
-  settings compatibility_date 2026-04-24, flags: nodejs_compat (from wrangler.jsonc)
+  data workers-nodejs-compat-matrix@ee58120 (workerd 1.20260929.1), ...
+  settings compatibility_date 2026-09-29, flags: nodejs_compat (from wrangler.jsonc)
 ```
 
 The header says which target was checked, how many modules were reached, which export conditions were used, which data the results come from, and where the runtime settings were read from.

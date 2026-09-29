@@ -62,7 +62,7 @@ describe('edgefit check on bun', () => {
     expect(await run(['check', '--target', 'bun', '--entry', 'src/index.ts'], io)).toBe(1);
     expect(io.output()).toContain('edgefit · bun (Bun)');
     expect(io.output()).toContain('error    mocked  node:async_hooks.createHook  (bun)');
-    expect(io.output()).toContain('note: Bun 1.2.0 is older than the data (1.3.13)');
+    expect(io.output()).toContain('note: Bun 1.2.0 is older than the data (1.4.2)');
   });
 
   it('checks several targets in one run', async () => {
@@ -81,7 +81,7 @@ describe('edgefit check on deno', () => {
     expect(await run(['check', '--target', 'deno-deploy', '--entry', 'src/main.ts'], io)).toBe(1);
     expect(io.output()).toContain('edgefit · deno-deploy (Deno Deploy)');
     expect(io.output()).toContain('unsupported  node:v8.takeCoverage  (deno-deploy)');
-    expect(io.output()).toContain('note: Deno 2.5.0 is older than the data (2.7.13)');
+    expect(io.output()).toContain('note: Deno 2.5.0 is older than the data (2.9.7)');
   });
 });
 
@@ -105,12 +105,12 @@ describe('edgefit targets and help', () => {
     expect(await run(['targets'], io)).toBe(0);
     expect(io.output()).toContain('workerd  Cloudflare Workers');
     expect(io.output()).toContain('workers-nodejs-compat-matrix@ee58120');
-    expect(io.output()).toContain('overrides/workerd (workerd 1.20260424.1)');
+    expect(io.output()).toContain('overrides/workerd (workerd 1.20260929.1)');
     expect(io.output()).toContain('bun  Bun');
-    expect(io.output()).toContain('overrides/bun (bun 1.3.13)');
+    expect(io.output()).toContain('overrides/bun (bun 1.4.2)');
     expect(io.output()).toContain('deno  Deno');
     expect(io.output()).toContain('deno-deploy  Deno Deploy');
-    expect(io.output()).toContain('overrides/deno (deno 2.7.13)');
+    expect(io.output()).toContain('overrides/deno (deno 2.9.7)');
   });
 
   it('prints help without a command', async () => {

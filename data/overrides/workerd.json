@@ -53,13 +53,13 @@
       "source": "internal/internal_fs_promises.ts"
     },
     "net.createServer": {
-      "status": "unsupported",
-      "note": "Workers cannot listen on sockets; throws",
+      "status": "mismatch",
+      "note": "listen() works only on a port the platform declares for the worker, and other ports fail with EADDRNOTAVAIL",
       "source": "internal/internal_net.ts"
     },
     "net.Server": {
-      "status": "unsupported",
-      "note": "Workers cannot listen on sockets; throws",
+      "status": "mismatch",
+      "note": "listen() works only on a port the platform declares for the worker, and other ports fail with EADDRNOTAVAIL",
       "source": "internal/internal_net.ts"
     },
     "tls.createServer": {
@@ -80,7 +80,8 @@
     "http.setMaxIdleHTTPParsers": {
       "status": "unsupported",
       "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
-      "source": "http.ts"
+      "source": "http.ts",
+      "validatesFirst": true
     },
     "http2.connect": {
       "status": "unsupported",
@@ -105,12 +106,14 @@
     "dns.lookupService": {
       "status": "unsupported",
       "note": "throws Not implemented",
-      "source": "internal/internal_dns.ts"
+      "source": "internal/internal_dns.ts",
+      "validatesFirst": true
     },
     "dns.resolveAny": {
       "status": "unsupported",
       "note": "throws Not implemented",
-      "source": "internal/internal_dns.ts"
+      "source": "internal/internal_dns.ts",
+      "validatesFirst": true
     },
     "dns.setServers": {
       "status": "unsupported",
@@ -405,7 +408,8 @@
     "vm.compileFunction": {
       "status": "unsupported",
       "note": "code generation from strings is not allowed; throws ERR_METHOD_NOT_IMPLEMENTED",
-      "source": "vm.ts"
+      "source": "vm.ts",
+      "validatesFirst": true
     },
     "vm.measureMemory": {
       "status": "unsupported",
@@ -420,7 +424,8 @@
     "vm.runInContext": {
       "status": "unsupported",
       "note": "code generation from strings is not allowed; throws ERR_METHOD_NOT_IMPLEMENTED",
-      "source": "vm.ts"
+      "source": "vm.ts",
+      "validatesFirst": true
     },
     "vm.runInNewContext": {
       "status": "unsupported",
@@ -480,22 +485,26 @@
     "v8.setFlagsFromString": {
       "status": "unsupported",
       "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
-      "source": "v8.ts"
+      "source": "v8.ts",
+      "validatesFirst": true
     },
     "v8.setHeapSnapshotNearHeapLimit": {
       "status": "unsupported",
       "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
-      "source": "v8.ts"
+      "source": "v8.ts",
+      "validatesFirst": true
     },
     "v8.isStringOneByteRepresentation": {
       "status": "unsupported",
       "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
-      "source": "v8.ts"
+      "source": "v8.ts",
+      "validatesFirst": true
     },
     "v8.queryObjects": {
       "status": "unsupported",
       "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
-      "source": "v8.ts"
+      "source": "v8.ts",
+      "validatesFirst": true
     },
     "v8.takeCoverage": {
       "status": "unsupported",
@@ -518,23 +527,23 @@
       "source": "v8.ts"
     },
     "inspector.open": {
-      "status": "unsupported",
-      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "status": "mocked",
+      "note": "does nothing and returns a disposable that does nothing",
       "source": "inspector.ts"
     },
     "inspector.close": {
-      "status": "unsupported",
-      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "status": "mocked",
+      "note": "does nothing",
       "source": "inspector.ts"
     },
     "inspector.url": {
-      "status": "unsupported",
-      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "status": "mocked",
+      "note": "always returns undefined",
       "source": "inspector.ts"
     },
     "inspector.waitForDebugger": {
-      "status": "unsupported",
-      "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
+      "status": "mocked",
+      "note": "returns at once without waiting for a debugger",
       "source": "inspector.ts"
     },
     "inspector.Session": {

@@ -19,7 +19,7 @@ A build can leave a deploy config for wrangler to use instead: `.wrangler/deploy
 The report header shows where the settings came from:
 
 ```
-settings compatibility_date 2026-04-24, flags: nodejs_compat (from wrangler.jsonc)
+settings compatibility_date 2026-09-29, flags: nodejs_compat (from wrangler.jsonc)
 ```
 
 Without a wrangler config, edgefit uses the settings the compatibility data was generated with (its date and `nodejs_compat`), and says so in a note in the report and in the JSON `notes`. A wrangler config that has no `compatibility_flags` enables none, as on Workers. One with no `compatibility_date` gets the data's date, with a note. You can override any of this in the [config file](/guide/configuration#cloudflare-workers).
@@ -32,7 +32,7 @@ A module that is not native at your date and flags is reported as `mocked`, beca
 
 ## What the data covers
 
-- **Node API data** from workers-nodejs-compat-matrix, generated with workerd `1.20260424.1`.
+- **Node API data** from workers-nodejs-compat-matrix, generated with workerd `1.20260929.1`.
 - **Curated overrides** for APIs that the matrix reports as present but that throw or do nothing when called. Some examples:
 
 | API                    | Result        | Why                                                                 |

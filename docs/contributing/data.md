@@ -44,6 +44,7 @@ The matrix only records whether an API exists. Override files record what happen
 - `status` is `unsupported`, `mocked`, `mismatch` or `supported`.
 - `note` is the detail line users see. Say what happens, in plain words.
 - `source` is a path relative to the source URL in `source.json`, pinned to the runtime version. It becomes the `see` link in reports.
+- `validatesFirst` (optional) marks a stub that checks its arguments before it throws, as workerd's `vm.compileFunction` does. The runtime probe then does not take an argument error for a working implementation.
 
 ### Adding or changing an entry
 
@@ -88,7 +89,12 @@ The probe code is in `scripts/probe`.
 
 ## Bumping a data source
 
-1. Replace the vendored files with the new release.
-2. Update the version, commit and date in `source.json`.
-3. Update the override files' source URLs to the new tag, and review every entry against the new source. A pinned probe run on the new version shows which ones changed.
-4. Run the tests and compare results on the fixture projects. Explain every change in the pull request.
+The matrix provider's repository may lag behind the runtimes. Check its newest commit first: if it has newer dumps, vendor those. If it does not, regenerate the runtime dumps with its own scripts, at the commit `source.json` names:
+
+1. Clone the provider at that commit. Its `node/dump.mjs`, `bun/dump.js`, `deno/dump.js` and `workerd/dump.mjs` write `data/<runtime>.json`. The Node baseline stays as it is.
+2. Run each script with the release you want: `bun run bun/dump.js`, `deno run --allow-write=./data/deno.json --allow-read --allow-env --allow-sys deno/dump.js` (Deno 2.9 needs `--allow-sys`), and `node workerd/dump.mjs <date>` after installing that `workerd` version, where `<date>` is the release's date.
+3. Copy the dumps to `data/workers-nodejs-compat-matrix`, keeping the file formatting.
+4. In `source.json`, update `generatedAt`, the runtime versions, the workerd compatibility date, and the override sources' tags. Say in `note` how the data was generated.
+5. Check that every override `source` still exists at the new tag. Files move: Bun's `src/bun.js` became `src/jsc`.
+6. Review every override against the new source, and run a `pinned` probe on the new versions (see below). It lists overrides that no longer match. A stub that now works is removed, and one that changed is corrected. A stub that validates its arguments before it throws gets `"validatesFirst": true`, so the probe does not read its argument error as a working implementation.
+7. Run the tests and compare results on the fixture projects. Explain every change in the pull request.
