@@ -242,6 +242,11 @@ body {
   font-size: 24px;
 }
 
+.VPHomeContent.vp-doc h2 .header-anchor {
+  /* The default offsets the anchor by the heading's padding, which the home page removes. */
+  top: 0;
+}
+
 .VPHomeContent.vp-doc div[class*='language-'] {
   background: var(--vp-c-bg);
   box-shadow: var(--ef-shadow-panel);
