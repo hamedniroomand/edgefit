@@ -63,7 +63,7 @@ runs:
 
     - name: Restore the base report
       id: cache
-      uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/edgefit/base.json
         key: ${{ steps.base.outputs.cache-key }}
@@ -92,7 +92,7 @@ runs:
 
     - name: Save the base report
       if: steps.cache.outputs.cache-hit != 'true' && steps.base-check.outputs.empty != 'true'
-      uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/edgefit/base.json
         key: ${{ steps.base.outputs.cache-key }}
@@ -117,7 +117,7 @@ runs:
         node "$EDGEFIT" diff base.json head.json --fail-on never --no-color | tee diff.txt
 
     - name: Comment on the pull request
-      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
       env:
         # One comment per project and targets, found again by this marker on later pushes.
         MARKER: '<!-- edgefit ${{ inputs.working-directory }} ${{ inputs.targets }} -->'
