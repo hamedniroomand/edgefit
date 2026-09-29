@@ -8,7 +8,7 @@ npx edgefit check --target deno --entry main.ts
 
 ## What the data covers
 
-- **Node API data** is the compatibility matrix's Deno `2.7.13` dump, compared with the same Node baseline.
+- **Node API data** is the compatibility matrix's Deno `2.9.7` dump, compared with the same Node baseline.
 - **Curated overrides** are read from Deno's `ext/node` polyfills at the same version. They cover stubs that call `notImplemented`, such as `v8.takeCoverage` and `cluster.fork`, and exports Deno lacks in modules the matrix does not cover, such as `child_process` and `worker_threads`.
 
 ## Import maps and specifiers

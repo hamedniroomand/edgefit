@@ -121,6 +121,7 @@ export default defineConfig({
             link('folder-git-2', 'Development setup', '/contributing/'),
             link('network', 'Architecture', '/contributing/architecture'),
             link('flask-conical', 'Compatibility data', '/contributing/data'),
+            link('search', 'Keeping the data current', '/contributing/maintenance'),
             link('rocket', 'Releasing', '/contributing/releasing'),
           ],
         },

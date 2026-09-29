@@ -16,18 +16,24 @@ function lookupGlobal(path) {
   return { owner, member };
 }
 
-/** Resolves the module namespace, then each path segment, returning the member and its owner. */
-async function lookup(api) {
+const loadNodeModule = name => import(/* @vite-ignore */ `node:${name}`);
+
+/**
+ * Resolves the module namespace, then each path segment, returning the member and its owner.
+ * The data records a module's named exports and its `default` separately, so an `exact` lookup
+ * does not fall back to `default` for a name the namespace lacks.
+ */
+async function lookup(api, { exact, load }) {
   const [module, ...path] = api.split('.');
   if (module === '*globals*') {
     return lookupGlobal(path);
   }
-  const namespace = await import(/* @vite-ignore */ `node:${module}`);
+  const namespace = await load(module);
   if (path.length === 0) {
     return { owner: namespace, member: namespace };
   }
   let owner = namespace;
-  let member = namespace[path[0]] ?? namespace.default?.[path[0]];
+  let member = exact ? namespace[path[0]] : (namespace[path[0]] ?? namespace.default?.[path[0]]);
   for (const key of path.slice(1)) {
     owner = member;
     member = member[key];
@@ -56,10 +62,10 @@ function isClass(member, kind) {
   return kind === 'class' || /^class\b/u.test(Function.prototype.toString.call(member));
 }
 
-export async function probeApi({ api, kind, lookup: lookupOnly = false }) {
+export async function probeApi({ api, kind, lookup: lookupOnly = false }, load = loadNodeModule) {
   let found;
   try {
-    found = await lookup(api);
+    found = await lookup(api, { exact: lookupOnly, load });
   } catch {
     return 'missing';
   }

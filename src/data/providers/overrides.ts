@@ -12,6 +12,8 @@ interface OverrideEntry {
   source: string;
   /** Members of an overridden module that work. */
   except?: string[];
+  /** The stub checks its arguments before it throws, which the runtime probe knows about. */
+  validatesFirst?: boolean;
 }
 
 interface OverridesFile {

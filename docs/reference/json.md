@@ -17,8 +17,8 @@ edgefit check --format json
       "key": "workerd",
       "platform": "Cloudflare Workers",
       "conditions": ["workerd", "worker", "browser"],
-      "data": "workers-nodejs-compat-matrix@ee58120 (workerd 1.20260424.1), ...",
-      "settings": "compatibility_date 2026-04-24, flags: nodejs_compat (from wrangler.jsonc)",
+      "data": "workers-nodejs-compat-matrix@ee58120 (workerd 1.20260929.1), ...",
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from wrangler.jsonc)",
       "notes": [],
       "entry": "src/index.ts",
       "modules": 5,
@@ -36,7 +36,7 @@ edgefit check --format json
           "location": { "file": "node_modules/chokidar/index.js", "line": 5, "column": 13 },
           "otherLocations": [],
           "chain": ["src/index.ts", "src/dev/reload.ts", "chokidar"],
-          "source": "https://github.com/cloudflare/workerd/tree/v1.20260424.1/src/node/internal/internal_fs_callback.ts"
+          "source": "https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node/internal/internal_fs_callback.ts"
         }
       ]
     }

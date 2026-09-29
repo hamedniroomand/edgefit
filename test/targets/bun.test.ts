@@ -21,7 +21,7 @@ describe('bun lookups', () => {
   const target = createBunTarget(projectWith({}));
 
   it('reports an API missing from Bun as unsupported', () => {
-    expect(target.lookup({ module: 'util', path: ['getCallSites'] })).toEqual({
+    expect(target.lookup({ module: 'util', path: ['transferableAbortSignal'] })).toEqual({
       status: 'unsupported',
       note: 'does not exist on the target',
       absent: true,
@@ -29,18 +29,19 @@ describe('bun lookups', () => {
   });
 
   it('reports a curated stub with its Bun source', () => {
-    expect(target.lookup({ module: 'v8', path: ['setFlagsFromString'] })).toEqual({
+    expect(target.lookup({ module: 'v8', path: ['takeCoverage'] })).toEqual({
       status: 'unsupported',
       note: 'throws a NotImplementedError',
-      source: 'https://github.com/oven-sh/bun/tree/bun-v1.3.13/src/js/node/v8.ts',
+      source: 'https://github.com/oven-sh/bun/tree/bun-v1.4.2/src/js/node/v8.ts',
     });
     expect(target.lookup({ module: 'async_hooks', path: ['createHook'] }).status).toBe('mocked');
   });
 
-  it('reports a mismatch in shape', () => {
-    expect(target.lookup({ module: 'buffer', path: ['transcode'] })).toEqual({
+  it('reports a curated mismatch', () => {
+    expect(target.lookup({ module: 'v8', path: ['serialize'] })).toEqual({
       status: 'mismatch',
-      note: 'is a undefined on the target but a function in Node',
+      note: "uses JavaScriptCore's serialization format, so data is not interchangeable with Node's",
+      source: 'https://github.com/oven-sh/bun/tree/bun-v1.4.2/src/js/node/v8.ts',
     });
   });
 
@@ -60,11 +61,11 @@ describe('bun lookups', () => {
 describe('bun target info', () => {
   it('names the matrix commit and Bun version', () => {
     const { info } = createBunTarget(projectWith({}));
-    expect(info.data).toContain('workers-nodejs-compat-matrix@ee58120 (bun 1.3.13)');
-    expect(info.data).toContain('https://github.com/oven-sh/bun/tree/bun-v1.3.13');
+    expect(info.data).toContain('workers-nodejs-compat-matrix@ee58120 (bun 1.4.2)');
+    expect(info.data).toContain('https://github.com/oven-sh/bun/tree/bun-v1.4.2');
     expect(info.conditions).toEqual(['bun', 'node']);
     expect(info.settings).toBe(
-      'Bun 1.3.13 (from the compatibility data; no pinned Bun version found)',
+      'Bun 1.4.2 (from the compatibility data; no pinned Bun version found)',
     );
     expect(info.notes).toEqual([]);
   });
@@ -73,13 +74,13 @@ describe('bun target info', () => {
     const { info } = createBunTarget(fixture('bun-app'));
     expect(info.settings).toBe('Bun 1.2.0 (from package.json packageManager)');
     expect(info.notes).toEqual([
-      'Bun 1.2.0 is older than the data (1.3.13); APIs added to Bun since then are reported as supported.',
+      'Bun 1.2.0 is older than the data (1.4.2); APIs added to Bun since then are reported as supported.',
     ]);
   });
 
   it('lets the config version win over the pinned one', () => {
-    const { info } = createBunTarget(fixture('bun-app'), { version: '1.3.13' });
-    expect(info.settings).toBe('Bun 1.3.13 (from the edgefit config)');
+    const { info } = createBunTarget(fixture('bun-app'), { version: '1.4.2' });
+    expect(info.settings).toBe('Bun 1.4.2 (from the edgefit config)');
     expect(info.notes).toEqual([]);
   });
 });
@@ -110,7 +111,7 @@ describe('pinned Bun versions', () => {
 
   it('compares versions numerically', () => {
     expect(compareVersions('1.2.10', '1.2.9')).toBeGreaterThan(0);
-    expect(compareVersions('1.2.0', '1.3.13')).toBeLessThan(0);
-    expect(compareVersions('latest', '1.3.13')).toBe(0);
+    expect(compareVersions('1.2.0', '1.4.2')).toBeLessThan(0);
+    expect(compareVersions('latest', '1.4.2')).toBe(0);
   });
 });

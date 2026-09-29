@@ -46,7 +46,7 @@
     "repl": {
       "status": "unsupported",
       "note": "node:repl is a stub: repl.start does not exist and the other members throws a NotImplementedError",
-      "source": "src/js/node/repl.ts",
+      "source": "src/js/node/repl.js",
       "except": ["builtinModules"]
     },
     "trace_events": {
@@ -77,26 +77,6 @@
       "note": "always returns process.stdin",
       "source": "src/js/node/async_hooks.ts"
     },
-    "v8.cachedDataVersionTag": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/v8.ts"
-    },
-    "v8.getHeapSpaceStatistics": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/v8.ts"
-    },
-    "v8.getHeapCodeStatistics": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/v8.ts"
-    },
-    "v8.setFlagsFromString": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/v8.ts"
-    },
     "v8.takeCoverage": {
       "status": "unsupported",
       "note": "throws a NotImplementedError",
@@ -113,11 +93,6 @@
       "source": "src/js/node/v8.ts"
     },
     "v8.promiseHooks": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/v8.ts"
-    },
-    "v8.startupSnapshot": {
       "status": "unsupported",
       "note": "throws a NotImplementedError",
       "source": "src/js/node/v8.ts"
@@ -142,11 +117,6 @@
       "note": "throws a NotImplementedError",
       "source": "src/js/node/v8.ts"
     },
-    "v8.GCProfiler": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/v8.ts"
-    },
     "v8.serialize": {
       "status": "mismatch",
       "note": "uses JavaScriptCore's serialization format, so data is not interchangeable with Node's",
@@ -157,54 +127,9 @@
       "note": "uses JavaScriptCore's serialization format, so data is not interchangeable with Node's",
       "source": "src/js/node/v8.ts"
     },
-    "inspector.open": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/inspector.ts"
-    },
-    "inspector.close": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/inspector.ts"
-    },
-    "inspector.waitForDebugger": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/inspector.ts"
-    },
-    "inspector.url": {
-      "status": "mocked",
-      "note": "always returns undefined",
-      "source": "src/js/node/inspector.ts"
-    },
-    "inspector/promises.open": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/inspector.ts"
-    },
-    "inspector/promises.close": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/inspector.ts"
-    },
-    "inspector/promises.waitForDebugger": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/inspector.ts"
-    },
-    "inspector/promises.url": {
-      "status": "mocked",
-      "note": "always returns undefined",
-      "source": "src/js/node/inspector.ts"
-    },
     "test.run": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError; use bun:test",
-      "source": "src/js/node/test.ts"
-    },
-    "test.mock": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError; use bun:test",
+      "status": "mismatch",
+      "note": "needs an explicit files array, and the watch, coverage, shard, only, concurrency, name pattern and forceExit options throw a NotImplementedError",
       "source": "src/js/node/test.ts"
     },
     "test.snapshot": {
@@ -227,45 +152,36 @@
       "note": "throws a NotImplementedError unless passed a timer from setTimeout or setInterval; legacy timer objects are not supported",
       "source": "src/js/node/timers.ts"
     },
-    "vm.measureMemory": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/vm.ts"
-    },
-    "worker_threads.markAsUntransferable": {
-      "status": "unsupported",
-      "note": "throws a NotImplementedError",
-      "source": "src/js/node/worker_threads.ts"
-    },
     "worker_threads.moveMessagePortToContext": {
       "status": "unsupported",
       "note": "throws a NotImplementedError",
-      "source": "src/js/node/worker_threads.ts"
+      "source": "src/js/node/worker_threads.ts",
+      "validatesFirst": true
     },
     "module.register": {
       "status": "mocked",
       "note": "does nothing; use Bun.plugin for loader hooks",
-      "source": "src/bun.js/modules/NodeModuleModule.cpp"
+      "source": "src/jsc/modules/NodeModuleModule.cpp"
     },
     "module.syncBuiltinESMExports": {
       "status": "mocked",
       "note": "does nothing",
-      "source": "src/bun.js/modules/NodeModuleModule.cpp"
+      "source": "src/jsc/modules/NodeModuleModule.cpp"
     },
     "process.getActiveResourcesInfo": {
       "status": "mocked",
       "note": "always returns an empty array",
-      "source": "src/bun.js/bindings/BunProcess.cpp"
+      "source": "src/jsc/bindings/BunProcess.cpp"
     },
     "process._getActiveHandles": {
       "status": "mocked",
       "note": "always returns an empty array",
-      "source": "src/bun.js/bindings/BunProcess.cpp"
+      "source": "src/jsc/bindings/BunProcess.cpp"
     },
     "process._getActiveRequests": {
       "status": "mocked",
       "note": "always returns an empty array",
-      "source": "src/bun.js/bindings/BunProcess.cpp"
+      "source": "src/jsc/bindings/BunProcess.cpp"
     },
     "process.config": {
       "status": "supported",

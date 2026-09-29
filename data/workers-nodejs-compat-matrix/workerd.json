@@ -204,7 +204,9 @@
       "Exception": "function",
       "Global": "function",
       "Instance": "function",
-      "JSTag": { "*self*": "object" },
+      "JSTag": {
+        "*self*": "object"
+      },
       "LinkError": "function",
       "Memory": "function",
       "Module": "function",
@@ -1639,7 +1641,11 @@
       "hardwareConcurrency": "number",
       "language": "string",
       "languages": "object",
-      "locks": { "*self*": "missing", "query": "missing", "request": "missing" },
+      "locks": {
+        "*self*": "missing",
+        "query": "missing",
+        "request": "missing"
+      },
       "platform": "string",
       "userAgent": "string"
     },
@@ -1713,7 +1719,11 @@
       "availableMemory": "function",
       "binding": "function",
       "chdir": "function",
-      "config": { "*self*": "object", "target_defaults": "object", "variables": "object" },
+      "config": {
+        "*self*": "object",
+        "target_defaults": "object",
+        "variables": "object"
+      },
       "constrainedMemory": "function",
       "cpuUsage": "function",
       "cwd": "function",
@@ -1722,7 +1732,9 @@
       "domain": "null",
       "emit": "function",
       "emitWarning": "function",
-      "env": { "*self*": "object" },
+      "env": {
+        "*self*": "object"
+      },
       "eventNames": "function",
       "execArgv": "object",
       "execPath": "string",
@@ -2178,7 +2190,9 @@
       "notStrictEqual": "function",
       "ok": "function",
       "partialDeepStrictEqual": "function",
-      "prototype": { "*self*": "object" },
+      "prototype": {
+        "*self*": "object"
+      },
       "rejects": "function",
       "strict": "function",
       "strictEqual": "function",
@@ -2231,7 +2245,9 @@
       "notStrictEqual": "function",
       "ok": "function",
       "partialDeepStrictEqual": "function",
-      "prototype": { "*self*": "object" },
+      "prototype": {
+        "*self*": "object"
+      },
       "rejects": "function",
       "strict": "function",
       "strictEqual": "function",
@@ -2426,7 +2442,11 @@
     "SlowBuffer": "function",
     "atob": "function",
     "btoa": "function",
-    "constants": { "*self*": "object", "MAX_LENGTH": "number", "MAX_STRING_LENGTH": "number" },
+    "constants": {
+      "*self*": "object",
+      "MAX_LENGTH": "number",
+      "MAX_STRING_LENGTH": "number"
+    },
     "default": {
       "*self*": "object",
       "Blob": "function",
@@ -2436,7 +2456,11 @@
       "SlowBuffer": "function",
       "atob": "function",
       "btoa": "function",
-      "constants": { "*self*": "object", "MAX_LENGTH": "number", "MAX_STRING_LENGTH": "number" },
+      "constants": {
+        "*self*": "object",
+        "MAX_LENGTH": "number",
+        "MAX_STRING_LENGTH": "number"
+      },
       "isAscii": "function",
       "isUtf8": "function",
       "kMaxLength": "number",
@@ -3328,7 +3352,11 @@
     "*self*": "object",
     "Socket": "function",
     "createSocket": "function",
-    "default": { "*self*": "object", "Socket": "function", "createSocket": "function" }
+    "default": {
+      "*self*": "object",
+      "Socket": "function",
+      "createSocket": "function"
+    }
   },
   "diagnostics_channel": {
     "*self*": "object",
@@ -4586,7 +4614,9 @@
       "destroy": "function",
       "emit": "function",
       "eventNames": "function",
-      "freeSockets": { "*self*": "object" },
+      "freeSockets": {
+        "*self*": "object"
+      },
       "getMaxListeners": "function",
       "getName": "function",
       "keepAlive": "boolean",
@@ -4616,11 +4646,15 @@
       "removeAllListeners": "function",
       "removeListener": "function",
       "removeSocket": "function",
-      "requests": { "*self*": "object" },
+      "requests": {
+        "*self*": "object"
+      },
       "reuseSocket": "function",
       "scheduling": "string",
       "setMaxListeners": "function",
-      "sockets": { "*self*": "object" },
+      "sockets": {
+        "*self*": "object"
+      },
       "totalSocketCount": "number"
     },
     "maxHeaderSize": "number",
@@ -5236,7 +5270,9 @@
       "domain": "null",
       "emit": "function",
       "eventNames": "function",
-      "freeSockets": { "*self*": "object" },
+      "freeSockets": {
+        "*self*": "object"
+      },
       "getMaxListeners": "function",
       "getName": "function",
       "keepAlive": "boolean",
@@ -5269,11 +5305,15 @@
       "removeAllListeners": "function",
       "removeListener": "function",
       "removeSocket": "function",
-      "requests": { "*self*": "object" },
+      "requests": {
+        "*self*": "object"
+      },
       "reuseSocket": "function",
       "scheduling": "string",
       "setMaxListeners": "function",
-      "sockets": { "*self*": "object" },
+      "sockets": {
+        "*self*": "object"
+      },
       "totalSocketCount": "number"
     },
     "request": "function"
@@ -5299,7 +5339,10 @@
       "Module": "function",
       "SourceMap": "function",
       "builtinModules": "object",
-      "constants": { "*self*": "object", "compileCacheStatus": "object" },
+      "constants": {
+        "*self*": "object",
+        "compileCacheStatus": "object"
+      },
       "createRequire": "function",
       "enableCompileCache": "function",
       "findPackageJSON": "function",
@@ -5345,7 +5388,7 @@
   "net": {
     "*self*": "object",
     "BlockList": "class",
-    "Server": "function",
+    "Server": "class",
     "Socket": "function",
     "SocketAddress": "class",
     "Stream": "function",
@@ -5355,7 +5398,7 @@
     "default": {
       "*self*": "object",
       "BlockList": "class",
-      "Server": "function",
+      "Server": "class",
       "Socket": "function",
       "SocketAddress": "class",
       "Stream": "function",
@@ -6562,7 +6605,11 @@
       "availableMemory": "function",
       "binding": "function",
       "chdir": "function",
-      "config": { "*self*": "object", "target_defaults": "object", "variables": "object" },
+      "config": {
+        "*self*": "object",
+        "target_defaults": "object",
+        "variables": "object"
+      },
       "constrainedMemory": "function",
       "cpuUsage": "function",
       "cwd": "function",
@@ -6571,7 +6618,9 @@
       "domain": "null",
       "emit": "function",
       "emitWarning": "function",
-      "env": { "*self*": "object" },
+      "env": {
+        "*self*": "object"
+      },
       "eventNames": "function",
       "execArgv": "object",
       "execPath": "string",
@@ -6993,7 +7042,9 @@
     "dlopen": "function",
     "domain": "null",
     "emitWarning": "function",
-    "env": { "*self*": "object" },
+    "env": {
+      "*self*": "object"
+    },
     "execArgv": "object",
     "execPath": "string",
     "execve": "function",
@@ -7466,7 +7517,11 @@
       "on": "function",
       "once": "function",
       "pipeline": "function",
-      "promises": { "*self*": "object", "finished": "function", "pipeline": "function" },
+      "promises": {
+        "*self*": "object",
+        "finished": "function",
+        "pipeline": "function"
+      },
       "prototype": {
         "*self*": "object",
         "addListener": "function",
@@ -7500,7 +7555,11 @@
     "isReadable": "function",
     "isWritable": "function",
     "pipeline": "function",
-    "promises": { "*self*": "object", "finished": "function", "pipeline": "function" },
+    "promises": {
+      "*self*": "object",
+      "finished": "function",
+      "pipeline": "function"
+    },
     "setDefaultHighWaterMark": "function"
   },
   "stream/consumers": {
@@ -7523,7 +7582,11 @@
   },
   "stream/promises": {
     "*self*": "object",
-    "default": { "*self*": "object", "finished": "function", "pipeline": "function" },
+    "default": {
+      "*self*": "object",
+      "finished": "function",
+      "pipeline": "function"
+    },
     "finished": "function",
     "pipeline": "function"
   },
@@ -7570,7 +7633,10 @@
   "string_decoder": {
     "*self*": "object",
     "StringDecoder": "function",
-    "default": { "*self*": "object", "StringDecoder": "function" }
+    "default": {
+      "*self*": "object",
+      "StringDecoder": "function"
+    }
   },
   "sys": {
     "*self*": "object",
@@ -7790,7 +7856,11 @@
     "enroll": "function",
     "promises": {
       "*self*": "object",
-      "scheduler": { "*self*": "object", "wait": "function", "yield": "function" },
+      "scheduler": {
+        "*self*": "object",
+        "wait": "function",
+        "yield": "function"
+      },
       "setImmediate": "function",
       "setInterval": "function",
       "setTimeout": "function"
@@ -7804,12 +7874,20 @@
     "*self*": "object",
     "default": {
       "*self*": "object",
-      "scheduler": { "*self*": "object", "wait": "function", "yield": "function" },
+      "scheduler": {
+        "*self*": "object",
+        "wait": "function",
+        "yield": "function"
+      },
       "setImmediate": "function",
       "setInterval": "function",
       "setTimeout": "function"
     },
-    "scheduler": { "*self*": "object", "wait": "function", "yield": "function" },
+    "scheduler": {
+      "*self*": "object",
+      "wait": "function",
+      "yield": "function"
+    },
     "setImmediate": "function",
     "setInterval": "function",
     "setTimeout": "function"

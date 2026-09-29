@@ -9,7 +9,7 @@ export interface Gate {
 }
 
 export const flagsSource =
-  'https://github.com/cloudflare/workerd/blob/v1.20260424.1/src/workerd/io/compatibility-date.capnp';
+  'https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/workerd/io/compatibility-date.capnp';
 
 const httpModules: Gate = { flag: 'enable_nodejs_http_modules', date: '2025-08-15' };
 const httpServer: Gate = { flag: 'enable_nodejs_http_server_modules', date: '2025-09-01' };

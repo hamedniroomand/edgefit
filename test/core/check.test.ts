@@ -146,7 +146,8 @@ describe('check on Web APIs', () => {
       'warning web caches.open',
       'warning web FileReader',
     ]);
-    expect(deno).toEqual(['error unsupported navigator.locks.request']);
+    // Deno has had Web Locks since 2.9, so it reports nothing here.
+    expect(deno).toEqual([]);
   });
 
   it('treats a feature check as a check, not a use', async () => {

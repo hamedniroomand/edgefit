@@ -5,43 +5,44 @@
       "provider": "workers-nodejs-compat-matrix",
       "url": "https://github.com/cloudflare/workers-nodejs-compat-matrix",
       "commit": "ee581200e130e66d654a1a372d73eca3360310fb",
-      "generatedAt": "2026-04-27T18:20:51.756Z",
+      "generatedAt": "2026-09-29T17:00:00.000Z",
+      "note": "The Bun, Deno and workerd dumps were regenerated with the provider's own scripts at this commit, because its repository has no newer data. Deno runs with --allow-sys, which 2.9 needs. The Node baseline is unchanged.",
       "license": "MIT",
       "versions": {
         "node": "20.20.2, 22.22.2, 24.15.0",
-        "workerd": "1.20260424.1",
-        "bun": "1.3.13",
-        "deno": "2.7.13"
+        "workerd": "1.20260929.1",
+        "bun": "1.4.2",
+        "deno": "2.9.7"
       },
       "settings": {
         "workerd": {
-          "compatibilityDate": "2026-04-24",
+          "compatibilityDate": "2026-09-29",
           "compatibilityFlags": ["nodejs_compat"]
         }
       }
     },
     {
       "provider": "overrides/workerd",
-      "url": "https://github.com/cloudflare/workerd/tree/v1.20260424.1/src/node",
+      "url": "https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node",
       "license": "MIT",
       "versions": {
-        "workerd": "1.20260424.1"
+        "workerd": "1.20260929.1"
       }
     },
     {
       "provider": "overrides/bun",
-      "url": "https://github.com/oven-sh/bun/tree/bun-v1.3.13",
+      "url": "https://github.com/oven-sh/bun/tree/bun-v1.4.2",
       "license": "MIT",
       "versions": {
-        "bun": "1.3.13"
+        "bun": "1.4.2"
       }
     },
     {
       "provider": "overrides/deno",
-      "url": "https://github.com/denoland/deno/tree/v2.7.13/ext/node/polyfills",
+      "url": "https://github.com/denoland/deno/tree/v2.9.7/ext/node/polyfills",
       "license": "MIT",
       "versions": {
-        "deno": "2.7.13"
+        "deno": "2.9.7"
       }
     },
     {

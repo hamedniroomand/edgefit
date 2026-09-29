@@ -30,7 +30,7 @@ error    unsupported  node:fs.watch  (workerd)
        file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION
        chokidar@4.0.1  node_modules/chokidar/index.js:5:13
        via src/index.ts > src/dev/reload.ts > chokidar
-       see https://github.com/cloudflare/workerd/tree/v1.20260424.1/src/node/internal/internal_fs_callback.ts
+       see https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node/internal/internal_fs_callback.ts
 ```
 
 ## Why edgefit

@@ -7,5 +7,5 @@ export interface ProbeEntry {
   lookup?: boolean;
 }
 
-export function probeApi(entry: ProbeEntry): Promise<Outcome>;
+export function probeApi(entry: ProbeEntry, load?: (module: string) => unknown): Promise<Outcome>;
 export function probeApis(apis: ProbeEntry[]): Promise<Record<string, Outcome>>;

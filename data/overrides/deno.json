@@ -119,37 +119,7 @@
       "note": "throws Not implemented",
       "source": "v8.ts"
     },
-    "v8.setFlagsFromString": {
-      "status": "mocked",
-      "note": "does nothing",
-      "source": "v8.ts"
-    },
     "v8.getCppHeapStatistics": {
-      "status": "unsupported",
-      "note": "does not exist on Deno",
-      "source": "v8.ts"
-    },
-    "v8.promiseHooks": {
-      "status": "unsupported",
-      "note": "does not exist on Deno",
-      "source": "v8.ts"
-    },
-    "v8.queryObjects": {
-      "status": "unsupported",
-      "note": "does not exist on Deno",
-      "source": "v8.ts"
-    },
-    "v8.startupSnapshot": {
-      "status": "unsupported",
-      "note": "does not exist on Deno",
-      "source": "v8.ts"
-    },
-    "v8.setHeapSnapshotNearHeapLimit": {
-      "status": "unsupported",
-      "note": "does not exist on Deno",
-      "source": "v8.ts"
-    },
-    "v8.GCProfiler": {
       "status": "unsupported",
       "note": "does not exist on Deno",
       "source": "v8.ts"
@@ -164,31 +134,6 @@
       "note": "throws Not implemented",
       "source": "vm.js"
     },
-    "worker_threads.moveMessagePortToContext": {
-      "status": "unsupported",
-      "note": "throws Not implemented",
-      "source": "worker_threads.ts"
-    },
-    "worker_threads.isInternalThread": {
-      "status": "unsupported",
-      "note": "does not exist on Deno",
-      "source": "worker_threads.ts"
-    },
-    "worker_threads.markAsUncloneable": {
-      "status": "unsupported",
-      "note": "does not exist on Deno",
-      "source": "worker_threads.ts"
-    },
-    "worker_threads.isMarkedAsUntransferable": {
-      "status": "unsupported",
-      "note": "does not exist on Deno",
-      "source": "worker_threads.ts"
-    },
-    "worker_threads.postMessageToThread": {
-      "status": "unsupported",
-      "note": "does not exist on Deno",
-      "source": "worker_threads.ts"
-    },
     "inspector.NetworkResources": {
       "status": "unsupported",
       "note": "does not exist on Deno",
@@ -199,55 +144,10 @@
       "note": "does not exist on Deno",
       "source": "inspector.js"
     },
-    "repl.writer": {
-      "status": "unsupported",
-      "note": "does not exist on Deno",
-      "source": "repl.ts"
-    },
     "repl.isValidSyntax": {
       "status": "unsupported",
       "note": "does not exist on Deno",
       "source": "repl.ts"
-    },
-    "test.run": {
-      "status": "unsupported",
-      "note": "throws Not implemented; use Deno.test",
-      "source": "testing.ts"
-    },
-    "test.before": {
-      "status": "unsupported",
-      "note": "throws Not implemented; use Deno.test",
-      "source": "testing.ts"
-    },
-    "test.after": {
-      "status": "unsupported",
-      "note": "throws Not implemented; use Deno.test",
-      "source": "testing.ts"
-    },
-    "test.beforeEach": {
-      "status": "unsupported",
-      "note": "throws Not implemented; use Deno.test",
-      "source": "testing.ts"
-    },
-    "test.afterEach": {
-      "status": "unsupported",
-      "note": "throws Not implemented; use Deno.test",
-      "source": "testing.ts"
-    },
-    "test.mock.getter": {
-      "status": "unsupported",
-      "note": "throws Not implemented",
-      "source": "testing.ts"
-    },
-    "test.mock.setter": {
-      "status": "unsupported",
-      "note": "throws Not implemented",
-      "source": "testing.ts"
-    },
-    "test.mock.timers": {
-      "status": "unsupported",
-      "note": "throws Not implemented",
-      "source": "testing.ts"
     },
     "test.snapshot": {
       "status": "unsupported",

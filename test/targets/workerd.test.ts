@@ -121,7 +121,7 @@ const notesOf = (root: string, options: WorkerdOptions = {}): readonly string[] 
 describe('workerd settings that were assumed', () => {
   it('says so when there is no wrangler config', () => {
     expect(notesOf('bun-app')).toEqual([
-      'No wrangler config was found, so compatibility_date 2026-04-24 and the flags nodejs_compat are assumed. ' +
+      'No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. ' +
         'Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, ' +
         'or point `workerd.wranglerConfig` at your wrangler config.',
     ]);
@@ -132,14 +132,14 @@ describe('workerd settings that were assumed', () => {
   });
 
   it('is quiet when the edgefit config sets both', () => {
-    const options = { compatibilityDate: '2026-04-24', compatibilityFlags: ['nodejs_compat'] };
+    const options = { compatibilityDate: '2026-09-29', compatibilityFlags: ['nodejs_compat'] };
     expect(notesOf('bun-app', options)).toEqual([]);
   });
 });
 
 describe('workerd settings that are only partly assumed', () => {
   it('names only what is still assumed', () => {
-    const [note] = notesOf('bun-app', { compatibilityDate: '2026-04-24' });
+    const [note] = notesOf('bun-app', { compatibilityDate: '2026-09-29' });
     expect(note).toContain('the flags nodejs_compat are assumed');
     expect(note).not.toContain('compatibility_date 2026');
   });
@@ -148,8 +148,17 @@ describe('workerd settings that are only partly assumed', () => {
     const target = createWorkerdTarget(fixture('wrangler-bare'));
     expect(target.info.settings).toContain('flags: none (from wrangler.jsonc)');
     expect(target.info.notes[0]).toContain(
-      'wrangler.jsonc has no compatibility_date, so 2026-04-24 is assumed.',
+      'wrangler.jsonc has no compatibility_date, so 2026-09-29 is assumed.',
     );
+    // From 2026-08-04 nodejs_compat is on without a flag, so the assumed date needs no note.
+    expect(target.info.notes.join(' ')).not.toContain('nodejs_compat is not enabled');
+  });
+
+  it('says nodejs_compat is off for a wrangler config without flags on an older date', () => {
+    const target = createWorkerdTarget(fixture('wrangler-bare'), {
+      compatibilityDate: '2026-04-24',
+    });
+    expect(target.info.settings).toContain('flags: none');
     expect(target.info.notes.join(' ')).toContain('nodejs_compat is not enabled');
   });
 });

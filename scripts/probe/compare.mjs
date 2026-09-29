@@ -17,6 +17,18 @@ export function matrixHas(tree, api) {
 function overrideDisagreement(override, outcome) {
   const stub = override.status === 'unsupported';
   const probedAsStub = MISSING_OR_UNSUPPORTED.has(outcome);
+  // A mismatch is a partial implementation, so a call with no arguments cannot confirm or refute it.
+  if (override.status === 'mismatch') {
+    return undefined;
+  }
+  // A call that returns or throws something else says nothing about a stub, and a stub that
+  // `validatesFirst` throws an argument error before it reaches the not-implemented throw.
+  if (
+    stub &&
+    (outcome === 'inconclusive' || (outcome === 'implemented' && override.validatesFirst))
+  ) {
+    return undefined;
+  }
   return stub === probedAsStub
     ? undefined
     : `override says \`${override.status}\`, probe says \`${outcome}\``;
