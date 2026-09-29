@@ -1,0 +1,34 @@
+name: Preview
+
+# Publishes an installable build of every pull request and of `main` with pkg.pr.new (a GitHub App
+# that must be installed on the repository). Nothing is published to npm. Try a build with:
+#   npx https://pkg.pr.new/edgefit@<pr-number-or-sha>
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+jobs:
+  preview:
+    if: github.repository_owner == 'hamedniroomand'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: voidzero-dev/setup-vp@3754dd7dbdb32bd8f6d28b6043de13ad3a75f21f # v1.21.1
+        with:
+          node-version: '24'
+          cache: true
+          run-install: true
+      - run: vp run build
+      - run: vp exec pkg-pr-new publish --compact --pnpm
