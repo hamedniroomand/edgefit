@@ -41,6 +41,8 @@ interface TargetReport {
   entry: string;
   modules: number;
   findings: Finding[];
+  /** Findings in code that only runs when the API exists. They never fail a check. */
+  guarded: Finding[];
   ignored: number;
   supported: SupportedApi[];
 }

@@ -192,14 +192,15 @@ Some calls block for ever with no arguments. `inspector.waitForDebugger` waits f
 
 A data bump touches more than JSON:
 
-| Where                                     | What to update                                                                                       |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `src/targets/workerd/gates.ts`            | `flagsSource` points at the compatibility flags at a tag. Compare the gates first (below)            |
-| `test/targets/{workerd,bun,deno}.test.ts` | Versions and dates in expected text, curated examples that were removed or changed                   |
-| `test/cli/run.test.ts`                    | The version strings in `edgefit targets` and the "older than the data" notes                         |
-| `test/core/check.test.ts`                 | Web API findings per target (Deno gained `navigator.locks` in 2.9, for example)                      |
-| `docs/`                                   | The sample reports and the version numbers in `targets/*.md`, `getting-started.md`, `reference/*.md` |
-| `CHANGELOG.md`                            | A **Data** section that says what users will notice                                                  |
+| Where                                     | What to update                                                                                                          |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `src/targets/workerd/gates.ts`            | `flagsSource` points at the compatibility flags at a tag. Compare the gates first (below)                               |
+| `test/targets/{workerd,bun,deno}.test.ts` | Versions and dates in expected text, curated examples that were removed or changed                                      |
+| `test/cli/run.test.ts`                    | The version strings in `edgefit targets` and the "older than the data" notes                                            |
+| `test/core/check.test.ts`                 | Web API findings per target (Deno gained `navigator.locks` in 2.9, for example)                                         |
+| `docs/`                                   | The sample reports and the version numbers in `targets/*.md`, `getting-started.md`, `reference/*.md`                    |
+| `docs/guide/status.md`, `README.md`       | The runtime versions, dump date and compatibility date. `test/docs/status.test.ts` fails until they match `source.json` |
+| `CHANGELOG.md`                            | A **Data** section that says what users will notice                                                                     |
 
 ### Compatibility gates
 
@@ -233,5 +234,6 @@ After a bump, a few tests fail because the data moved. That is the signal to loo
 - [ ] Every override `source` still resolves at the new tag
 - [ ] Pinned probe on all three runtimes has no unexplained disagreements
 - [ ] `gates.ts` compared with the new compatibility flags
-- [ ] Tests, docs samples and changelog updated
+- [ ] Tests, docs samples, the status page, the README and the changelog updated
+- [ ] Limitations still true: reread [the limitations page](/guide/limitations) when the data's age or sources change
 - [ ] `vp run ready` passes, and a few real projects were checked

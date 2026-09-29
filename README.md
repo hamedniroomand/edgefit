@@ -49,6 +49,10 @@ On pull requests, with the GitHub Action:
     targets: workerd
 ```
 
+## Status
+
+edgefit is a 0.x release and reads your code statically, so a clean run is not a guarantee: see the [limitations](https://hamedniroomand.github.io/edgefit/guide/limitations). Its data is pinned to workerd 1.20260929.1, Bun 1.4.2 and Deno 2.9.7 and compared with the newest releases every week: see the [status page](https://hamedniroomand.github.io/edgefit/guide/status).
+
 ## Documentation
 
 Configuration, per-runtime behavior, the GitHub Action, JSON reports and the JavaScript API are at **[hamedniroomand.github.io/edgefit](https://hamedniroomand.github.io/edgefit/)**.

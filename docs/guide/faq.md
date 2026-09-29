@@ -38,6 +38,18 @@ Different runtimes support different things, and packages often ship a different
 
 No. Everything runs locally, and the compatibility data ships inside the package.
 
+## How is this different from running my tests on the runtime?
+
+Tests run the code paths you exercise, and they need a good runtime setup. edgefit reads all the code you ship, including dependencies and branches no test reaches, and it needs no setup, so it finds a problem three packages down before a request does. It cannot see behavior that depends on values at runtime, and a passing check is not a passing test. Use both: edgefit in CI to catch what the graph reaches, tests for what your code does. See [Limitations](/guide/limitations).
+
+## Isn't `wrangler deploy --dry-run` enough?
+
+A dry run and a build check that the bundle compiles. wrangler replaces Node modules that are not native at your compatibility date with polyfills, so a build can succeed for code that throws or does nothing when called. edgefit reports that case, as `mocked`.
+
+## Which runtime versions does it check against?
+
+The versions on the [Status](/guide/status) page, and `edgefit targets` prints them for the version you installed. The data is compared with the newest releases every week.
+
 ## How often is the compatibility data updated?
 
 The data is pinned and only changes with an edgefit release, so upgrading edgefit is how you get newer data. A scheduled workflow probes the latest runtime releases and signals when the pinned data is due for an update. See [Compatibility data](/contributing/data).

@@ -86,6 +86,7 @@ export default defineConfig({
         {
           text: 'More',
           items: [
+            link('shield-check', 'Status', '/guide/status'),
             link('triangle-alert', 'Limitations', '/guide/limitations'),
             link('circle-alert', 'FAQ', '/guide/faq'),
           ],
