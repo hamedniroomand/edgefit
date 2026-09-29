@@ -3,6 +3,9 @@ contact_links:
   - name: Documentation
     url: https://hamedniroomand.github.io/edgefit/
     about: Guides, configuration and the CLI reference.
+  - name: Questions and ideas
+    url: https://github.com/hamedniroomand/edgefit/discussions
+    about: Ask how to use edgefit or talk through an idea. Issues are for bugs and wrong results.
   - name: Report a security issue
     url: https://github.com/hamedniroomand/edgefit/security/advisories/new
     about: Please report vulnerabilities privately, not in a public issue.
