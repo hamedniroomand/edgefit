@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-      - uses: hamedniroomand/edgefit@v1
+      - uses: hamedniroomand/edgefit@v0
         with:
           targets: workerd
           fail-on: new-errors
