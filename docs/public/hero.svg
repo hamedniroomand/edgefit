@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="256" height="256">
+  <defs>
+    <linearGradient id="fill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff8a3d"/>
+      <stop offset="1" stop-color="#e8452c"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="tile">
+      <rect width="32" height="32" rx="8"/>
+    </clipPath>
+  </defs>
+  <style>
+    /* One 6s loop: the entry node appears, the check draws to the second node, holds, then fades
+       to start again. Without animation every element rests in its final, visible state. */
+    .start, .end { transform-box: fill-box; transform-origin: center; }
+    .start { animation: pop 6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite; }
+    .check { stroke-dasharray: 1; animation: draw 6s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+    .end { animation: pop-end 6s cubic-bezier(0.34, 1.56, 0.64, 1) infinite; }
+    .shine { transform: translateX(-48px); animation: sweep 6s ease-in-out infinite; }
+
+    @keyframes pop {
+      0% { transform: scale(0); opacity: 0; }
+      8%, 88% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1); opacity: 0; }
+    }
+    @keyframes draw {
+      0%, 8% { stroke-dashoffset: 1; opacity: 1; }
+      36%, 88% { stroke-dashoffset: 0; opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes pop-end {
+      0%, 34% { transform: scale(0); opacity: 0; }
+      44%, 88% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1); opacity: 0; }
+    }
+    @keyframes sweep {
+      0%, 40% { transform: translateX(-48px) skewX(-20deg); }
+      70%, 100% { transform: translateX(48px) skewX(-20deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .start, .check, .end, .shine { animation: none; }
+      .shine { display: none; }
+    }
+  </style>
+  <rect width="32" height="32" rx="8" fill="url(#fill)"/>
+  <g clip-path="url(#tile)">
+    <rect class="shine" x="-8" y="-8" width="16" height="48" fill="url(#shine)"/>
+  </g>
+  <path class="check" pathLength="1" d="M8.5 16.5 13.5 21.5 23.5 10.5" fill="none" stroke="#fff" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle class="start" cx="8.5" cy="16.5" r="2.5" fill="#fff"/>
+  <circle class="end" cx="23.5" cy="10.5" r="2.5" fill="#fff"/>
+</svg>
