@@ -1,6 +1,6 @@
 # Architecture
 
-A check runs in five stages. Each has its own folder under `packages/edgefit/src`.
+A check runs in five stages. Each has its own folder under `src`.
 
 <Steps>
 
@@ -30,7 +30,7 @@ For `--built`, `built/` then maps each usage through the sourcemaps to its origi
 
 ## Data
 
-`data/` loads the vendored files from `packages/edgefit/data`:
+`data/` loads the vendored files from `data`:
 
 - `providers/matrix.ts` reads the workers-nodejs-compat-matrix dumps and compares each runtime with the Node baseline.
 - `providers/overrides.ts` applies the curated override file for the target.

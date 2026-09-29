@@ -22,7 +22,6 @@ export default defineConfig({
   lastUpdated: true,
 
   // Roadmap specs live next to the site for maintainers and are not pages.
-  srcExclude: ['specs/**'],
 
   sitemap: { hostname: site },
 

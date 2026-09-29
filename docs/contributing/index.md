@@ -36,7 +36,7 @@ vp run ready
 ### Try your build
 
 ```sh
-node packages/edgefit/dist/cli/main.mjs check --root path/to/a/project
+node dist/cli/main.mjs check --root path/to/a/project
 ```
 
 </Steps>
@@ -67,9 +67,11 @@ The site is built with VitePress and deployed to GitHub Pages on every push to `
 
 ## Tests
 
-Tests live in `packages/edgefit/test` and mirror the `src` folders. End-to-end behavior is tested against small projects in `test/fixtures`, each with a hand-made `node_modules` so results never depend on the registry.
+Tests live in `test` and mirror the `src` folders. End-to-end behavior is tested against small projects in `test/fixtures`, each with a hand-made `node_modules` so results never depend on the registry.
 
 When you fix a false positive or a missed finding, add a fixture or a case that shows it. That is how precision is kept from regressing.
+
+`test/core/benchmarks.test.ts` holds small stand-ins for apps that are known to run on Workers: a Hono app and a Nitro build that bundles jose. Their dependencies are copies of real published code. A known-good app must report no errors and no warnings that nobody can act on, so a change that breaks one of these tests is a precision regression, not a test to update. To add one, copy the smallest real files that show the pattern into a fixture, keep their license header, and assert what a person deploying that code should see.
 
 ## Commits and pull requests
 
@@ -79,4 +81,4 @@ When you fix a false positive or a missed finding, add a fixture or a case that 
 
 ## Roadmap
 
-Planned work is written up as specs in [`docs/specs`](https://github.com/hamedniroomand/edgefit/tree/main/docs/specs). If you want to pick one up, open an issue first so work is not duplicated.
+Planned work is tracked as [issues](https://github.com/hamedniroomand/edgefit/issues), grouped by milestone. If you want to pick one up, comment on it first so work is not duplicated.

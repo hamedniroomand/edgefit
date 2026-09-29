@@ -1,0 +1,7 @@
+{
+  // A Nitro 3 build without sourcemaps that bundles two pieces of jose 6.2.12.
+  "name": "fixture-nitro-jose",
+  "main": ".output/server/index.mjs",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}
