@@ -1,7 +1,6 @@
 import { builtinName } from '@/data/builtins.ts';
-import { staticString } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
-import { interopArgument, isRequire, resolveBinding } from '@/extract/bindings.ts';
+import { interopArgument, isRequire, moduleSpecifier, resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { moduleRef } from '@/extract/refs.ts';
 import { isTracked } from '@/extract/scope.ts';
@@ -13,7 +12,7 @@ function visitRequire(node: NodeOf<'CallExpression'>, context: VisitContext): vo
   if (argument === undefined) {
     return;
   }
-  const specifier = staticString(argument);
+  const specifier = moduleSpecifier(argument, context.scope);
   if (specifier === undefined) {
     context.collector.dynamic(undefined, 'require(<expression>)', computedModuleReason, node.start);
     context.visit(argument);
@@ -42,7 +41,7 @@ export const visitCall: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
 };
 
 export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node, context) => {
-  const specifier = staticString(node.source);
+  const specifier = moduleSpecifier(node.source, context.scope);
   if (specifier === undefined) {
     context.collector.dynamic(undefined, 'import(<expression>)', computedModuleReason, node.start);
     context.visitChildren(node);

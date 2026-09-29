@@ -6,7 +6,7 @@ import type { ApiRef } from '@/types.ts';
 import { staticKey, staticString, unwrap } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { globalRef, isInteropHelper, memberRef, moduleRef } from './refs.ts';
-import { isTracked, lookup } from './scope.ts';
+import { isTracked, lookup, lookupString } from './scope.ts';
 import type { Binding, Scope } from './scope.ts';
 
 export interface BindingContext {
@@ -16,6 +16,14 @@ export interface BindingContext {
 
 function tracked(ref: ApiRef): Binding {
   return { ref, recorded: false };
+}
+
+/** The module name an `import()` or `require()` argument spells out, directly or through a `const`. */
+export function moduleSpecifier(node: Node | null | undefined, scope: Scope): string | undefined {
+  if (node?.type === 'Identifier') {
+    return lookupString(scope, node.name);
+  }
+  return staticString(node);
 }
 
 export function isRequire(callee: Node, scope: Scope): boolean {
@@ -35,7 +43,7 @@ export function requiredModule(node: NodeOf<'CallExpression'>, scope: Scope): st
   if (!isRequire(node.callee, scope)) {
     return undefined;
   }
-  const specifier = staticString(node.arguments[0]);
+  const specifier = moduleSpecifier(node.arguments[0], scope);
   return specifier === undefined ? undefined : builtinName(specifier);
 }
 
@@ -87,7 +95,7 @@ export function resolveBinding(node: Node, context: BindingContext): Binding | u
     return resolveCall(node, context);
   }
   if (node.type === 'ImportExpression') {
-    const specifier = staticString(node.source);
+    const specifier = moduleSpecifier(node.source, context.scope);
     const module = specifier === undefined ? undefined : builtinName(specifier);
     return module === undefined ? undefined : tracked(moduleRef(module));
   }

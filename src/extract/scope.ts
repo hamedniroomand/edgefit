@@ -8,11 +8,25 @@ export type Binding = { ref: ApiRef; recorded: boolean } | 'require' | null;
 
 export interface Scope {
   names: Map<string, Binding>;
+  /** `const` names bound to a plain string, which can stand in for a literal specifier. */
+  strings: Map<string, string>;
   parent: Scope | undefined;
 }
 
 export function createScope(parent?: Scope): Scope {
-  return { names: new Map(), parent };
+  return { names: new Map(), strings: new Map(), parent };
+}
+
+/** The string a `const` holds, unless a nearer declaration of the name shadows it. */
+export function lookupString(scope: Scope | undefined, name: string): string | undefined {
+  if (scope === undefined) {
+    return undefined;
+  }
+  const value = scope.strings.get(name);
+  if (value !== undefined) {
+    return value;
+  }
+  return scope.names.has(name) ? undefined : lookupString(scope.parent, name);
 }
 
 /** Returns `undefined` when no enclosing scope declares the name. */
