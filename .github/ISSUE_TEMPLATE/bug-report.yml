@@ -1,0 +1,39 @@
+name: Bug report
+description: The CLI, the GitHub Action or the docs do not work as described.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce
+      description: A repository, or the smallest project and command that shows the problem.
+      placeholder: |
+        1. npm install edgefit
+        2. npx edgefit check --entry src/index.ts
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: The full output, with `--no-color`.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: edgefit version
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Node.js version and OS
+      placeholder: Node 22.18, macOS 15

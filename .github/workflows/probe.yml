@@ -1,0 +1,82 @@
+name: Probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      discover:
+        description: Probe every API in the matrix baseline, not only the curated ones
+        type: boolean
+        default: false
+  schedule:
+    - cron: '17 5 * * 1'
+
+permissions:
+  contents: read
+
+env:
+  PROBE: scripts/probe
+  SPEC: ${{ github.workspace }}/spec.json
+  RESULTS: ${{ github.workspace }}/results.json
+
+jobs:
+  probe:
+    name: ${{ matrix.runtime }} (${{ matrix.channel }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [bun, deno, workerd]
+        channel: [pinned, latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          # The repo declares pnpm, which setup-node would try to cache without it being installed.
+          package-manager-cache: false
+      - name: Resolve the version to probe
+        id: version
+        run: |
+          if [ "${{ matrix.channel }}" = pinned ]; then
+            echo "value=$(node -e "import('./$PROBE/data.mjs').then(m => console.log(m.pinnedVersion('${{ matrix.runtime }}')))")" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=latest" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build the list of APIs
+        run: |
+          flags=""
+          [ "${{ inputs.discover }}" = true ] && flags="$flags --discover"
+          [ "${{ matrix.channel }}" = latest ] && flags="$flags --mocked"
+          node "$PROBE/apis-cli.mjs" ${{ matrix.runtime }} $flags > "$SPEC"
+
+      - if: matrix.runtime == 'bun'
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: ${{ steps.version.outputs.value }}
+      - if: matrix.runtime == 'bun'
+        run: bun "$PROBE/run.mjs" "$SPEC" "$RESULTS"
+
+      - if: matrix.runtime == 'deno'
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
+        with:
+          deno-version: ${{ steps.version.outputs.value == 'latest' && 'v2.x' || steps.version.outputs.value }}
+      - if: matrix.runtime == 'deno'
+        run: deno run -A "$PROBE/run.mjs" "$SPEC" "$RESULTS"
+
+      - if: matrix.runtime == 'workerd'
+        working-directory: ${{ runner.temp }}
+        run: |
+          npm init -y > /dev/null
+          npm install workerd@${{ steps.version.outputs.value }}
+          node "$GITHUB_WORKSPACE/$PROBE/workerd/run.mjs" "$SPEC" "$RESULTS"
+
+      - name: Summarize
+        run: node "$PROBE/summarize.mjs" ${{ matrix.runtime }} ${{ matrix.channel }} "$RESULTS" probes | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: probe-${{ matrix.runtime }}-${{ matrix.channel }}
+          path: |
+            results.json
+            probes/

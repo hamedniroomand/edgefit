@@ -1,0 +1,43 @@
+name: Action
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  fixtures:
+    name: Action on ${{ matrix.fixture }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - fixture: worker
+            targets: workerd
+            entry: ''
+          - fixture: bun-app
+            targets: bun
+            entry: src/index.ts
+          - fixture: deno-app
+            targets: deno, deno-deploy
+            entry: src/main.ts
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          # The action installs pnpm through corepack; setup-node's cache would look for it first.
+          package-manager-cache: false
+      - uses: ./
+        with:
+          working-directory: test/fixtures/${{ matrix.fixture }}
+          targets: ${{ matrix.targets }}
+          entry: ${{ matrix.entry }}
+          # The fixtures have findings on purpose, so a PR that adds or changes one would always
+          # "regress". This job checks the action runs end to end; diff tests cover fail-on.
+          fail-on: never

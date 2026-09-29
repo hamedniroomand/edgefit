@@ -1,0 +1,50 @@
+name: Wrong result
+description: edgefit reports an API that works, or misses one that breaks.
+labels: [data]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Results come from pinned data. Run `edgefit targets` to see the versions, and check the finding's `see` link first.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - False error or warning (the API works)
+        - Missed finding (the API breaks, but edgefit passes it)
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      options: [workerd, bun, deno, deno-deploy]
+    validations:
+      required: true
+  - type: input
+    id: api
+    attributes:
+      label: API
+      placeholder: node:fs.watch
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: What happens when you call it on the runtime, and a link to the runtime source or docs if you have one.
+    validations:
+      required: true
+  - type: textarea
+    id: finding
+    attributes:
+      label: The finding
+      description: The finding as edgefit printed it, if there is one.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: edgefit version
+    validations:
+      required: true
