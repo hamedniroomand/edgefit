@@ -75,6 +75,14 @@ edgefit targets
 
 Prints every target with its export conditions and data, then every data source with its version and license.
 
+## Version
+
+```sh
+edgefit --version   # or -v
+```
+
+Prints the installed version and exits with `0`. With `pnpm dlx` or `npx`, pin a version (`pnpm dlx edgefit@0.2.0 check`) when you need to be sure which one runs, since the package manager may reuse a cached copy of `latest`.
+
 ## Output formats
 
 | Format   | Use it for                                                                                 |

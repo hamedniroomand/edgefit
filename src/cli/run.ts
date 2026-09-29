@@ -1,3 +1,5 @@
+import manifest from '@pkg' with { type: 'json' };
+
 import { EdgefitError } from '@/errors.ts';
 
 import { runCheck } from './commands/check.ts';
@@ -23,6 +25,11 @@ function dispatch(argv: string[], io: CliIo): Promise<number> | number {
     }
     case 'targets': {
       return runTargets(io);
+    }
+    case '--version':
+    case '-v': {
+      io.stdout(`${manifest.version}\n`);
+      return exitCodes.ok;
     }
     case undefined:
     case 'help':
