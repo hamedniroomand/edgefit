@@ -5,8 +5,8 @@
       "provider": "workers-nodejs-compat-matrix",
       "url": "https://github.com/cloudflare/workers-nodejs-compat-matrix",
       "commit": "ee581200e130e66d654a1a372d73eca3360310fb",
-      "generatedAt": "2026-09-29T17:00:00.000Z",
-      "note": "The Bun, Deno and workerd dumps were regenerated with the provider's own scripts at this commit, because its repository has no newer data. Deno runs with --allow-sys, which 2.9 needs. The Node baseline is unchanged.",
+      "generatedAt": "2026-09-29T18:00:00.000Z",
+      "note": "The Bun, Deno and workerd dumps were regenerated with the provider's own scripts at this commit, on Linux without a terminal through this repository's Dump data workflow, because the provider's repository has no newer data. Deno runs with --allow-sys, which 2.9 needs. The Node baseline is unchanged.",
       "license": "MIT",
       "versions": {
         "node": "20.20.2, 22.22.2, 24.15.0",
