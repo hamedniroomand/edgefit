@@ -1,10 +1,19 @@
 # Changelog
 
-## Unreleased
+## 0.3.1
+
+A fix for false errors on projects without `nodejs_compat`, and documentation.
+
+### Fixed
 
 - `const { process } = globalThis` is no longer reported as a use of `process`. Only the places the name is used count, and a use after a check such as `process !== void 0` is guarded. This removes the `node:process needs the nodejs_compat flag` error that Hono's `color.js` produced in a project without `nodejs_compat`.
 - `void 0` counts as `undefined` in checks like `x !== void 0`, which is how minified code writes them.
 - An API a missing `nodejs_compat` flag leaves undefined (`process`, `Buffer`, `global`, and Node modules) counts as absent, so code that checks for it first is reported as guarded instead of failing the check. An import of a Node module without the flag still fails.
+
+### Documentation
+
+- A [status page](https://hamedniroomand.github.io/edgefit/guide/status) lists the runtime versions in the data and how current they are. The [limitations](https://hamedniroomand.github.io/edgefit/guide/limitations) page now covers the age of the data, assumed settings, which build outputs are tested and more.
+- The GitHub Action examples use `@v0`. It follows the newest 0.x release, and the page says how to pin an exact release or a commit SHA.
 
 ## 0.3.0
 
