@@ -17,8 +17,13 @@ export function summaryLine(result: CheckResult): string {
   return parts.join(', ');
 }
 
+// pnpm keeps each package at node_modules/.pnpm/<name>@<version>/node_modules/<name>, often
+// above the project. The text report shows the path a person would recognize instead.
+const pnpmStorePath = /^(?:.*?\/)?node_modules\/\.pnpm\/[^/]+\/node_modules\//u;
+
 export function formatLocation(location: Location): string {
-  return `${location.file}:${location.line}:${location.column}`;
+  const file = location.file.replace(pnpmStorePath, 'node_modules/');
+  return `${file}:${location.line}:${location.column}`;
 }
 
 export function ownerName(owned: { package: PackageInfo | undefined }): string {

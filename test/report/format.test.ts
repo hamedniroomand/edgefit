@@ -199,3 +199,29 @@ describe('unknown findings next to others', () => {
     expect(summaryLine(resultOf([unknown('import(<expression>)')]))).toBe('0 errors, 1 warning');
   });
 });
+
+describe('pnpm store paths', () => {
+  const at = (file: string, name: string): Finding =>
+    makeFinding('node:fs.watch', {
+      package: { name, version: '1.0.0' },
+      location: { file, line: 2, column: 1 },
+    });
+  const store = '../node_modules/.pnpm/chokidar@4.0.3/node_modules/chokidar/esm/handler.js';
+
+  it('are shown as the package path in the text report', () => {
+    const text = formatText(resultOf([at(store, 'chokidar')]), { color: false });
+    expect(text).toContain('node_modules/chokidar/esm/handler.js:2:1');
+    expect(text).not.toContain('.pnpm');
+  });
+
+  it('are shortened for scoped packages too', () => {
+    const scoped =
+      'node_modules/.pnpm/@hono+zod-validator@0.9.1_zod@4.6.5/node_modules/@hono/zod-validator/index.js';
+    const text = formatText(resultOf([at(scoped, '@hono/zod-validator')]), { color: false });
+    expect(text).toContain('node_modules/@hono/zod-validator/index.js:2:1');
+  });
+
+  it('are kept as they are in the JSON report', () => {
+    expect(formatJson(resultOf([at(store, 'chokidar')]))).toContain('.pnpm/chokidar@4.0.3');
+  });
+});
