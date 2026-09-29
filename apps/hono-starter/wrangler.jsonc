@@ -1,0 +1,7 @@
+{
+  // The Worker from Hono's Cloudflare Workers starter.
+  "name": "sample-hono-starter",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}

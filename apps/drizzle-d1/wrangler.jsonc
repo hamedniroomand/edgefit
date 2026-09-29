@@ -1,0 +1,7 @@
+{
+  // A Worker that queries a D1 database with drizzle-orm.
+  "name": "sample-drizzle-d1",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}

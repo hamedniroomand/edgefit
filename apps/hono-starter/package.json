@@ -1,0 +1,8 @@
+{
+  "name": "sample-hono-starter",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "hono": "4.13.11"
+  }
+}

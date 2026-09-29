@@ -1,4 +1,6 @@
+import { existsSync } from 'node:fs';
 import path from 'node:path';
+import process from 'node:process';
 
 import type { CliIo } from '@/cli/io.ts';
 import type { LookupResult } from '@/data/dump.ts';
@@ -10,6 +12,23 @@ export const fixturesDirectory = path.join(import.meta.dirname, 'fixtures');
 
 export function fixture(name: string): string {
   return path.join(fixturesDirectory, name);
+}
+
+/** Apps with real installed packages: see `apps/README.md`. */
+export function sampleApp(name: string): string {
+  return path.join(import.meta.dirname, '../apps', name);
+}
+
+/**
+ * Whether the sample apps' packages are installed: `vp install` in `apps/`. CI always installs
+ * them, so a missing install there is an error. A local run without them skips.
+ */
+export function sampleAppsInstalled(): boolean {
+  const installed = existsSync(path.join(sampleApp('known-bad'), 'node_modules'));
+  if (!installed && process.env.CI !== undefined) {
+    throw new Error('The sample apps are not installed. Run: vp install (in apps/)');
+  }
+  return installed;
 }
 
 const defaultGlobals = new Set([

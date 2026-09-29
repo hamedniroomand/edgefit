@@ -1,5 +1,5 @@
-import { keyAgreement, supported } from "./_libs/jose.mjs";
+import { calculatePKCECodeChallenge, generateKeyPair, keyAgreement, supported } from "./_libs/oauth4webapi+jose.mjs";
 //#region server/routes/index.ts
-var routes_default = { fetch: () => [keyAgreement, supported] };
+var routes_default = { fetch: () => [calculatePKCECodeChallenge, generateKeyPair, keyAgreement, supported] };
 //#endregion
 export { routes_default as default };

@@ -1,0 +1,8 @@
+{
+  "name": "sample-pg-app",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "pg": "8.23.0"
+  }
+}
