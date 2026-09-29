@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- The GitHub Action's warning about a base commit it could not check now says to build in `install-command` when the entry is build output, and the action docs explain why the base needs its own build.
+
 ## 0.4.0
 
 The GitHub Action installs the published package, and the text report is easier to read with pnpm.
