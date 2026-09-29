@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { describe, expect, it } from 'vite-plus/test';
 
 import { run } from '@/cli/run.ts';
@@ -114,5 +117,29 @@ describe('edgefit targets and help', () => {
     const io = captureIo(fixture('worker'));
     expect(await run([], io)).toBe(0);
     expect(io.output()).toContain('Usage: edgefit <command> [options]');
+  });
+});
+
+describe('edgefit --version', () => {
+  const { version } = JSON.parse(
+    readFileSync(path.join(import.meta.dirname, '../../package.json'), 'utf8'),
+  ) as { version: string };
+
+  it('prints the package version and exits with 0', async () => {
+    const io = captureIo(fixture('worker'));
+    expect(await run(['--version'], io)).toBe(0);
+    expect(io.output()).toBe(`${version}\n`);
+  });
+
+  it('accepts -v', async () => {
+    const io = captureIo(fixture('worker'));
+    expect(await run(['-v'], io)).toBe(0);
+    expect(io.output()).toBe(`${version}\n`);
+  });
+
+  it('is listed in the help', async () => {
+    const io = captureIo(fixture('worker'));
+    await run(['help'], io);
+    expect(io.output()).toContain('--version');
   });
 });

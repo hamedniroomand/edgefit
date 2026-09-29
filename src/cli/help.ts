@@ -13,6 +13,8 @@ Commands:
   targets   List supported targets and the data behind each
   help      Show this help
 
+Run edgefit --version (or -v) to print the installed version.
+
 Options for check:
   --target <name>    Target runtime (repeatable): ${targetKeys.join(', ')}. Default: workerd
   --entry <file>     Entry point. Default: config \`entry\`, then wrangler \`main\`

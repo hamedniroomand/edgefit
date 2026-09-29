@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `edgefit --version` and `-v` print the installed version.
+
 ## 0.2.0
 
 Fewer false errors and less noise on real projects.

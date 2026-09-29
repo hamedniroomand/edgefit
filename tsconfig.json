@@ -4,6 +4,7 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "target": "es2023",
     "lib": ["es2023"],
@@ -16,6 +17,7 @@
     "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"],
+      "@pkg": ["./package.json"],
       "@scripts/*": ["./scripts/*"],
       "~/*": ["./test/*"]
     }
