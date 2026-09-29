@@ -31,4 +31,4 @@ jobs:
           cache: true
           run-install: true
       - run: vp run build
-      - run: vp exec pkg-pr-new publish --compact --pnpm
+      - run: npx --yes pkg-pr-new@0.0.88 publish --compact --pnpm
