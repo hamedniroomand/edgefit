@@ -78,7 +78,7 @@ runs:
         git worktree add --detach --force "$worktree" "$BASE"
         # A base without a checkable project, such as one before edgefit was set up, counts as empty.
         if ! "$GITHUB_ACTION_PATH/action/check.sh" "$worktree" "$RUNNER_TEMP/edgefit/base.json"; then
-          echo '::warning::edgefit could not check the base commit, so every finding counts as new.'
+          echo "::warning::edgefit could not check the base commit, so every finding counts as new. If the entry is build output, build it in install-command so the base has it too."
           echo '{ "version": 1, "targets": [] }' > "$RUNNER_TEMP/edgefit/base.json"
           echo 'empty=true' >> "$GITHUB_OUTPUT"
         fi
