@@ -1,0 +1,137 @@
+name: edgefit
+description: Report the runtime compatibility findings a pull request adds or fixes
+author: hamedniroomand
+branding:
+  icon: check-circle
+  color: orange
+
+inputs:
+  targets:
+    description: "Targets to check, separated by commas or spaces. Default: the config file's targets, then workerd"
+    default: ''
+  entry:
+    description: "Entry point. Default: the config file's entry, then wrangler's main"
+    default: ''
+  working-directory:
+    description: Project root, relative to the repository root
+    default: .
+  fail-on:
+    description: 'When to fail: new-errors, errors or never'
+    default: new-errors
+  install-command:
+    description: 'Installs the dependencies, run in the repository root of the base and the head. Default: chosen from the lockfile'
+    default: ''
+  github-token:
+    description: Token for the pull request comment. Needs pull-requests write permission
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: Build edgefit
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: |
+        command -v corepack > /dev/null || npm install --global corepack
+        corepack pnpm install --frozen-lockfile
+        corepack pnpm --filter edgefit run build
+
+    - name: Find the base commit
+      id: base
+      shell: bash
+      env:
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        EDGEFIT_DIRECTORY: ${{ github.action_path }}
+        CACHE_INPUTS: ${{ inputs.targets }} | ${{ inputs.entry }} | ${{ inputs.working-directory }} | ${{ inputs.install-command }}
+      run: |
+        if [ -z "$BASE_SHA" ]; then
+          echo '::error::The edgefit action runs on pull_request events.'
+          exit 1
+        fi
+        fetch=(--no-tags --quiet)
+        if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
+          fetch+=(--unshallow)
+        fi
+        git fetch "${fetch[@]}" origin "$BASE_SHA"
+        sha=$(git merge-base "$BASE_SHA" HEAD)
+        # A cached base report is only valid for the same edgefit build, data and inputs.
+        build=$(cd "$EDGEFIT_DIRECTORY" && find dist data -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -c1-16)
+        inputs=$(echo "$CACHE_INPUTS" | sha256sum | cut -c1-16)
+        mkdir -p "$RUNNER_TEMP/edgefit"
+        echo "sha=$sha" >> "$GITHUB_OUTPUT"
+        echo "cache-key=edgefit-base-$build-$inputs-$sha" >> "$GITHUB_OUTPUT"
+
+    - name: Restore the base report
+      id: cache
+      uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      with:
+        path: ${{ runner.temp }}/edgefit/base.json
+        key: ${{ steps.base.outputs.cache-key }}
+
+    - name: Check the base
+      id: base-check
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        BASE: ${{ steps.base.outputs.sha }}
+        EDGEFIT: ${{ github.action_path }}/dist/cli/main.mjs
+        TARGETS: ${{ inputs.targets }}
+        ENTRY: ${{ inputs.entry }}
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+        INSTALL_COMMAND: ${{ inputs.install-command }}
+      run: |
+        worktree="$RUNNER_TEMP/edgefit-base"
+        git worktree add --detach --force "$worktree" "$BASE"
+        # A base without a checkable project, such as one before edgefit was set up, counts as empty.
+        if ! "$GITHUB_ACTION_PATH/action/check.sh" "$worktree" "$RUNNER_TEMP/edgefit/base.json"; then
+          echo '::warning::edgefit could not check the base commit, so every finding counts as new.'
+          echo '{ "version": 1, "targets": [] }' > "$RUNNER_TEMP/edgefit/base.json"
+          echo 'empty=true' >> "$GITHUB_OUTPUT"
+        fi
+        git worktree remove --force "$worktree"
+
+    - name: Save the base report
+      if: steps.cache.outputs.cache-hit != 'true' && steps.base-check.outputs.empty != 'true'
+      uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+      with:
+        path: ${{ runner.temp }}/edgefit/base.json
+        key: ${{ steps.base.outputs.cache-key }}
+
+    - name: Check the head
+      shell: bash
+      env:
+        EDGEFIT: ${{ github.action_path }}/dist/cli/main.mjs
+        TARGETS: ${{ inputs.targets }}
+        ENTRY: ${{ inputs.entry }}
+        WORKING_DIRECTORY: ${{ inputs.working-directory }}
+        INSTALL_COMMAND: ${{ inputs.install-command }}
+      run: '"$GITHUB_ACTION_PATH/action/check.sh" "$PWD" "$RUNNER_TEMP/edgefit/head.json"'
+
+    - name: Compare
+      shell: bash
+      env:
+        EDGEFIT: ${{ github.action_path }}/dist/cli/main.mjs
+      run: |
+        cd "$RUNNER_TEMP/edgefit"
+        node "$EDGEFIT" diff base.json head.json --fail-on never --format json > diff.json
+        node "$EDGEFIT" diff base.json head.json --fail-on never --no-color | tee diff.txt
+
+    - name: Comment on the pull request
+      uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+      env:
+        # One comment per project and targets, found again by this marker on later pushes.
+        MARKER: '<!-- edgefit ${{ inputs.working-directory }} ${{ inputs.targets }} -->'
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const { comment } = await import(`${process.env.GITHUB_ACTION_PATH}/action/comment.js`);
+          await comment({ github, context, core });
+
+    - name: Annotate new findings
+      shell: bash
+      env:
+        EDGEFIT: ${{ github.action_path }}/dist/cli/main.mjs
+        FAIL_ON: ${{ inputs.fail-on }}
+      run: |
+        cd "$RUNNER_TEMP/edgefit"
+        node "$EDGEFIT" diff base.json head.json --fail-on "$FAIL_ON" --format github
