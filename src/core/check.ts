@@ -31,6 +31,8 @@ export interface TargetReport {
   entry: string;
   modules: number;
   findings: Finding[];
+  /** Findings in code that only runs when the API exists, kept out of `findings`. */
+  guarded: Finding[];
   ignored: number;
   /** Empty unless `includeSupported` is set. */
   supported: SupportedApi[];
@@ -73,7 +75,7 @@ async function checkTarget(
   const { modules, notes } =
     options.built === undefined ? { modules: scanned, notes: [] } : attributeOutput(scanned, root);
 
-  const { findings, ignored } = collectFindings(modules, {
+  const { findings, guarded, ignored } = collectFindings(modules, {
     target,
     levels: { ...defaultLevels, ...config.levels },
     ignore: config.ignore ?? [],
@@ -83,6 +85,7 @@ async function checkTarget(
     entry: toPosix(graph.entry),
     modules: graph.modules.size,
     findings,
+    guarded,
     ignored,
     supported: options.includeSupported === true ? collectSupported(modules, target) : [],
   };

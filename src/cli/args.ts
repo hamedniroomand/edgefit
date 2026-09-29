@@ -17,6 +17,7 @@ export interface CheckArgs {
   config: string | undefined;
   format: ReportFormat;
   color: boolean;
+  verbose: boolean;
 }
 
 export interface CompareArgs {
@@ -103,6 +104,7 @@ export function parseCheckArgs(argv: string[]): CheckArgs {
       ...projectOptions,
       target: { type: 'string', multiple: true },
       built: { type: 'string' },
+      verbose: { type: 'boolean' },
     },
   });
   if (values.built !== undefined && values.entry !== undefined) {
@@ -116,6 +118,7 @@ export function parseCheckArgs(argv: string[]): CheckArgs {
     config: values.config,
     format: parseFormat(values.format),
     color: values.color ?? true,
+    verbose: values.verbose ?? false,
   };
 }
 

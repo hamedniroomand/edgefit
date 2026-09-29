@@ -27,6 +27,7 @@ function report(key: TargetKey, parts: Partial<TargetReport>): TargetReport {
     entry: 'src/index.ts',
     modules: 1,
     findings: [],
+    guarded: [],
     ignored: 0,
     supported: [],
     ...parts,

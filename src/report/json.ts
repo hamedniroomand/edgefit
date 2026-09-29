@@ -22,6 +22,7 @@ export function formatJson(result: CheckResult): string {
       modules: targetReport.modules,
       ignored: targetReport.ignored,
       findings: targetReport.findings,
+      guarded: targetReport.guarded,
     })),
   };
   return `${JSON.stringify(report, null, 2)}\n`;

@@ -1,10 +1,13 @@
 import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef, Location, Usage } from '@/types.ts';
 
+import { GuardStack } from './guards.ts';
 import { normalizeRef } from './refs.ts';
 
 export class UsageCollector {
   public readonly usages: Usage[] = [];
+  /** The APIs known to exist at the point being visited. */
+  public readonly guards = new GuardStack();
   readonly #file: string;
   readonly #lineStarts: number[] = [0];
 
@@ -31,11 +34,13 @@ export class UsageCollector {
 
   public api(ref: ApiRef, offset: number): void {
     const api = normalizeRef(ref);
+    const guarded = this.guards.covers(api);
     this.usages.push({
       kind: 'api',
       api,
       display: displayApi(api.module, api.path),
       location: this.location(offset),
+      ...(guarded ? { guarded: true as const } : {}),
     });
   }
 

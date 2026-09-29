@@ -1,0 +1,7 @@
+{
+  // A Worker that checks for APIs before using them.
+  "name": "fixture-guarded-app",
+  "main": "src/index.js",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}

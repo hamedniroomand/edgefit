@@ -135,3 +135,54 @@ describe('collecting supported APIs', () => {
     ]);
   });
 });
+
+describe('collecting guarded findings', () => {
+  const absent = stubTarget({
+    'fs.watch': { status: 'unsupported', note: 'does not exist on the target', absent: true },
+    fs: { status: 'unsupported', note: 'does not exist on the target', absent: true },
+  });
+  const absentOptions: FindingOptions = { ...options, target: absent };
+  const guardedWatch = (file: string, line: number): Usage => ({
+    ...watch(file, line),
+    guarded: true,
+  });
+
+  it('sets guarded usages of a missing API apart from the findings', () => {
+    const { findings, guarded } = collectFindings(
+      [module('a.js', [guardedWatch('a.js', 1)], 'pkg'), module('b.js', [watch('b.js', 2)], 'pkg')],
+      absentOptions,
+    );
+    expect(findings.map(finding => finding.location.file)).toEqual(['b.js']);
+    expect(guarded.map(finding => finding.location.file)).toEqual(['a.js']);
+    expect(guarded[0]?.guarded).toBe(true);
+  });
+
+  it('keeps a guarded usage of an API that exists and throws as a finding', () => {
+    const { findings, guarded } = collectFindings(
+      [module('a.js', [guardedWatch('a.js', 1)], 'pkg')],
+      options,
+    );
+    expect(findings.map(finding => finding.api)).toEqual(['node:fs.watch']);
+    expect(findings[0]?.guarded).toBeUndefined();
+    expect(guarded).toEqual([]);
+  });
+
+  it('keeps an unguarded module finding when only a member of it is guarded', () => {
+    const whole = makeUsage({ module: 'fs', path: [] }, { location: at('a.js', 1) });
+    const { findings, guarded } = collectFindings(
+      [module('a.js', [whole, guardedWatch('a.js', 2)], 'pkg')],
+      absentOptions,
+    );
+    expect(findings.map(finding => finding.api)).toEqual(['node:fs']);
+    expect(guarded.map(finding => finding.api)).toEqual(['node:fs.watch']);
+  });
+
+  it('applies ignore rules to guarded findings too', () => {
+    const { guarded, ignored } = collectFindings(
+      [module('a.js', [guardedWatch('a.js', 1)], 'pkg')],
+      { ...absentOptions, ignore: [{ package: 'pkg' }] },
+    );
+    expect(guarded).toEqual([]);
+    expect(ignored).toBe(1);
+  });
+});

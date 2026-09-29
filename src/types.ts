@@ -35,6 +35,8 @@ export interface Usage {
   /** For dynamic and mocked usages: why the API could not be determined statically, or what replaced it. */
   reason?: string;
   location: Location;
+  /** Set when the code only runs if the API exists, for example inside `if (x.y)`. */
+  guarded?: true;
 }
 
 export interface Finding {
@@ -55,6 +57,8 @@ export interface Finding {
   chain: string[];
   /** Link to the curated source behind this result, when there is one. */
   source?: string;
+  /** Set when the code only runs if the API exists. Guarded findings never fail a check. */
+  guarded?: true;
 }
 
 export interface IgnoreRule {

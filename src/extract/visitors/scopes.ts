@@ -3,13 +3,15 @@ import type { Visitor } from '@/extract/context.ts';
 import { collectBlockNames, collectLexicalNames, patternNames } from '@/extract/declarations.ts';
 import { createScope, declare } from '@/extract/scope.ts';
 
+import { visitStatements } from './guards.ts';
+
 type FunctionNode = NodeOf<
   'FunctionDeclaration' | 'FunctionExpression' | 'ArrowFunctionExpression'
 >;
 
 export const visitProgram: Visitor<NodeOf<'Program'>> = (node, context) => {
   declare(context.scope, collectBlockNames(node.body));
-  context.visitAll(node.body);
+  visitStatements(node.body, context);
 };
 
 export const visitFunction: Visitor<FunctionNode> = (node, context) => {
@@ -30,7 +32,7 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
     if (body?.type === 'BlockStatement') {
       // The body shares the function's scope instead of opening a block scope.
       context.withAncestor(body, () => {
-        context.visitAll(body.body);
+        visitStatements(body.body, context);
       });
     } else {
       context.visit(body);
@@ -50,7 +52,7 @@ export const visitBlock: Visitor<NodeOf<'BlockStatement' | 'StaticBlock'>> = (no
   const scope = createScope(context.scope);
   declare(scope, collectLexicalNames(node.body));
   context.inScope(scope, () => {
-    context.visitAll(node.body);
+    visitStatements(node.body, context);
   });
 };
 
