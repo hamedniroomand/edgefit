@@ -67,3 +67,29 @@ describe('dynamic access', () => {
     expect(usagesOf('const = ;')).toEqual(['dynamic <unparsed file>']);
   });
 });
+
+describe('keys that cannot name an API', () => {
+  it('reads a string-literal key on a global like a property', () => {
+    expect(usagesOf("globalThis['Buffer'].from('a');")).toEqual(
+      usagesOf("globalThis.Buffer.from('a');"),
+    );
+  });
+
+  it('does not report a symbol key as a computed access', () => {
+    const plain = ['api node:fs', 'api node:fs'];
+    expect(usagesOf("import fs from 'fs';\nfs[Symbol.iterator];")).toEqual(plain);
+    expect(usagesOf("import fs from 'fs';\nfs[Symbol('x')];")).toEqual(plain);
+    expect(usagesOf("import fs from 'fs';\nfs[Symbol.for('x')];")).toEqual(plain);
+  });
+
+  it('still reports a key that could be anything', () => {
+    expect(usagesOf("import fs from 'fs';\nfs[Symbols.iterator];")).toContain(
+      'dynamic node:fs[<expression>]',
+    );
+  });
+
+  it('does not report the global object itself when it is exported', () => {
+    expect(usagesOf('const root = globalThis;\nexport { root };')).toEqual([]);
+    expect(usagesOf('export const root = globalThis;')).toEqual([]);
+  });
+});

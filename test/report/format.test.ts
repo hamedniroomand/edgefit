@@ -5,6 +5,7 @@ import { annotation, formatGithub } from '@/report/github.ts';
 import { formatJson } from '@/report/json.ts';
 import { summaryLine } from '@/report/summary.ts';
 import { formatText } from '@/report/text.ts';
+import type { Finding } from '@/types.ts';
 import { makeFinding } from '~/helpers.ts';
 
 const info = {
@@ -130,5 +131,71 @@ describe('guarded findings', () => {
     };
     expect(report.summary.errors).toBe(0);
     expect(report.targets[0]?.guarded).toMatchObject([{ api: 'node:fs.watch', guarded: true }]);
+  });
+});
+
+const unknown = (api: string, parts: Parameters<typeof makeFinding>[1] = {}): Finding =>
+  makeFinding(api, {
+    category: 'unknown',
+    level: 'warning',
+    detail: 'cannot be checked statically: accessed with a computed property',
+    ...parts,
+  });
+
+describe('unknown findings', () => {
+  const owner = { name: 'better-auth', version: '1.7.6' };
+  const many = [
+    unknown('globalThis[<expression>]', {
+      package: owner,
+      otherLocations: [
+        { file: 'a.js', line: 1, column: 1 },
+        { file: 'a.js', line: 2, column: 1 },
+      ],
+    }),
+    unknown('import(<expression>)', { package: owner }),
+    unknown('globalThis[<expression>]', {
+      package: { name: 'vue', version: '3.5.0' },
+      location: { file: 'node_modules/vue/index.js', line: 4, column: 2 },
+    }),
+  ];
+
+  it('are folded into one line per package, with counts', () => {
+    const text = formatText(resultOf(many), { color: false });
+    expect(text).toContain(
+      'better-auth@1.7.6  4 accesses that cannot be checked: globalThis[<expression>] (3), import(<expression>) (1)',
+    );
+    expect(text).toContain(
+      'vue@3.5.0  1 access that cannot be checked: globalThis[<expression>] (1)',
+    );
+    expect(text).toContain('Run with --verbose for the locations.');
+    expect(text).not.toContain('node_modules/vue/index.js');
+  });
+
+  it('are listed in full with --verbose', () => {
+    const text = formatText(resultOf(many), { color: false, verbose: true });
+    expect(text).toContain('node_modules/vue/index.js:4:2');
+    expect(text).not.toContain('that cannot be checked');
+  });
+});
+
+describe('unknown findings next to others', () => {
+  it('keep the details of errors and of other warnings', () => {
+    const text = formatText(resultOf([chokidar, makeFinding('node:fs.cp', { level: 'warning' })]), {
+      color: false,
+    });
+    expect(text).toContain('node_modules/chokidar/index.js:5:3');
+    expect(text).toContain('warning  unsupported  node:fs.cp');
+    expect(text).not.toContain('cannot be checked');
+  });
+
+  it('stay in full when the user made them errors', () => {
+    const text = formatText(resultOf([unknown('import(<expression>)', { level: 'error' })]), {
+      color: false,
+    });
+    expect(text).toContain('error    unknown  import(<expression>)');
+  });
+
+  it('are still counted as warnings in the summary', () => {
+    expect(summaryLine(resultOf([unknown('import(<expression>)')]))).toBe('0 errors, 1 warning');
   });
 });

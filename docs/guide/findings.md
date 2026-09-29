@@ -63,6 +63,17 @@ edgefit could not determine what is used. Typical causes:
 
 An `unknown` finding is only reported when the access could reach something unsupported. Computed access on a module that is fully supported on the target is not reported.
 
+Symbol keys such as `x[Symbol.iterator]` are never reported, since a symbol cannot name an API. The global object on its own (`globalThis`, `self`) is not reported either, and neither is `globalThis['crypto']`, which is read like `globalThis.crypto`.
+
+By default the `unknown` warnings are folded into one line per package, because there are often many and they rarely need action:
+
+```
+warning  unknown  jose@6.2.12  1 access that cannot be checked: globalThis[<expression>] (1)
+       Run with --verbose for the locations.
+```
+
+`--verbose` lists each one with its location and chain. The JSON report always has every finding, and the summary still counts them as warnings. An `unknown` you turned into an error with `levels` is listed in full.
+
 ## Guarded usages
 
 Code often checks for an API before it uses it:
