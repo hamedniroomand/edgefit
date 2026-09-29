@@ -45,9 +45,9 @@ jobs:
       - run: vp run ready
       - name: Pack
         run: vp pm pack --pack-destination "$RUNNER_TEMP/package"
-      # Trusted publishing needs npm 11.5.1 or later.
-      - name: Update npm
-        run: npm install --global npm@^11.5.1
+      # Trusted publishing needs npm 11.5.1 or later, which Node 24 ships.
+      - name: Check npm
+        run: node -e "const [a, b, c] = process.argv[1].split('.').map(Number); if (a < 11 || (a === 11 && (b < 5 || (b === 5 && c < 1)))) { console.error('npm ' + process.argv[1] + ' is older than 11.5.1'); process.exit(1); }" "$(npm --version)"
       - name: Publish
         run: |
           tag=latest
