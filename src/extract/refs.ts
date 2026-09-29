@@ -117,7 +117,8 @@ export function escapes(node: Node, parent: Node): boolean {
 function isNullishOperand(node: Node): boolean {
   return (
     (node.type === 'Identifier' && node.name === 'undefined') ||
-    (node.type === 'Literal' && node.value === null && node.raw === 'null')
+    (node.type === 'Literal' && node.value === null && node.raw === 'null') ||
+    (node.type === 'UnaryExpression' && node.operator === 'void')
   );
 }
 

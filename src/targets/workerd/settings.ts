@@ -25,10 +25,15 @@ function unsupported(note: string, source?: string): LookupResult {
     : { status: 'unsupported', note, source };
 }
 
+/** An API a missing flag leaves undefined: code that checks for it first never reaches it. */
+function withoutFlag(note: string): LookupResult {
+  return { ...unsupported(note, flagsSource), absent: true };
+}
+
 function checkGlobal(api: ApiRef, settings: WorkerdSettings): LookupResult | undefined {
   const [name] = api.path;
   if (name !== undefined && nodeCompatGlobals.has(name) && !hasNodeCompat(settings)) {
-    return unsupported('is only defined with the nodejs_compat compatibility flag', flagsSource);
+    return withoutFlag('is only defined with the nodejs_compat compatibility flag');
   }
   return undefined;
 }
@@ -49,7 +54,7 @@ export function checkSettings(api: ApiRef, settings: WorkerdSettings): LookupRes
       api.module === 'async_hooks' && settings.compatibilityFlags.includes('nodejs_als');
     return alsOnly
       ? undefined
-      : unsupported('needs the nodejs_compat compatibility flag, which is not set', flagsSource);
+      : withoutFlag('needs the nodejs_compat compatibility flag, which is not set');
   }
   const gate = gatesFor(api).find(candidate => !isGateOpen(candidate, settings));
   if (gate === undefined) {

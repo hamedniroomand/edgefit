@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- `const { process } = globalThis` is no longer reported as a use of `process`. Only the places the name is used count, and a use after a check such as `process !== void 0` is guarded. This removes the `node:process needs the nodejs_compat flag` error that Hono's `color.js` produced in a project without `nodejs_compat`.
+- `void 0` counts as `undefined` in checks like `x !== void 0`, which is how minified code writes them.
+- An API a missing `nodejs_compat` flag leaves undefined (`process`, `Buffer`, `global`, and Node modules) counts as absent, so code that checks for it first is reported as guarded instead of failing the check. An import of a Node module without the flag still fails.
+
 ## 0.3.0
 
 The data now describes the newest workerd, Bun and Deno, and the project keeps itself honest about it.
