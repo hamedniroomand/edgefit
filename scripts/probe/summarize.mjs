@@ -1,9 +1,11 @@
 // `node summarize.mjs <runtime> <pinned|latest> results.json [probesDirectory]` prints a job summary.
+// For the latest channel it also writes `drift.json`, which the report job turns into an issue.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { compareOutcomes, implementedMocks, proposeOverrides } from './compare.mjs';
+import { compareOutcomes, proposeOverrides } from './compare.mjs';
 import { pinnedVersion, readMatrix, readOverrides } from './data.mjs';
+import { driftFor } from './drift.mjs';
 
 const [runtime, channel, resultsFile, probesDirectory] = process.argv.slice(2);
 const { version, outcomes, mocked } = JSON.parse(readFileSync(resultsFile, 'utf8'));
@@ -11,25 +13,44 @@ const overrides = readOverrides(runtime);
 
 const section = (title, items) =>
   items.length > 0 ? [`### ${title}`, ...items.map(item => `- ${item}`), ''] : [];
+const code = api => `\`${api}\``;
 
-const disagreements = compareOutcomes(outcomes, overrides, readMatrix(runtime)).map(
-  ({ api, message }) => `\`${api}\`: ${message}`,
-);
-const lines = [
-  `## ${runtime} ${version} (${channel}, pinned ${pinnedVersion(runtime)})`,
-  '',
-  ...(channel === 'pinned'
-    ? section('Disagreements with the overrides and the matrix', disagreements)
-    : section('Curated stubs that now work (bump the pinned data)', disagreements)),
-  ...section(
-    'Mocked entries that are now implemented',
-    implementedMocks(mocked).map(api => `\`${api}\``),
-  ),
-  ...section(
-    'Proposed overrides',
-    proposeOverrides(outcomes, overrides).map(api => `\`${api}\``),
-  ),
-];
+const heading = `## ${runtime} ${version} (${channel}, pinned ${pinnedVersion(runtime)})`;
+const proposed = section('Proposed overrides', proposeOverrides(outcomes, overrides).map(code));
+let lines;
+
+if (channel === 'latest') {
+  const drift = driftFor({
+    runtime,
+    pinned: pinnedVersion(runtime),
+    latest: version,
+    outcomes,
+    mocked,
+    overrides,
+  });
+  writeFileSync('drift.json', `${JSON.stringify(drift, null, 2)}\n`);
+  lines = [
+    heading,
+    '',
+    ...section(
+      'Marked missing in the data, but present in this release',
+      drift.nowPresent.map(code),
+    ),
+    ...section('Curated stubs that now work (bump the pinned data)', drift.stubsNowWork.map(code)),
+    ...section('Mocked entries that are now implemented', drift.mocksImplemented.map(code)),
+    ...proposed,
+  ];
+} else {
+  const disagreements = compareOutcomes(outcomes, overrides, readMatrix(runtime)).map(
+    ({ api, message }) => `\`${api}\`: ${message}`,
+  );
+  lines = [
+    heading,
+    '',
+    ...section('Disagreements with the overrides and the matrix', disagreements),
+    ...proposed,
+  ];
+}
 console.log(lines.length > 2 ? lines.join('\n') : `${lines.join('\n')}\nNo disagreements.\n`);
 
 if (channel === 'pinned' && probesDirectory) {

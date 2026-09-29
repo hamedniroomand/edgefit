@@ -7,6 +7,10 @@ on:
         description: Probe every API in the matrix baseline, not only the curated ones
         type: boolean
         default: false
+      open-issue:
+        description: Also open, update or close the data drift issue, as the weekly run does
+        type: boolean
+        default: false
   schedule:
     - cron: '17 5 * * 1'
 
@@ -46,7 +50,7 @@ jobs:
           fi
       - name: Build the list of APIs
         run: |
-          flags=""
+          flags="--drift"
           [ "${{ inputs.discover }}" = true ] && flags="$flags --discover"
           [ "${{ matrix.channel }}" = latest ] && flags="$flags --mocked"
           node "$PROBE/apis-cli.mjs" ${{ matrix.runtime }} $flags > "$SPEC"
@@ -67,6 +71,9 @@ jobs:
 
       - if: matrix.runtime == 'workerd'
         working-directory: ${{ runner.temp }}
+        env:
+          # The latest channel probes with the newest compatibility date its release accepts.
+          PROBE_LATEST: ${{ matrix.channel == 'latest' && '1' || '0' }}
         run: |
           npm init -y > /dev/null
           npm install workerd@${{ steps.version.outputs.value }}
@@ -79,4 +86,47 @@ jobs:
           name: probe-${{ matrix.runtime }}-${{ matrix.channel }}
           path: |
             results.json
+            drift.json
             probes/
+          if-no-files-found: ignore
+
+  report:
+    name: Data drift issue
+    needs: probe
+    # Only the weekly run, or a manual one that asks for it, writes to the issue tracker.
+    if: github.event_name == 'schedule' || inputs.open-issue
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: probe-*-latest
+          path: reports
+      - name: Write the issue text
+        id: drift
+        run: node "$PROBE/drift-issue.mjs" reports "$RUNNER_TEMP/body.md"
+      - name: Open, update or close the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          DRIFT: ${{ steps.drift.outputs.drift }}
+          TITLE: The compatibility data is behind the latest runtimes
+        run: |
+          number=$(gh issue list --state open --label data --json number,title \
+            --jq "[.[] | select(.title == \"$TITLE\")][0].number // empty")
+          if [ "$DRIFT" = true ] && [ -z "$number" ]; then
+            gh issue create --title "$TITLE" --label data --body-file "$RUNNER_TEMP/body.md"
+          elif [ "$DRIFT" = true ]; then
+            gh issue edit "$number" --body-file "$RUNNER_TEMP/body.md"
+          elif [ -n "$number" ]; then
+            gh issue close "$number" --comment "The pinned data agrees with the latest releases again."
+          fi

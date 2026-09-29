@@ -71,8 +71,16 @@ Dangerous APIs such as `process.exit`, `child_process.*` and `fs` writes are onl
 
 The workflow runs twice per runtime:
 
-- **pinned** probes the versions in `source.json` and lists every disagreement with the overrides in the job summary.
-- **latest** probes the newest release and lists curated stubs that now work, which is the signal to bump the data. It also runs a small targeted check for each `mocked` entry.
+- **pinned** probes the versions in `source.json` and lists every disagreement with the overrides and the matrix in the job summary.
+- **latest** probes the newest release and lists what differs from the pinned data. For workerd it uses the newest compatibility date that release accepts, since newer dates turn features on.
+
+Both channels also look up every API the runtime's data marks as missing (Web APIs like `crypto.subtle.getPublicKey` included, and each global counted once), without calling it. A `missing` API that exists in the newest release is the clearest sign that the data is behind. The latest channel reports three kinds of drift:
+
+- APIs the data marks missing that now exist
+- curated stubs that now work, which means the probe got an argument error from real code (an inconclusive result is not counted)
+- `mocked` entries the targeted check found implemented
+
+Every Monday, and on a manual run with **open-issue** ticked, a last job collects the latest results and keeps one issue, labelled `data`, up to date with them. It opens the issue when there is drift, edits it on later weeks, and closes it when the data agrees with the newest releases again.
 
 Nothing is committed automatically. Probe results are evidence for reviewers. edgefit itself never reads them when checking a project, so results only ever come from the reviewed override files.
 
