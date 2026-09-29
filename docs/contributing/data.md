@@ -93,9 +93,9 @@ The probe code is in `scripts/probe`.
 
 The matrix provider's repository may lag behind the runtimes. Check its newest commit first: if it has newer dumps, vendor those. If it does not, regenerate the runtime dumps with its own scripts, at the commit `source.json` names:
 
-1. Clone the provider at that commit. Its `node/dump.mjs`, `bun/dump.js`, `deno/dump.js` and `workerd/dump.mjs` write `data/<runtime>.json`. The Node baseline stays as it is.
-2. Run each script with the release you want: `bun run bun/dump.js`, `deno run --allow-write=./data/deno.json --allow-read --allow-env --allow-sys deno/dump.js` (Deno 2.9 needs `--allow-sys`), and `node workerd/dump.mjs <date>` after installing that `workerd` version, where `<date>` is the release's date.
-3. Copy the dumps to `data/workers-nodejs-compat-matrix`, keeping the file formatting.
+1. Run the **Dump data** workflow with the runtime versions you want. It checks out the provider at the commit in `source.json` and runs its dump scripts on Linux, which is how the provider makes them.
+2. Download its `runtime-dumps` artifact. Do not dump on a laptop: macOS lacks Linux-only constants and a terminal changes `process.stdin`, so the dump would disagree with the probe. The maintenance runbook has the details, and how to dump by hand in a container.
+3. Copy the three dumps to `data/workers-nodejs-compat-matrix`, keeping the file formatting.
 4. In `source.json`, update `generatedAt`, the runtime versions, the workerd compatibility date, and the override sources' tags. Say in `note` how the data was generated.
 5. Check that every override `source` still exists at the new tag. Files move: Bun's `src/bun.js` became `src/jsc`.
 6. Review every override against the new source, and run a `pinned` probe on the new versions (see below). It lists overrides that no longer match. A stub that now works is removed, and one that changed is corrected. A stub that validates its arguments before it throws gets `"validatesFirst": true`, so the probe does not read its argument error as a working implementation.

@@ -99,27 +99,36 @@ If it has newer dumps, vendor them. If its newest commit is the one you already 
 
 ### 2. Regenerate the dumps
 
-The Node baseline (`baseline.json`) stays as it is. Only the runtimes change:
+The Node baseline (`baseline.json`) stays as it is. Only the runtimes change, and they must be dumped **on Linux with no terminal attached**. A dump made on a laptop is wrong in two ways: it lacks the Linux-only constants (`O_DIRECT`, `O_NOATIME`, `RTLD_DEEPBIND`, `SIGPWR`, `SIGPOLL`, `SIGSTKFLT`), and it lacks the `process.stdin` members that only exist when stdin is a pipe or file instead of a terminal. The probe runs on Linux, so it reports every one of them as drift.
+
+Run the **Dump data** workflow, which does this with the provider's own scripts at the commit in `source.json`:
 
 ```sh
-git clone https://github.com/cloudflare/workers-nodejs-compat-matrix.git /tmp/matrix
-cd /tmp/matrix && git checkout <the commit in source.json>
+gh workflow run dump-data.yml -f workerd=1.20260929.1 -f bun=1.4.2 -f deno=2.9.7
+gh run download <run id> -n runtime-dumps -D /tmp/dumps
+```
 
+The artifact has `bun.json`, `deno.json`, `workerd.json` and a `versions.txt` with the versions and the provider commit. The workflow commits nothing.
+
+If you ever have to dump by hand, do it in a Linux container (`docker run --rm -i`, without `-t`, so stdin is not a terminal) with the provider's commands:
+
+```sh
 bun run bun/dump.js
 deno run --allow-write=./data/deno.json --allow-read --allow-env --allow-sys deno/dump.js
-(cd workerd && npm install workerd@<version>)
+(cd workerd && npm install workerd@<version> --no-save)
 node workerd/dump.mjs <YYYY-MM-DD>       # the release's date, from 1.YYYYMMDD.N
 ```
 
 Notes that cost time once:
 
 - Deno 2.9 needs `--allow-sys`. The provider's own command does not have it.
-- The npm `deno` package does not always have the newest release. Download the binary from the GitHub release instead.
+- The npm `deno` package does not always have the newest release, so the workflow uses `setup-deno`.
 - workerd warns that `nodejs_compat` is the default from 2026-08-04. That is harmless.
+- **Check the result before vendoring**: compare the new dump with the old one and look at what went from present to missing. Real removals are rare. A list of constants or `stdin` members means the dump came from the wrong environment.
 
 ### 3. Vendor the files
 
-Copy `data/{bun,deno,workerd}.json` from the clone into `data/workers-nodejs-compat-matrix`, and keep the formatting: two-space indent and a final newline (`json.dumps(data, indent=2, ensure_ascii=False)` plus `\n` matches).
+Copy `bun.json`, `deno.json` and `workerd.json` from the artifact into `data/workers-nodejs-compat-matrix`, and keep the formatting: two-space indent and a final newline (`json.dumps(data, indent=2, ensure_ascii=False)` plus `\n` matches).
 
 Then update `data/source.json`:
 
