@@ -33,6 +33,18 @@ With no base, `fail-on: new-errors` fails on any error, since every finding is n
 | `edgefit-package`   |                                            | Path to a tarball to install instead, to test a package before publishing    |
 | `github-token`      | `github.token`                             | Token for the comment. Needs `pull-requests: write`                          |
 
+## Build output
+
+If the entry is build output, such as `.output/server/index.mjs`, the base commit needs a build too: the action checks it out in a clean worktree, and a build made before the action ran only exists for the head. Build in `install-command`, which runs for both:
+
+```yaml
+- uses: hamedniroomand/edgefit@v0
+  with:
+    install-command: pnpm install --frozen-lockfile && pnpm build
+```
+
+Without it, the action warns that it could not check the base, and every finding counts as new.
+
 ## Which edgefit runs
 
 The action installs the published `edgefit` package from npm, so it needs no pnpm and builds nothing. It runs the version it was released with: `@v0.4.0` runs `edgefit@0.4.0`, and `@v0` runs the newest 0.x release. Set `edgefit-version` to run another one, for example a newer CLI with an older action while you test it.
