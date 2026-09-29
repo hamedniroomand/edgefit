@@ -83,6 +83,8 @@ Both channels also look up every API the runtime's data marks as missing (Web AP
 
 Every Monday, and on a manual run with **open-issue** ticked, a last job collects the latest results and keeps one issue, labelled `data`, up to date with them. It opens the issue when there is drift, edits it on later weeks, and closes it when the data agrees with the newest releases again.
 
+The [maintenance runbook](/contributing/maintenance) explains how to read the drift issue and what to do about each list.
+
 Nothing is committed automatically. Probe results are evidence for reviewers. edgefit itself never reads them when checking a project, so results only ever come from the reviewed override files.
 
 The probe code is in `scripts/probe`.
