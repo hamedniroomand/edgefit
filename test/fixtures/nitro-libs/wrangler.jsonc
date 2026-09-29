@@ -1,0 +1,7 @@
+{
+  // Nitro 3 build output without sourcemaps: each chunk is named after the packages in it.
+  "name": "fixture-nitro-libs",
+  "main": ".output/server/index.mjs",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}

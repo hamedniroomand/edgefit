@@ -37,3 +37,18 @@ export function builtEntry(root: string, built: string): string {
   }
   return path.relative(root, entry);
 }
+
+/** Whether the entry sits in a Nitro build output, which is marked by a `nitro.json` beside it. */
+export function isBuildOutput(root: string, entry: string): boolean {
+  const base = path.resolve(root);
+  for (
+    let directory = path.dirname(path.resolve(base, entry));
+    directory.startsWith(base) && directory !== base;
+    directory = path.dirname(directory)
+  ) {
+    if (isFile(path.join(directory, 'nitro.json'))) {
+      return true;
+    }
+  }
+  return false;
+}
