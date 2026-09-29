@@ -15,6 +15,7 @@ const runtime = {
   sqlite: 'missing',
   test: { '*self*': 'missing' },
   vm: { '*self*': 'object', runInContext: 'function' },
+  constants: { '*self*': 'object', default: { '*self*': 'object' } },
 };
 const baseline = {
   '*globals*': {
@@ -26,6 +27,7 @@ const baseline = {
   sqlite: 'object',
   test: { '*self*': 'function' },
   vm: { '*self*': 'object', runInContext: 'function' },
+  constants: { '*self*': 'object', ENGINE: 'number', default: { ENGINE: 'number' } },
 };
 const overrides = { 'fs.cp': { status: 'unsupported', note: '', source: '' } };
 
@@ -34,6 +36,7 @@ describe('missingApis', () => {
     expect(missingApis(runtime, baseline, overrides)).toEqual([
       '*globals*.BroadcastChannel',
       '*globals*.crypto.subtle.getPublicKey',
+      'constants.ENGINE',
       'fs.watch',
       'sqlite',
       'test',
@@ -155,12 +158,33 @@ describe('renderIssue', () => {
     expect(found).toBe(true);
     expect(body).toContain('<!-- edgefit-data-drift -->');
     expect(body).toContain('### workerd (pinned 1.20260424.1, latest 1.20260924.0)');
-    expect(body).toContain('`*globals*.crypto.subtle.getPublicKey`');
+    expect(body).toContain('- **globals** (1): `crypto.subtle.getPublicKey`');
     expect(body).toContain('`v8.takeCoverage`');
     expect(body).not.toContain('### bun');
   });
 
   it('reports no drift when every runtime agrees', () => {
     expect(renderIssue([clean]).drift).toBe(false);
+  });
+});
+
+describe('renderIssue with many APIs', () => {
+  const many = driftFor({
+    runtime: 'bun',
+    pinned: '1.3.0',
+    latest: '1.4.0',
+    outcomes: Object.fromEntries(
+      Array.from({ length: 20 }, (_, index) => [`constants.SSL_${index}`, 'present']),
+    ),
+    mocked: {},
+    overrides: {},
+  });
+
+  it('folds a module into one line and says how many more there are', () => {
+    const { body } = renderIssue([many]);
+    expect(body).toContain('- **constants** (20): `SSL_0`, `SSL_1`');
+    expect(body).toContain(', and 8 more');
+    expect(body).not.toContain('`SSL_9`');
+    expect(body).toContain('`drift.json` artifacts');
   });
 });
