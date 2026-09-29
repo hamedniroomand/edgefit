@@ -16,6 +16,8 @@ npx edgefit check --built .output/server/index.mjs  # or the entry file
 
 `--built` and `--entry` cannot be used together.
 
+You don't need `--built` when the entry is already inside a Nitro output, for example when wrangler's `main` is `.output/server/index.mjs`. edgefit sees the `nitro.json` next to it and scans the output as build output.
+
 ## How the entry is found
 
 For a directory, edgefit uses the `main` of a wrangler config inside it. Otherwise it looks for the first of these files:
@@ -46,6 +48,19 @@ Build with `sourcemap: true`. Nitro also empties the mappings of server sourcema
 :::
 
 When the maps have no mappings, the report adds a note saying so.
+
+### Without sourcemaps
+
+Recent Nitro builds mark the code of every module in a chunk with `//#region <path>` comments. When a chunk has no sourcemap, edgefit reads those markers to name the package a finding belongs to, so the report says `jose@6.2.12` instead of `your code`, and an [ignore rule](/guide/configuration#ignoring-findings) with `package` works.
+
+The file and line still point into the chunk, because the markers name the original file but not the line inside it. Chunks without markers, such as those from older Nitro versions, stay unattributed.
+
+```
+error    unsupported  navigator.locks.request  (workerd)
+       does not exist on the target
+       jose@6.2.12  .output/server/_libs/jose.mjs:1875:34
+       via .output/server/index.mjs > .output/server/_libs/jose.mjs > jose
+```
 
 ## Polyfills the build injected
 

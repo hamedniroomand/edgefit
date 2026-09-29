@@ -2,7 +2,7 @@ import path from 'node:path';
 import process from 'node:process';
 
 import { attributeOutput } from '@/built/attribute.ts';
-import { builtEntry } from '@/built/entry.ts';
+import { builtEntry, isBuildOutput } from '@/built/entry.ts';
 import { EdgefitError } from '@/errors.ts';
 import { resolveGraph } from '@/resolve/graph.ts';
 import { createTarget } from '@/targets/index.ts';
@@ -72,8 +72,10 @@ async function checkTarget(
     plugins: target.resolvePlugins,
   });
   const scanned = scanModules(graph, root, target.globals);
-  const { modules, notes } =
-    options.built === undefined ? { modules: scanned, notes: [] } : attributeOutput(scanned, root);
+  const isBuilt = options.built !== undefined || isBuildOutput(root, entry);
+  const { modules, notes } = isBuilt
+    ? attributeOutput(scanned, root)
+    : { modules: scanned, notes: [] };
 
   const { findings, guarded, ignored } = collectFindings(modules, {
     target,

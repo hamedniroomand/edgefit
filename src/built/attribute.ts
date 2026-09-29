@@ -5,6 +5,8 @@ import { toPosix } from '@/core/scan.ts';
 import { PackageResolver } from '@/resolve/packages.ts';
 import type { Usage } from '@/types.ts';
 
+import { readRegions } from './regions.ts';
+import type { Regions } from './regions.ts';
 import { OutputSourceMap } from './source-map.ts';
 import { unenvUsage } from './unenv.ts';
 
@@ -16,9 +18,9 @@ export interface AttributedModules {
 function unmappedNote(count: number): string {
   const files = count === 1 ? '1 output file has' : `${count} output files have`;
   return (
-    `${files} no sourcemap mappings, so their findings point into the build output. ` +
+    `${files} no sourcemap mappings, so their findings point into the build output, and packages are read from its region markers where it has them. ` +
     'Build with `sourcemap: true` (Nitro also needs `experimental.sourcemapMinify: false`) ' +
-    'to report the original files and packages.'
+    'to report the original files and lines.'
   );
 }
 
@@ -46,6 +48,33 @@ function usagesByOriginal(
 }
 
 /**
+ * Splits a chunk's usages by the module region they sit in. The locations stay in the output,
+ * because a region names the original file but the line inside it is not known.
+ */
+function usagesByRegion(chunk: ModuleUsages, regions: Regions): Map<string, Usage[]> {
+  const byFile = new Map<string, Usage[]>();
+  for (const usage of chunk.usages) {
+    const file = regions.fileAt(usage.location.line) ?? '';
+    byFile.set(file, [...(byFile.get(file) ?? []), usage]);
+  }
+  return byFile;
+}
+
+/** The chunk's own leftovers (under `''`) followed by one module per original file. */
+function splitChunk(
+  chunk: ModuleUsages,
+  byFile: Map<string, Usage[]>,
+  moduleFor: (file: string, usages: Usage[]) => ModuleUsages,
+): ModuleUsages[] {
+  const inChunk = byFile.get('') ?? [];
+  byFile.delete('');
+  return [
+    { ...chunk, usages: inChunk },
+    ...[...byFile].map(([file, usages]) => moduleFor(file, usages)),
+  ];
+}
+
+/**
  * Attributes the usages found in built chunks to the original files and packages their
  * sourcemaps name, and reports the unenv polyfills the build bundled as mocked.
  */
@@ -67,20 +96,27 @@ export function attributeOutput(chunks: readonly ModuleUsages[], root: string): 
       return usage === undefined ? [] : [originalModule(chunk, file, [usage])];
     });
 
+  const regionModules = (chunk: ModuleUsages): ModuleUsages[] => {
+    const regions = readRegions(path.resolve(root, chunk.file));
+    return regions === undefined
+      ? [chunk]
+      : splitChunk(chunk, usagesByRegion(chunk, regions), (file, usages) =>
+          originalModule(chunk, file, usages),
+        );
+  };
+
   const modules = chunks.flatMap(chunk => {
     const map = OutputSourceMap.read(path.resolve(root, chunk.file));
     if ((map === undefined || map.dropsMappings) && chunk.usages.length > 0) {
       unmapped += 1;
     }
     if (map === undefined) {
-      return [chunk];
+      return regionModules(chunk);
     }
-    const byFile = usagesByOriginal(chunk, map, root);
-    const inChunk = byFile.get('') ?? [];
-    byFile.delete('');
     return [
-      { ...chunk, usages: inChunk },
-      ...[...byFile].map(([file, usages]) => originalModule(chunk, file, usages)),
+      ...splitChunk(chunk, usagesByOriginal(chunk, map, root), (file, usages) =>
+        originalModule(chunk, file, usages),
+      ),
       ...unenvModules(chunk, map),
     ];
   });
