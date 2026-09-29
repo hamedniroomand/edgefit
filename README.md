@@ -32,6 +32,7 @@ error    unsupported  node:fs.watch  (workerd)
 - Never claims safety: code it cannot analyze is reported as `unknown`.
 - Checks `workerd`, `bun`, `deno` and `deno-deploy`, and framework build output.
 - Reproducible: all data is vendored and pinned, and every result links to its source.
+- Tested on real starters: Hono, Hono with zod, drizzle-orm, a Postgres client and a Nitro build, with pinned packages installed from npm.
 
 ## Quick start
 

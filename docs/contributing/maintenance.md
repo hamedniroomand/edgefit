@@ -216,7 +216,7 @@ A new `enable_nodejs_*` flag or a changed date has to be reflected in `gates.ts`
 
 ### Tests that fail on purpose
 
-After a bump, a few tests fail because the data moved. That is the signal to look, not to silence: check that each new expected value matches what the runtime does now. The benchmark fixtures (`test/core/benchmarks.test.ts`) must keep passing. A failure there is a precision regression, not a test to update.
+After a bump, a few tests fail because the data moved. That is the signal to look, not to silence: check that each new expected value matches what the runtime does now. The sample apps (`test/core/sample-apps.test.ts` and `test/apps`) must keep passing. A failure there is a precision regression, not a test to update.
 
 ## Deno Deploy
 

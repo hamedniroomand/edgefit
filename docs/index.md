@@ -79,6 +79,13 @@ findings do not drown out new ones.
 
 </Card>
 
+<Card title="Tested on real apps" icon="flask-conical" to="/guide/status#how-precision-is-kept">
+
+Every release is checked against popular starters (Hono, zod, drizzle-orm, a
+Postgres client, a Nitro build) installed from npm.
+
+</Card>
+
 </CardGroup>
 
 ## Supported runtimes
