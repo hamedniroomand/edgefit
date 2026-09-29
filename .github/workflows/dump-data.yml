@@ -1,0 +1,83 @@
+name: Dump data
+
+# Regenerates the Bun, Deno and workerd dumps with the matrix provider's own scripts, on Linux
+# without a terminal, which is how the provider makes them. A dump made on a laptop lacks the
+# Linux-only constants (O_DIRECT, RTLD_DEEPBIND, SIGPWR) and the process.stdin members that only
+# exist when stdin is not a terminal. Nothing is committed: download the artifact and vendor the
+# files, see docs/contributing/maintenance.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      workerd:
+        description: workerd version, for example 1.20260929.1
+        required: true
+      bun:
+        description: Bun version, for example 1.4.2
+        required: true
+      deno:
+        description: Deno version, for example 2.9.7
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PROVIDER_DIR: ${{ github.workspace }}/matrix
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: ${{ inputs.bun }}
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
+        with:
+          deno-version: ${{ inputs.deno }}
+      - name: Check out the provider at the pinned commit
+        run: |
+          commit=$(node -p "require('./data/source.json').sources.find(s => s.provider === 'workers-nodejs-compat-matrix').commit")
+          git clone https://github.com/cloudflare/workers-nodejs-compat-matrix.git "$PROVIDER_DIR"
+          git -C "$PROVIDER_DIR" checkout "$commit"
+      - name: Dump Bun
+        working-directory: ${{ env.PROVIDER_DIR }}
+        run: bun run bun/dump.js
+      - name: Dump Deno
+        working-directory: ${{ env.PROVIDER_DIR }}
+        run: deno run --allow-write=./data/deno.json --allow-read --allow-env --allow-sys deno/dump.js
+      - name: Dump workerd
+        working-directory: ${{ env.PROVIDER_DIR }}
+        env:
+          WORKERD_VERSION: ${{ inputs.workerd }}
+        run: |
+          (cd workerd && npm install "workerd@$WORKERD_VERSION" --no-save)
+          date=$(echo "$WORKERD_VERSION" | sed -E 's/^[0-9]+\.([0-9]{4})([0-9]{2})([0-9]{2}).*/\1-\2-\3/')
+          node workerd/dump.mjs "$date"
+      - name: Record the versions
+        env:
+          WORKERD_VERSION: ${{ inputs.workerd }}
+          BUN_VERSION: ${{ inputs.bun }}
+          DENO_VERSION: ${{ inputs.deno }}
+        run: |
+          {
+            echo "workerd $WORKERD_VERSION"
+            echo "bun $BUN_VERSION"
+            echo "deno $DENO_VERSION"
+            echo "provider $(git -C "$PROVIDER_DIR" rev-parse HEAD)"
+          } > "$PROVIDER_DIR/data/versions.txt"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: runtime-dumps
+          path: |
+            matrix/data/bun.json
+            matrix/data/deno.json
+            matrix/data/workerd.json
+            matrix/data/versions.txt
