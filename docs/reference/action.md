@@ -1,10 +1,12 @@
 # GitHub Action
 
 ```yaml
-- uses: hamedniroomand/edgefit@v1
+- uses: hamedniroomand/edgefit@v0
   with:
     targets: workerd
 ```
+
+`@v0` is a moving tag that follows the newest 0.x release. While edgefit is 0.x, a minor release can change behavior, so pin an exact release (`@v0.3.0`) or a commit SHA if you want a workflow that never changes on its own. From 1.0.0 the tag will be `@v1`.
 
 The action runs on `pull_request` events. It checks the merge base and the head, comments with the difference and annotates new findings. See [Pull request checks](/guide/ci) for a full workflow.
 
@@ -38,11 +40,11 @@ The base report is saved with `actions/cache`, keyed by the base commit, the edg
 Use one step per project:
 
 ```yaml
-- uses: hamedniroomand/edgefit@v1
+- uses: hamedniroomand/edgefit@v0
   with:
     working-directory: apps/api
     targets: workerd
-- uses: hamedniroomand/edgefit@v1
+- uses: hamedniroomand/edgefit@v0
   with:
     working-directory: apps/worker
     targets: workerd, bun

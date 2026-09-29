@@ -95,9 +95,6 @@ The workflow then:
 A tag with a pre-release suffix, such as `v0.2.0-beta.1`, is published under the `next` dist-tag
 and marked as a pre-release on GitHub.
 
-The action's moving major tag (`v0`, then `v1` from 1.0.0 on) is not updated by the workflow. Move it by hand after a
-stable release:
+After a stable release, the workflow moves the action's major tag (`v0`, then `v1` from 1.0.0 on) to the release commit, so nothing has to be done by hand. A pre-release tag does not move it. The tag ruleset protects only `v*.*.*`, and the Release workflow only starts for those, so moving the major tag starts nothing.
 
-```sh
-git tag -f v0 && git push -f origin v0
-```
+If the tag is ever wrong, move it with `git tag -f v0 <release tag> && git push -f origin v0`.
