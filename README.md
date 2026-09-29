@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/public/icon.svg" width="72" alt="edgefit">
+  <img src="https://raw.githubusercontent.com/hamedniroomand/edgefit/main/docs/public/icon.svg" width="72" alt="edgefit">
 </p>
 
 <h1 align="center">edgefit</h1>
@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/edgefit"><img src="https://img.shields.io/npm/v/edgefit?color=f06a2f&label=npm" alt="npm version"></a>
   <a href="https://github.com/hamedniroomand/edgefit/actions/workflows/ci.yml"><img src="https://github.com/hamedniroomand/edgefit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/hamedniroomand/edgefit?color=f06a2f" alt="MIT license"></a>
+  <a href="https://github.com/hamedniroomand/edgefit/blob/main/LICENSE"><img src="https://img.shields.io/github/license/hamedniroomand/edgefit?color=f06a2f" alt="MIT license"></a>
   <a href="https://hamedniroomand.github.io/edgefit/"><img src="https://img.shields.io/badge/docs-edgefit-f06a2f" alt="Documentation"></a>
 </p>
 
@@ -19,14 +19,9 @@
 
 edgefit follows your code and every dependency from the entry point, finds the Node and Web APIs it reaches, and checks each one against pinned compatibility data for the runtime you deploy to. Every finding names the package, the file and the import chain behind it.
 
-```
-$ npx edgefit check
-
-error    unsupported  node:fs.watch  (workerd)
-       file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION
-       chokidar@4.0.1  node_modules/chokidar/index.js:5:13
-       via src/index.ts > src/dev/reload.ts > chokidar
-```
+<p align="center">
+  <img src="https://raw.githubusercontent.com/hamedniroomand/edgefit/main/docs/public/demo.gif" width="800" alt="edgefit check on a Worker project: five errors for file watching and process spawning APIs from chokidar and cross-spawn, each with the package, the file and line, the import chain and a link to the workerd source.">
+</p>
 
 - Resolves packages with the target's export conditions, so a library's Workers build is checked, not its Node build.
 - Never claims safety: code it cannot analyze is reported as `unknown`.
@@ -60,8 +55,8 @@ Configuration, per-runtime behavior, the GitHub Action, JSON reports and the Jav
 
 ## Contributing
 
-Bug reports, data corrections and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md) to report a vulnerability.
+Bug reports, data corrections and pull requests are welcome. See [CONTRIBUTING.md](https://github.com/hamedniroomand/edgefit/blob/main/CONTRIBUTING.md), and [SECURITY.md](https://github.com/hamedniroomand/edgefit/blob/main/SECURITY.md) to report a vulnerability.
 
 ## License
 
-[MIT](LICENSE) © Hamed Niroomand. The vendored compatibility data is © Cloudflare, Inc. (MIT) and runtime-compat-data (CC0-1.0); both licenses ship in [`data`](data).
+[MIT](https://github.com/hamedniroomand/edgefit/blob/main/LICENSE) © Hamed Niroomand. The vendored compatibility data is © Cloudflare, Inc. (MIT) and runtime-compat-data (CC0-1.0); both licenses ship in [`data`](https://github.com/hamedniroomand/edgefit/tree/main/data).

@@ -74,6 +74,8 @@ keeps working, and a leaked token can no longer publish.
 
 ## Every later release
 
+If the text report changed shape, re-record the demo first: `vp pack && vhs docs/demo.tape` (needs `vhs`, and `vp install` in `apps/`).
+
 1. Update `version` in `package.json` and rename the `## Unreleased` section of `CHANGELOG.md` to
    `## <version>`. Changes merged between releases add their line under `## Unreleased`.
 2. Commit and merge to `main`.

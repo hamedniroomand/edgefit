@@ -23,15 +23,7 @@ hero:
       link: https://github.com/hamedniroomand/edgefit
 ---
 
-```
-$ npx edgefit check
-
-error    unsupported  node:fs.watch  (workerd)
-       file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION
-       chokidar@4.0.1  node_modules/chokidar/index.js:5:13
-       via src/index.ts > src/dev/reload.ts > chokidar
-       see https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node/internal/internal_fs_callback.ts
-```
+![edgefit check on a Worker project: five errors for file watching and process spawning APIs from chokidar and cross-spawn, each with the package, the file and line, the import chain and a link to the workerd source.](/demo.gif)
 
 ## Why edgefit
 
