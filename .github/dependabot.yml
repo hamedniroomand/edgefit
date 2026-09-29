@@ -17,6 +17,10 @@ updates:
       interval: weekly
     commit-message:
       prefix: chore(deps)
+    ignore:
+      # Types follow the oldest Node.js the package supports (engines), not the latest release.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     exclude-paths:
       - test/fixtures/**
     groups:
