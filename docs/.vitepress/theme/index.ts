@@ -8,6 +8,7 @@ import CardGroup from './components/CardGroup.vue';
 import GraphPattern from './components/GraphPattern.vue';
 import RuntimeLogos from './components/RuntimeLogos.vue';
 import Steps from './components/Steps.vue';
+import Terminal from './components/Terminal.vue';
 
 import './style.css';
 
@@ -23,5 +24,6 @@ export default {
     app.component('Card', Card);
     app.component('CardGroup', CardGroup);
     app.component('Steps', Steps);
+    app.component('Terminal', Terminal);
   },
 } satisfies Theme;

@@ -607,3 +607,66 @@ body {
     animation: none !important;
   }
 }
+
+/* A recorded terminal, framed like a window so the dark recording sits well on light pages. */
+.ef-terminal {
+  --ef-terminal-bg: #1e1e2e;
+  max-width: 960px;
+  margin: 40px auto;
+  overflow: hidden;
+  background: var(--ef-terminal-bg);
+  border: 1px solid var(--vp-c-border);
+  border-radius: var(--ef-radius);
+  box-shadow: var(--ef-shadow-panel);
+}
+
+.ef-terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--ef-terminal-bg) 82%, white);
+  border-bottom: 1px solid rgb(255 255 255 / 0.06);
+}
+
+.ef-terminal-dots {
+  display: flex;
+  gap: 7px;
+}
+
+.ef-terminal-dots i {
+  width: 11px;
+  height: 11px;
+  background: rgb(255 255 255 / 0.18);
+  border-radius: 50%;
+}
+
+.ef-terminal-title {
+  flex: 1;
+  padding-right: 50px;
+  font-family: var(--vp-font-family-mono);
+  font-size: 12px;
+  color: rgb(205 214 244 / 0.6);
+  text-align: center;
+}
+
+.ef-terminal-screen {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .ef-terminal {
+    margin: 24px 0;
+    overflow-x: auto;
+    border-radius: 10px;
+  }
+
+  /* Keep the text readable: the recording scrolls sideways instead of shrinking. */
+  .ef-terminal-bar,
+  .ef-terminal-screen {
+    min-width: 760px;
+  }
+}

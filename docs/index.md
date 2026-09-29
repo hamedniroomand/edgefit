@@ -23,7 +23,11 @@ hero:
       link: https://github.com/hamedniroomand/edgefit
 ---
 
-![edgefit check on a Worker project: five errors for file watching and process spawning APIs from chokidar and cross-spawn, each with the package, the file and line, the import chain and a link to the workerd source.](/demo.gif)
+<Terminal
+  src="/demo.gif"
+  title="npx edgefit check"
+  alt="edgefit check on a Worker project: five errors for file watching and process spawning APIs from chokidar and cross-spawn, each with the package, the file and line, the import chain and a link to the workerd source."
+/>
 
 ## Why edgefit
 

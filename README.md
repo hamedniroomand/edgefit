@@ -20,7 +20,7 @@
 edgefit follows your code and every dependency from the entry point, finds the Node and Web APIs it reaches, and checks each one against pinned compatibility data for the runtime you deploy to. Every finding names the package, the file and the import chain behind it.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/hamedniroomand/edgefit/main/docs/public/demo.gif" width="800" alt="edgefit check on a Worker project: five errors for file watching and process spawning APIs from chokidar and cross-spawn, each with the package, the file and line, the import chain and a link to the workerd source.">
+  <img src="https://raw.githubusercontent.com/hamedniroomand/edgefit/main/docs/public/demo.gif" width="640" alt="edgefit check on a Worker project: five errors for file watching and process spawning APIs from chokidar and cross-spawn, each with the package, the file and line, the import chain and a link to the workerd source.">
 </p>
 
 - Resolves packages with the target's export conditions, so a library's Workers build is checked, not its Node build.
