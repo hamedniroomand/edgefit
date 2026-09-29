@@ -26,7 +26,7 @@ edgefit check [options]
 | `--root <dir>`      | Project root. Default: the current directory                                                                                          |
 | `--config <file>`   | Config file. Default: `edgefit.config.{ts,mts,js,mjs}` in the root                                                                    |
 | `--format <format>` | `text`, `json` or `github`. Default: `text`                                                                                           |
-| `--verbose`         | List [guarded](/guide/findings#guarded-usages) findings, which are otherwise only counted                                             |
+| `--verbose`         | List every finding in full: [guarded](/guide/findings#guarded-usages) ones and the `unknown` warnings that are otherwise folded       |
 | `--no-color`        | Disable colors                                                                                                                        |
 
 `--entry` and `--built` cannot be combined.

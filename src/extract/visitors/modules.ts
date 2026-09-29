@@ -4,7 +4,7 @@ import { builtinName } from '@/data/builtins.ts';
 import { staticKey } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
-import { displayRef, moduleRef } from '@/extract/refs.ts';
+import { displayRef, isGlobalRoot, moduleRef } from '@/extract/refs.ts';
 import { assign, isTracked, lookup } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
@@ -41,7 +41,8 @@ export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context)
 
 function exportLocal(local: Node, context: VisitContext): void {
   const binding = local.type === 'Identifier' ? lookup(context.scope, local.name) : undefined;
-  if (isTracked(binding)) {
+  // The global object says nothing about which API is used, wherever it goes.
+  if (isTracked(binding) && !isGlobalRoot(binding.ref)) {
     context.collector.dynamic(
       binding.ref,
       displayRef(binding.ref),

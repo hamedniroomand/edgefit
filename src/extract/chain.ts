@@ -2,7 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef } from '@/types.ts';
 
-import { staticKey, unwrap } from './ast.ts';
+import { isSymbolKey, staticKey, unwrap } from './ast.ts';
 import { memberRef } from './refs.ts';
 
 const invokers = new Set(['apply', 'bind', 'call']);
@@ -33,6 +33,10 @@ export function followChain(stack: readonly Node[], ref: ApiRef, offset: number)
       const key = staticKey(parent.property, parent.computed);
       if (key !== undefined && current.ref.path.length > 0 && invokers.has(key)) {
         // `fn.call(...)` uses `fn` itself; `call` is not part of the API.
+        break;
+      }
+      if (key === undefined && parent.computed && isSymbolKey(parent.property)) {
+        // A symbol is never an API name, so the chain ends here without being unknown.
         break;
       }
       if (key === undefined) {
