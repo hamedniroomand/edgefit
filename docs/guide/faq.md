@@ -1,5 +1,19 @@
 # FAQ
 
+## `npx edgefit` fails with EBADDEVENGINES
+
+Your project's `package.json` sets `devEngines.packageManager` to a package manager other than npm, and npm refuses to run anything inside it. Use the one the project declares instead:
+
+```sh
+pnpm dlx edgefit check
+bunx edgefit check
+yarn dlx edgefit check
+```
+
+## Findings say "your code" for a Nitro or Nuxt build
+
+The report cannot tell which package a finding belongs to without a sourcemap. Build with `sourcemap: true` (Nitro also needs `experimental.sourcemapMinify: false`) and rerun. Recent Nitro builds also mark each module in a chunk, and edgefit reads those markers to name the package even without sourcemaps, though the location then points into the build. See [Framework build output](/guide/built-output).
+
 ## Why is a package I never imported in my report?
 
 Look at the `via` line. It is the import chain from your entry to that package. A dependency of a dependency is still code you ship.

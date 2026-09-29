@@ -1,0 +1,7 @@
+{
+  // A Hono Worker with the logger middleware, whose package is a small copy of hono 4.13.9.
+  "name": "fixture-hono-app",
+  "main": "src/index.js",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}

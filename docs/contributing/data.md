@@ -4,7 +4,7 @@ The quality of edgefit's results is the quality of its data. This page explains 
 
 ## Where it lives
 
-Everything is in `packages/edgefit/data`:
+Everything is in `data`:
 
 | Path                            | What it is                                                    |
 | ------------------------------- | ------------------------------------------------------------- |
@@ -49,7 +49,7 @@ The matrix only records whether an API exists. Override files record what happen
 
 1. Find the code in the runtime's source at the pinned version, not at `main`.
 2. Add the entry with a `note` that describes the behavior and a `source` that points to that file.
-3. Add or update a test in `packages/edgefit/test` that shows the finding.
+3. Add or update a test in `test` that shows the finding.
 4. In the pull request, link the lines you read.
 
 Entries without a source are not accepted. The whole point of an override is that anyone can check it.
@@ -76,7 +76,7 @@ The workflow runs twice per runtime:
 
 Nothing is committed automatically. Probe results are evidence for reviewers. edgefit itself never reads them when checking a project, so results only ever come from the reviewed override files.
 
-The probe code is in `packages/edgefit/scripts/probe`.
+The probe code is in `scripts/probe`.
 
 ## Bumping a data source
 

@@ -1,0 +1,1 @@
+{ "preset": "cloudflare-module", "serverEntry": "server/index.mjs" }
