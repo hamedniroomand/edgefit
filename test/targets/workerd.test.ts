@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { createWorkerdTarget } from '@/targets/workerd/index.ts';
 import { checkSettings } from '@/targets/workerd/settings.ts';
 import type { WorkerdSettings } from '@/targets/workerd/settings.ts';
+import type { WorkerdOptions } from '@/types.ts';
 import { fixture } from '~/helpers.ts';
 
 function settings(
@@ -111,5 +112,44 @@ describe('workerd target with a deploy redirect', () => {
   it('is skipped when the wrangler config is turned off', () => {
     const target = createWorkerdTarget(fixture('nitro-redirect'), { wranglerConfig: false });
     expect(target.defaultEntry).toBeUndefined();
+  });
+});
+
+const notesOf = (root: string, options: WorkerdOptions = {}): readonly string[] =>
+  createWorkerdTarget(fixture(root), options).info.notes;
+
+describe('workerd settings that were assumed', () => {
+  it('says so when there is no wrangler config', () => {
+    expect(notesOf('bun-app')).toEqual([
+      'No wrangler config was found, so compatibility_date 2026-04-24 and the flags nodejs_compat are assumed. ' +
+        'Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, ' +
+        'or point `workerd.wranglerConfig` at your wrangler config.',
+    ]);
+  });
+
+  it('is quiet when the settings came from a wrangler config', () => {
+    expect(notesOf('worker')).toEqual([]);
+  });
+
+  it('is quiet when the edgefit config sets both', () => {
+    const options = { compatibilityDate: '2026-04-24', compatibilityFlags: ['nodejs_compat'] };
+    expect(notesOf('bun-app', options)).toEqual([]);
+  });
+});
+
+describe('workerd settings that are only partly assumed', () => {
+  it('names only what is still assumed', () => {
+    const [note] = notesOf('bun-app', { compatibilityDate: '2026-04-24' });
+    expect(note).toContain('the flags nodejs_compat are assumed');
+    expect(note).not.toContain('compatibility_date 2026');
+  });
+
+  it('assumes a missing date but not missing flags in a wrangler config', () => {
+    const target = createWorkerdTarget(fixture('wrangler-bare'));
+    expect(target.info.settings).toContain('flags: none (from wrangler.jsonc)');
+    expect(target.info.notes[0]).toContain(
+      'wrangler.jsonc has no compatibility_date, so 2026-04-24 is assumed.',
+    );
+    expect(target.info.notes.join(' ')).toContain('nodejs_compat is not enabled');
   });
 });

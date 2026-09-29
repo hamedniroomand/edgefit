@@ -1,0 +1,5 @@
+{
+  // A wrangler config that sets neither a compatibility date nor flags.
+  "name": "fixture-wrangler-bare",
+  "main": "src/index.ts",
+}

@@ -5,8 +5,8 @@ import { loadTargetData } from '@/targets/target-data.ts';
 import type { Target } from '@/targets/target.ts';
 import type { ApiRef, WorkerdOptions } from '@/types.ts';
 
-import { checkSettings, settingsNotes } from './settings.ts';
-import type { DataSettings, WorkerdSettings } from './settings.ts';
+import { assumedNotes, checkSettings, settingsNotes } from './settings.ts';
+import type { AssumedSettings, DataSettings, WorkerdSettings } from './settings.ts';
 import { findWranglerConfig, mainFrom, readWranglerConfig } from './wrangler.ts';
 import type { WranglerConfig } from './wrangler.ts';
 
@@ -23,23 +23,37 @@ function loadWrangler(
   return file === undefined ? undefined : readWranglerConfig(file);
 }
 
+interface ResolvedSettings {
+  settings: WorkerdSettings;
+  assumed: AssumedSettings;
+}
+
 function resolveSettings(
   root: string,
   options: WorkerdOptions,
   wrangler: WranglerConfig | undefined,
   defaults: DataSettings,
-): WorkerdSettings {
-  const compatibilityDate =
-    options.compatibilityDate ?? wrangler?.compatibilityDate ?? defaults.compatibilityDate;
-  const compatibilityFlags =
-    options.compatibilityFlags ?? wrangler?.compatibilityFlags ?? defaults.compatibilityFlags;
+): ResolvedSettings {
+  const date = options.compatibilityDate ?? wrangler?.compatibilityDate;
+  // A wrangler config without flags enables none; only a missing config falls back to the data.
+  const flags =
+    options.compatibilityFlags ??
+    wrangler?.compatibilityFlags ??
+    (wrangler === undefined ? undefined : []);
   let origin = 'the compatibility data defaults (no wrangler config found)';
   if (options.compatibilityDate !== undefined || options.compatibilityFlags !== undefined) {
     origin = 'the edgefit config';
   } else if (wrangler !== undefined) {
     origin = path.relative(root, wrangler.file);
   }
-  return { compatibilityDate, compatibilityFlags, origin };
+  return {
+    settings: {
+      compatibilityDate: date ?? defaults.compatibilityDate,
+      compatibilityFlags: flags ?? defaults.compatibilityFlags,
+      origin,
+    },
+    assumed: { date: date === undefined, flags: flags === undefined },
+  };
 }
 
 function describeSettings(settings: WorkerdSettings): string {
@@ -52,7 +66,8 @@ export function createWorkerdTarget(root: string, options: WorkerdOptions = {}):
   const { index, matrixSource, description, globals } = loadTargetData('workerd');
   const dataSettings = matrixSource.settings?.workerd as DataSettings;
   const wrangler = loadWrangler(root, options.wranglerConfig);
-  const settings = resolveSettings(root, options, wrangler, dataSettings);
+  const { settings, assumed } = resolveSettings(root, options, wrangler, dataSettings);
+  const wranglerFile = wrangler === undefined ? undefined : path.relative(root, wrangler.file);
   const lookup = (api: ApiRef): LookupResult => checkSettings(api, settings) ?? index.lookup(api);
 
   return {
@@ -62,7 +77,10 @@ export function createWorkerdTarget(root: string, options: WorkerdOptions = {}):
       conditions: workerdConditions,
       data: description,
       settings: describeSettings(settings),
-      notes: settingsNotes(settings, dataSettings),
+      notes: [
+        ...assumedNotes(assumed, settings, wranglerFile),
+        ...settingsNotes(settings, dataSettings),
+      ],
     },
     resolvePlatform: 'browser',
     defaultEntry: wrangler === undefined ? undefined : mainFrom(root, wrangler),

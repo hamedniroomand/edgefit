@@ -66,6 +66,37 @@ export function checkSettings(api: ApiRef, settings: WorkerdSettings): LookupRes
   };
 }
 
+/** Which settings had no value of their own, so the compatibility data's were used. */
+export interface AssumedSettings {
+  date: boolean;
+  flags: boolean;
+}
+
+/** Tells the user which settings were guessed, and how to give the real ones. */
+export function assumedNotes(
+  assumed: AssumedSettings,
+  settings: WorkerdSettings,
+  wranglerFile: string | undefined,
+): string[] {
+  if (wranglerFile === undefined) {
+    const parts = [
+      ...(assumed.date ? [`compatibility_date ${settings.compatibilityDate}`] : []),
+      ...(assumed.flags ? [`the flags ${settings.compatibilityFlags.join(', ') || 'none'}`] : []),
+    ];
+    const verb = assumed.date && !assumed.flags ? 'is' : 'are';
+    return parts.length === 0
+      ? []
+      : [
+          `No wrangler config was found, so ${parts.join(' and ')} ${verb} assumed. ` +
+            'Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, ' +
+            'or point `workerd.wranglerConfig` at your wrangler config.',
+        ];
+  }
+  return assumed.date
+    ? [`${wranglerFile} has no compatibility_date, so ${settings.compatibilityDate} is assumed.`]
+    : [];
+}
+
 /** How the project's settings differ from those the compatibility data was generated with. */
 export function settingsNotes(settings: WorkerdSettings, dataSettings: DataSettings): string[] {
   const notes: string[] = [];
