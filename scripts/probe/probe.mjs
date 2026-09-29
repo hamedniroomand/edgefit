@@ -78,10 +78,17 @@ export async function probeApi({ api, kind, lookup: lookupOnly = false }) {
   return 'inconclusive';
 }
 
-/** Probes each API in turn, since a call may change state the next one reads. */
+/**
+ * Probes each API in turn, since a call may change state the next one reads. With `PROBE_TRACE`
+ * set, each name is logged first, so the last line shows which call a hung probe was in.
+ */
 export async function probeApis(apis) {
+  const trace = Boolean(globalThis.process?.env?.PROBE_TRACE);
   const outcomes = {};
   for (const entry of apis) {
+    if (trace) {
+      console.error(`probe ${entry.api}${entry.lookup ? ' (lookup)' : ''}`);
+    }
     outcomes[entry.api] = await probeApi(entry);
   }
   return outcomes;

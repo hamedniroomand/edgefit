@@ -26,6 +26,11 @@ jobs:
   probe:
     name: ${{ matrix.runtime }} (${{ matrix.channel }})
     runs-on: ubuntu-latest
+    # A probe finishes in under a minute; a call that never returns should not hold the run.
+    timeout-minutes: 15
+    env:
+      # Logs each API before it is probed, so a hang shows where it stopped.
+      PROBE_TRACE: '1'
     strategy:
       fail-fast: false
       matrix:
