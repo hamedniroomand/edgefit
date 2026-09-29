@@ -1,9 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
+
+The GitHub Action installs the published package, and the text report is easier to read with pnpm.
 
 ### Changed
 
+- The GitHub Action installs the published `edgefit` package instead of building itself, so it no longer needs pnpm or corepack. It runs the version its tag was released with, verifies the signature and provenance with `npm audit signatures`, and has new inputs `edgefit-version` and `edgefit-package`. `edgefit-version: source` keeps the old build for one release.
 - The text report shows a package installed by pnpm as `node_modules/<package>/...` instead of its path in the `.pnpm` store. The JSON report and GitHub annotations keep the real file path.
 
 ## 0.3.2

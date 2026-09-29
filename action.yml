@@ -21,6 +21,12 @@ inputs:
   install-command:
     description: 'Installs the dependencies, run in the repository root of the base and the head. Default: chosen from the lockfile'
     default: ''
+  edgefit-version:
+    description: "edgefit version to run. Default: the version this action was released with. `source` builds the action's own checkout (deprecated)"
+    default: ''
+  edgefit-package:
+    description: Path to an edgefit tarball to install instead of a release, to test a package before it is published
+    default: ''
   github-token:
     description: Token for the pull request comment. Needs pull-requests write permission
     default: ${{ github.token }}
@@ -28,13 +34,14 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Build edgefit
+    - name: Install edgefit
+      id: install
       shell: bash
-      working-directory: ${{ github.action_path }}
-      run: |
-        command -v corepack > /dev/null || npm install --global corepack
-        corepack pnpm install --frozen-lockfile
-        corepack pnpm --filter edgefit run build
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        EDGEFIT_VERSION: ${{ inputs.edgefit-version }}
+        EDGEFIT_PACKAGE: ${{ inputs.edgefit-package }}
+      run: '"$GITHUB_ACTION_PATH/action/install.sh"'
 
     - name: Find the base commit
       id: base
@@ -43,40 +50,9 @@ runs:
         EVENT: ${{ github.event_name }}
         PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         PUSH_BEFORE: ${{ github.event.before }}
-        EDGEFIT_DIRECTORY: ${{ github.action_path }}
+        IDENTITY: ${{ steps.install.outputs.identity }}
         CACHE_INPUTS: ${{ inputs.targets }} | ${{ inputs.entry }} | ${{ inputs.working-directory }} | ${{ inputs.install-command }}
-      run: |
-        mkdir -p "$RUNNER_TEMP/edgefit"
-        fetch=(--no-tags --quiet)
-        if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
-          fetch+=(--unshallow)
-        fi
-        # What the head is compared with: a pull request's merge base, or the commit before a push.
-        # Other events, and a push that creates a branch or rewrites history, have no base, so
-        # every finding counts as new.
-        sha=''
-        if [ -n "$PR_BASE_SHA" ]; then
-          git fetch "${fetch[@]}" origin "$PR_BASE_SHA"
-          sha=$(git merge-base "$PR_BASE_SHA" HEAD)
-        elif [ "$EVENT" = push ] && [ -n "$PUSH_BEFORE" ] && [ "${PUSH_BEFORE//0/}" != '' ]; then
-          if git fetch "${fetch[@]}" origin "$PUSH_BEFORE"; then
-            sha=$PUSH_BEFORE
-          else
-            echo "::warning::edgefit could not fetch the commit before this push, so every finding counts as new."
-          fi
-        fi
-        if [ -z "$sha" ]; then
-          echo "::notice::edgefit has no base commit for a $EVENT event, so every finding counts as new."
-          echo '{ "version": 1, "targets": [] }' > "$RUNNER_TEMP/edgefit/base.json"
-          echo 'has-base=false' >> "$GITHUB_OUTPUT"
-          exit 0
-        fi
-        # A cached base report is only valid for the same edgefit build, data and inputs.
-        build=$(cd "$EDGEFIT_DIRECTORY" && find dist data -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -c1-16)
-        inputs=$(echo "$CACHE_INPUTS" | sha256sum | cut -c1-16)
-        echo "sha=$sha" >> "$GITHUB_OUTPUT"
-        echo 'has-base=true' >> "$GITHUB_OUTPUT"
-        echo "cache-key=edgefit-base-$build-$inputs-$sha" >> "$GITHUB_OUTPUT"
+      run: '"$GITHUB_ACTION_PATH/action/base.sh"'
 
     - name: Restore the base report
       id: cache
@@ -92,7 +68,7 @@ runs:
       shell: bash
       env:
         BASE: ${{ steps.base.outputs.sha }}
-        EDGEFIT: ${{ github.action_path }}/dist/cli/main.mjs
+        EDGEFIT: ${{ steps.install.outputs.cli }}
         TARGETS: ${{ inputs.targets }}
         ENTRY: ${{ inputs.entry }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
@@ -118,7 +94,7 @@ runs:
     - name: Check the head
       shell: bash
       env:
-        EDGEFIT: ${{ github.action_path }}/dist/cli/main.mjs
+        EDGEFIT: ${{ steps.install.outputs.cli }}
         TARGETS: ${{ inputs.targets }}
         ENTRY: ${{ inputs.entry }}
         WORKING_DIRECTORY: ${{ inputs.working-directory }}
@@ -128,7 +104,7 @@ runs:
     - name: Compare
       shell: bash
       env:
-        EDGEFIT: ${{ github.action_path }}/dist/cli/main.mjs
+        EDGEFIT: ${{ steps.install.outputs.cli }}
       run: |
         cd "$RUNNER_TEMP/edgefit"
         node "$EDGEFIT" diff base.json head.json --fail-on never --format json > diff.json
@@ -159,7 +135,7 @@ runs:
     - name: Annotate new findings
       shell: bash
       env:
-        EDGEFIT: ${{ github.action_path }}/dist/cli/main.mjs
+        EDGEFIT: ${{ steps.install.outputs.cli }}
         FAIL_ON: ${{ inputs.fail-on }}
       run: |
         cd "$RUNNER_TEMP/edgefit"
