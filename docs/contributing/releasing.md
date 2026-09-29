@@ -97,6 +97,6 @@ The workflow then:
 A tag with a pre-release suffix, such as `v0.2.0-beta.1`, is published under the `next` dist-tag
 and marked as a pre-release on GitHub.
 
-After a stable release, the workflow moves the action's major tag (`v0`, then `v1` from 1.0.0 on) to the release commit, so nothing has to be done by hand. A pre-release tag does not move it. The tag ruleset protects only `v*.*.*`, and the Release workflow only starts for those, so moving the major tag starts nothing.
+After a stable release, the workflow moves the action's major tag (`v0`, then `v1` from 1.0.0 on) to the release commit, so nothing has to be done by hand. The action installs the `edgefit` version in its own `package.json`, so it needs nothing else on release: the tag holds that version, and the workflow publishes to npm before it moves `v0`. A pre-release tag does not move it. The tag ruleset protects only `v*.*.*`, and the Release workflow only starts for those, so moving the major tag starts nothing.
 
 If the tag is ever wrong, move it with `git tag -f v0 <release tag> && git push -f origin v0`.

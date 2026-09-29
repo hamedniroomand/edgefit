@@ -29,7 +29,19 @@ With no base, `fail-on: new-errors` fails on any error, since every finding is n
 | `working-directory` | `.`                                        | Project root, relative to the repository root                                |
 | `fail-on`           | `new-errors`                               | `new-errors`, `errors` or `never`                                            |
 | `install-command`   | chosen from the lockfile                   | Installs dependencies in the repository root, for both the base and the head |
+| `edgefit-version`   | the version the action was released with   | edgefit version to run, for example `0.4.0`                                  |
+| `edgefit-package`   |                                            | Path to a tarball to install instead, to test a package before publishing    |
 | `github-token`      | `github.token`                             | Token for the comment. Needs `pull-requests: write`                          |
+
+## Which edgefit runs
+
+The action installs the published `edgefit` package from npm, so it needs no pnpm and builds nothing. It runs the version it was released with: `@v0.4.0` runs `edgefit@0.4.0`, and `@v0` runs the newest 0.x release. Set `edgefit-version` to run another one, for example a newer CLI with an older action while you test it.
+
+After installing, the action runs `npm audit signatures`, so the registry signature and the provenance of what it installed are verified. It fails if they do not verify. Node.js 22.18 or newer must be on the runner; add `actions/setup-node` if yours is older.
+
+If a release was published a moment ago, the action tries the install for about a minute before it fails.
+
+`edgefit-version: source` builds the action's own checkout as older releases did. It is kept for one release and will be removed.
 
 ## Permissions
 
@@ -43,7 +55,7 @@ Without `pull-requests: write`, the action still annotates findings but cannot c
 
 ## Caching
 
-The base report is saved with `actions/cache`, keyed by the base commit, the edgefit build and data, and the inputs. A second pull request on the same base reuses it.
+The base report is saved with `actions/cache`, keyed by the base commit, the edgefit version and the inputs. A second pull request on the same base reuses it.
 
 ## Monorepos
 
