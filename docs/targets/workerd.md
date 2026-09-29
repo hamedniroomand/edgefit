@@ -10,9 +10,11 @@ npx edgefit check --target workerd
 
 If the project root has a `wrangler.jsonc`, `wrangler.json` or `wrangler.toml`, edgefit reads:
 
-- `main` as the entry point, when no `--entry` or config `entry` is given
+- `main` as the entry point, when no `--entry` or config `entry` is given. It is read relative to the config it is written in
 - `compatibility_date`
 - `compatibility_flags`
+
+A build can leave a deploy config for wrangler to use instead: `.wrangler/deploy/config.json` points to it. Nitro 3 does this and writes no config in the project root. edgefit follows the redirect first, like wrangler, so a Nitro build needs no `--entry` and its compatibility date and flags are read from `.output/server/wrangler.json`.
 
 The report header shows where the settings came from:
 

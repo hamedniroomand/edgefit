@@ -7,7 +7,7 @@ import type { ApiRef, WorkerdOptions } from '@/types.ts';
 
 import { checkSettings, settingsNotes } from './settings.ts';
 import type { DataSettings, WorkerdSettings } from './settings.ts';
-import { findWranglerConfig, readWranglerConfig } from './wrangler.ts';
+import { findWranglerConfig, mainFrom, readWranglerConfig } from './wrangler.ts';
 import type { WranglerConfig } from './wrangler.ts';
 
 export const workerdConditions = ['workerd', 'worker', 'browser'];
@@ -65,7 +65,7 @@ export function createWorkerdTarget(root: string, options: WorkerdOptions = {}):
       notes: settingsNotes(settings, dataSettings),
     },
     resolvePlatform: 'browser',
-    defaultEntry: wrangler?.main,
+    defaultEntry: wrangler === undefined ? undefined : mainFrom(root, wrangler),
     globals,
     lookup,
     hasProblemsBelow: api =>

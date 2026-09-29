@@ -45,3 +45,11 @@ describe('build output without sourcemaps', () => {
     expect(report?.target.notes).toEqual([]);
   });
 });
+
+describe('a Nitro output found through the deploy redirect', () => {
+  it('needs no entry or wrangler config in the project root', async () => {
+    const [report] = (await check({ root: fixture('nitro-redirect') })).reports;
+    expect(report?.entry).toBe('.output/server/index.mjs');
+    expect(report?.target.settings).toContain('from .output/server/wrangler.json');
+  });
+});
