@@ -56,7 +56,7 @@ edgefit scans from one entry point. A project with several entries, such as seve
 
 ## Framework build output
 
-Build output is tested with Nitro and Nuxt. edgefit also looks for the entry files of SvelteKit's and Astro's Cloudflare adapters and of OpenNext, but those layouts are not covered by tests, so treat their results as less proven.
+Build output is tested with Nitro and Nuxt. edgefit also looks for the entry files of SvelteKit's and Astro's Cloudflare adapters and of OpenNext, but only the directory layout is covered by a test, not real adapter output, so treat their results as less proven. Nothing marks those layouts as build output, so pass `--built`.
 
 Mapping findings to packages needs sourcemaps. Without them, edgefit reads the `//#region` markers that recent Nitro (Rolldown) builds write, and names the package from them. A build without either, such as one from an older Nitro, is reported against the build files, and an `ignore` rule with `package` cannot match. See [Framework build output](/guide/built-output).
 

@@ -1,0 +1,6 @@
+# Its own workspace, apart from the repository's: these apps install real packages so edgefit can
+# be checked against them. Nothing here is published with edgefit.
+packages:
+  - '*'
+minimumReleaseAgeExclude:
+  - hono@4.13.11

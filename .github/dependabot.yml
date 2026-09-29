@@ -26,3 +26,15 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+
+  # The sample apps pin exact versions. A bump is reviewed: read the result again before
+  # changing an expectation.
+  - package-ecosystem: npm
+    directory: /apps
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      apps:
+        patterns: ['*']

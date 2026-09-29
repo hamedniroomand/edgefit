@@ -28,7 +28,7 @@ export default defineConfig({
     bracketSpacing: true,
     embeddedLanguageFormatting: 'auto',
     endOfLine: 'lf',
-    ignorePatterns: ['.wrangler', 'openspec', 'test/fixtures', 'data/runtime-compat-data'],
+    ignorePatterns: ['.wrangler', 'openspec', 'apps', 'test/fixtures', 'data/runtime-compat-data'],
     insertFinalNewline: true,
     jsxSingleQuote: false,
     objectWrap: 'preserve',
@@ -48,7 +48,7 @@ export default defineConfig({
     vueIndentScriptAndStyle: true,
   },
   lint: {
-    ignorePatterns: ['commitlint.config.js', 'vite.config.ts', 'test/fixtures', 'scripts'],
+    ignorePatterns: ['commitlint.config.js', 'vite.config.ts', 'apps', 'test/fixtures', 'scripts'],
     categories: {
       correctness: 'error',
       perf: 'error',
@@ -99,6 +99,22 @@ export default defineConfig({
     cache: true,
   },
   test: {
-    include: ['test/**/*.test.ts'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          include: ['test/**/*.test.ts'],
+          exclude: ['test/apps/**'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'apps',
+          include: ['test/apps/**/*.test.ts'],
+        },
+      },
+    ],
   },
 });

@@ -24,6 +24,9 @@ jobs:
           node-version: '24'
           cache: true
           run-install: true
+      - name: Install the sample apps
+        working-directory: apps
+        run: vp install --frozen-lockfile
       - run: vp run ready
       - name: Check the package (publint, are-the-types-wrong)
         run: |
@@ -42,4 +45,7 @@ jobs:
           node-version: '22'
           cache: true
           run-install: true
+      - name: Install the sample apps
+        working-directory: apps
+        run: vp install --frozen-lockfile
       - run: vp test

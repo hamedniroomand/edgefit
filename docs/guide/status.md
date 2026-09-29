@@ -49,7 +49,7 @@ edgefit is a 0.x release. What you can rely on:
 
 False errors cost more trust than missed warnings, so precision is tested, not assumed:
 
-- **Benchmark apps.** Small stand-ins for apps that are known to run on Workers, built from copies of real published code, must report no errors and no warnings that nobody can act on. Today that is a Hono app with its logger middleware and a Nitro build that bundles pieces of jose. A failure there is a regression.
+- **Sample apps.** Small apps built on real, pinned packages: a Hono starter, Hono with zod, drizzle-orm on D1, a Postgres client (`pg`) and a Nitro build with pieces of oauth4webapi and jose. Each must report no errors and no warnings that nobody can act on, and where a result depends on `nodejs_compat` both cases are checked. A known-bad app (a file watcher and a process spawner) must report exactly what each runtime lacks, so a change that makes edgefit miss an API fails too. A failure there is a regression.
 - **Fixture projects** cover the findings, the guards, the constant specifiers, the build output layouts and the settings.
 - **The weekly probe** runs the real runtimes and compares them with the curated overrides, which is how stale entries are found.
 

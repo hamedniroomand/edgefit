@@ -16,7 +16,7 @@ npx edgefit check --built .output/server/index.mjs  # or the entry file
 
 `--built` and `--entry` cannot be used together.
 
-You don't need `--built` when the entry is already inside a Nitro output, for example when wrangler's `main` is `.output/server/index.mjs`. edgefit sees the `nitro.json` next to it and scans the output as build output.
+You don't need `--built` when the entry is already inside a Nitro output, for example when wrangler's `main` is `.output/server/index.mjs`. edgefit sees the `nitro.json` next to it and scans the output as build output. SvelteKit's and Astro's outputs have no such marker, so always pass `--built` for them, for example `--built .svelte-kit/cloudflare`.
 
 ## How the entry is found
 

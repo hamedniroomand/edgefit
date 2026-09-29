@@ -43,6 +43,9 @@ jobs:
             echo "::error::Tag $GITHUB_REF_NAME does not match package version $version"
             exit 1
           fi
+      - name: Install the sample apps
+        working-directory: apps
+        run: vp install --frozen-lockfile
       - run: vp run ready
       - name: Pack
         run: vp pm pack --pack-destination "$RUNNER_TEMP/package"

@@ -1,0 +1,7 @@
+{
+  // A Worker that pulls in a file watcher and a process spawner by accident, both installed from npm.
+  "name": "sample-known-bad",
+  "main": "src/index.js",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}

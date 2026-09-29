@@ -71,7 +71,9 @@ Tests live in `test` and mirror the `src` folders. End-to-end behavior is tested
 
 When you fix a false positive or a missed finding, add a fixture or a case that shows it. That is how precision is kept from regressing.
 
-`test/core/benchmarks.test.ts` holds small stand-ins for apps that are known to run on Workers: a Hono app and a Nitro build that bundles jose. Their dependencies are copies of real published code. A known-good app must report no errors and no warnings that nobody can act on, so a change that breaks one of these tests is a precision regression, not a test to update. To add one, copy the smallest real files that show the pattern into a fixture, keep their license header, and assert what a person deploying that code should see.
+`test/core/sample-apps.test.ts` holds small stand-ins for apps that are known to run on Workers: a Hono app and a Nitro build that bundles jose. Their dependencies are copies of real published code. A known-good app must report no errors and no warnings that nobody can act on, so a change that breaks one of these tests is a precision regression, not a test to update. To add one, copy the smallest real files that show the pattern into a fixture, keep their license header, and assert what a person deploying that code should see.
+
+Apps that need whole real packages live in `apps/`, a pnpm workspace of its own with exact pins, and `test/apps` checks them. Install them with `vp install` inside `apps/`; CI does. To add one, make a folder with a `package.json`, a `wrangler.jsonc` and a few lines of source, read what edgefit reports against the runtime source, and assert that.
 
 ## Commits and pull requests
 

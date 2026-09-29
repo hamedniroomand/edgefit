@@ -1,0 +1,7 @@
+{
+  // A Worker that queries Postgres through pg, installed from npm.
+  "name": "sample-pg-app",
+  "main": "src/index.js",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}
