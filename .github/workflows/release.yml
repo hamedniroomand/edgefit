@@ -1,13 +1,14 @@
 name: Release
 
-# Publishes edgefit to npm when a `v*` tag is pushed. It uses npm trusted publishing (OIDC), so no
+# Publishes edgefit to npm when a version tag such as `v0.3.0` is pushed. The action's moving major
+# tag (`v0`) does not match, so moving it does not start a release. It uses npm trusted publishing (OIDC), so no
 # npm token is stored in the repository. npm only accepts it after the package exists and this
 # workflow is registered as its trusted publisher: publish the first version by hand, see
 # docs/contributing/releasing.md.
 
 on:
   push:
-    tags: ['v*']
+    tags: ['v*.*.*']
 
 permissions:
   contents: read

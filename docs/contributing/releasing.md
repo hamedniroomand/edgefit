@@ -1,6 +1,6 @@
 # Releasing
 
-`edgefit` is published to npm by `.github/workflows/release.yml` when a `v*` tag is pushed. The
+`edgefit` is published to npm by `.github/workflows/release.yml` when a version tag such as `v0.3.0` is pushed. Moving the action's major tag (`v0`) does not start a release, because only `v*.*.*` tags trigger it. The
 workflow uses [npm trusted publishing](https://docs.npmjs.com/trusted-publishers): GitHub Actions
 proves its identity to npm with OIDC, so no npm token is stored anywhere, and npm adds
 [provenance](https://docs.npmjs.com/generating-provenance-statements) when the repository is
@@ -61,7 +61,7 @@ choose **GitHub Actions** and enter:
 | Environment name     | `npm`            |
 
 The environment must match `environment: npm` in the workflow. Create it on GitHub under
-**Settings → Environments**; protection rules there (required reviewers, only `v*` tags) then apply
+**Settings → Environments**; protection rules there (required reviewers, only `v*.*.*` tags) then apply
 to every publish.
 
 Once a release has gone through the workflow, restrict publishing on npm under **Settings →
