@@ -16,7 +16,15 @@ export type ChainResult =
       node: Node;
       parent: Node | undefined;
     }
-  | { kind: 'computed'; ref: ApiRef; offset: number; propertyOffset: number };
+  | {
+      kind: 'computed';
+      ref: ApiRef;
+      offset: number;
+      propertyOffset: number;
+      /** The member access with the computed key, and what it sits in. */
+      member: Node;
+      memberParent: Node | undefined;
+    };
 
 /**
  * Follows the reference at the top of the ancestor stack up through member accesses
@@ -40,7 +48,13 @@ export function followChain(stack: readonly Node[], ref: ApiRef, offset: number)
         break;
       }
       if (key === undefined) {
-        return { kind: 'computed', ...current, propertyOffset: parent.property.start };
+        return {
+          kind: 'computed',
+          ...current,
+          propertyOffset: parent.property.start,
+          member: parent,
+          memberParent: stack[position - 2],
+        };
       }
       current = { ref: memberRef(current.ref, key), offset: parent.property.start, extended: true };
     } else if (unwrap(parent) !== node) {

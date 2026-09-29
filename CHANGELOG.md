@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- `typeof x[key]` is a check for a member, so a computed key inside `typeof` is no longer reported as unknown. This removes the `globalThis[<expression>]` warning jose produced.
 - The report says when the compatibility date or flags were assumed from the data because there is no wrangler config (or it has no `compatibility_date`), and how to set them.
 - A wrangler config without `compatibility_flags` now enables no flags, as on Workers, instead of borrowing `nodejs_compat` from the data. Node built-ins are reported as unavailable for such a project, unless its date is 2026-08-04 or later.
 - `unknown` warnings are folded into one line per package in the text report, with a count for each API. `--verbose` lists them in full, and the JSON report and the summary are unchanged.

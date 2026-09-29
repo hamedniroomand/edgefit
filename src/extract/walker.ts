@@ -91,12 +91,15 @@ export class Walker implements VisitContext {
       if (!isGlobalRoot(chain.ref)) {
         this.collector.api(chain.ref, chain.offset);
       }
-      this.collector.dynamic(
-        chain.ref,
-        `${displayRef(chain.ref)}[<expression>]`,
-        'accessed with a computed property',
-        chain.propertyOffset,
-      );
+      // `typeof x[key]` only tests for a member, so there is nothing to follow.
+      if (chain.memberParent === undefined || !isFeatureCheck(chain.member, chain.memberParent)) {
+        this.collector.dynamic(
+          chain.ref,
+          `${displayRef(chain.ref)}[<expression>]`,
+          'accessed with a computed property',
+          chain.propertyOffset,
+        );
+      }
       return;
     }
     const { node, parent } = chain;

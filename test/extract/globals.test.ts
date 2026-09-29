@@ -93,3 +93,16 @@ describe('keys that cannot name an API', () => {
     expect(usagesOf('export const root = globalThis;')).toEqual([]);
   });
 });
+
+describe('checking for a computed member', () => {
+  it('does not report typeof on a computed key as a use', () => {
+    expect(usagesOf("if (typeof globalThis[name] > 'u') throw new Error(name);")).toEqual([]);
+    expect(
+      usagesOf("import fs from 'fs';\nif (typeof fs[name] === 'undefined') throw new Error();"),
+    ).toEqual(['api node:fs', 'api node:fs']);
+  });
+
+  it('still reports calling a computed member', () => {
+    expect(usagesOf('globalThis[name]();')).toEqual(['dynamic globalThis[<expression>]']);
+  });
+});
