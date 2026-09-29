@@ -11,6 +11,7 @@ node_modules
 !test/fixtures/**/node_modules
 dist
 dist-ssr
+!test/fixtures/**/dist
 *.local
 
 # dotenv environment variable files
