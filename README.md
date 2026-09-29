@@ -44,7 +44,7 @@ npx edgefit compare --entry src/index.ts           # every runtime side by side
 On pull requests, with the GitHub Action:
 
 ```yaml
-- uses: hamedniroomand/edgefit@v1
+- uses: hamedniroomand/edgefit@v0
   with:
     targets: workerd
 ```

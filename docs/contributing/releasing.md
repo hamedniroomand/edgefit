@@ -39,7 +39,7 @@ npm asks for a second factor. Check the result with `npm view edgefit`.
 
 ### 3. Tag and release on GitHub
 
-The GitHub Action is referenced by tag (`hamedniroomand/edgefit@v1`), so the tag is needed even
+The GitHub Action is referenced by tag (`hamedniroomand/edgefit@v0`), so the tag is needed even
 though the workflow did not publish:
 
 ```sh
@@ -95,9 +95,9 @@ The workflow then:
 A tag with a pre-release suffix, such as `v0.2.0-beta.1`, is published under the `next` dist-tag
 and marked as a pre-release on GitHub.
 
-The action's moving major tag (`v1`) is not updated by the workflow. Move it by hand after a
+The action's moving major tag (`v0`, then `v1` from 1.0.0 on) is not updated by the workflow. Move it by hand after a
 stable release:
 
 ```sh
-git tag -f v1 && git push -f origin v1
+git tag -f v0 && git push -f origin v0
 ```
