@@ -1,4 +1,4 @@
-import { matrixHas } from '@scripts/probe/compare.mjs';
+import { compareOutcomes, matrixHas } from '@scripts/probe/compare.mjs';
 import { compatibilityDateFor, driftFor, missingApis, renderIssue } from '@scripts/probe/drift.mjs';
 import { probeApi } from '@scripts/probe/probe.mjs';
 import { describe, expect, it } from 'vite-plus/test';
@@ -70,6 +70,63 @@ describe('probing a lookup', () => {
     expect(await probeApi({ api: 'sqlite', lookup: true })).toBe('present');
     expect(await probeApi({ api: 'fs.readFile', lookup: true })).toBe('present');
     expect(await probeApi({ api: 'fs.nothing', lookup: true })).toBe('missing');
+  });
+});
+
+describe('an exact lookup', () => {
+  // A module whose namespace lacks `Assert` while its default export has it, like Deno's assert/strict.
+  const load = (): unknown => ({ default: { Assert: class {} }, other: () => 1 });
+
+  it('does not fall back to the default export', async () => {
+    expect(await probeApi({ api: 'assert.Assert', lookup: true }, load)).toBe('missing');
+    expect(await probeApi({ api: 'assert.other', lookup: true }, load)).toBe('present');
+  });
+
+  it('finds the member through the default export when asked for it', async () => {
+    expect(await probeApi({ api: 'assert.default.Assert', lookup: true }, load)).toBe('present');
+  });
+
+  it('keeps the fallback when a function is called', async () => {
+    expect(await probeApi({ api: 'assert.Assert', kind: 'class' }, load)).toBe('inconclusive');
+  });
+});
+
+describe('driftFor and stubs that validate first', () => {
+  const overrides = {
+    'vm.compileFunction': { status: 'unsupported', note: '', source: '', validatesFirst: true },
+    'vm.other': { status: 'unsupported', note: '', source: '' },
+  };
+  const outcomes = { 'vm.compileFunction': 'implemented', 'vm.other': 'implemented' };
+
+  it('ignores an argument error from a stub known to validate first', () => {
+    const drift = driftFor({
+      runtime: 'workerd',
+      pinned: '1',
+      latest: '2',
+      outcomes,
+      mocked: {},
+      overrides,
+    });
+    expect(drift.stubsNowWork).toEqual(['vm.other']);
+  });
+});
+
+describe('compareOutcomes for stubs', () => {
+  const stub = { status: 'unsupported', note: '', source: '' };
+
+  it('does not treat an inconclusive call as a sign that a stub works', () => {
+    expect(compareOutcomes({ 'a.b': 'inconclusive' }, { 'a.b': stub }, {})).toEqual([]);
+  });
+
+  it('does not compare a partial implementation with a bare call', () => {
+    const partial = { status: 'mismatch', note: '', source: '' };
+    expect(compareOutcomes({ 'a.b': 'unsupported' }, { 'a.b': partial }, {})).toEqual([]);
+  });
+
+  it('accepts an argument error from a stub that validates first, but not from another', () => {
+    const outcomes = { 'a.b': 'implemented' };
+    expect(compareOutcomes(outcomes, { 'a.b': { ...stub, validatesFirst: true } }, {})).toEqual([]);
+    expect(compareOutcomes(outcomes, { 'a.b': stub }, {})).toHaveLength(1);
   });
 });
 

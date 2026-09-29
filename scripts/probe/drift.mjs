@@ -66,7 +66,10 @@ export function driftFor({ runtime, pinned, latest, outcomes, mocked, overrides 
   // Only `implemented` is evidence: a call that throws an argument error reached real code.
   // `inconclusive` says nothing either way.
   const stubs = Object.keys(outcomes).filter(
-    api => overrides[api]?.status === 'unsupported' && outcomes[api] === 'implemented',
+    api =>
+      overrides[api]?.status === 'unsupported' &&
+      !overrides[api].validatesFirst &&
+      outcomes[api] === 'implemented',
   );
   return {
     runtime,
