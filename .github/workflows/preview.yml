@@ -1,20 +1,19 @@
 name: Preview
 
-# Publishes an installable build of every pull request and of `main` with pkg.pr.new (a GitHub App
-# that must be installed on the repository). Nothing is published to npm. Try a build with:
-#   npx https://pkg.pr.new/edgefit@<pr-number-or-sha>
+# Publishes an installable build of every pull request with pkg.pr.new (a GitHub App that must be
+# installed on the repository), so its link shows on the pull request. Nothing is published to
+# npm. Try a build with:
+#   npx https://pkg.pr.new/edgefit@<pr-number>
 
 on:
-  push:
-    branches: [main]
   pull_request:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
-  cancel-in-progress: ${{ github.event_name != 'push' }}
+  group: ${{ github.workflow }}-${{ github.event.number }}
+  cancel-in-progress: true
 
 jobs:
   preview:
