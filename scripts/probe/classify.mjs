@@ -51,6 +51,10 @@ export function isDenied(api) {
   if (module === 'cluster') {
     return name === 'fork';
   }
+  // Waits until a debugger attaches, which never happens in a probe.
+  if (module === 'inspector' || module === 'inspector/promises') {
+    return name === 'waitForDebugger';
+  }
   if (module === 'fs' || module === 'fs/promises') {
     return FS_WRITERS.has(name.replace(/Sync$/u, ''));
   }

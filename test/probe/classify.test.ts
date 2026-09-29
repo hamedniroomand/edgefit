@@ -42,14 +42,19 @@ describe('isDenied', () => {
     'fs.writeFileSync',
     'fs.promises.rm',
     'fs/promises.writeFile',
+    'inspector.waitForDebugger',
+    'inspector/promises.waitForDebugger',
   ])('denies %s', api => {
     expect(isDenied(api)).toBe(true);
   });
 
-  it.each(['fs.readFile', 'fs.promises.watch', 'process.cwd', 'process.report.writeReport'])(
-    'allows %s',
-    api => {
-      expect(isDenied(api)).toBe(false);
-    },
-  );
+  it.each([
+    'fs.readFile',
+    'fs.promises.watch',
+    'process.cwd',
+    'process.report.writeReport',
+    'inspector.url',
+  ])('allows %s', api => {
+    expect(isDenied(api)).toBe(false);
+  });
 });

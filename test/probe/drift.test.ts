@@ -1,0 +1,166 @@
+import { matrixHas } from '@scripts/probe/compare.mjs';
+import { compatibilityDateFor, driftFor, missingApis, renderIssue } from '@scripts/probe/drift.mjs';
+import { probeApi } from '@scripts/probe/probe.mjs';
+import { describe, expect, it } from 'vite-plus/test';
+
+const runtime = {
+  '*globals*': {
+    BroadcastChannel: 'missing',
+    global: { BroadcastChannel: 'missing', crypto: { subtle: { getPublicKey: 'missing' } } },
+    globalThis: { BroadcastChannel: 'missing' },
+    crypto: { subtle: { getPublicKey: 'missing', digest: 'function', '*self*': 'object' } },
+    Retired: 'missing',
+  },
+  fs: { '*self*': 'object', watch: 'missing', readFile: 'function', cp: 'missing' },
+  sqlite: 'missing',
+  test: { '*self*': 'missing' },
+  vm: { '*self*': 'object', runInContext: 'function' },
+};
+const baseline = {
+  '*globals*': {
+    BroadcastChannel: 'class',
+    crypto: { subtle: { getPublicKey: 'function', digest: 'function', '*self*': 'object' } },
+    Retired: 'missing',
+  },
+  fs: { '*self*': 'object', watch: 'function', readFile: 'function', cp: 'function' },
+  sqlite: 'object',
+  test: { '*self*': 'function' },
+  vm: { '*self*': 'object', runInContext: 'function' },
+};
+const overrides = { 'fs.cp': { status: 'unsupported', note: '', source: '' } };
+
+describe('missingApis', () => {
+  it('lists what the data marks missing and Node has, once, without overridden APIs', () => {
+    expect(missingApis(runtime, baseline, overrides)).toEqual([
+      '*globals*.BroadcastChannel',
+      '*globals*.crypto.subtle.getPublicKey',
+      'fs.watch',
+      'sqlite',
+      'test',
+    ]);
+  });
+
+  it('leaves out APIs that Node itself does not have', () => {
+    expect(missingApis(runtime, baseline, overrides)).not.toContain('*globals*.Retired');
+  });
+});
+
+describe('matrixHas', () => {
+  it('does not count an entry marked missing as present', () => {
+    expect(matrixHas(runtime, 'fs.watch')).toBe(false);
+    expect(matrixHas(runtime, 'fs.readFile')).toBe(true);
+    expect(matrixHas(runtime, 'test')).toBe(false);
+    expect(matrixHas(runtime, 'fs.nothing')).toBe(false);
+  });
+});
+
+describe('probing a lookup', () => {
+  it('finds a global member and reports one that is missing', async () => {
+    expect(await probeApi({ api: '*globals*.crypto.subtle.digest', lookup: true })).toBe('present');
+    expect(await probeApi({ api: '*globals*.crypto.subtle.nothing', lookup: true })).toBe(
+      'missing',
+    );
+    expect(await probeApi({ api: '*globals*.noSuchGlobal', lookup: true })).toBe('missing');
+  });
+
+  it('finds a module and a member of it without calling anything', async () => {
+    expect(await probeApi({ api: 'sqlite', lookup: true })).toBe('present');
+    expect(await probeApi({ api: 'fs.readFile', lookup: true })).toBe('present');
+    expect(await probeApi({ api: 'fs.nothing', lookup: true })).toBe('missing');
+  });
+});
+
+describe('compatibilityDateFor', () => {
+  it('reads the date from a workerd version', () => {
+    expect(compatibilityDateFor('1.20260924.0')).toBe('2026-09-24');
+  });
+
+  it('gives nothing for a version without a date', () => {
+    expect(compatibilityDateFor('latest')).toBeUndefined();
+    expect(compatibilityDateFor('1.2.3')).toBeUndefined();
+  });
+});
+
+const outcomes = {
+  '*globals*.crypto.subtle.getPublicKey': 'present',
+  'fs.watch': 'missing',
+  'v8.takeCoverage': 'implemented',
+  'v8.setFlagsFromString': 'unsupported',
+};
+const curated = {
+  'v8.takeCoverage': { status: 'unsupported', note: '', source: '' },
+  'v8.setFlagsFromString': { status: 'unsupported', note: '', source: '' },
+};
+
+describe('driftFor', () => {
+  const drift = driftFor({
+    runtime: 'workerd',
+    pinned: '1.20260424.1',
+    latest: '1.20260924.0',
+    outcomes,
+    mocked: { 'a.b': 'implemented', 'a.c': 'noop' },
+    overrides: curated,
+  });
+
+  it('separates APIs the data marks missing from curated stubs that work', () => {
+    expect(drift.nowPresent).toEqual(['*globals*.crypto.subtle.getPublicKey']);
+    expect(drift.stubsNowWork).toEqual(['v8.takeCoverage']);
+    expect(drift.mocksImplemented).toEqual(['a.b']);
+  });
+
+  it('does not count an inconclusive probe as a stub that works', () => {
+    const inconclusive = driftFor({
+      runtime: 'workerd',
+      pinned: '1',
+      latest: '2',
+      outcomes: { 'vm.Script': 'inconclusive', 'vm.compileFunction': 'implemented' },
+      mocked: {},
+      overrides: {
+        'vm.Script': { status: 'unsupported', note: '', source: '' },
+        'vm.compileFunction': { status: 'unsupported', note: '', source: '' },
+      },
+    });
+    expect(inconclusive.stubsNowWork).toEqual(['vm.compileFunction']);
+  });
+
+  it('keeps the versions', () => {
+    expect(drift).toMatchObject({
+      runtime: 'workerd',
+      pinned: '1.20260424.1',
+      latest: '1.20260924.0',
+    });
+  });
+});
+
+describe('renderIssue', () => {
+  const drift = driftFor({
+    runtime: 'workerd',
+    pinned: '1.20260424.1',
+    latest: '1.20260924.0',
+    outcomes,
+    mocked: {},
+    overrides: curated,
+  });
+  const clean = driftFor({
+    runtime: 'bun',
+    pinned: '1.3.0',
+    latest: '1.3.0',
+    outcomes: {},
+    mocked: {},
+    overrides: {},
+  });
+
+  it('lists what changed per runtime, with the marker used to find the issue again', () => {
+    const { body, drift: found } = renderIssue([drift, clean]);
+    expect(found).toBe(true);
+    expect(body).toContain('<!-- edgefit-data-drift -->');
+    expect(body).toContain('### workerd (pinned 1.20260424.1, latest 1.20260924.0)');
+    expect(body).toContain('`*globals*.crypto.subtle.getPublicKey`');
+    expect(body).toContain('`v8.takeCoverage`');
+    expect(body).not.toContain('### bun');
+  });
+
+  it('reports no drift when every runtime agrees', () => {
+    expect(renderIssue([clean]).drift).toBe(false);
+  });
+});

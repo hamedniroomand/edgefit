@@ -2,10 +2,30 @@ import { classifyThrown, isDenied } from './classify.mjs';
 
 const SETTLE_MS = 100;
 
+/** Resolves `*globals*.a.b` from the global object, as the data names global APIs. */
+function lookupGlobal(path) {
+  let owner;
+  let member = globalThis;
+  for (const key of path) {
+    owner = member;
+    member = member?.[key];
+  }
+  if (member === undefined || path.length === 0) {
+    throw new TypeError(`*globals*.${path.join('.')} is undefined`);
+  }
+  return { owner, member };
+}
+
 /** Resolves the module namespace, then each path segment, returning the member and its owner. */
 async function lookup(api) {
   const [module, ...path] = api.split('.');
+  if (module === '*globals*') {
+    return lookupGlobal(path);
+  }
   const namespace = await import(/* @vite-ignore */ `node:${module}`);
+  if (path.length === 0) {
+    return { owner: namespace, member: namespace };
+  }
   let owner = namespace;
   let member = namespace[path[0]] ?? namespace.default?.[path[0]];
   for (const key of path.slice(1)) {
@@ -36,12 +56,15 @@ function isClass(member, kind) {
   return kind === 'class' || /^class\b/u.test(Function.prototype.toString.call(member));
 }
 
-export async function probeApi({ api, kind }) {
+export async function probeApi({ api, kind, lookup: lookupOnly = false }) {
   let found;
   try {
     found = await lookup(api);
   } catch {
     return 'missing';
+  }
+  if (lookupOnly) {
+    return 'present';
   }
   const { owner, member } = found;
   if (typeof member !== 'function' || isDenied(api)) {
@@ -55,10 +78,17 @@ export async function probeApi({ api, kind }) {
   return 'inconclusive';
 }
 
-/** Probes each API in turn, since a call may change state the next one reads. */
+/**
+ * Probes each API in turn, since a call may change state the next one reads. With `PROBE_TRACE`
+ * set, each name is logged first, so the last line shows which call a hung probe was in.
+ */
 export async function probeApis(apis) {
+  const trace = Boolean(globalThis.process?.env?.PROBE_TRACE);
   const outcomes = {};
   for (const entry of apis) {
+    if (trace) {
+      console.error(`probe ${entry.api}${entry.lookup ? ' (lookup)' : ''}`);
+    }
     outcomes[entry.api] = await probeApi(entry);
   }
   return outcomes;

@@ -7,9 +7,11 @@ export function matrixHas(tree, api) {
   const [module, ...path] = api.split('.');
   let node = tree[module];
   for (const key of path) {
-    node = node?.[key];
+    node = typeof node === 'object' ? node[key] : undefined;
   }
-  return node !== undefined;
+  // The data lists what the runtime lacks as `missing`, on the API or on the object holding it.
+  const type = typeof node === 'object' ? node?.['*self*'] : node;
+  return node !== undefined && type !== 'missing';
 }
 
 function overrideDisagreement(override, outcome) {

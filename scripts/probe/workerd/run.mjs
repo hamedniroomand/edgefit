@@ -6,12 +6,21 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import { workerdSettings } from '../data.mjs';
+import { compatibilityDateFor } from '../drift.mjs';
 
 const [specFile, resultsFile] = process.argv.slice(2);
 const parent = path.join(import.meta.dirname, '..');
 const directory = mkdtempSync(path.join(tmpdir(), 'edgefit-workerd-'));
 const port = 8787;
-const { compatibilityDate, compatibilityFlags } = workerdSettings();
+const installed = createRequire(path.join(process.cwd(), 'noop.js'));
+const { version } = installed('workerd/package.json');
+const pinned = workerdSettings();
+// The latest channel uses the newest date its release accepts, because newer dates turn features on.
+const compatibilityDate =
+  process.env.PROBE_LATEST === '1'
+    ? (compatibilityDateFor(version) ?? pinned.compatibilityDate)
+    : pinned.compatibilityDate;
+const { compatibilityFlags } = pinned;
 
 const modules = [
   ['worker.mjs', path.join(import.meta.dirname, 'worker.mjs')],
@@ -40,7 +49,7 @@ ${modules.map(([name]) => `    (name = "${name}", esModule = embed "${name}"),`)
 `,
 );
 
-const binary = createRequire(path.join(process.cwd(), 'noop.js')).resolve('workerd/bin/workerd');
+const binary = installed.resolve('workerd/bin/workerd');
 const server = spawn(binary, ['serve', path.join(directory, 'config.capnp')], { stdio: 'inherit' });
 try {
   let response;
@@ -51,8 +60,7 @@ try {
     }
   }
   const results = await response.json();
-  const { version } = createRequire(path.join(process.cwd(), 'noop.js'))('workerd/package.json');
-  writeFileSync(resultsFile, JSON.stringify({ ...results, version }));
+  writeFileSync(resultsFile, JSON.stringify({ ...results, version, compatibilityDate }));
 } finally {
   server.kill();
 }
