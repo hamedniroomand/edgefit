@@ -69,6 +69,19 @@ describe('workerd module gates', () => {
   });
 });
 
+describe('what a missing nodejs_compat flag leaves undefined', () => {
+  it('marks the result as absent, so a check for the API protects the code', () => {
+    const bare = settings('2026-05-20', []);
+    expect(checkSettings({ module: 'process', path: ['env'] }, bare)).toMatchObject({
+      status: 'unsupported',
+      absent: true,
+    });
+    expect(checkSettings({ module: '*globals*', path: ['Buffer'] }, bare)).toMatchObject({
+      absent: true,
+    });
+  });
+});
+
 describe('workerd target', () => {
   it('reads settings and the entry from the wrangler config', () => {
     const target = createWorkerdTarget(fixture('worker'));

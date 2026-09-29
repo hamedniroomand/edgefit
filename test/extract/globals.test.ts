@@ -106,3 +106,25 @@ describe('checking for a computed member', () => {
     expect(usagesOf('globalThis[name]();')).toEqual(['dynamic globalThis[<expression>]']);
   });
 });
+
+describe('destructuring from the global object', () => {
+  it('does not count the destructuring as a use', () => {
+    expect(usagesOf('const { process, Buffer } = globalThis;')).toEqual([]);
+  });
+
+  it('counts each use of the name', () => {
+    expect(usagesOf('const { process } = globalThis;\nprocess.cwd();')).toEqual([
+      'api node:process.cwd',
+    ]);
+  });
+
+  it('still counts a member of a module when it is destructured', () => {
+    expect(usagesOf("import fs from 'fs';\nconst { watch } = fs;")).toContain('api node:fs.watch');
+  });
+
+  it('guards a use after a check, including void 0', () => {
+    const source =
+      'const { process } = globalThis;\nconst noColor = process !== void 0 ? process.env.NO_COLOR : undefined;';
+    expect(usagesOf(source)).toEqual(['api node:process.env.NO_COLOR [guarded]']);
+  });
+});

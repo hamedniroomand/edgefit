@@ -35,3 +35,12 @@ describe('known-good apps', () => {
     ).toEqual(['crypto.subtle.getPublicKey jose@6.2.12']);
   });
 });
+
+describe('known-good apps without nodejs_compat', () => {
+  it('a Hono app checks for process before it uses it, so it reports nothing', async () => {
+    const config = { workerd: { compatibilityDate: '2026-05-20', compatibilityFlags: [] } };
+    const [report] = (await check({ root: fixture('hono-app'), config })).reports;
+    expect(report?.target.notes.join(' ')).toContain('nodejs_compat is not enabled');
+    expect(report?.findings).toEqual([]);
+  });
+});

@@ -4,20 +4,20 @@ import { staticKey, staticString } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
-import { displayRef, memberRef } from '@/extract/refs.ts';
+import { displayRef, isGlobalRoot, memberRef } from '@/extract/refs.ts';
 import { assign } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
 type DestructuredProperty = NodeOf<'ObjectPattern'>['properties'][number];
 
-function bindTarget(target: Node, ref: ApiRef, context: VisitContext): void {
+function bindTarget(target: Node, ref: ApiRef, context: VisitContext, recorded = true): void {
   let binding = target;
   if (binding.type === 'AssignmentPattern') {
     context.visit(binding.right);
     binding = binding.left;
   }
   if (binding.type === 'Identifier') {
-    assign(context.scope, binding.name, { ref, recorded: true });
+    assign(context.scope, binding.name, { ref, recorded });
   } else if (binding.type === 'ObjectPattern') {
     bindDestructured(binding, ref, context);
   } else {
@@ -49,8 +49,13 @@ function bindProperty(property: DestructuredProperty, ref: ApiRef, context: Visi
     return;
   }
   const member = memberRef(ref, key);
-  context.collector.api(member, property.key.start);
-  bindTarget(property.value, member, context);
+  // `const { process } = globalThis` only reads a property that may not exist, and code that does
+  // this usually checks the value before it uses it. What counts is where the name is used.
+  const recorded = !isGlobalRoot(ref);
+  if (recorded) {
+    context.collector.api(member, property.key.start);
+  }
+  bindTarget(property.value, member, context, recorded);
 }
 
 /** `const { promises: { watch } } = fs` binds `watch` to `fs.promises.watch`. */
