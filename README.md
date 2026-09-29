@@ -1,0 +1,62 @@
+<p align="center">
+  <img src="docs/public/icon.svg" width="72" alt="edgefit">
+</p>
+
+<h1 align="center">edgefit</h1>
+
+<p align="center">
+  Know your project runs on Cloudflare Workers, Bun or Deno before you deploy.
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/edgefit"><img src="https://img.shields.io/npm/v/edgefit?color=f06a2f&label=npm" alt="npm version"></a>
+  <a href="https://github.com/hamedniroomand/edgefit/actions/workflows/ci.yml"><img src="https://github.com/hamedniroomand/edgefit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/hamedniroomand/edgefit?color=f06a2f" alt="MIT license"></a>
+  <a href="https://hamedniroomand.github.io/edgefit/"><img src="https://img.shields.io/badge/docs-edgefit-f06a2f" alt="Documentation"></a>
+</p>
+
+---
+
+edgefit follows your code and every dependency from the entry point, finds the Node and Web APIs it reaches, and checks each one against pinned compatibility data for the runtime you deploy to. Every finding names the package, the file and the import chain behind it.
+
+```
+$ npx edgefit check
+
+error    unsupported  node:fs.watch  (workerd)
+       file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION
+       chokidar@4.0.1  node_modules/chokidar/index.js:5:13
+       via src/index.ts > src/dev/reload.ts > chokidar
+```
+
+- Resolves packages with the target's export conditions, so a library's Workers build is checked, not its Node build.
+- Never claims safety: code it cannot analyze is reported as `unknown`.
+- Checks `workerd`, `bun`, `deno` and `deno-deploy`, and framework build output.
+- Reproducible: all data is vendored and pinned, and every result links to its source.
+
+## Quick start
+
+```sh
+npx edgefit check                                  # entry and settings from wrangler.jsonc
+npx edgefit check --entry src/index.ts --target bun
+npx edgefit compare --entry src/index.ts           # every runtime side by side
+```
+
+On pull requests, with the GitHub Action:
+
+```yaml
+- uses: hamedniroomand/edgefit@v1
+  with:
+    targets: workerd
+```
+
+## Documentation
+
+Configuration, per-runtime behavior, the GitHub Action, JSON reports and the JavaScript API are at **[hamedniroomand.github.io/edgefit](https://hamedniroomand.github.io/edgefit/)**.
+
+## Contributing
+
+Bug reports, data corrections and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md) to report a vulnerability.
+
+## License
+
+[MIT](LICENSE) © Hamed Niroomand. The vendored compatibility data is © Cloudflare, Inc. (MIT) and runtime-compat-data (CC0-1.0); both licenses ship in [`data`](data).

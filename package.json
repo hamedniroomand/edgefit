@@ -1,0 +1,65 @@
+{
+  "name": "edgefit",
+  "version": "0.1.0",
+  "description": "Check whether a project and its dependencies will run on edge and alternative JS runtimes",
+  "keywords": [
+    "bun",
+    "cloudflare-workers",
+    "compatibility",
+    "deno",
+    "edge",
+    "workerd"
+  ],
+  "homepage": "https://hamedniroomand.github.io/edgefit/",
+  "bugs": "https://github.com/hamedniroomand/edgefit/issues",
+  "license": "MIT",
+  "author": "Hamed Niroomand",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamedniroomand/edgefit.git"
+  },
+  "bin": {
+    "edgefit": "./dist/cli/main.mjs"
+  },
+  "files": [
+    "dist",
+    "data"
+  ],
+  "type": "module",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "dev": "vp run edgefit-docs#dev",
+    "docs:build": "vp run edgefit-docs#build",
+    "docs:dev": "vp run edgefit-docs#dev",
+    "docs:preview": "vp run edgefit-docs#preview",
+    "format": "vp fmt",
+    "lint": "vp lint",
+    "prepare": "vp config",
+    "ready": "vp check && vp run -r test && vp run -r build",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "jsonc-parser": "^3.3.1",
+    "oxc-parser": "^0.151.0",
+    "smol-toml": "^1.9.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@types/node": "^22.20.4",
+    "vite-plus": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "packageManager": "pnpm@12.6.0"
+}
