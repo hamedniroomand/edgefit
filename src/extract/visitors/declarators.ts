@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { staticKey } from '@/extract/ast.ts';
+import { staticKey, staticString } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
@@ -87,4 +87,17 @@ export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, con
   } else {
     context.visitPattern(id);
   }
+};
+
+/** Remembers `const name = 'text'`, so `import(name)` can be read like `import('text')`. */
+export const visitDeclaration: Visitor<NodeOf<'VariableDeclaration'>> = (node, context) => {
+  if (node.kind === 'const') {
+    for (const { id, init } of node.declarations) {
+      const value = id.type === 'Identifier' ? staticString(init) : undefined;
+      if (id.type === 'Identifier' && value !== undefined) {
+        context.scope.strings.set(id.name, value);
+      }
+    }
+  }
+  context.visitChildren(node);
 };

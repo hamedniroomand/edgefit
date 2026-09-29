@@ -3,7 +3,7 @@ import type { Node } from 'oxc-parser';
 import type { Visitor } from '@/extract/context.ts';
 
 import { visitCall, visitImportExpression } from './calls.ts';
-import { visitDeclarator } from './declarators.ts';
+import { visitDeclaration, visitDeclarator } from './declarators.ts';
 import { visitExportAll, visitExportNamed, visitImport, visitImportEquals } from './modules.ts';
 import {
   skip,
@@ -47,6 +47,7 @@ const visitors: VisitorMap = {
   TSImportEqualsDeclaration: visitImportEquals,
   CallExpression: visitCall,
   ImportExpression: visitImportExpression,
+  VariableDeclaration: visitDeclaration,
   VariableDeclarator: visitDeclarator,
   Identifier: visitIdentifier,
   MemberExpression: visitMember,
