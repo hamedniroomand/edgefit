@@ -2,6 +2,10 @@ name: Action
 
 on:
   pull_request:
+  # A push compares with the commit before it, and a manual run has no base at all.
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read

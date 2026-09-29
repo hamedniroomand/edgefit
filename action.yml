@@ -40,29 +40,47 @@ runs:
       id: base
       shell: bash
       env:
-        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        EVENT: ${{ github.event_name }}
+        PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        PUSH_BEFORE: ${{ github.event.before }}
         EDGEFIT_DIRECTORY: ${{ github.action_path }}
         CACHE_INPUTS: ${{ inputs.targets }} | ${{ inputs.entry }} | ${{ inputs.working-directory }} | ${{ inputs.install-command }}
       run: |
-        if [ -z "$BASE_SHA" ]; then
-          echo '::error::The edgefit action runs on pull_request events.'
-          exit 1
-        fi
+        mkdir -p "$RUNNER_TEMP/edgefit"
         fetch=(--no-tags --quiet)
         if [ "$(git rev-parse --is-shallow-repository)" = true ]; then
           fetch+=(--unshallow)
         fi
-        git fetch "${fetch[@]}" origin "$BASE_SHA"
-        sha=$(git merge-base "$BASE_SHA" HEAD)
+        # What the head is compared with: a pull request's merge base, or the commit before a push.
+        # Other events, and a push that creates a branch or rewrites history, have no base, so
+        # every finding counts as new.
+        sha=''
+        if [ -n "$PR_BASE_SHA" ]; then
+          git fetch "${fetch[@]}" origin "$PR_BASE_SHA"
+          sha=$(git merge-base "$PR_BASE_SHA" HEAD)
+        elif [ "$EVENT" = push ] && [ -n "$PUSH_BEFORE" ] && [ "${PUSH_BEFORE//0/}" != '' ]; then
+          if git fetch "${fetch[@]}" origin "$PUSH_BEFORE"; then
+            sha=$PUSH_BEFORE
+          else
+            echo "::warning::edgefit could not fetch the commit before this push, so every finding counts as new."
+          fi
+        fi
+        if [ -z "$sha" ]; then
+          echo "::notice::edgefit has no base commit for a $EVENT event, so every finding counts as new."
+          echo '{ "version": 1, "targets": [] }' > "$RUNNER_TEMP/edgefit/base.json"
+          echo 'has-base=false' >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
         # A cached base report is only valid for the same edgefit build, data and inputs.
         build=$(cd "$EDGEFIT_DIRECTORY" && find dist data -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -c1-16)
         inputs=$(echo "$CACHE_INPUTS" | sha256sum | cut -c1-16)
-        mkdir -p "$RUNNER_TEMP/edgefit"
         echo "sha=$sha" >> "$GITHUB_OUTPUT"
+        echo 'has-base=true' >> "$GITHUB_OUTPUT"
         echo "cache-key=edgefit-base-$build-$inputs-$sha" >> "$GITHUB_OUTPUT"
 
     - name: Restore the base report
       id: cache
+      if: steps.base.outputs.has-base == 'true'
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/edgefit/base.json
@@ -70,7 +88,7 @@ runs:
 
     - name: Check the base
       id: base-check
-      if: steps.cache.outputs.cache-hit != 'true'
+      if: steps.base.outputs.has-base == 'true' && steps.cache.outputs.cache-hit != 'true'
       shell: bash
       env:
         BASE: ${{ steps.base.outputs.sha }}
@@ -91,7 +109,7 @@ runs:
         git worktree remove --force "$worktree"
 
     - name: Save the base report
-      if: steps.cache.outputs.cache-hit != 'true' && steps.base-check.outputs.empty != 'true'
+      if: steps.base.outputs.has-base == 'true' && steps.cache.outputs.cache-hit != 'true' && steps.base-check.outputs.empty != 'true'
       uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ runner.temp }}/edgefit/base.json
@@ -116,7 +134,18 @@ runs:
         node "$EDGEFIT" diff base.json head.json --fail-on never --format json > diff.json
         node "$EDGEFIT" diff base.json head.json --fail-on never --no-color | tee diff.txt
 
+    - name: Write the job summary
+      shell: bash
+      run: |
+        {
+          echo '### edgefit'
+          echo '```'
+          cat "$RUNNER_TEMP/edgefit/diff.txt"
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
+
     - name: Comment on the pull request
+      if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
       uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
       env:
         # One comment per project and targets, found again by this marker on later pushes.
