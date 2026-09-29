@@ -6,6 +6,8 @@ export interface Classification {
   category: Category;
   detail: string;
   source: string | undefined;
+  /** The target lacks the API, so code that checks for it first never reaches it. */
+  absent: boolean;
 }
 
 const categoryByStatus: Partial<Record<Status, Category>> = {
@@ -32,7 +34,12 @@ function classifyApi(usage: Usage, target: Target): Classification | undefined {
     return undefined;
   }
   const category = result.category ?? statusCategory;
-  return { category, detail: describe(result), source: result.source };
+  return {
+    category,
+    detail: describe(result),
+    source: result.source,
+    absent: result.absent === true,
+  };
 }
 
 /**
@@ -51,6 +58,7 @@ function classifyDynamic(usage: Usage, target: Target): Classification | undefin
     category: 'unknown',
     detail: `cannot be checked statically: ${reason}`,
     source: undefined,
+    absent: false,
   };
 }
 
@@ -63,7 +71,12 @@ export function classify(usage: Usage, target: Target): Classification | undefin
       return classifyDynamic(usage, target);
     }
     case 'mocked': {
-      return { category: 'mocked', detail: usage.reason ?? 'is mocked', source: undefined };
+      return {
+        category: 'mocked',
+        detail: usage.reason ?? 'is mocked',
+        source: undefined,
+        absent: false,
+      };
     }
     default: {
       throw new Error(`Unknown usage kind: ${String(usage.kind)}`);

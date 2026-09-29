@@ -8,6 +8,8 @@ export async function runCheck(argv: string[], io: CliIo): Promise<number> {
   const args = parseCheckArgs(argv);
   const { root, config } = await loadProject(args, io);
   const result = await check({ root, config, built: args.built });
-  io.stdout(formatReport(result, args.format, { color: args.color && io.color }));
+  io.stdout(
+    formatReport(result, args.format, { color: args.color && io.color, verbose: args.verbose }),
+  );
   return countLevels(result).errors > 0 ? 1 : 0;
 }

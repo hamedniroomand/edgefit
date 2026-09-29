@@ -5,6 +5,8 @@ import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { moduleRef } from '@/extract/refs.ts';
 import { isTracked } from '@/extract/scope.ts';
 
+import { visitOptionalCallee } from './guards.ts';
+
 const computedModuleReason = 'the module name is computed at runtime';
 
 function visitRequire(node: NodeOf<'CallExpression'>, context: VisitContext): void {
@@ -37,7 +39,9 @@ export const visitCall: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
     context.useRef(binding.ref, node.start, false);
     return;
   }
-  context.visitChildren(node);
+  if (!visitOptionalCallee(node, context)) {
+    context.visitChildren(node);
+  }
 };
 
 export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node, context) => {

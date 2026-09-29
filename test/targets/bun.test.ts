@@ -24,6 +24,7 @@ describe('bun lookups', () => {
     expect(target.lookup({ module: 'util', path: ['getCallSites'] })).toEqual({
       status: 'unsupported',
       note: 'does not exist on the target',
+      absent: true,
     });
   });
 

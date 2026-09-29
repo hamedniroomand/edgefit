@@ -19,7 +19,7 @@ export function isReportFormat(value: string): value is ReportFormat {
 export function formatReport(
   result: CheckResult,
   format: ReportFormat,
-  options: { color: boolean },
+  options: { color: boolean; verbose?: boolean },
 ): string {
   switch (format) {
     case 'json': {

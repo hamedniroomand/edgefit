@@ -34,7 +34,9 @@ export const visitClassMember: Visitor<
 
 export const visitAssignment: Visitor<NodeOf<'AssignmentExpression'>> = (node, context) => {
   // Writing to a plain name neither reads it nor changes what edgefit tracks.
-  if (node.left.type !== 'Identifier') {
+  if (node.left.type === 'Identifier') {
+    context.collector.guards.drop(node.left.name);
+  } else {
     context.visitPattern(node.left);
   }
   context.visit(node.right);

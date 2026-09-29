@@ -2,9 +2,11 @@
 
 edgefit is a static analysis tool, and it is honest about what that means. This page lists what it does not do today, so you know where to look yourself.
 
-## Runtime guards are not understood yet
+## Only some guards are understood
 
-Isomorphic packages often branch on the runtime:
+A usage of an API the target lacks, in code that only runs when the API exists, is [guarded](/guide/findings#guarded-usages) and does not fail a check. That covers checks on the API itself: `if (x.y)`, `typeof x.y`, `'y' in x`, `x.y?.()` and guard clauses.
+
+Other ways code decides what to do are not understood, and every branch is reported:
 
 ```js
 if (typeof Deno !== 'undefined') {
@@ -16,7 +18,7 @@ if (typeof Deno !== 'undefined') {
 }
 ```
 
-Today every branch is reported, including ones that never run on your target. If you have confirmed a branch is dead on your runtime, [ignore](/guide/configuration#ignoring-findings) the finding with a reason. Guard awareness is planned.
+Checks on which runtime this is (`typeof Deno`, `process.versions.bun`, `navigator.userAgent`), `try`/`catch` around a call, and checks hidden behind a helper function all still produce findings. If you have confirmed a branch never runs on your runtime, [ignore](/guide/configuration#ignoring-findings) the finding with a reason.
 
 ## Reachability is per module
 

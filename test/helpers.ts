@@ -22,9 +22,13 @@ const defaultGlobals = new Set([
 ]);
 
 /** Extracts usages from a snippet as compact `kind display` strings. */
-export function usagesOf(source: string, file = 'src/input.ts'): string[] {
-  return extractUsages(file, source, { globals: defaultGlobals }).map(
-    usage => `${usage.kind} ${usage.display}`,
+export function usagesOf(
+  source: string,
+  file = 'src/input.ts',
+  globals: ReadonlySet<string> = defaultGlobals,
+): string[] {
+  return extractUsages(file, source, { globals }).map(
+    usage => `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}`,
   );
 }
 

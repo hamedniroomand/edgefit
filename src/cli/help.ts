@@ -21,6 +21,7 @@ Options for check:
   --root <dir>       Project root. Default: the current directory
   --config <file>    Config file. Default: edgefit.config.{ts,mts,js,mjs} in the root
   --format <format>  Output format: ${reportFormats.join(', ')}. Default: text
+  --verbose          List guarded findings: an API the target lacks, checked for before use
   --no-color         Disable colored output
 
 Usage for compare: edgefit compare [target...] [options]

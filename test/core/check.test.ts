@@ -163,3 +163,22 @@ describe('check on Web APIs', () => {
     expect(fileReader?.level).toBe('error');
   });
 });
+
+describe('check with guarded code', () => {
+  const describeAll = (findings: Finding[] | undefined): string[] =>
+    (findings ?? []).map(finding => `${finding.api} ${finding.location.file}`);
+
+  it('hides code that checks for an API the target lacks', async () => {
+    const [report] = (await check({ root: fixture('guarded-app') })).reports;
+    expect(describeAll(report?.guarded)).toEqual(['crypto.subtle.getPublicKey src/index.js']);
+    expect(report?.guarded[0]?.guarded).toBe(true);
+  });
+
+  it('keeps an API that exists and throws, even behind a check', async () => {
+    const [report] = (await check({ root: fixture('guarded-app') })).reports;
+    expect(describeAll(report?.findings)).toEqual([
+      'node:fs.watch src/always.js',
+      'node:fs.watch src/index.js',
+    ]);
+  });
+});

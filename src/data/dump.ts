@@ -17,6 +17,8 @@ export interface LookupResult {
   source?: string;
   /** Reported under this category instead of the one the status maps to. */
   category?: Category;
+  /** The API is missing on the target, so a check for it fails. False for one that exists and throws. */
+  absent?: true;
 }
 
 const functionLike = new Set(['function', 'class']);
@@ -49,7 +51,7 @@ export function compare(base: DumpNode | undefined, target: DumpNode | undefined
     return { status: 'supported' };
   }
   if (targetType === 'missing') {
-    return { status: 'unsupported', note: 'does not exist on the target' };
+    return { status: 'unsupported', note: 'does not exist on the target', absent: true };
   }
   const sameKind =
     baseType === targetType || (functionLike.has(baseType) && functionLike.has(targetType));

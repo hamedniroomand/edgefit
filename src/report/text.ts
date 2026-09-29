@@ -11,6 +11,8 @@ export type Paint = (style: Style, text: string) => string;
 
 export interface TextOptions {
   color: boolean;
+  /** Also list the findings in code that checks for the API first. */
+  verbose?: boolean;
 }
 
 const indent = '       ';
@@ -38,7 +40,10 @@ function formatHeader(report: TargetReport, paint: Paint): string[] {
 }
 
 export function formatFinding(finding: Finding, paint: Paint): string[] {
-  const level = finding.level === 'error' ? paint('red', 'error  ') : paint('yellow', 'warning');
+  let level = finding.level === 'error' ? paint('red', 'error  ') : paint('yellow', 'warning');
+  if (finding.guarded === true) {
+    level = paint('dim', 'guarded');
+  }
   const more =
     finding.otherLocations.length > 0
       ? paint('dim', `  (+${finding.otherLocations.length} more)`)
@@ -57,6 +62,28 @@ export function formatFinding(finding: Finding, paint: Paint): string[] {
   return lines;
 }
 
+function formatGuarded(report: TargetReport, paint: Paint, verbose: boolean): string[] {
+  if (report.guarded.length === 0) {
+    return [];
+  }
+  if (!verbose) {
+    const count = report.guarded.length;
+    return [
+      paint(
+        'dim',
+        `${count} guarded ${count === 1 ? 'usage' : 'usages'} hidden: the code checks for an API this target lacks. Run with --verbose to list them.`,
+      ),
+    ];
+  }
+  return [
+    paint(
+      'dim',
+      'Guarded: the code checks for an API this target lacks before using it, so these do not fail a check.',
+    ),
+    ...report.guarded.map(finding => formatFinding(finding, paint).join('\n')),
+  ];
+}
+
 export function formatText(result: CheckResult, options: TextOptions): string {
   const paint = painter(options);
   const sections = result.reports.map(report => {
@@ -65,7 +92,9 @@ export function formatText(result: CheckResult, options: TextOptions): string {
       findings.length > 0
         ? findings.join('\n\n')
         : paint('green', 'No known incompatible reachable APIs found.');
-    return `${formatHeader(report, paint).join('\n')}\n\n${body}`;
+    const guarded = formatGuarded(report, paint, options.verbose === true);
+    const tail = guarded.length > 0 ? `\n\n${guarded.join('\n\n')}` : '';
+    return `${formatHeader(report, paint).join('\n')}\n\n${body}${tail}`;
   });
   return `${sections.join('\n\n')}\n\n${summaryLine(result)}\n`;
 }

@@ -23,6 +23,7 @@ edgefit check --format json
       "entry": "src/index.ts",
       "modules": 5,
       "ignored": 0,
+      "guarded": [],
       "findings": [
         {
           "category": "unsupported",
@@ -43,6 +44,8 @@ edgefit check --format json
 }
 ```
 
+`guarded` has the same shape as `findings` and holds usages of an API the target lacks, in code that only runs when the API exists (see [guarded usages](/guide/findings#guarded-usages)). They are not counted in `summary` and never fail a check.
+
 ### Finding
 
 | Field            | Type                  | Description                                                         |
@@ -58,6 +61,7 @@ edgefit check --format json
 | `otherLocations` | `object[]`            | Other places the same package uses the same API                     |
 | `chain`          | `string[]`            | Import chain from the entry                                         |
 | `source`         | `string \| undefined` | Link to the runtime source behind a curated result                  |
+| `guarded`        | `true \| undefined`   | Set on entries of `guarded`                                         |
 
 ## compare
 

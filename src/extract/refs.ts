@@ -114,10 +114,31 @@ export function escapes(node: Node, parent: Node): boolean {
   return !consumingParents.has(parent.type);
 }
 
-/** `typeof x.y` and `'y' in x` test for an API rather than use it. */
+function isNullishOperand(node: Node): boolean {
+  return (
+    (node.type === 'Identifier' && node.name === 'undefined') ||
+    (node.type === 'Literal' && node.value === null && node.raw === 'null')
+  );
+}
+
+/**
+ * Tests for an API rather than uses it: `typeof x.y`, `'y' in x`, `!x.y`, `x.y === undefined`,
+ * and `x.y` as the condition of an `if` or `?:` or the left side of `&&`. The left side of `||`
+ * and `??` is the value that gets used, so it stays a use.
+ */
 export function isFeatureCheck(node: Node, parent: Node): boolean {
   if (parent.type === 'UnaryExpression') {
-    return parent.operator === 'typeof';
+    return parent.operator === 'typeof' || parent.operator === '!';
   }
-  return parent.type === 'BinaryExpression' && parent.operator === 'in' && parent.right === node;
+  if (parent.type === 'BinaryExpression') {
+    if (parent.operator === 'in') {
+      return parent.right === node;
+    }
+    const other = parent.left === node ? parent.right : parent.left;
+    return ['==', '===', '!=', '!=='].includes(parent.operator) && isNullishOperand(other);
+  }
+  if (parent.type === 'IfStatement' || parent.type === 'ConditionalExpression') {
+    return parent.test === node;
+  }
+  return parent.type === 'LogicalExpression' && parent.operator === '&&' && parent.left === node;
 }

@@ -25,6 +25,7 @@ describe('classifying API usages', () => {
       category: 'unsupported',
       detail: 'does not exist on the target',
       source: 'src-url',
+      absent: false,
     });
   });
 
@@ -58,6 +59,7 @@ describe('classifying dynamic usages', () => {
       category: 'unknown',
       detail: 'cannot be checked statically: the argument is not a literal',
       source: undefined,
+      absent: false,
     });
   });
 

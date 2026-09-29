@@ -7,11 +7,9 @@ describe('parsing check arguments', () => {
     expect(parseCheckArgs([])).toEqual({
       targets: undefined,
       entry: undefined,
-      built: undefined,
-      root: undefined,
-      config: undefined,
       format: 'text',
       color: true,
+      verbose: false,
     });
   });
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import type { CheckResult } from '@/core/check.ts';
 import { annotation, formatGithub } from '@/report/github.ts';
+import { formatJson } from '@/report/json.ts';
 import { summaryLine } from '@/report/summary.ts';
 import { formatText } from '@/report/text.ts';
 import { makeFinding } from '~/helpers.ts';
@@ -15,11 +16,23 @@ const info = {
   notes: [],
 };
 
-function resultOf(findings: ReturnType<typeof makeFinding>[], ignored = 0): CheckResult {
+function resultOf(
+  findings: ReturnType<typeof makeFinding>[],
+  ignored = 0,
+  guarded: ReturnType<typeof makeFinding>[] = [],
+): CheckResult {
   return {
     root: '/project',
     reports: [
-      { target: info, entry: 'src/index.ts', modules: 3, findings, ignored, supported: [] },
+      {
+        target: info,
+        entry: 'src/index.ts',
+        modules: 3,
+        findings,
+        guarded,
+        ignored,
+        supported: [],
+      },
     ],
   };
 }
@@ -88,5 +101,34 @@ describe('GitHub annotations', () => {
         .split('\n')
         .at(-1),
     ).toBe('edgefit: 1 error, 0 warnings');
+  });
+});
+
+describe('guarded findings', () => {
+  const guarded = makeFinding('node:fs.watch', { guarded: true });
+
+  it('are counted but left out of the list and the summary', () => {
+    const text = formatText(resultOf([], 0, [guarded]), { color: false });
+    expect(text).toContain('No known incompatible reachable APIs found.');
+    expect(text).toContain('1 guarded usage hidden');
+    expect(text).toContain('Run with --verbose');
+    expect(text).toContain('0 errors, 0 warnings');
+    expect(text).not.toContain('node:fs.watch');
+  });
+
+  it('are listed with --verbose', () => {
+    const text = formatText(resultOf([], 0, [guarded]), { color: false, verbose: true });
+    expect(text).toContain('Guarded: the code checks for an API this target lacks');
+    expect(text).toContain('guarded  unsupported  node:fs.watch');
+    expect(text).toContain('0 errors, 0 warnings');
+  });
+
+  it('are in the JSON report next to the findings', () => {
+    const report = JSON.parse(formatJson(resultOf([], 0, [guarded]))) as {
+      summary: { errors: number };
+      targets: { guarded: { api: string; guarded: boolean }[] }[];
+    };
+    expect(report.summary.errors).toBe(0);
+    expect(report.targets[0]?.guarded).toMatchObject([{ api: 'node:fs.watch', guarded: true }]);
   });
 });

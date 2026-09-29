@@ -16,6 +16,7 @@ describe('deno lookups', () => {
     expect(target.lookup({ module: 'util', path: ['isString'] })).toEqual({
       status: 'unsupported',
       note: 'does not exist on the target',
+      absent: true,
     });
   });
 

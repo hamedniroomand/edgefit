@@ -41,6 +41,8 @@ export interface SupportedApi {
 
 export interface FindingSet {
   findings: Finding[];
+  /** Findings in code that only runs when the API exists. They never fail a check. */
+  guarded: Finding[];
   ignored: number;
 }
 
@@ -70,6 +72,7 @@ function withoutRedundantModules(findings: readonly Finding[]): Finding[] {
           other !== finding &&
           other.location.file === finding.location.file &&
           other.category === finding.category &&
+          (other.guarded !== true || finding.guarded === true) &&
           other.api.startsWith(`${finding.api}.`),
       ),
   );
@@ -101,6 +104,8 @@ function toFinding(
     otherLocations: [],
     chain: module.chain,
     ...(classification.source === undefined ? {} : { source: classification.source }),
+    // A check only protects code from an API the target lacks; one that exists and throws still fails.
+    ...(usage.guarded === true && classification.absent ? { guarded: true as const } : {}),
   };
 }
 
@@ -151,7 +156,8 @@ export function collectFindings(
   );
   const kept = raw.filter(finding => !isIgnored(finding, options.ignore));
   return {
-    findings: group(kept).toSorted(compareFindings),
+    findings: group(kept.filter(finding => finding.guarded !== true)).toSorted(compareFindings),
+    guarded: group(kept.filter(finding => finding.guarded === true)).toSorted(compareFindings),
     ignored: raw.length - kept.length,
   };
 }
