@@ -21,7 +21,7 @@ vp run ready      # all of the above, as CI runs it
 vp run docs:dev   # the docs site; docs:build and docs:preview too
 ```
 
-The [contributing guide](https://hamedniroomand.github.io/edgefit/contributing/) covers the repository layout and architecture, and how the compatibility data is maintained.
+The [contributing guide](https://edgefit.kitdev.space/contributing/) covers the repository layout and architecture, and how the compatibility data is maintained.
 
 ## Pull requests
 

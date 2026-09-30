@@ -12,7 +12,7 @@
   <a href="https://www.npmjs.com/package/edgefit"><img src="https://img.shields.io/npm/v/edgefit?color=f06a2f&label=npm" alt="npm version"></a>
   <a href="https://github.com/hamedniroomand/edgefit/actions/workflows/ci.yml"><img src="https://github.com/hamedniroomand/edgefit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/hamedniroomand/edgefit/blob/main/LICENSE"><img src="https://img.shields.io/github/license/hamedniroomand/edgefit?color=f06a2f" alt="MIT license"></a>
-  <a href="https://hamedniroomand.github.io/edgefit/"><img src="https://img.shields.io/badge/docs-edgefit-f06a2f" alt="Documentation"></a>
+  <a href="https://edgefit.kitdev.space/"><img src="https://img.shields.io/badge/docs-edgefit-f06a2f" alt="Documentation"></a>
 </p>
 
 ---
@@ -47,11 +47,11 @@ On pull requests, with the GitHub Action:
 
 ## Status
 
-edgefit is a 0.x release and reads your code statically, so a clean run is not a guarantee: see the [limitations](https://hamedniroomand.github.io/edgefit/guide/limitations). Its data is pinned to workerd 1.20260929.1, Bun 1.4.2 and Deno 2.9.7 and compared with the newest releases every week: see the [status page](https://hamedniroomand.github.io/edgefit/guide/status).
+edgefit is a 0.x release and reads your code statically, so a clean run is not a guarantee: see the [limitations](https://edgefit.kitdev.space/guide/limitations). Its data is pinned to workerd 1.20260929.1, Bun 1.4.2 and Deno 2.9.7 and compared with the newest releases every week: see the [status page](https://edgefit.kitdev.space/guide/status).
 
 ## Documentation
 
-Configuration, per-runtime behavior, the GitHub Action, JSON reports and the JavaScript API are at **[hamedniroomand.github.io/edgefit](https://hamedniroomand.github.io/edgefit/)**.
+Configuration, per-runtime behavior, the GitHub Action, JSON reports and the JavaScript API are at **[edgefit.kitdev.space](https://edgefit.kitdev.space/)**.
 
 ## Contributing
 

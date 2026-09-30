@@ -35,7 +35,7 @@ A fix for false errors on projects without `nodejs_compat`, and documentation.
 
 ### Documentation
 
-- A [status page](https://hamedniroomand.github.io/edgefit/guide/status) lists the runtime versions in the data and how current they are. The [limitations](https://hamedniroomand.github.io/edgefit/guide/limitations) page now covers the age of the data, assumed settings, which build outputs are tested and more.
+- A [status page](https://edgefit.kitdev.space/guide/status) lists the runtime versions in the data and how current they are. The [limitations](https://edgefit.kitdev.space/guide/limitations) page now covers the age of the data, assumed settings, which build outputs are tested and more.
 - The GitHub Action examples use `@v0`. It follows the newest 0.x release, and the page says how to pin an exact release or a commit SHA.
 
 ## 0.3.0

@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: Documentation
-    url: https://hamedniroomand.github.io/edgefit/
+    url: https://edgefit.kitdev.space/
     about: Guides, configuration and the CLI reference.
   - name: Questions and ideas
     url: https://github.com/hamedniroomand/edgefit/discussions

@@ -138,7 +138,7 @@ export function renderIssue(drifts) {
     ...sections,
     'The complete lists are in the `drift.json` artifacts of the latest Probe run.',
     '',
-    'To update the data, follow [Bumping a data source](https://hamedniroomand.github.io/edgefit/contributing/data#bumping-a-data-source).',
+    'To update the data, follow [Bumping a data source](https://edgefit.kitdev.space/contributing/data#bumping-a-data-source).',
     '',
   ].join('\n');
   return { body, drift: changed.length > 0 };
