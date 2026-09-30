@@ -17,7 +17,7 @@ export default defineConfig({
   title,
   description,
   lang: 'en-US',
-  base: '/edgefit/',
+  base: '/',
   cleanUrls: true,
   lastUpdated: true,
 
