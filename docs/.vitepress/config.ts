@@ -4,7 +4,7 @@ import type { DefaultTheme } from 'vitepress';
 import { icon } from './icons.ts';
 
 const repository = 'https://github.com/hamedniroomand/edgefit';
-const site = 'https://hamedniroomand.github.io/edgefit/';
+const site = 'https://edgefit.kitdev.space';
 const title = 'edgefit';
 const description =
   'Find out whether your project and its dependencies will run on Cloudflare Workers, Bun and Deno before you deploy.';
@@ -48,6 +48,15 @@ export default defineConfig({
     ['meta', { name: 'twitter:title', content: 'edgefit: will it run on the edge?' }],
     ['meta', { name: 'twitter:description', content: description }],
     ['meta', { name: 'twitter:image', content: `${site}og-image.png` }],
+    [
+      'script',
+      {
+        defer: '',
+        src: 'https://umami.niroomand.dev/script.js',
+        'data-website-id': '37627c38-58b8-4fa1-9104-26ff6b4e211a',
+        'data-domains': new URL(site).hostname,
+      },
+    ],
   ],
 
   markdown: {
