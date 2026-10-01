@@ -21,33 +21,29 @@ function unwrap(node: Node | null | undefined): Node | null | undefined {
  * Netlify reads this instead of a `[[edge_functions]]` table.
  */
 export function hasInlineRoute(file: string): boolean {
-  try {
-    const { program } = parseSync(file, readFileSync(file, 'utf8'), {
-      lang: /\.[cm]?tsx?$/u.test(file) ? 'ts' : 'js',
-      sourceType: 'module',
+  const { program } = parseSync(file, readFileSync(file, 'utf8'), {
+    lang: /\.[cm]?tsx?$/u.test(file) ? 'ts' : 'js',
+    sourceType: 'module',
+  });
+  return program.body.some(statement => {
+    if (
+      statement.type !== 'ExportNamedDeclaration' ||
+      statement.declaration?.type !== 'VariableDeclaration'
+    ) {
+      return false;
+    }
+    return statement.declaration.declarations.some(declarator => {
+      const init = unwrap(declarator.init);
+      return (
+        declarator.id.type === 'Identifier' &&
+        declarator.id.name === 'config' &&
+        init?.type === 'ObjectExpression' &&
+        init.properties.some(
+          property =>
+            property.type === 'Property' &&
+            ['path', 'pattern'].includes(keyName(property.key) ?? ''),
+        )
+      );
     });
-    return program.body.some(statement => {
-      if (
-        statement.type !== 'ExportNamedDeclaration' ||
-        statement.declaration?.type !== 'VariableDeclaration'
-      ) {
-        return false;
-      }
-      return statement.declaration.declarations.some(declarator => {
-        const init = unwrap(declarator.init);
-        return (
-          declarator.id.type === 'Identifier' &&
-          declarator.id.name === 'config' &&
-          init?.type === 'ObjectExpression' &&
-          init.properties.some(
-            property =>
-              property.type === 'Property' &&
-              ['path', 'pattern'].includes(keyName(property.key) ?? ''),
-          )
-        );
-      });
-    });
-  } catch {
-    return false;
-  }
+  });
 }

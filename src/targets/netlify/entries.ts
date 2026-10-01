@@ -46,7 +46,7 @@ export function findEntries(root: string, config: NetlifyConfig | undefined): En
   const exists = existsSync(directory);
   const declared = [...new Set(config?.functions ?? [])].map(name => ({
     name,
-    file: exists ? functionFile(directory, name) : undefined,
+    file: functionFile(directory, name),
   }));
   const listed = exists ? listFunctions(directory) : [];
   const toEntries = (files: string[]): string[] =>

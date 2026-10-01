@@ -13,7 +13,7 @@ type PackageJson = Record<string, unknown>;
 export function readPackageJson(root: string): PackageJson | undefined {
   try {
     const value: unknown = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
-    return typeof value === 'object' && value !== null ? (value as PackageJson) : undefined;
+    return value as PackageJson | undefined;
   } catch {
     return undefined;
   }
@@ -56,9 +56,6 @@ export function guessedSource(root: string, { label, find }: SourceInput): Entry
 function firstString(value: unknown): string | undefined {
   if (typeof value === 'string') {
     return value;
-  }
-  if (Array.isArray(value)) {
-    return value.map(item => firstString(item)).find(item => item !== undefined);
   }
   if (typeof value === 'object' && value !== null) {
     return Object.entries(value)

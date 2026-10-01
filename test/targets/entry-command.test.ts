@@ -35,5 +35,6 @@ describe('the file in a start command', () => {
     expect(bun('bun run src/missing.ts')).toBeUndefined();
     expect(bun('bun run build && bun run src/index.ts')).toBeUndefined();
     expect(bun('bun run ../outside.ts')).toBeUndefined();
+    expect(bun('')).toBeUndefined();
   });
 });

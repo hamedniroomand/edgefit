@@ -141,7 +141,11 @@ describe('Vercel entries', () => {
 describe('Netlify entries', () => {
   it('takes functions that route themselves with an inline config, before the whole directory', () => {
     const { exact } = detect('netlify-edge', 'netlify-inline');
-    expect(exact?.files).toEqual(['netlify/edge-functions/a.ts', 'netlify/edge-functions/c.ts']);
+    expect(exact?.files).toEqual([
+      'netlify/edge-functions/a.ts',
+      'netlify/edge-functions/c.ts',
+      'netlify/edge-functions/d.js',
+    ]);
     expect(exact?.source).toContain('[[edge_functions]] in netlify.toml');
   });
 });

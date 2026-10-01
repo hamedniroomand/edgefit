@@ -30,6 +30,19 @@ describe('skipped targets in a check report', () => {
   });
 });
 
+describe('a skipped target that searched nothing', () => {
+  it('says only that no entry was found', () => {
+    const result: CheckResult = {
+      root: '/project',
+      reports: [],
+      skipped: [{ key: 'bun', searched: [] }],
+    };
+    expect(formatGithub(result)).toContain(
+      '::warning title=edgefit%3A bun skipped::No entry found.\n',
+    );
+  });
+});
+
 describe('skipped targets in a diff', () => {
   const diff = diffReports(
     parseJsonReport(baseJson, 'base.json'),
