@@ -46,7 +46,7 @@ A setting always wins, because it is the smallest change. A finding in code that
 
 - `packages` is keyed by the name of the package the finding is in. `apis` is keyed by the API as reports show it, such as `node:fs.watch`. A trailing `*` matches a prefix.
 - The entry for the package wins over the one for the API. `apis` inside a package entry limits it to those APIs. Among `apis` keys, an exact key wins over a prefix, and a longer prefix over a shorter one, whatever order the file lists them in.
-- `targets` lists the targets the fix is true for: `workerd`, `bun`, `deno` or `deno-deploy`.
+- `targets` lists the targets the fix is true for: `workerd`, `bun`, `deno`, `deno-deploy`, `netlify-edge` or `vercel-edge`.
 - `kind` is `replace` (use another package, named in `package`) or `change` (change the code or its configuration). `setting` is for the hints edgefit works out itself, and the data file does not accept it.
 - `text` is one sentence that says what to do. It must be true without reading anything else.
 - `source` is an `https` link to the code or documentation that supports the text. **An entry without a source is not accepted.** The file is checked when it loads and by a test.

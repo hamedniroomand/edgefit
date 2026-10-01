@@ -28,12 +28,26 @@ export function flattenMatrix(tree) {
 /**
  * The APIs to probe. By default only those already curated; `discover` adds every API in the
  * matrix baseline, and `drift` adds a lookup of each API the runtime's data marks missing, to see
- * whether it exists now.
+ * whether it exists now. `presence` replaces all of that with a lookup, never a call, of every
+ * module API in the baseline that has no override, which is safe on any runtime and shows what an
+ * older release lacks.
  */
-export function buildSpec(runtime, { discover = false, mocked = false, drift = false } = {}) {
+export function buildSpec(
+  runtime,
+  { discover = false, mocked = false, drift = false, presence = false } = {},
+) {
   const overrides = readOverrides(runtime);
   const baseline = readMatrix('baseline');
   const kinds = new Map(flattenMatrix(baseline).map(({ api, kind }) => [api, kind]));
+  if (presence) {
+    return {
+      apis: [...kinds.keys()]
+        .filter(api => !overrides[api])
+        .sort()
+        .map(api => ({ api, lookup: true })),
+      mocked: [],
+    };
+  }
   const names = new Set(Object.keys(overrides));
   if (discover) {
     for (const api of kinds.keys()) {

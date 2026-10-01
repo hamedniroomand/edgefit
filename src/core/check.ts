@@ -48,9 +48,11 @@ function entryFor(targets: readonly Target[], config: EdgefitConfig): string {
   const entry =
     config.entry ?? targets.find(target => target.defaultEntry !== undefined)?.defaultEntry;
   if (entry === undefined) {
+    // A target that looked for an entry and found none or several says why, in its own terms.
     throw new EdgefitError(
       'No entry point to scan.',
-      'Pass --entry, set `entry` in edgefit.config.ts, or set `main` in the wrangler config.',
+      targets.find(target => target.entryHint !== undefined)?.entryHint ??
+        'Pass --entry, set `entry` in edgefit.config.ts, or set `main` in the wrangler config.',
     );
   }
   return entry;
@@ -72,7 +74,10 @@ async function checkTarget(
     plugins: target.resolvePlugins,
   });
   const isBuilt = options.built !== undefined || isBuildOutput(root, entry);
-  const scanned = scanModules(graph, root, target.globals, { trace: !isBuilt });
+  const scanned = scanModules(graph, root, target.globals, {
+    trace: !isBuilt,
+    lazyNodeImports: target.lazyNodeImports,
+  });
   const { modules, notes } = isBuilt
     ? attributeOutput(scanned, root)
     : { modules: scanned, notes: [] };

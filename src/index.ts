@@ -8,3 +8,7 @@ export { formatReport } from './report/index.ts';
 export type { ReportFormat } from './report/index.ts';
 export type { TargetInfo } from './targets/index.ts';
 export type * from './types.ts';
+export { checkPackage } from './package/check-package.ts';
+export type { CheckPackageOptions } from './package/check-package.ts';
+export { badgeMessage, renderBadge, shieldsEndpoint } from './package/badge.ts';
+export type { PackageEntryResult, PackageResult, PackageStatus } from './package/result.ts';

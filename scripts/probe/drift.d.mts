@@ -10,6 +10,8 @@ export interface Drift {
   stubsNowWork: string[];
   /** Mocked entries the latest release implements. */
   mocksImplemented: string[];
+  /** Findings that are not API lists, such as a documentation page that changed. */
+  sections?: { title: string; items: string[] }[];
 }
 
 export const issueMarker: string;

@@ -222,6 +222,28 @@ After a bump, a few tests fail because the data moved. That is the signal to loo
 
 `deno-deploy` reuses the Deno matrix and adds its own layer (`overrides/deno-deploy.json`, sourced from Deno's docs). Deploy often runs an older Deno than the newest release, so the report notes that APIs added since are reported as supported. Review that layer when Deploy's runtime version changes.
 
+## Netlify Edge Functions
+
+`netlify-edge` reuses the Deno matrix, so the Deno probes cover its runtime. Its own inputs are the Deno range of `@netlify/edge-bundler` and three sections of Netlify's documentation, and a weekly job (`netlify-edge` in `probe.yml`) compares both with what `data/overrides/netlify-edge.json` records. When it reports a change:
+
+1. Read the changed page. If it now names a Deno version or blocks an API, add the entry to the override layer with the page as its source.
+2. If the Deno range changed, set the `netlify-edge` version in `source.json` to the range's lowest version, and update `bundler` in the override file.
+3. Update the hashes in the override file.
+
+The `deno (netlify-min)` run of the probe looks up every API in the oldest Deno Netlify supports and lists where it differs from the data. It only informs the job summary. If Netlify starts documenting the version it runs, use that version in place of the minimum.
+
+## Vercel Edge
+
+`vercel-edge` is built from one documentation page, so keep it in step with the page. The weekly `vercel-edge` job parses the page and lists modules, Web APIs and disabled features that the data lacks or still has, and modules whose description changed. It also compares the globals of Vercel's emulator with the documentation. To act on it:
+
+1. Read the page and update `data/allowlists/vercel-edge.json` and `data/overrides/vercel-edge.json`. Set the version in `source.json` to the page's `last_updated` date.
+2. For a changed description, re-read it: the member lists for `async_hooks` and `util` come from those sentences. Then update the hash.
+3. For members, the job reads `NativeModuleMap` from `next` (`dist/server/web/sandbox/context.js`) and from `@vercel/node` (`dist/dev-server.mjs`), compares both with `modules` in the allowlist, and reports members either side has that the data lacks or no longer has, and any disagreement between the two. Update the lists, and `members.sources` in the allowlist and the `next` and `@vercel/node` versions in `source.json`.
+4. For Next.js, the job reads the list of Node.js modules its edge build keeps (`SUPPORTED_NATIVE_MODULES` in `dist/build/webpack/plugins/middleware-plugin.js`) and whether it still stubs out the others with `__import_unsupported`. If the stand-in is gone, importing a missing module may fail at load, and `lazyNodeImports` on the `vercel-edge` target needs to be reconsidered.
+5. For a global the emulator has that the data does not keep, decide from the documentation whether Vercel provides it, and add it to `emulatorGlobals` if so.
+
+A difference between the emulator and the documentation that is already understood goes in `knownDivergences` in `scripts/probe/vercel/emulator.mjs`, with the reason.
+
 ## After merging
 
 1. The next Probe run should close the drift issue. If it still lists entries, they are real: handle them or mark them `validatesFirst` with a reason.

@@ -71,6 +71,16 @@ function validateDeno(value: unknown, file: string): void {
   }
 }
 
+function validateNetlify(value: unknown, file: string): void {
+  if (!isRecord(value)) {
+    fail(file, '`netlify` must be an object');
+  }
+  const { configFile } = value;
+  if (configFile !== undefined && configFile !== false && typeof configFile !== 'string') {
+    fail(file, '`netlify.configFile` must be a string or false');
+  }
+}
+
 /** Checks the shape of a loaded config, since a config file is not type checked at runtime. */
 export function validateConfig(value: unknown, file: string): EdgefitConfig {
   if (!isRecord(value)) {
@@ -99,6 +109,9 @@ export function validateConfig(value: unknown, file: string): EdgefitConfig {
   }
   if (value.deno !== undefined) {
     validateDeno(value.deno, file);
+  }
+  if (value.netlify !== undefined) {
+    validateNetlify(value.netlify, file);
   }
   return value as EdgefitConfig;
 }

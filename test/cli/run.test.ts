@@ -113,6 +113,23 @@ describe('edgefit targets and help', () => {
     expect(io.output()).toContain('overrides/deno (deno 2.9.7)');
   });
 
+  it('lists the Edge platforms and shows a source with no license as such', async () => {
+    const io = captureIo(fixture('worker'));
+    expect(await run(['targets'], io)).toBe(0);
+    expect(io.output()).toContain('netlify-edge  Netlify Edge Functions');
+    expect(io.output()).toContain('vercel-edge  Vercel Edge');
+    expect(io.output()).toContain('allowlist/vercel-edge (vercel-edge 2026-08-03)');
+    expect(io.output()).toContain(
+      'no license, facts only, https://vercel.com/docs/functions/runtimes/edge',
+    );
+  });
+
+  it('lists targets in a project whose netlify.toml is malformed', async () => {
+    const io = captureIo(fixture('netlify-badtoml'));
+    expect(await run(['targets'], io)).toBe(0);
+    expect(io.output()).toContain('netlify-edge  Netlify Edge Functions');
+  });
+
   it('prints help without a command', async () => {
     const io = captureIo(fixture('worker'));
     expect(await run([], io)).toBe(0);

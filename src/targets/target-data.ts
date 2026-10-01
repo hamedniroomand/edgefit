@@ -2,10 +2,13 @@ import { CompatIndex } from '@/data/compat-index.ts';
 import { findDataDirectory } from '@/data/data-directory.ts';
 import { describeSource, findSource } from '@/data/manifest.ts';
 import type { DataSource } from '@/data/manifest.ts';
+import { allowlistProvider } from '@/data/providers/allowlist.ts';
 import { matrixProvider } from '@/data/providers/matrix.ts';
 import type { MatrixRuntime } from '@/data/providers/matrix.ts';
 import { overridesProvider } from '@/data/providers/overrides.ts';
+import type { CompatProvider, CompatTree } from '@/data/providers/provider.ts';
 import { runtimeCompatDataProvider } from '@/data/providers/runtime-compat-data.ts';
+import type { WebKey } from '@/data/providers/runtime-compat-data.ts';
 import type { TargetKey } from '@/types.ts';
 
 export interface TargetData {
@@ -26,16 +29,19 @@ const alwaysTrackedGlobals = ['process', 'Buffer', 'global', 'globalThis', 'self
 /**
  * The compatibility matrix for a runtime, with its curated overrides applied. Extra layers,
  * such as a platform's restrictions, apply on top and win over the runtime's own overrides.
- * Web API data fills in the globals the matrix does not describe.
+ * Web API data fills in the globals the matrix does not describe; `webKey` picks its column
+ * when a platform has one of its own.
  */
 export function loadTargetData(
-  runtime: MatrixRuntime,
+  runtime: MatrixRuntime | 'vercel-edge',
   extraLayers: readonly TargetKey[] = [],
   dataDirectory = findDataDirectory(),
+  webKey?: WebKey,
 ): TargetData {
-  const matrix = matrixProvider(runtime);
+  const matrix: CompatProvider<CompatTree> =
+    runtime === 'vercel-edge' ? allowlistProvider(runtime) : matrixProvider(runtime);
   const overrides = [runtime, ...extraLayers].map(layer => overridesProvider(layer));
-  const web = runtimeCompatDataProvider(runtime);
+  const web = runtimeCompatDataProvider(runtime, webKey);
   const matrixSource = findSource(dataDirectory, matrix.name);
   const webSource = findSource(dataDirectory, web.name);
   const index = new CompatIndex(

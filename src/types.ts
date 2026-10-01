@@ -3,10 +3,10 @@ export type Category = 'unsupported' | 'mocked' | 'mismatch' | 'web' | 'unknown'
 
 export type Level = 'error' | 'warning' | 'off';
 
-export type TargetKey = 'workerd' | 'bun' | 'deno' | 'deno-deploy';
+export type TargetKey = 'workerd' | 'bun' | 'deno' | 'deno-deploy' | 'netlify-edge' | 'vercel-edge';
 
-/** The runtime a target runs code on. `deno` covers Deno Deploy too. */
-export type Runtime = 'workerd' | 'bun' | 'deno';
+/** A runtime code can check for. A target runs on one or more: Netlify Edge is `deno` and `netlify`. */
+export type Runtime = 'workerd' | 'bun' | 'deno' | 'netlify' | 'vercel-edge';
 
 /** Code that only runs when the runtime is (`present`) or is not (`!present`) `runtime`. */
 export interface RuntimeCondition {
@@ -117,6 +117,11 @@ export interface DenoOptions {
   configFile?: string | false;
 }
 
+export interface NetlifyOptions {
+  /** Path to a `netlify.toml`. Found next to the project root when omitted. */
+  configFile?: string | false;
+}
+
 export interface EdgefitConfig {
   targets?: TargetKey[];
   entry?: string;
@@ -124,6 +129,8 @@ export interface EdgefitConfig {
   bun?: BunOptions;
   /** Used by both the `deno` and `deno-deploy` targets. */
   deno?: DenoOptions;
+  /** Used by the `netlify-edge` target. */
+  netlify?: NetlifyOptions;
   ignore?: IgnoreRule[];
   levels?: Partial<Record<Category, Level>>;
   /** Extra export conditions to resolve with, before the target's own. */

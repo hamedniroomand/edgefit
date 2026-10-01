@@ -88,6 +88,35 @@ edgefit check --format json
 
 Each value in `results` is a category or `supported`. A target that does not reach the API, or where the finding was ignored or turned off, is left out of `results`.
 
+## package
+
+`edgefit package <name> --format json`. It has its own `version`, bumped on a breaking change.
+
+```json
+{
+  "version": 1,
+  "package": "@scope/name",
+  "resolved": "2.3.1",
+  "checkedAt": "2026-09-30T12:00:00.000Z",
+  "edgefit": "0.5.0",
+  "data": { "workerd": "1.20260929.1", "bun": "1.4.2", "deno": "2.9.7" },
+  "targets": ["workerd", "bun", "deno"],
+  "summary": { "workerd": "pass", "bun": "pass", "deno": "warn" },
+  "context": { "workerd": { "settings": "compatibility_date …", "notes": [] } },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "@scope/name",
+      "results": { "workerd": { "status": "pass", "errors": 0, "warnings": 0 } }
+    }
+  ]
+}
+```
+
+`status` is `pass`, `warn` (warnings only), `fail` (an error) or `error` (the entry could not be checked, with a `message`). `resolved` is the installed version, never the requested range. `summary` is each target's worst status.
+
+The table's `results.json` lists one row per package with `name`, `file`, `resolved`, `summary`, `subpaths`, and `error` when the package could not be installed or checked.
+
 ## diff
 
 ```json

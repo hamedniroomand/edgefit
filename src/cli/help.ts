@@ -9,6 +9,7 @@ Check whether a project and its dependencies will run on edge and alternative JS
 Commands:
   check     Scan a project from its entry point
   compare   Show the reached APIs side by side across targets
+  package   Check a package from the registry or a local directory
   diff      Show what changed between two \`check --format json\` reports
   targets   List supported targets and the data behind each
   help      Show this help
@@ -37,6 +38,18 @@ Usage for diff: edgefit diff <base.json> <head.json> [options]
   --fail-on <when>   Exit with 1 on: ${failOnValues.join(', ')}. Default: new-errors
   --format <format>  Output format: ${reportFormats.join(', ')}. Default: text
                      github annotates only the new findings
+  --no-color         Disable colored output
+
+Usage for package: edgefit package <name[@version]|dir|file.tgz> [options]
+  Installs the package into a temporary project without running its scripts, then checks each
+  public entry point with every export used.
+  --target <name>    Target runtime (repeatable). Default: ${compareTargetKeys.join(', ')}
+  --export <subpath> Check only this \`exports\` subpath, e.g. ./client (repeatable)
+  --skip <subpath>   Leave out this subpath (repeatable)
+  --badge <file>     Also write a badge SVG
+  --registry <url>   npm registry to install from
+  --keep             Keep the temporary project for debugging
+  --format <format>  Output format: text, json. Default: text
   --no-color         Disable colored output
 
 Exit codes: 0 no errors, 1 findings at error level, 2 invalid input or project.

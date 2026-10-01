@@ -1,0 +1,23 @@
+name: Package request
+description: Ask for a package to be added to the compatibility table
+title: 'Add <package> to the compatibility table'
+labels: [package-request]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Package name
+      description: The npm name, for example `hono` or `@scope/name`.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why should it be listed?
+      description: For example, edge users hit it often, or it is a popular alternative to a listed package.
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        A maintainer adds the package with a one-line pull request to `table/packages.json`. CI runs `edgefit package` on it, so the result is on the pull request. You can also open that pull request yourself.

@@ -37,6 +37,7 @@ describe('isDenied', () => {
     'process.exit',
     'process.abort',
     'process.kill',
+    'process.default.abort',
     'child_process.spawn',
     'cluster.fork',
     'fs.writeFileSync',
@@ -52,6 +53,7 @@ describe('isDenied', () => {
     'fs.readFile',
     'fs.promises.watch',
     'process.cwd',
+    'process.default.cwd',
     'process.report.writeReport',
     'inspector.url',
   ])('allows %s', api => {

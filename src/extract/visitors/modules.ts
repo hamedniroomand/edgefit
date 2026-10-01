@@ -30,7 +30,8 @@ export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context)
       assign(context.scope, specifier.local.name, { ref: moduleRef(module), recorded: false });
     } else if (specifier.importKind !== 'type') {
       const ref = namedRef(module, specifier.imported);
-      const recorded = ref.path.length > 0;
+      // Named imports are read where they are used when the platform stubs out the module.
+      const recorded = ref.path.length > 0 && !context.collector.lazyNodeImports;
       if (recorded) {
         context.collector.api(ref, specifier.imported.start);
       }

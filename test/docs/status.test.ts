@@ -51,6 +51,37 @@ describe('the status page', () => {
   });
 });
 
+describe('the status page and the Edge platform targets', () => {
+  it('names the Deno floor Netlify Edge is recorded with', () => {
+    expect(status).toContain(source('overrides/netlify-edge').versions['netlify-edge']);
+  });
+
+  it('names the date of the Vercel documentation the data was read from', () => {
+    expect(status).toContain(source('allowlist/vercel-edge').versions['vercel-edge']);
+    expect(source('overrides/vercel-edge').versions['vercel-edge']).toBe(
+      source('allowlist/vercel-edge').versions['vercel-edge'],
+    );
+  });
+
+  it('names the releases the Vercel member lists were read from', () => {
+    const { members } = JSON.parse(read('data/allowlists/vercel-edge.json')) as {
+      members: { sources: { package: string; version: string }[] };
+    };
+    const versions = source('allowlist/vercel-edge').versions;
+    for (const { package: name, version } of members.sources) {
+      expect(versions[name]).toBe(version);
+      expect(status).toContain(version);
+    }
+  });
+
+  it('names the emulator release the Vercel probe is pinned to', () => {
+    const { emulator } = JSON.parse(read('data/allowlists/vercel-edge.json')) as {
+      emulator: { version: string };
+    };
+    expect(status).toContain(emulator.version);
+  });
+});
+
 describe('the README', () => {
   it('names the runtime versions in the data', () => {
     for (const runtime of ['workerd', 'bun', 'deno'] as const) {

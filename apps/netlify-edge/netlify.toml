@@ -1,0 +1,4 @@
+# A Hono app as a Netlify Edge Function, with hono installed from npm.
+[[edge_functions]]
+function = "app"
+path = "/*"

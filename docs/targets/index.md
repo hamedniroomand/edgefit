@@ -4,12 +4,14 @@ Every result edgefit gives comes from data that is vendored in the package, pinn
 
 ## Targets
 
-| Target        | Runtime                                  | Export conditions              |
-| ------------- | ---------------------------------------- | ------------------------------ |
-| `workerd`     | [Cloudflare Workers](/targets/workerd)   | `workerd`, `worker`, `browser` |
-| `bun`         | [Bun](/targets/bun)                      | `bun`, `node`                  |
-| `deno`        | [Deno](/targets/deno)                    | `deno`, `node`                 |
-| `deno-deploy` | [Deno Deploy](/targets/deno#deno-deploy) | `deno`, `node`                 |
+| Target         | Runtime                                            | Export conditions                 |
+| -------------- | -------------------------------------------------- | --------------------------------- |
+| `workerd`      | [Cloudflare Workers](/targets/workerd)             | `workerd`, `worker`, `browser`    |
+| `bun`          | [Bun](/targets/bun)                                | `bun`, `node`                     |
+| `deno`         | [Deno](/targets/deno)                              | `deno`, `node`                    |
+| `deno-deploy`  | [Deno Deploy](/targets/deno#deno-deploy)           | `deno`, `node`                    |
+| `netlify-edge` | [Netlify Edge Functions](/targets/netlify-edge)    | `node`                            |
+| `vercel-edge`  | [Vercel Edge](/targets/vercel-edge) (experimental) | `edge-light`, `module`, `browser` |
 
 Run `edgefit targets` to print this list along with the exact data versions:
 
@@ -41,7 +43,9 @@ Globals such as `caches`, `FileReader` and `navigator.gpu` are checked against [
 
 ### Target settings
 
-Last, each target applies its own settings: the compatibility date and flags on workerd, the pinned version on Bun, the import map on Deno.
+Last, each target applies its own settings: the compatibility date and flags on workerd, the pinned version on Bun, the import map on Deno and Netlify.
+
+Vercel Edge has no matrix dump to start from, so its Node data is the baseline cut down to what Vercel's documentation allows. See [Vercel Edge](/targets/vercel-edge).
 
 </Steps>
 
@@ -53,4 +57,4 @@ The cost is that data can lag behind runtime releases. A scheduled workflow in t
 
 ## Licenses
 
-The vendored compatibility matrix is © Cloudflare, Inc., under the MIT license. The runtime-compat-data files are CC0-1.0. Both licenses ship with the package under `data/`.
+The vendored compatibility matrix is © Cloudflare, Inc., under the MIT license. The runtime-compat-data files are CC0-1.0. Both licenses ship with the package under `data/`. The Vercel Edge data is API names and hashes read from Vercel's documentation, which has no open license; it lists `none`, and no text is copied.

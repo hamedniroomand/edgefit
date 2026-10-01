@@ -135,3 +135,101 @@ describe('checks that say nothing about the runtime', () => {
     ).toEqual(watch());
   });
 });
+
+describe('usages behind a check for a platform', () => {
+  it('knows typeof EdgeRuntime, which names Vercel', () => {
+    expect(usagesOf(`${fs}if (typeof EdgeRuntime !== 'undefined') fs.watch('.');`)).toEqual(
+      watch('vercel-edge'),
+    );
+  });
+
+  it('knows typeof Netlify, and its else branch', () => {
+    expect(usagesOf(`${fs}if (typeof Netlify !== 'undefined') fs.watch('.');`)).toEqual(
+      watch('netlify'),
+    );
+    expect(usagesOf(`${fs}if (typeof Netlify === 'undefined') fs.watch('.');`)).toEqual(
+      watch('not netlify'),
+    );
+  });
+});
+
+describe('usages behind a check on a runtime marker’s type', () => {
+  it('knows the form Vercel documents, typeof EdgeRuntime !== "string"', () => {
+    expect(usagesOf(`${fs}if (typeof EdgeRuntime !== 'string') fs.watch('.');`)).toEqual(
+      watch('not vercel-edge'),
+    );
+    expect(usagesOf(`${fs}if (typeof EdgeRuntime === 'string') fs.watch('.');`)).toEqual(
+      watch('vercel-edge'),
+    );
+  });
+
+  it('knows the else branch, and the undefined form beside it', () => {
+    expect(
+      usagesOf(`${fs}if (typeof EdgeRuntime === 'string') noop(); else fs.watch('.');`),
+    ).toEqual(watch('not vercel-edge'));
+    expect(usagesOf(`${fs}if (typeof EdgeRuntime === 'undefined') fs.watch('.');`)).toEqual(
+      watch('not vercel-edge'),
+    );
+  });
+
+  it('knows the object type of Deno, Bun and Netlify', () => {
+    expect(usagesOf(`${fs}if (typeof Deno === 'object') fs.watch('.');`)).toEqual(watch('deno'));
+    expect(usagesOf(`${fs}if (typeof Deno !== 'object') fs.watch('.');`)).toEqual(
+      watch('not deno'),
+    );
+    expect(usagesOf(`${fs}if (typeof Netlify !== 'object') fs.watch('.');`)).toEqual(
+      watch('not netlify'),
+    );
+  });
+
+  it('leaves a check against another type as before', () => {
+    expect(usagesOf(`${fs}if (typeof Deno === 'function') fs.watch('.');`)).toEqual(watch('deno'));
+  });
+});
+
+// The read of process.env.NEXT_RUNTIME is a usage too; these tests are about what it guards.
+const watchUsages = (code: string): string[] =>
+  usagesOf(code).filter(usage => usage.startsWith('api node:fs.watch'));
+const only = (...tags: string[]): string[] => watch(...tags).slice(1);
+
+describe('usages behind process.env.NEXT_RUNTIME', () => {
+  it('knows edge means Vercel’s Edge runtime, and nodejs means it is not', () => {
+    const edge = "process.env.NEXT_RUNTIME === 'edge'";
+    expect(watchUsages(`${fs}if (${edge}) fs.watch('.');`)).toEqual(only('vercel-edge'));
+    expect(watchUsages(`${fs}if (process.env.NEXT_RUNTIME !== 'edge') fs.watch('.');`)).toEqual(
+      only('not vercel-edge'),
+    );
+    expect(watchUsages(`${fs}if (process.env.NEXT_RUNTIME === 'nodejs') fs.watch('.');`)).toEqual(
+      only('not vercel-edge'),
+    );
+    expect(watchUsages(`${fs}if (process.env.NEXT_RUNTIME !== 'nodejs') fs.watch('.');`)).toEqual(
+      only('vercel-edge'),
+    );
+  });
+
+  it('knows the else branch, a bracket read, a helper and a guard clause', () => {
+    expect(
+      watchUsages(`${fs}if (process.env.NEXT_RUNTIME === 'edge') noop(); else fs.watch('.');`),
+    ).toEqual(only('not vercel-edge'));
+    expect(watchUsages(`${fs}if (process.env['NEXT_RUNTIME'] === 'edge') fs.watch('.');`)).toEqual(
+      only('vercel-edge'),
+    );
+    expect(
+      watchUsages(
+        `${fs}const isEdge = () => process.env.NEXT_RUNTIME === 'edge';\nif (isEdge()) fs.watch('.');`,
+      ),
+    ).toEqual(only('vercel-edge'));
+    expect(
+      watchUsages(
+        `${fs}function f() { if (process.env.NEXT_RUNTIME === 'edge') return; fs.watch('.'); }`,
+      ),
+    ).toEqual(only('not vercel-edge'));
+  });
+
+  it('ignores other values and other variables', () => {
+    expect(watchUsages(`${fs}if (process.env.NEXT_RUNTIME === 'other') fs.watch('.');`)).toEqual(
+      only(),
+    );
+    expect(watchUsages(`${fs}if (process.env.OTHER === 'edge') fs.watch('.');`)).toEqual(only());
+  });
+});

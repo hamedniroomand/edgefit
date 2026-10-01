@@ -69,6 +69,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/', activeMatch: '^/guide/' },
       { text: 'Targets', link: '/targets/', activeMatch: '^/targets/' },
+      { text: 'Packages', link: '/packages/', activeMatch: '^/packages/' },
       { text: 'Reference', link: '/reference/cli', activeMatch: '^/reference/' },
       { text: 'Contributing', link: '/contributing/', activeMatch: '^/contributing/' },
     ],
@@ -96,6 +97,7 @@ export default defineConfig({
           text: 'More',
           items: [
             link('shield-check', 'Status', '/guide/status'),
+            link('package', 'Checking packages', '/guide/packages'),
             link('triangle-alert', 'Limitations', '/guide/limitations'),
             link('circle-alert', 'FAQ', '/guide/faq'),
           ],
@@ -109,6 +111,8 @@ export default defineConfig({
             link('cloud', 'Cloudflare Workers', '/targets/workerd'),
             link('zap', 'Bun', '/targets/bun'),
             link('globe', 'Deno and Deno Deploy', '/targets/deno'),
+            link('network', 'Netlify Edge Functions', '/targets/netlify-edge'),
+            link('layers', 'Vercel Edge', '/targets/vercel-edge'),
           ],
         },
       ],

@@ -12,6 +12,17 @@ import { isTracked, lookup } from './scope.ts';
 const globalRuntimes = new Map<string, Runtime>([
   ['Deno', 'deno'],
   ['Bun', 'bun'],
+  ['EdgeRuntime', 'vercel-edge'],
+  ['Netlify', 'netlify'],
+]);
+// What `typeof` says about each global marker when its runtime is there. `typeof EdgeRuntime` is
+// `'string'`, which is the form Vercel documents, so `!== 'string'` means another runtime. A key of
+// `process.versions` (`process.versions.bun`) is a string too.
+const markerTypes = new Map<string, string>([
+  ['Deno', 'object'],
+  ['Bun', 'object'],
+  ['EdgeRuntime', 'string'],
+  ['Netlify', 'object'],
 ]);
 const versionRuntimes = new Map<string, Runtime>([
   ['deno', 'deno'],
@@ -36,7 +47,7 @@ function isGlobalObject(node: Node, context: BindingContext): boolean {
 }
 
 /** The global `name`, or the same property of the global object, as in `globalThis.Deno`. */
-function isGlobal(node: Node, name: string, context: BindingContext): boolean {
+export function isGlobal(node: Node, name: string, context: BindingContext): boolean {
   const inner = strip(node);
   return (
     isUnbound(inner, name, context) ||
@@ -84,6 +95,59 @@ export function runtimeMarker(node: Node, context: BindingContext): Runtime | un
   }
   const key = staticKey(inner.property, inner.computed);
   return key === undefined ? undefined : memberRuntime(inner.object, key, context);
+}
+
+/** The `typeof` a runtime marker has when its runtime is there, or `undefined` for anything else. */
+export function markerType(node: Node, context: BindingContext): string | undefined {
+  if (runtimeMarker(node, context) === undefined) {
+    return undefined;
+  }
+  const inner = strip(node);
+  const name =
+    inner.type === 'Identifier'
+      ? inner.name
+      : inner.type === 'MemberExpression'
+        ? staticKey(inner.property, inner.computed)
+        : undefined;
+  if (name === undefined) {
+    return undefined;
+  }
+  return markerTypes.get(name) ?? (versionRuntimes.has(name) ? 'string' : undefined);
+}
+
+function isNextRuntime(node: Node, context: BindingContext): boolean {
+  const inner = strip(node);
+  if (
+    inner.type !== 'MemberExpression' ||
+    staticKey(inner.property, inner.computed) !== 'NEXT_RUNTIME'
+  ) {
+    return false;
+  }
+  const env = strip(inner.object);
+  return (
+    env.type === 'MemberExpression' &&
+    staticKey(env.property, env.computed) === 'env' &&
+    isProcess(env.object, context)
+  );
+}
+
+/**
+ * What a comparison of `process.env.NEXT_RUNTIME` with a string says about Vercel's Edge runtime:
+ * Next.js replaces it at build time with `'edge'` for the edge build and `'nodejs'` for the Node
+ * one. Returns whether the comparison being equal means the Edge runtime is there.
+ */
+export function nextRuntimeEdge(node: Node, context: BindingContext): boolean | undefined {
+  if (node.type !== 'BinaryExpression') {
+    return undefined;
+  }
+  const [value, literal] = isNextRuntime(node.left, context)
+    ? [node.left, node.right]
+    : [node.right, node.left];
+  const text = isNextRuntime(value, context) ? stringLiteral(literal) : undefined;
+  if (text === 'edge') {
+    return true;
+  }
+  return text === 'nodejs' ? false : undefined;
 }
 
 function isUserAgent(node: Node, context: BindingContext): boolean {

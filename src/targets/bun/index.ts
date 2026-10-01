@@ -22,6 +22,7 @@ export function createBunTarget(root: string, options: BunOptions = {}): Target 
       settings: `Bun ${version} (from ${origin})`,
       notes: versionNotes('Bun', version, dataVersion),
     },
+    runtimes: ['bun'],
     resolvePlatform: 'node',
     defaultEntry: undefined,
     globals,

@@ -13,6 +13,8 @@ export interface ExtractOptions {
   globals: ReadonlySet<string>;
   /** Also split the module into the pieces that run on load and the pieces that wait to be used. */
   shape?: boolean;
+  /** The target's platform stubs out a Node.js module it lacks, so only reading from one fails. */
+  lazyNodeImports?: boolean;
 }
 
 export interface ExtractedModule {
@@ -61,7 +63,7 @@ export function extractModule(
   source: string,
   options: ExtractOptions,
 ): ExtractedModule {
-  const collector = new UsageCollector(file, source);
+  const collector = new UsageCollector(file, source, options.lazyNodeImports === true);
   const result = parse(file, source);
   const [error] = result.errors;
   if (error !== undefined && result.program.body.length === 0) {

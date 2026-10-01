@@ -40,7 +40,9 @@ const PROCESS_DENIED = new Set(['exit', 'reallyExit', 'abort', 'kill']);
 
 /** APIs that are only looked up, never called, because calling them has side effects. */
 export function isDenied(api) {
-  const [module, ...path] = api.split('.');
+  const [module, ...segments] = api.split('.');
+  // `process.default.abort` is the same call as `process.abort`.
+  const path = segments[0] === 'default' ? segments.slice(1) : segments;
   const name = path.at(-1) ?? '';
   if (module === 'child_process') {
     return true;

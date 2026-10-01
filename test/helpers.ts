@@ -4,6 +4,7 @@ import process from 'node:process';
 
 import type { CliIo } from '@/cli/io.ts';
 import type { LookupResult } from '@/data/dump.ts';
+import { EdgefitError } from '@/errors.ts';
 import { extractUsages } from '@/extract/index.ts';
 import type { Target } from '@/targets/index.ts';
 import type { ApiRef, Finding, Usage } from '@/types.ts';
@@ -51,8 +52,9 @@ export function usagesOf(
   source: string,
   file = 'src/input.ts',
   globals: ReadonlySet<string> = defaultGlobals,
+  options: { lazyNodeImports?: boolean } = {},
 ): string[] {
-  return extractUsages(file, source, { globals }).map(
+  return extractUsages(file, source, { globals, ...options }).map(
     usage =>
       `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${runtimeTags(usage)}`,
   );
@@ -111,6 +113,7 @@ export function stubTarget(
       settings: 'stub',
       notes: [],
     },
+    runtimes: ['workerd'],
     resolvePlatform: 'node',
     defaultEntry: undefined,
     globals: new Set(),
@@ -127,4 +130,17 @@ export function makeUsage(api: ApiRef | undefined, parts: Partial<Usage> = {}): 
     location: { file: 'src/index.ts', line: 1, column: 1 },
     ...parts,
   };
+}
+
+/** The user error a run fails with, for asserting on its message and hint. */
+export async function edgefitError(run: Promise<unknown>): Promise<EdgefitError> {
+  try {
+    await run;
+  } catch (error) {
+    if (error instanceof EdgefitError) {
+      return error;
+    }
+    throw error;
+  }
+  throw new Error('expected the run to fail with an EdgefitError');
 }

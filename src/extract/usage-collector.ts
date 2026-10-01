@@ -10,11 +10,14 @@ export class UsageCollector {
   public readonly offsets: number[] = [];
   /** The APIs known to exist at the point being visited. */
   public readonly guards = new GuardStack();
+  /** Importing a Node.js module is not a use of it: only what is read from it is. */
+  public readonly lazyNodeImports: boolean;
   readonly #file: string;
   readonly #lineStarts: number[] = [0];
 
-  public constructor(file: string, source: string) {
+  public constructor(file: string, source: string, lazyNodeImports = false) {
     this.#file = file;
+    this.lazyNodeImports = lazyNodeImports;
     for (let index = source.indexOf('\n'); index !== -1; index = source.indexOf('\n', index + 1)) {
       this.#lineStarts.push(index + 1);
     }
@@ -35,6 +38,10 @@ export class UsageCollector {
   }
 
   public api(ref: ApiRef, offset: number): void {
+    // A module as a whole is never read in this mode, so it is not a use that can fail.
+    if (this.lazyNodeImports && ref.module !== '*globals*' && ref.path.length === 0) {
+      return;
+    }
     const api = normalizeRef(ref);
     const guarded = this.guards.covers(api);
     this.offsets.push(offset);

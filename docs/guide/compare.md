@@ -19,7 +19,7 @@ node:fs.watch  ✗        ✓    ✓
 
 ## Choosing targets
 
-By default every target is compared except `deno-deploy`, whose column would be the same as `deno`. Name the targets you want as arguments:
+By default every target is compared except `deno-deploy` and `netlify-edge`, whose columns would be the same as `deno`, and the experimental `vercel-edge`. Name the targets you want as arguments:
 
 ```sh
 npx edgefit compare workerd bun

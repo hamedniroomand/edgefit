@@ -106,6 +106,18 @@ Postgres client, a Nitro build) installed from npm.
 
 </Card>
 
+<Card title="Netlify Edge Functions" icon="network" to="/targets/netlify-edge">
+
+`netlify-edge`. The Deno data, with the entry and import map read from `netlify.toml`.
+
+</Card>
+
+<Card title="Vercel Edge" icon="layers" to="/targets/vercel-edge">
+
+`vercel-edge`, experimental. Built from Vercel's documented list of allowed modules.
+
+</Card>
+
 </CardGroup>
 
 ## Where to go next
