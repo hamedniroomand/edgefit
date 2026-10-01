@@ -5,8 +5,8 @@ import { usagesOf } from '~/helpers.ts';
 const fs = "import fs from 'node:fs';\n";
 
 // The condition reads `process.env.NODE_ENV`, so only the call under it says whether the branch ran.
-const runs = (source: string, nodeEnv?: string): boolean =>
-  usagesOf(`${fs}${source}`, undefined, undefined, { nodeEnv }).includes('api node:fs.watch');
+const runs = (source: string, options?: { nodeEnv: string | undefined }): boolean =>
+  usagesOf(`${fs}${source}`, undefined, undefined, options).includes('api node:fs.watch');
 
 describe('usages behind a check of process.env.NODE_ENV', () => {
   it('skips the branch a production build removes', () => {
@@ -49,12 +49,18 @@ describe('usages behind a check of process.env.NODE_ENV', () => {
 
 describe('usages behind a check of process.env.NODE_ENV, with a setting or no answer', () => {
   it('uses the NODE_ENV the config sets', () => {
-    expect(runs("if (process.env.NODE_ENV !== 'production') fs.watch('.');", 'development')).toBe(
-      true,
-    );
-    expect(runs("if (process.env.NODE_ENV === 'production') fs.watch('.');", 'development')).toBe(
-      false,
-    );
+    expect(
+      runs("if (process.env.NODE_ENV !== 'production') fs.watch('.');", { nodeEnv: 'development' }),
+    ).toBe(true);
+    expect(
+      runs("if (process.env.NODE_ENV === 'production') fs.watch('.');", { nodeEnv: 'development' }),
+    ).toBe(false);
+  });
+
+  it('follows both branches when NODE_ENV is not fixed', () => {
+    const notFixed = { nodeEnv: undefined };
+    expect(runs("if (process.env.NODE_ENV !== 'production') fs.watch('.');", notFixed)).toBe(true);
+    expect(runs("if (process.env.NODE_ENV === 'production') fs.watch('.');", notFixed)).toBe(true);
   });
 
   it('keeps what it cannot decide', () => {

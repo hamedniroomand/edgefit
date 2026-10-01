@@ -79,6 +79,7 @@ export function createVercelEdgeTarget(root: string): Target {
     },
     runtimes: ['vercel-edge'],
     resolvePlatform: 'browser',
+    nodeEnv: 'production',
     defaultEntry: entry,
     entryHint: hint,
     lazyNodeImports: true,

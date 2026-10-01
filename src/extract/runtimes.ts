@@ -115,8 +115,6 @@ export function markerType(node: Node, context: BindingContext): string | undefi
   return markerTypes.get(name) ?? (versionRuntimes.has(name) ? 'string' : undefined);
 }
 
-export const defaultNodeEnv = 'production';
-
 function isEnvVariable(node: Node, name: string, context: BindingContext): boolean {
   const inner = strip(node);
   if (inner.type !== 'MemberExpression' || staticKey(inner.property, inner.computed) !== name) {
@@ -146,7 +144,7 @@ export function nodeEnvMatches(node: Node, context: BindingContext): boolean | u
     ? [node.left, node.right]
     : [node.right, node.left];
   const text = isEnvVariable(value, 'NODE_ENV', context) ? stringLiteral(literal) : undefined;
-  return text === undefined ? undefined : text === context.nodeEnv;
+  return text === undefined || context.nodeEnv === undefined ? undefined : text === context.nodeEnv;
 }
 
 /**

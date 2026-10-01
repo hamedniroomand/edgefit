@@ -52,9 +52,9 @@ export function usagesOf(
   source: string,
   file = 'src/input.ts',
   globals: ReadonlySet<string> = defaultGlobals,
-  options: { lazyNodeImports?: boolean; nodeEnv?: string } = {},
+  options: { lazyNodeImports?: boolean; nodeEnv?: string | undefined } = {},
 ): string[] {
-  return extractUsages(file, source, { globals, ...options }).map(
+  return extractUsages(file, source, { globals, nodeEnv: 'production', ...options }).map(
     usage =>
       `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${runtimeTags(usage)}`,
   );
@@ -115,6 +115,7 @@ export function stubTarget(
     },
     runtimes: ['workerd'],
     resolvePlatform: 'node',
+    nodeEnv: undefined,
     defaultEntry: undefined,
     globals: new Set(),
     lookup: api => results[keyOf(api)] ?? { status: 'supported' },

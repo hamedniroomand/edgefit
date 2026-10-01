@@ -132,7 +132,7 @@ Used by `netlify-edge`. By default edgefit looks for `netlify.toml` in the root,
 
 ## Environment
 
-edgefit treats `process.env.NODE_ENV` as a constant, as a production build does. The default is `production`, so code that only runs in development is not checked. To check the development build, set another value:
+edgefit treats `process.env.NODE_ENV` as a constant, as the platform's production build does, so code that only runs in development is not checked. The default is what the platform's build uses: `production` on `workerd`, `netlify-edge` and `vercel-edge`. Bun and Deno set no value, so on `bun`, `deno` and `deno-deploy` both branches of a check are followed. The report says which one was used. To set a value, for example to check the development build:
 
 ```ts
 export default defineConfig({

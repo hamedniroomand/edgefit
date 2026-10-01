@@ -58,6 +58,13 @@ function entryFor(targets: readonly Target[], config: EdgefitConfig): string {
   return entry;
 }
 
+function describeNodeEnv(nodeEnv: string | undefined, fromConfig: boolean): string {
+  if (nodeEnv === undefined) {
+    return 'NODE_ENV not fixed, so both branches of a check are followed';
+  }
+  return `NODE_ENV ${nodeEnv} (${fromConfig ? 'from the config' : "as the platform's build"})`;
+}
+
 async function checkTarget(
   target: Target,
   entry: string,
@@ -66,7 +73,7 @@ async function checkTarget(
 ): Promise<TargetReport> {
   const config = options.config ?? {};
   const conditions = [...(config.conditions ?? []), ...target.info.conditions];
-  const nodeEnv = config.env?.NODE_ENV ?? 'production';
+  const nodeEnv = config.env?.NODE_ENV ?? target.nodeEnv;
   const graph = await resolveGraph({
     root,
     entry,
@@ -92,7 +99,12 @@ async function checkTarget(
     suggestions: loadSuggestions(),
   });
   return {
-    target: { ...target.info, conditions, notes: [...target.info.notes, ...notes] },
+    target: {
+      ...target.info,
+      settings: `${target.info.settings}, ${describeNodeEnv(nodeEnv, config.env?.NODE_ENV !== undefined)}`,
+      conditions,
+      notes: [...target.info.notes, ...notes],
+    },
     entry: toPosix(graph.entry),
     modules: graph.modules.size,
     findings,

@@ -15,12 +15,16 @@ import { visitPattern } from './visitors/patterns.ts';
 export class Walker implements VisitContext {
   public readonly collector: UsageCollector;
   public readonly globals: ReadonlySet<string>;
-  public readonly nodeEnv: string;
+  public readonly nodeEnv: string | undefined;
   readonly #stack: Node[] = [];
   #scope: Scope = createScope();
   #boundInit: Node | undefined;
 
-  public constructor(collector: UsageCollector, globals: ReadonlySet<string>, nodeEnv: string) {
+  public constructor(
+    collector: UsageCollector,
+    globals: ReadonlySet<string>,
+    nodeEnv: string | undefined,
+  ) {
     this.collector = collector;
     this.globals = globals;
     this.nodeEnv = nodeEnv;

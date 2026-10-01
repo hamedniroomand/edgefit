@@ -80,9 +80,9 @@ Each rule needs `package`, `api`, or both.
 
 ## `env`
 
-| Field      | Type     | Default      | Description                                                                           |
-| ---------- | -------- | ------------ | ------------------------------------------------------------------------------------- |
-| `NODE_ENV` | `string` | `production` | What `process.env.NODE_ENV` is replaced with. Code the value rules out is not checked |
+| Field      | Type     | Default   | Description                                                                                                                                                                                      |
+| ---------- | -------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NODE_ENV` | `string` | by target | What `process.env.NODE_ENV` is replaced with. Code the value rules out is not checked. `production` on `workerd`, `netlify-edge` and `vercel-edge`; not fixed on `bun`, `deno` and `deno-deploy` |
 
 ## Validation
 
