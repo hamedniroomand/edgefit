@@ -1,0 +1,1 @@
+{ "name": "a", "scripts": { "start": "bun run dev", "dev": "bun --watch src/dev.ts" } }

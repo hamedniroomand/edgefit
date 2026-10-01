@@ -1,5 +1,5 @@
 import { countLevels } from '@/core/check.ts';
-import type { CheckResult } from '@/core/check.ts';
+import type { CheckResult, SkippedTarget } from '@/core/check.ts';
 import { EdgefitError } from '@/errors.ts';
 import type { Finding, TargetKey } from '@/types.ts';
 
@@ -13,12 +13,15 @@ const readableVersions: readonly number[] = [1, jsonReportVersion];
 export interface JsonReport {
   version: number;
   targets: { key: TargetKey; entries: string[]; findings: Finding[] }[];
+  /** Targets left out because they have no entry. Empty in version 1 reports. */
+  skipped: SkippedTarget[];
 }
 
 export function formatJson(result: CheckResult): string {
   const report = {
     version: jsonReportVersion,
     summary: countLevels(result),
+    skipped: result.skipped,
     targets: result.reports.map(targetReport => ({
       ...targetReport.target,
       entries: targetReport.entries,
@@ -71,6 +74,7 @@ export function parseJsonReport(text: string, source: string): JsonReport {
   }
   return {
     ...value,
+    skipped: Array.isArray(value.skipped) ? value.skipped : [],
     targets: value.targets.map(target => ({
       key: target.key,
       entries: entriesOf(target),

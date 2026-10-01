@@ -1,6 +1,7 @@
 import type { Plugin } from 'esbuild';
 
 import type { LookupResult } from '@/data/dump.ts';
+import type { EntryDetection } from '@/targets/entries.ts';
 import type { ApiRef, Runtime, TargetKey } from '@/types.ts';
 
 export interface TargetInfo {
@@ -25,15 +26,13 @@ export interface Target {
   readonly resolvePlugins?: readonly Plugin[];
   /** What the platform's build replaces `process.env.NODE_ENV` with, or `undefined` when it sets none. */
   readonly nodeEnv: string | undefined;
-  /** Entry points the target's own config declares, such as wrangler's `main`. Empty when it has none. */
-  readonly defaultEntries: readonly string[];
+  /** Where the target finds entries without `--entry`, and where it looked. */
+  readonly entries: EntryDetection;
   /**
    * The platform's build replaces a Node.js module it lacks with a stand-in that only throws when
    * something from it is used, so importing one is harmless. Then a use is what fails, not the import.
    */
   readonly lazyNodeImports?: boolean | undefined;
-  /** What to tell the user when there is no entry: why, and what to do. Replaces the generic hint. */
-  readonly entryHint?: string | undefined;
   /** Global names worth tracking because something at or below them is not fully supported. */
   readonly globals: ReadonlySet<string>;
   lookup: (api: ApiRef) => LookupResult;

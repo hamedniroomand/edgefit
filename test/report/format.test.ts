@@ -24,6 +24,7 @@ function resultOf(
 ): CheckResult {
   return {
     root: '/project',
+    skipped: [],
     reports: [
       {
         target: info,

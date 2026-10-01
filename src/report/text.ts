@@ -1,6 +1,7 @@
 import { styleText } from 'node:util';
 
-import type { CheckResult, TargetReport } from '@/core/check.ts';
+import type { CheckResult, SkippedTarget, TargetReport } from '@/core/check.ts';
+import { describeEntries } from '@/core/entries.ts';
 import { formatPackage } from '@/resolve/packages.ts';
 import type { Finding } from '@/types.ts';
 
@@ -10,6 +11,7 @@ import {
   fixSourceLine,
   formatLocation,
   ownerName,
+  skippedMessage,
   summaryLine,
 } from './summary.ts';
 
@@ -28,18 +30,6 @@ const indent = '       ';
 export function painter(options: TextOptions): Paint {
   return (style, text) =>
     options.color ? styleText(style, text, { validateStream: false }) : text;
-}
-
-const shownEntries = 3;
-
-/** `entry a.ts`, or `entries a.ts, b.ts, c.ts +2 more` when there are more than a few. */
-export function describeEntries(entries: readonly string[]): string {
-  if (entries.length === 1) {
-    return `entry ${entries[0]}`;
-  }
-  const rest = entries.length - shownEntries;
-  const more = rest > 0 ? ` +${rest} more` : '';
-  return `entries ${entries.slice(0, shownEntries).join(', ')}${more}`;
 }
 
 function formatHeader(report: TargetReport, paint: Paint): string[] {
@@ -135,6 +125,13 @@ function formatGuarded(report: TargetReport, paint: Paint, verbose: boolean): st
   ];
 }
 
+/** One line for each target left out because it has no entry. */
+export function formatSkipped(skipped: readonly SkippedTarget[], paint: Paint): string[] {
+  return skipped.map(target =>
+    paint('yellow', `edgefit · ${target.key} skipped: ${skippedMessage(target)}`),
+  );
+}
+
 export function formatText(result: CheckResult, options: TextOptions): string {
   const paint = painter(options);
   const sections = result.reports.map(report => {
@@ -153,5 +150,7 @@ export function formatText(result: CheckResult, options: TextOptions): string {
     const tail = guarded.length > 0 ? `\n\n${guarded.join('\n\n')}` : '';
     return `${formatHeader(report, paint).join('\n')}\n\n${body}${tail}`;
   });
-  return `${sections.join('\n\n')}\n\n${summaryLine(result)}\n`;
+  const skipped = formatSkipped(result.skipped, paint);
+  const all = [...sections, ...(skipped.length > 0 ? [skipped.join('\n')] : [])];
+  return `${all.join('\n\n')}\n\n${summaryLine(result)}\n`;
 }

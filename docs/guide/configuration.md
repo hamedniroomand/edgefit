@@ -34,7 +34,25 @@ export default defineConfig({
 
 - `targets` defaults to `['workerd']`. The valid names are `workerd`, `bun`, `deno`, `deno-deploy`, `netlify-edge` and `vercel-edge`.
 - `entry` is a path or a glob, or an array of them, relative to the project root. Globs skip `node_modules`. An `entry` in the config applies to every target.
-- Without `entry`, each target finds its own: wrangler's `main` for workerd, every function for Netlify Edge, the middleware file for Vercel Edge. A target that finds none uses the entries of the first target that has some, and the report says so. A project with a wrangler config can check Bun and Deno without repeating the entry.
+- Without `entry`, each target finds its own: wrangler's `main` for workerd, every function for Netlify Edge, the middleware file for Vercel Edge. A workerd, Bun or Deno target that finds none uses the entries that the first such target found by a declaration, and the settings line says where they came from. Netlify Edge and Vercel Edge never use another target's entries. A target left without an entry is skipped, and the report says where it looked. The run fails only when no target has an entry. A project with a wrangler config can check Bun and Deno without repeating the entry.
+
+## How entries are found
+
+An `--entry` or a config `entry` always wins. Without one, each target looks in these places. A declaration beats a guess, and the settings line of the report names the source. A guess adds a note. The order is by certainty, not by specificity: a declared `package.json` `main` beats a guessed `scripts.start`, even for Bun.
+
+| Target                   | Declared                                                                                                         | Guessed                                                                          |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `workerd`                | wrangler `main`                                                                                                  |                                                                                  |
+| `netlify-edge`           | `[[edge_functions]]` and functions that export `config` with a `path` or `pattern`, else the whole directory     |                                                                                  |
+| `vercel-edge`            | `middleware.*`, and `api/**`, `pages/api/**` and `app/**/route.*` (also under `src/`) that set `runtime: 'edge'` |                                                                                  |
+| `deno`, `deno-deploy`    | `deno.json` `exports`                                                                                            | the file in `tasks.start` or `tasks.dev`, then `main.ts`                         |
+| `bun`                    | `package.json` `module`                                                                                          | the file in `scripts.start` or `scripts.dev`, then `index.ts`                    |
+| `workerd`, `bun`, `deno` | `package.json` `exports` (the `.` entry), `module` or `main`                                                     | `src/index.*`, then `index.*`, then `package.json` fields in `dist/` or `build/` |
+
+- A `scripts` or `tasks` command is read for `bun run file`, `bun file`, `deno run file` and `deno serve file`, after any `KEY=value`. Only the first command of a chain counts, and the file must exist.
+- Only the project root is read. At a workspace root (`workspaces` in `package.json`, `pnpm-workspace.yaml`, or `workspace` in `deno.json`) nothing is guessed, so edgefit never picks an entry from another package. Run it in a package, or pass `--entry`.
+- A `workerd`, Bun or Deno target with no entry of its own uses the declared entries of another such target. A guess is never lent. Netlify Edge and Vercel Edge never use another target's entries.
+- A target with no entry is skipped, and the report lists where it looked. The text report prints a line, `--format github` prints a `::warning` for each, and `compare`, `diff` and the Action's comment show them too. The run fails when no target has one.
 
 ## Ignoring findings
 

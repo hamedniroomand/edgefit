@@ -1,6 +1,8 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
+import { detectEntries } from '@/targets/entries.ts';
+import { globFiles } from '@/targets/glob-files.ts';
 import { loadTargetData } from '@/targets/target-data.ts';
 import type { Target } from '@/targets/target.ts';
 
@@ -15,50 +17,66 @@ const middlewareNames = ['middleware', 'src/middleware'].flatMap(base =>
   ['ts', 'js', 'mts', 'mjs'].map(extension => `${base}.${extension}`),
 );
 
+const middlewareLabel = 'middleware.{ts,js,mts,mjs}';
+
 /** Routing Middleware runs on the edge runtime by default, so its file is the natural entry. */
 function findMiddleware(root: string): string | undefined {
   return middlewareNames.find(name => existsSync(path.join(root, name)));
 }
 
-interface Entry {
-  entries: string[];
-  settings: string;
-  notes: string[];
-  hint: string | undefined;
+const routeFiles = '*.{ts,tsx,js,jsx,mts,mjs}';
+const routePatterns = ['', 'src/'].flatMap(base => [
+  `${base}api/**/${routeFiles}`,
+  `${base}pages/api/**/${routeFiles}`,
+  `${base}app/**/route.{ts,tsx,js,jsx,mts,mjs}`,
+]);
+const routesLabel =
+  "api/**, pages/api/** and app/**/route.* (also under src/) that set runtime 'edge'";
+const edgeRuntimes = new Set(['edge', 'experimental-edge']);
+
+/** Route files run on Node.js unless they pick the Edge runtime, so only those that do are entries. */
+function findEdgeRoutes(root: string): string[] {
+  const files = new Set(routePatterns.flatMap(pattern => globFiles(root, pattern)));
+  return [...files]
+    .filter(file => edgeRuntimes.has(readRuntimeSetting(path.join(root, file)) ?? ''))
+    .sort();
 }
 
-const passEntry = 'Pass --entry, or set `entry` in edgefit.config.ts.';
+interface Entry {
+  entries: string[];
+  /** What was searched, with the reason when a file was found and skipped. */
+  label: string;
+  notes: string[];
+}
 
 /**
  * The middleware file, unless it picks the Node.js runtime for itself (`config.runtime`), which
  * Next.js 15.5 allows: the Edge runtime does not run it, so checking it would be all false errors.
+ * Edge routes come with it, since Vercel deploys each one as its own function.
  */
-function findEntry(root: string): Entry {
+function findEntries(root: string): Entry {
   const middleware = findMiddleware(root);
-  if (middleware === undefined) {
+  const routes = findEdgeRoutes(root);
+  if (middleware !== undefined && readRuntimeSetting(path.join(root, middleware)) === 'nodejs') {
     return {
-      entries: [],
-      settings: 'no middleware file found',
-      notes: [],
-      hint: `No middleware file found. ${passEntry}`,
+      entries: routes,
+      label: `${middlewareLabel} (skipped: ${middleware} sets runtime 'nodejs', so the Edge runtime does not run it), ${routesLabel}`,
+      notes: [
+        `${middleware} sets runtime 'nodejs', so it does not run on Vercel's Edge runtime. The vercel-edge target does not apply to it.`,
+      ],
     };
   }
-  if (readRuntimeSetting(path.join(root, middleware)) === 'nodejs') {
-    const message = `${middleware} sets runtime 'nodejs', so it does not run on Vercel's Edge runtime.`;
-    return {
-      entries: [],
-      settings: `${middleware} runs on Node.js`,
-      notes: [`${message} The vercel-edge target does not apply to it.`],
-      hint: `${message} ${passEntry}`,
-    };
-  }
-  return { entries: [middleware], settings: `entry ${middleware}`, notes: [], hint: undefined };
+  return {
+    entries: [...(middleware === undefined ? [] : [middleware]), ...routes],
+    label: `${middlewareLabel}, ${routesLabel}`,
+    notes: [],
+  };
 }
 
 export function createVercelEdgeTarget(root: string): Target {
   const { index, matrixSource, description, globals } = loadTargetData('vercel-edge');
   const docsDate = matrixSource.versions['vercel-edge'] ?? 'unknown';
-  const { entries, settings, notes, hint } = findEntry(root);
+  const { entries, label, notes } = findEntries(root);
 
   return {
     info: {
@@ -66,7 +84,7 @@ export function createVercelEdgeTarget(root: string): Target {
       platform: 'Vercel Edge',
       conditions: vercelEdgeConditions,
       data: description,
-      settings: `Vercel Edge runtime as documented on ${docsDate}, ${settings}`,
+      settings: `Vercel Edge runtime as documented on ${docsDate}`,
       notes: [
         `Based on Vercel's Edge runtime documentation (${docsDate}) and runtime-compat-data, not on a run in production. ` +
           'Anything the documentation does not list is reported as missing.',
@@ -80,8 +98,7 @@ export function createVercelEdgeTarget(root: string): Target {
     runtimes: ['vercel-edge'],
     resolvePlatform: 'browser',
     nodeEnv: 'production',
-    defaultEntries: entries,
-    entryHint: hint,
+    entries: detectEntries([{ label, guessed: false, find: () => entries }], false),
     lazyNodeImports: true,
     globals,
     lookup: api => index.lookup(api),

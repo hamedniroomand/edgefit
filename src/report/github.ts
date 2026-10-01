@@ -1,7 +1,7 @@
-import type { CheckResult } from '@/core/check.ts';
+import type { CheckResult, SkippedTarget } from '@/core/check.ts';
 import type { Finding } from '@/types.ts';
 
-import { chainLine, fixLine, ownerName, summaryLine } from './summary.ts';
+import { chainLine, fixLine, ownerName, skippedMessage, summaryLine } from './summary.ts';
 
 // https://docs.github.com/actions/using-workflows/workflow-commands-for-github-actions
 function escapeData(value: string): string {
@@ -35,10 +35,19 @@ export function annotation(finding: Finding): string {
   return `::${finding.level} ${properties}::${escapeData(details.join('\n'))}`;
 }
 
+/** A warning with no file, for a target left out because it has no entry. */
+export function skippedWarning(target: SkippedTarget): string {
+  const title = escapeProperty(`edgefit: ${target.key} skipped`);
+  return `::warning title=${title}::${escapeData(skippedMessage(target))}`;
+}
+
 export function formatGithub(result: CheckResult): string {
   const lines = result.reports.flatMap(report =>
     report.findings.map(finding => annotation(finding)),
   );
-  lines.push(`edgefit: ${summaryLine(result)}`);
+  lines.push(
+    ...result.skipped.map(target => skippedWarning(target)),
+    `edgefit: ${summaryLine(result)}`,
+  );
   return `${lines.join('\n')}\n`;
 }

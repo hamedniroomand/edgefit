@@ -1,6 +1,8 @@
 import path from 'node:path';
 
 import type { LookupResult } from '@/data/dump.ts';
+import { detectEntries } from '@/targets/entries.ts';
+import { fallbackSources } from '@/targets/entry-sources.ts';
 import { loadTargetData } from '@/targets/target-data.ts';
 import type { Target } from '@/targets/target.ts';
 import type { ApiRef, WorkerdOptions } from '@/types.ts';
@@ -85,8 +87,19 @@ export function createWorkerdTarget(root: string, options: WorkerdOptions = {}):
     runtimes: ['workerd'],
     resolvePlatform: 'browser',
     nodeEnv: 'production',
-    defaultEntries: [wrangler === undefined ? undefined : mainFrom(root, wrangler)].flatMap(
-      main => main ?? [],
+    entries: detectEntries(
+      [
+        {
+          label: `${wranglerFile ?? 'wrangler config'} "main"`,
+          guessed: false,
+          find: () =>
+            [wrangler === undefined ? undefined : mainFrom(root, wrangler)].flatMap(
+              main => main ?? [],
+            ),
+        },
+        ...fallbackSources(root),
+      ],
+      true,
     ),
     globals,
     lookup,

@@ -5,7 +5,7 @@ import process from 'node:process';
 /**
  * @typedef {{ owner: string, repo: string }} Repo
  * @typedef {{ id: number, body?: string }} IssueComment
- * @typedef {{ new: unknown[], fixed: unknown[] }} DiffJson The parts of `edgefit diff --format json` used here.
+ * @typedef {{ new: unknown[], fixed: unknown[], skipped?: unknown[] }} DiffJson The parts of `edgefit diff --format json` used here.
  * @typedef {object} ScriptArguments The parts of actions/github-script's arguments used here.
  * @property {{
  *   paginate: (route: unknown, parameters: Repo & { issue_number: number }) => Promise<IssueComment[]>,
@@ -43,7 +43,7 @@ export async function comment({ github, context, core }) {
     const existing = comments.find(entry => entry.body?.startsWith(marker) === true);
     if (existing !== undefined) {
       await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
-    } else if (diff.new.length + diff.fixed.length > 0) {
+    } else if (diff.new.length + diff.fixed.length + (diff.skipped?.length ?? 0) > 0) {
       await github.rest.issues.createComment({ owner, repo, issue_number: issueNumber, body });
     }
   } catch (error) {

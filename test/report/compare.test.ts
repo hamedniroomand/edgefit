@@ -37,6 +37,7 @@ function report(key: TargetKey, parts: Partial<TargetReport>): TargetReport {
 
 const result: CheckResult = {
   root: '/project',
+  skipped: [],
   reports: [
     report('workerd', {
       findings: [
@@ -87,6 +88,7 @@ describe('compare header', () => {
   it('names the entries once when every target checks the same ones', () => {
     const same: CheckResult = {
       root: '/project',
+      skipped: [],
       reports: [report('workerd', {}), report('bun', {})],
     };
     expect(formatCompareText(same, options)).toContain('edgefit compare · entry src/index.ts');
@@ -95,6 +97,7 @@ describe('compare header', () => {
   it('names the entries of each target when they differ', () => {
     const differ: CheckResult = {
       root: '/project',
+      skipped: [],
       reports: [
         report('workerd', {}),
         report('netlify-edge', { entries: ['netlify/a.ts', 'netlify/b.ts'] }),

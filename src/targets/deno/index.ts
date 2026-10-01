@@ -1,5 +1,7 @@
 import path from 'node:path';
 
+import { detectEntries } from '@/targets/entries.ts';
+import type { EntryDetection } from '@/targets/entries.ts';
 import { versionNotes } from '@/targets/runtime-version.ts';
 import { loadTargetData } from '@/targets/target-data.ts';
 import type { Target } from '@/targets/target.ts';
@@ -7,6 +9,7 @@ import type { DenoOptions, Runtime, TargetKey } from '@/types.ts';
 
 import { findDenoConfig, readDenoConfig } from './deno-config.ts';
 import type { DenoConfig } from './deno-config.ts';
+import { denoEntrySources } from './entries.ts';
 import type { ImportMap } from './import-map.ts';
 import { denoSpecifiers } from './specifiers-plugin.ts';
 
@@ -24,8 +27,7 @@ export interface DenoTargetOptions extends DenoOptions {
   deploy?: boolean;
   /** Applies Netlify Edge's override layer and Web API data on top of the Deno CLI's data. */
   netlify?: {
-    defaultEntries: readonly string[];
-    entryHint: string | undefined;
+    entries: EntryDetection;
     notes: readonly string[];
     /** Netlify reads its import map from `netlify.toml`, never from `deno.json`. */
     importMap: ImportMap | undefined;
@@ -122,8 +124,7 @@ export function createDenoTarget(root: string, options: DenoTargetOptions = {}):
     resolvePlatform: 'node',
     nodeEnv: netlify ? 'production' : undefined,
     resolvePlugins: [denoSpecifiers(netlify ? netlify.importMap : config?.importMap)],
-    defaultEntries: netlify?.defaultEntries ?? [],
-    entryHint: netlify?.entryHint,
+    entries: netlify?.entries ?? detectEntries(denoEntrySources(root, config?.file), true),
     globals,
     lookup: api => index.lookup(api),
     hasProblemsBelow: api => index.hasProblemsBelow(api),

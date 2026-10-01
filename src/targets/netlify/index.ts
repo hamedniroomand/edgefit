@@ -1,7 +1,5 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
-
-import { parse } from 'smol-toml';
 
 import { EdgefitError } from '@/errors.ts';
 import { readImportMapFile } from '@/targets/deno/deno-config.ts';
@@ -10,128 +8,9 @@ import { createDenoTarget } from '@/targets/deno/index.ts';
 import type { Target } from '@/targets/target.ts';
 import type { NetlifyOptions } from '@/types.ts';
 
-const defaultDirectory = 'netlify/edge-functions';
-const sourceExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.mts'];
-
-interface NetlifyConfig {
-  file: string;
-  /** `build.edge_functions`, relative to the config file. */
-  directory: string | undefined;
-  /** `functions.deno_import_map`, relative to the config file. */
-  importMap: string | undefined;
-  /** Function names from `[[edge_functions]]`, in order. */
-  functions: string[];
-}
-
-function readNetlifyConfig(root: string, file: string): NetlifyConfig {
-  let toml: {
-    build?: { edge_functions?: unknown };
-    functions?: { deno_import_map?: unknown };
-    edge_functions?: unknown;
-  };
-  try {
-    toml = parse(readFileSync(file, 'utf8')) as typeof toml;
-  } catch (error) {
-    const reason = error instanceof Error ? error.message.split('\n')[0] : String(error);
-    throw new EdgefitError(`Could not parse ${path.relative(root, file)}: ${reason}`);
-  }
-  const directory = toml.build?.edge_functions;
-  const importMap = toml.functions?.deno_import_map;
-  const declared: unknown[] = Array.isArray(toml.edge_functions) ? toml.edge_functions : [];
-  return {
-    file,
-    importMap: typeof importMap === 'string' ? importMap : undefined,
-    directory: typeof directory === 'string' ? directory : undefined,
-    functions: declared.flatMap(entry => {
-      const name = (entry as { function?: unknown } | null)?.function;
-      return typeof name === 'string' ? [name] : [];
-    }),
-  };
-}
-
-/** An explicit `configFile` that is missing is an error; the default `netlify.toml` may be absent. */
-function loadConfig(root: string, option: NetlifyOptions['configFile']): NetlifyConfig | undefined {
-  if (option === false) {
-    return undefined;
-  }
-  const file = path.resolve(root, option ?? 'netlify.toml');
-  if (existsSync(file)) {
-    return readNetlifyConfig(root, file);
-  }
-  if (option !== undefined) {
-    throw new EdgefitError(
-      `netlify.configFile ${option} does not exist`,
-      'Fix the path, or set netlify.configFile to false to skip netlify.toml.',
-    );
-  }
-  return undefined;
-}
-
-/** A source file for an edge function: `name.ts`, or `name/index.ts`. */
-function functionFile(directory: string, name: string): string | undefined {
-  const candidates = sourceExtensions.flatMap(extension => [
-    path.join(directory, `${name}${extension}`),
-    path.join(directory, name, `index${extension}`),
-  ]);
-  return candidates.find(candidate => existsSync(candidate));
-}
-
-interface EntryResult {
-  entries: string[];
-  notes: string[];
-  /** What to tell the user when there is no entry. */
-  hint: string | undefined;
-}
-
-const passEntry = 'Pass --entry, or set `entry` in edgefit.config.ts.';
-
-/** Every function Netlify would run: source files in the directory, and `name/index.ts` folders. */
-function listFunctions(directory: string): string[] {
-  return readdirSync(directory, { withFileTypes: true }).flatMap(item => {
-    if (item.isFile()) {
-      return sourceExtensions.includes(path.extname(item.name))
-        ? [path.join(directory, item.name)]
-        : [];
-    }
-    return item.isDirectory() ? (functionFile(directory, item.name) ?? []) : [];
-  });
-}
-
-/** Netlify runs every function in the edge functions directory, so each one is an entry. */
-function findEntries(root: string, config: NetlifyConfig | undefined): EntryResult {
-  const directory = path.resolve(
-    config === undefined ? root : path.dirname(config.file),
-    config?.directory ?? defaultDirectory,
-  );
-  const shown = path.relative(root, directory);
-  if (!existsSync(directory)) {
-    const message = `No ${shown} directory found.`;
-    return {
-      entries: [],
-      notes: [`${message} Pass --entry.`],
-      hint: `${message} ${passEntry}`,
-    };
-  }
-  const declared = [...new Set(config?.functions ?? [])];
-  const found = declared.map(name => ({ name, file: functionFile(directory, name) }));
-  const notes = found.flatMap(({ name, file }) =>
-    file === undefined
-      ? [`Function ${name} is declared in netlify.toml but not found in ${shown}.`]
-      : [],
-  );
-  const files =
-    declared.length > 0 ? found.flatMap(({ file }) => file ?? []) : listFunctions(directory);
-  const entries = files.map(file => path.relative(root, file)).sort();
-  if (entries.length === 0) {
-    const message = `No edge function found in ${shown}.`;
-    return {
-      entries,
-      notes: [...notes, `${message} Pass --entry.`],
-      hint: `${message} ${passEntry}`,
-    };
-  }
-  return { entries, notes, hint: undefined };
-}
+import { loadConfig } from './config.ts';
+import type { NetlifyConfig } from './config.ts';
+import { findEntries } from './entries.ts';
 
 interface ImportMapResult {
   importMap: ImportMap | undefined;
@@ -165,7 +44,7 @@ function loadImportMap(root: string, config: NetlifyConfig | undefined): ImportM
 
 export function createNetlifyEdgeTarget(root: string, netlify: NetlifyOptions = {}): Target {
   const config = loadConfig(root, netlify.configFile);
-  const { entries, notes, hint } = findEntries(root, config);
+  const { entries, notes } = findEntries(root, config);
   const map = loadImportMap(root, config);
   let configNote = 'no netlify.toml found, no import map';
   if (config !== undefined) {
@@ -175,8 +54,7 @@ export function createNetlifyEdgeTarget(root: string, netlify: NetlifyOptions = 
   return createDenoTarget(root, {
     netlify: {
       importMap: map.importMap,
-      defaultEntries: entries,
-      entryHint: hint,
+      entries,
       notes: [
         'Packages are resolved with the `node` condition: @netlify/edge-bundler 16.1.1 bundles npm dependencies with esbuild for the node platform and passes no conditions (dist/node/npm_dependencies.js). It also picks `module`, `browser` then `main` fields and defines `process.env.NODE_ENV` as production, which edgefit does not apply.',
         "Netlify's docs name no blocked Node.js APIs. The Deno version is the minimum @netlify/edge-bundler requires, not the one Netlify runs.",

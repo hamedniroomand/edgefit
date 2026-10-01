@@ -17,7 +17,7 @@ export function findDenoConfig(root: string): string | undefined {
   return configNames.map(name => path.join(root, name)).find(file => existsSync(file));
 }
 
-function readJsonc(file: string): Record<string, unknown> {
+export function readJsonc(file: string): Record<string, unknown> {
   const raw = parseJsonc(readFileSync(file, 'utf8'), file);
   return (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>;
 }

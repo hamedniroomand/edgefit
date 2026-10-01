@@ -1,3 +1,4 @@
+import type { SkippedTarget } from '@/core/check.ts';
 import { findingKey } from '@/core/findings.ts';
 import type { Finding, TargetKey } from '@/types.ts';
 
@@ -12,6 +13,8 @@ export interface ReportDiff {
   fixed: Finding[];
   /** Head findings that the base report also has. */
   unchanged: Finding[];
+  /** Targets the head report left out because they have no entry. */
+  skipped: SkippedTarget[];
 }
 
 /** When `diff` exits with 1: on new error-level findings, on any in the head, or never. */
@@ -34,6 +37,7 @@ export function diffReports(base: JsonReport, head: JsonReport): ReportDiff {
     added: headFindings.filter(finding => !baseKeys.has(findingKey(finding))),
     fixed: baseFindings.filter(finding => !headKeys.has(findingKey(finding))),
     unchanged: headFindings.filter(finding => baseKeys.has(findingKey(finding))),
+    skipped: head.skipped,
   };
 }
 
