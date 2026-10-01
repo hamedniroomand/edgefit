@@ -101,11 +101,18 @@ describe('vercel-edge globals', () => {
     expect(status('*globals*', 'process', 'cwd')).toBe('unsupported');
   });
 
-  it('reads the global process as the process module, so process.env is found there too', () => {
-    expect(status('process', 'env')).toBe('supported');
-    expect(status('process', 'env', 'FOO')).toBe('supported');
-    expect(status('process', 'cwd')).toBe('unsupported');
-    expect(status('process', 'nextTick')).toBe('unsupported');
+  it('allows env on the global process, and on nothing else of process', () => {
+    const global = (...path: string[]): string =>
+      target.lookup({ module: 'process', path, global: true }).status;
+    expect(global('env')).toBe('supported');
+    expect(global('env', 'FOO')).toBe('supported');
+    expect(global('cwd')).toBe('unsupported');
+    expect(global('nextTick')).toBe('unsupported');
+  });
+
+  it('does not allow node:process, which is not one of the allowed modules', () => {
+    expect(status('process', 'env')).toBe('unsupported');
+    expect(status('process', 'env', 'FOO')).toBe('unsupported');
   });
 
   it('blocks dynamic code and compiling WebAssembly from bytes', () => {

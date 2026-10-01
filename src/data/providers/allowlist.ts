@@ -44,44 +44,6 @@ function pickMembers(node: DumpNode | undefined, members: readonly string[]): Du
   return { ...keep(node), ...(inner === undefined ? {} : { default: keep(inner) }) };
 }
 
-/** The globals the list names, and for `globalMembers` only the members it keeps. */
-function allowedGlobals(
-  baseGlobals: DumpNode | undefined,
-  allowed: AllowlistFile,
-): Record<string, DumpNode> {
-  const globals: Record<string, DumpNode> = {
-    '*self*': child(baseGlobals, '*self*') ?? 'object',
-  };
-  for (const global of [
-    ...allowed.globals,
-    ...allowed.languageGlobals,
-    ...allowed.emulatorGlobals,
-  ]) {
-    const node = child(baseGlobals, global);
-    if (node !== undefined) {
-      globals[global] = node;
-    }
-  }
-  for (const [global, members] of Object.entries(allowed.globalMembers)) {
-    const node = child(baseGlobals, global);
-    if (node !== undefined) {
-      globals[global] = pickMembers(node, members);
-    }
-  }
-  return globals;
-}
-
-/**
- * The extractor reads the global `process` as the `process` module, so what the global has, the
- * module has: `process.env` is looked up there.
- */
-function mirrorProcess(runtime: Dump, baseline: Dump, allowed: AllowlistFile): void {
-  const members = allowed.globalMembers.process;
-  if (members !== undefined && baseline.process !== undefined) {
-    runtime.process = pickMembers(baseline.process, members);
-  }
-}
-
 /**
  * A runtime with no dump of its own, described by what its docs allow: the Node baseline with
  * everything not listed removed. A module or global the list omits then reads as missing, so a
@@ -103,8 +65,26 @@ export function allowlistProvider(target: TargetKey): CompatProvider<CompatTree>
           runtime[module] = allow === true ? node : pickMembers(node, allow);
         }
       }
-      const globals = allowedGlobals(baseline[globalsKey], allowed);
-      mirrorProcess(runtime, baseline, allowed);
+      const baseGlobals = baseline[globalsKey];
+      const globals: Record<string, DumpNode> = {
+        '*self*': child(baseGlobals, '*self*') ?? 'object',
+      };
+      for (const global of [
+        ...allowed.globals,
+        ...allowed.languageGlobals,
+        ...allowed.emulatorGlobals,
+      ]) {
+        const node = child(baseGlobals, global);
+        if (node !== undefined) {
+          globals[global] = node;
+        }
+      }
+      for (const [global, members] of Object.entries(allowed.globalMembers)) {
+        const node = child(baseGlobals, global);
+        if (node !== undefined) {
+          globals[global] = pickMembers(node, members);
+        }
+      }
       runtime[globalsKey] = globals;
 
       return {

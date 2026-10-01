@@ -74,7 +74,7 @@ describe.skipIf(!installed)('next.js middleware on vercel-edge', () => {
     const [report] = result.reports;
     expect(report?.entries).toEqual(['middleware.ts']);
     expect(report?.findings).toEqual([]);
-    expect(report?.guarded.map(finding => finding.api)).toEqual(['reportError']);
+    expect(report?.guarded.map(finding => finding.api)).toEqual(['node:process.emit', 'reportError']);
   });
 
   it.each([

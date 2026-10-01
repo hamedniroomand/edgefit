@@ -1,10 +1,12 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
+import type { LookupResult } from '@/data/dump.ts';
 import { detectEntries } from '@/targets/entries.ts';
 import { globFiles } from '@/targets/glob-files.ts';
 import { loadTargetData } from '@/targets/target-data.ts';
 import type { Target } from '@/targets/target.ts';
+import type { ApiRef } from '@/types.ts';
 
 import { readRuntimeSetting } from './runtime-config.ts';
 
@@ -73,6 +75,28 @@ function findEntries(root: string): Entry {
   };
 }
 
+const notAllowed: LookupResult = {
+  status: 'unsupported',
+  note: 'does not exist on the target',
+  absent: true,
+};
+
+/**
+ * The docs list `process.env` among the globals, and `node:process` is not one of the allowed
+ * modules. The extractor reads both as the `process` module, so a reference that came from the
+ * global is looked up as a global. One that came from an import has nothing to match: Next.js
+ * replaces the module with a stand-in that throws when it is read.
+ */
+function isProcessImport(api: ApiRef): boolean {
+  return api.module === 'process' && api.global !== true;
+}
+
+function toVercelRef(api: ApiRef): ApiRef {
+  return api.module === 'process' && api.global === true
+    ? { module: '*globals*', path: ['process', ...api.path] }
+    : api;
+}
+
 export function createVercelEdgeTarget(root: string): Target {
   const { index, matrixSource, description, globals } = loadTargetData('vercel-edge');
   const docsDate = matrixSource.versions['vercel-edge'] ?? 'unknown';
@@ -101,7 +125,7 @@ export function createVercelEdgeTarget(root: string): Target {
     entries: detectEntries([{ label, guessed: false, find: () => entries }], false),
     lazyNodeImports: true,
     globals,
-    lookup: api => index.lookup(api),
-    hasProblemsBelow: api => index.hasProblemsBelow(api),
+    lookup: api => (isProcessImport(api) ? notAllowed : index.lookup(toVercelRef(api))),
+    hasProblemsBelow: api => isProcessImport(api) || index.hasProblemsBelow(toVercelRef(api)),
   };
 }

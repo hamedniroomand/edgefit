@@ -20,6 +20,11 @@ export interface ApiRef {
   module: string;
   /** Member path below the module, e.g. `['promises', 'watch']`. Empty for the module itself. */
   path: string[];
+  /**
+   * Set on a `process` reference that came from the global, not from importing `node:process`.
+   * Most runtimes expose both the same way. Vercel's Edge runtime has only the global.
+   */
+  global?: true;
 }
 
 export interface Location {
