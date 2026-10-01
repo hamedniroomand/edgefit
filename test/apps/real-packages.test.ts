@@ -73,6 +73,70 @@ describe.skipIf(!installed)('a known-bad app', () => {
 });
 
 /**
+ * The same app on the Edge platforms. Netlify runs Deno, which has everything chokidar and
+ * cross-spawn reach. Vercel allows five modules, so every other one is an error: the watcher's
+ * fs, path, os, process and stream, and the spawner's child_process, which the matrix does not
+ * cover and the override layer has to catch. `events`, which chokidar also imports, is allowed.
+ */
+describe.skipIf(!installed)('a known-bad app on the Edge platforms', () => {
+  const root = sampleApp('known-bad');
+
+  it('finds nothing to report on netlify-edge', async () => {
+    const config = { targets: ['netlify-edge' as const], entry: 'src/index.js' };
+    expect((await check({ root, config })).reports[0]?.findings).toEqual([]);
+  });
+
+  it('reports every module Vercel does not allow, including child_process', async () => {
+    const config = { targets: ['vercel-edge' as const], entry: 'src/index.js' };
+    const [report] = (await check({ root, config })).reports;
+    const modules = new Set(report?.findings.map(finding => finding.api.replace(/\.[^.]*$/u, '')));
+    expect([...modules].sort()).toEqual([
+      'node:child_process',
+      'node:fs',
+      'node:fs/promises',
+      'node:os',
+      'node:path',
+      'node:process',
+      'node:stream',
+    ]);
+    // The two packages and the dependencies of theirs that reach fs, path and process.
+    expect(new Set(report?.findings.map(finding => finding.package?.name))).toEqual(
+      new Set(['chokidar', 'cross-spawn', 'isexe', 'path-key', 'readdirp', 'which']),
+    );
+    expect(report?.findings.every(finding => finding.level === 'error')).toBe(true);
+  });
+
+  it('shows the Edge platforms in the compare table when they are named', async () => {
+    const io = captureIo(root);
+    await run(['compare', 'workerd', 'netlify-edge', 'vercel-edge', '--entry', 'src/index.js', '--no-color'], io);
+    expect(io.output()).toContain('API                           workerd  netlify-edge  vercel-edge');
+    expect(io.output()).toContain('node:child_process.spawn      ✗        ✓             ✗');
+  });
+});
+
+/**
+ * ajv compiles every schema with `new Function`, which Vercel's Edge runtime disables, so a
+ * middleware that validates with it fails at runtime. Deno allows it.
+ */
+describe.skipIf(!installed)('a package that compiles code from strings', () => {
+  const root = sampleApp('dynamic-code');
+
+  it('reports new Function on vercel-edge, with what to do about it', async () => {
+    const config = { targets: ['vercel-edge' as const], entry: 'src/index.js' };
+    const [report] = (await check({ root, config })).reports;
+    expect(report?.findings.map(finding => `${finding.api} ${finding.package?.name}`)).toEqual([
+      'Function(string) ajv',
+    ]);
+    expect(report?.findings[0]?.suggestion?.text).toContain('unstable_allowDynamic');
+  });
+
+  it('finds nothing to report on netlify-edge', async () => {
+    const config = { targets: ['netlify-edge' as const], entry: 'src/index.js' };
+    expect((await check({ root, config })).reports[0]?.findings).toEqual([]);
+  });
+});
+
+/**
  * pg reaches net, dns and Buffer, which workerd implements with nodejs_compat, and loads
  * pg-cloudflare to open sockets on Workers. Without the flag every one of those is missing.
  */

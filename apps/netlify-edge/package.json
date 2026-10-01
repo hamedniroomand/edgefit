@@ -1,0 +1,8 @@
+{
+  "name": "sample-netlify-edge",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "hono": "4.13.11"
+  }
+}

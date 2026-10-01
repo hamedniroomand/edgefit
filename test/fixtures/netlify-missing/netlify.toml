@@ -1,0 +1,10 @@
+[[edge_functions]]
+function = "a"
+path = "/a"
+
+[[edge_functions]]
+function = "gone"
+path = "/gone"
+
+[functions]
+  deno_import_map = "./nope.json"

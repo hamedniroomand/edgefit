@@ -68,6 +68,24 @@
         "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/node/internal/internal_fs_promises.ts",
         "reviewed": "2026-09-30"
       }
+    ],
+    "eval": [
+      {
+        "targets": ["vercel-edge"],
+        "kind": "change",
+        "text": "The Edge runtime does not allow eval. Remove it, or, for code that is bundled but never runs on the edge, allow it in Next.js with `unstable_allowDynamic` in the middleware config.",
+        "source": "https://nextjs.org/docs/app/api-reference/file-conventions/middleware#unstable_allowdynamic",
+        "reviewed": "2026-09-30"
+      }
+    ],
+    "Function(string)": [
+      {
+        "targets": ["vercel-edge"],
+        "kind": "change",
+        "text": "The Edge runtime does not allow code built from a string. Use a library that does not compile code, or, for code that is bundled but never runs on the edge, allow it in Next.js with `unstable_allowDynamic` in the middleware config.",
+        "source": "https://nextjs.org/docs/app/api-reference/file-conventions/middleware#unstable_allowdynamic",
+        "reviewed": "2026-09-30"
+      }
     ]
   }
 }

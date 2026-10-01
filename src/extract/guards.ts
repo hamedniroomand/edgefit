@@ -8,7 +8,14 @@ import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import type { Guard } from './guard-stack.ts';
 import { memberRef, normalizeRef } from './refs.ts';
-import { agentRuntime, isUnbound, memberRuntime, runtimeMarker } from './runtimes.ts';
+import {
+  agentRuntime,
+  isUnbound,
+  markerType,
+  memberRuntime,
+  nextRuntimeEdge,
+  runtimeMarker,
+} from './runtimes.ts';
 import { isTracked, lookup, lookupCheck } from './scope.ts';
 
 const jumps = new Set(['ReturnStatement', 'ThrowStatement', 'ContinueStatement', 'BreakStatement']);
@@ -68,6 +75,11 @@ function typeofGuard(
     return undefined;
   }
   const equal = isEquality(node.operator) ? truth : !truth;
+  // A runtime marker has a known type, so `typeof EdgeRuntime !== 'string'` says it is missing.
+  const known = markerType(call.argument, context);
+  if (known !== undefined && text === known) {
+    return presence(call.argument, equal, context);
+  }
   const exists = equal ? text !== 'undefined' : text === 'undefined';
   if (exists) {
     return presence(call.argument, true, context);
@@ -92,6 +104,10 @@ function comparisonGuard(
   const agent = agentRuntime(node, context);
   if (agent !== undefined) {
     return runtimeGuard(agent, equal);
+  }
+  const edge = nextRuntimeEdge(node, context);
+  if (edge !== undefined) {
+    return runtimeGuard('vercel-edge', equal === edge);
   }
   const left = isNullish(node.left);
   if (!left && !isNullish(node.right)) {

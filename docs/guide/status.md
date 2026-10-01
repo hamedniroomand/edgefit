@@ -6,12 +6,14 @@ What edgefit checks today, against which runtime versions, and how much you can 
 
 Every result comes from data that is pinned to these releases. `edgefit targets` prints the same thing for the version you have installed.
 
-| Target        | Runtime in the data | Notes                                                               |
-| ------------- | ------------------- | ------------------------------------------------------------------- |
-| `workerd`     | 1.20260929.1        | Compatibility date 2026-09-29, `nodejs_compat`                      |
-| `bun`         | 1.4.2               |                                                                     |
-| `deno`        | 2.9.7               |                                                                     |
-| `deno-deploy` | Deno 2.5.0 layer    | Deno Deploy runs an older Deno, so it has its own curated overrides |
+| Target         | Runtime in the data | Notes                                                                                                                                                    |
+| -------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workerd`      | 1.20260929.1        | Compatibility date 2026-09-29, `nodejs_compat`                                                                                                           |
+| `bun`          | 1.4.2               |                                                                                                                                                          |
+| `deno`         | 2.9.7               |                                                                                                                                                          |
+| `deno-deploy`  | Deno 2.5.0 layer    | Deno Deploy runs an older Deno, so it has its own curated overrides                                                                                      |
+| `netlify-edge` | Deno 2.4.2 or newer | The oldest Deno `@netlify/edge-bundler` 16.1.1 accepts; Netlify does not document its own                                                                |
+| `vercel-edge`  | Docs of 2026-08-03  | Experimental: Vercel's documented allowlist, not a runtime dump. Members from `next` 16.3.8 and `@vercel/node` 16.0.2. Emulator `@edge-runtime/vm` 5.0.0 |
 
 | Data                      | Version                                                                |
 | ------------------------- | ---------------------------------------------------------------------- |
@@ -30,7 +32,7 @@ Two parts are older than the rest, and the [limitations](/guide/limitations#the-
 
 ## What is covered
 
-- Node built-in modules and their members, and Web API globals, for Cloudflare Workers, Bun, Deno and Deno Deploy.
+- Node built-in modules and their members, and Web API globals, for Cloudflare Workers, Bun, Deno, Deno Deploy, Netlify Edge Functions and (experimental) Vercel Edge.
 - Your code and every dependency, resolved the way the target's bundler does, with the import chain behind each finding.
 - Framework build output from Nitro and Nuxt, mapped to packages with sourcemaps or, without them, with the build's region markers.
 - Pull request checks with the GitHub Action, JSON reports, and `diff` between two reports.
@@ -49,7 +51,7 @@ edgefit is a 0.x release. What you can rely on:
 
 False errors cost more trust than missed warnings, so precision is tested, not assumed:
 
-- **Sample apps.** Small apps built on real, pinned packages: a Hono starter, Hono with zod, drizzle-orm on D1, a Postgres client (`pg`) and a Nitro build with pieces of oauth4webapi and jose. Each must report no errors and no warnings that nobody can act on, and where a result depends on `nodejs_compat` both cases are checked. A known-bad app (a file watcher and a process spawner) must report exactly what each runtime lacks, so a change that makes edgefit miss an API fails too. A failure there is a regression.
+- **Sample apps.** Small apps built on real, pinned packages: a Hono starter, Hono with zod, drizzle-orm on D1, a Postgres client (`pg`), a Nitro build with pieces of oauth4webapi and jose, and Hono as a Netlify Edge Function and as Vercel Routing Middleware. Each must report no errors and no warnings that nobody can act on, and where a result depends on `nodejs_compat` both cases are checked. A known-bad app (a file watcher and a process spawner) must report exactly what each runtime lacks, including every module Vercel Edge does not allow, so a change that makes edgefit miss an API fails too. A failure there is a regression.
 - **Fixture projects** cover the findings, the guards, the constant specifiers, the build output layouts and the settings.
 - **The weekly probe** runs the real runtimes and compares them with the curated overrides, which is how stale entries are found.
 

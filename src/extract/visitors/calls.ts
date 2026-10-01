@@ -1,11 +1,35 @@
 import { builtinName } from '@/data/builtins.ts';
+import { stringLiteral } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { interopArgument, isRequire, moduleSpecifier, resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { moduleRef } from '@/extract/refs.ts';
+import { isGlobal } from '@/extract/runtimes.ts';
 import { isTracked } from '@/extract/scope.ts';
 
 import { visitOptionalCallee } from './guards.ts';
+
+// The call of the `Function` constructor with code in a string, which Vercel's Edge runtime
+// disables. Shown as `Function(string)`.
+const dynamicFunction = { module: '*globals*', path: ['Function', '(string)'] };
+
+/** `Function('return this')()` is the classic way to reach the global object, and code that uses it checks for `globalThis` first. */
+const isGlobalObjectIdiom = /^\s*return\s+this\s*;?\s*$/u;
+
+/** `Function(code)` and `new Function(code)`: code built from a string. Without arguments it builds nothing to run. */
+function recordDynamicFunction(
+  node: NodeOf<'CallExpression'> | NodeOf<'NewExpression'>,
+  context: VisitContext,
+): void {
+  if (node.arguments.length === 0 || !isGlobal(node.callee, 'Function', context)) {
+    return;
+  }
+  const [only] = node.arguments;
+  const text = node.arguments.length === 1 && only !== undefined ? stringLiteral(only) : undefined;
+  if (text === undefined || !isGlobalObjectIdiom.test(text)) {
+    context.useRef(dynamicFunction, node.start);
+  }
+}
 
 const computedModuleReason = 'the module name is computed at runtime';
 
@@ -27,6 +51,7 @@ function visitRequire(node: NodeOf<'CallExpression'>, context: VisitContext): vo
 }
 
 export const visitCall: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
+  recordDynamicFunction(node, context);
   if (isRequire(node.callee, context.scope)) {
     visitRequire(node, context);
     return;
@@ -63,4 +88,9 @@ export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node,
       context.collector.guards.deferred(record);
     }
   }
+};
+
+export const visitNew: Visitor<NodeOf<'NewExpression'>> = (node, context) => {
+  recordDynamicFunction(node, context);
+  context.visitChildren(node);
 };

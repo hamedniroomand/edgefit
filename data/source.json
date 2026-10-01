@@ -54,6 +54,34 @@
       }
     },
     {
+      "provider": "overrides/netlify-edge",
+      "url": "https://www.npmjs.com/package/@netlify/edge-bundler/v/16.1.1",
+      "license": "MIT",
+      "versions": {
+        "netlify-edge": "2.4.2"
+      }
+    },
+    {
+      "provider": "allowlist/vercel-edge",
+      "url": "https://vercel.com/docs/functions/runtimes/edge",
+      "license": "none",
+      "note": "API names and hashes read from Vercel's documentation, and member lists from next and @vercel/node (MIT); no text is copied.",
+      "versions": {
+        "vercel-edge": "2026-08-03",
+        "next": "16.3.8",
+        "@vercel/node": "16.0.2"
+      }
+    },
+    {
+      "provider": "overrides/vercel-edge",
+      "url": "https://vercel.com/docs/functions/runtimes/edge",
+      "license": "none",
+      "note": "API names and hashes read from Vercel's documentation; no text is copied.",
+      "versions": {
+        "vercel-edge": "2026-08-03"
+      }
+    },
+    {
       "provider": "runtime-compat-data",
       "url": "https://www.npmjs.com/package/runtime-compat-data/v/0.0.5",
       "commit": "b964f92b2d6810bb4f4911785c123dce97601c63",

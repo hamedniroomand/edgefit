@@ -1,0 +1,15 @@
+{
+  "description": "APIs Netlify Edge Functions block on top of the Deno CLI, applied by the netlify-edge target. None are documented: Netlify says edge functions run in a Deno runtime that supports Node.js built-in modules, and its limits page lists size, memory and CPU time limits but no blocked APIs. The Deno version Netlify runs is not documented either; the version recorded is the minimum (^2.4.2) that @netlify/edge-bundler 16.1.1 requires. `docs` holds hashes of the Netlify docs sections this data rests on (the API page's runtime environment and supported web APIs, and the limits page), and `bundler` the release and Deno range it was read from; the weekly check compares both.",
+  "modules": {},
+  "apis": {},
+  "docs": {
+    "runtimeEnvironment": "5ce92a1f7ea7e853",
+    "supportedWebApis": "bb19b2a82580835f",
+    "limits": "ce5f5a7a756e60f3"
+  },
+  "bundler": {
+    "package": "@netlify/edge-bundler",
+    "version": "16.1.1",
+    "denoRange": "^2.4.2"
+  }
+}

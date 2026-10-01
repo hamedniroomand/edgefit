@@ -7,7 +7,6 @@ import type {
   IgnoreRule,
   Level,
   PackageInfo,
-  Runtime,
   Suggestion,
   TargetKey,
   Usage,
@@ -27,17 +26,10 @@ export const defaultLevels: Record<Category, Level> = {
   unknown: 'warning',
 };
 
-const runtimeOf: Record<TargetKey, Runtime> = {
-  workerd: 'workerd',
-  bun: 'bun',
-  deno: 'deno',
-  'deno-deploy': 'deno',
-};
-
 /** Whether the runtime checks around a usage rule out the target's runtime, so the code never runs on it. */
-function isOtherRuntime(usage: Usage, target: TargetKey): boolean {
+function isOtherRuntime(usage: Usage, target: Target): boolean {
   return (
-    usage.runtimes?.some(({ runtime, present }) => (runtime === runtimeOf[target]) !== present) ??
+    usage.runtimes?.some(({ runtime, present }) => target.runtimes.includes(runtime) !== present) ??
     false
   );
 }
@@ -142,7 +134,7 @@ function toFinding(
   }
   const target: TargetKey = options.target.info.key;
   const guarded =
-    (usage.guarded === true && classification.absent) || isOtherRuntime(usage, target);
+    (usage.guarded === true && classification.absent) || isOtherRuntime(usage, options.target);
   const suggestion = guarded ? undefined : suggest(module, usage, classification, options);
   return {
     category: classification.category,

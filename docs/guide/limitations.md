@@ -61,6 +61,8 @@ Without a wrangler config, edgefit uses the compatibility date and flags of its 
 
 Deno Deploy runs an older Deno than the newest release. Its results are the Deno data plus a curated layer, and that layer is the least tested part of the data.
 
+Netlify Edge Functions run Deno, but Netlify does not document which version or which Node APIs it blocks. The `netlify-edge` target uses the Deno data, records the oldest Deno Netlify's bundler accepts as a floor, and has no curated layer. If Netlify runs an older Deno than the data, an API added since is reported as supported.
+
 ## Your runtime's own APIs are not checked
 
 edgefit checks Node built-ins and standard Web APIs. It does not check runtime-specific APIs such as Workers bindings, `Bun.serve` or `Deno.readFile`, and it does not check that your bundle fits the runtime's size limits, memory or CPU time.
@@ -83,6 +85,10 @@ Mapping findings to packages needs sourcemaps. Without them, edgefit reads the `
 
 `jsr:` imports are not scanned yet and are reported as `unknown`.
 
-## Planned targets
+## Vercel Edge is documented, not measured
 
-Netlify Edge Functions and Vercel Edge are not supported yet.
+Vercel publishes no compatibility dump for its Edge runtime, so the `vercel-edge` target is built from its documentation. Anything the documentation does not list is reported as missing, `require` calls are not checked, and the target is experimental. Vercel also recommends its Node.js runtime for functions. See [Vercel Edge](/targets/vercel-edge).
+
+## Platform limits are not checked
+
+Beyond API compatibility, platforms limit bundle size, memory and CPU time per request (Netlify Edge Functions: 20 MB, 512 MB and 50 ms). edgefit checks none of them.

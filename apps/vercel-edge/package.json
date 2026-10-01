@@ -1,0 +1,8 @@
+{
+  "name": "sample-vercel-edge",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "hono": "4.13.11"
+  }
+}

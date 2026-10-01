@@ -23,6 +23,8 @@ export interface ScanOptions {
    * and its exports are not the ones the source names.
    */
   trace: boolean;
+  /** The target's platform stubs out a Node.js module it lacks, so only reading from one fails. */
+  lazyNodeImports?: boolean;
 }
 
 /** Extracts runtime API usages from every script in the graph, with its package and import chain. */
@@ -41,7 +43,11 @@ export function scanModules(
       const posixFile = toPosix(file);
       return {
         file,
-        found: extractModule(posixFile, source, { globals, shape: options.trace }),
+        found: extractModule(posixFile, source, {
+          globals,
+          shape: options.trace,
+          lazyNodeImports: options.lazyNodeImports,
+        }),
         unchecked: uncheckedImports(posixFile, source, module.externals),
       };
     });

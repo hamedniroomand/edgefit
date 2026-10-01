@@ -33,6 +33,12 @@ function toImports(value: unknown): Record<string, string> | undefined {
   );
 }
 
+/** The `imports` of a standalone import map file. */
+export function readImportMapFile(file: string): ImportMap | undefined {
+  const imports = toImports(readJsonc(file).imports);
+  return imports === undefined ? undefined : { imports, directory: path.dirname(file) };
+}
+
 /** Deno ignores `importMap` when the config has its own `imports`. */
 function readImportMap(file: string, config: Record<string, unknown>): ImportMap | undefined {
   const imports = toImports(config.imports);

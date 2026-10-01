@@ -1,0 +1,125 @@
+{
+  "description": "Node built-ins the baseline dump does not cover and Vercel's Edge runtime lacks (the allowlist removes the rest), and JavaScript features it disables, applied by the vercel-edge target on top of the allowlist. eval and WebAssembly.compile are blocked. `new Function(string)` is blocked too and is listed as `Function.(string)`, the name edgefit gives a call of the Function constructor with code in an argument (`Function('return this')`, the global object idiom, is not counted). WebAssembly.instantiate is blocked only for buffer sources, so it is not listed either. Calling require directly is not allowed; edgefit does not model that yet.",
+  "modules": {
+    "child_process": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "cluster": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "domain": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "inspector": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "inspector/promises": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "punycode": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "readline": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "readline/promises": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "repl": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "tty": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "v8": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "vm": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "wasi": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "worker_threads": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "test": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "test/reporters": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    },
+    "sea": {
+      "status": "unsupported",
+      "note": "is not available in the Edge runtime: only events, buffer, assert, async_hooks and util can be imported",
+      "source": "#compatible-nodejs-modules",
+      "except": []
+    }
+  },
+  "apis": {
+    "*globals*.eval": {
+      "status": "unsupported",
+      "note": "is disabled in the Edge runtime: dynamic code execution is not allowed",
+      "source": "#unsupported-apis"
+    },
+    "*globals*.WebAssembly.compile": {
+      "status": "unsupported",
+      "note": "is disabled in the Edge runtime: WebAssembly modules must come from an import, not a buffer",
+      "source": "#unsupported-apis"
+    },
+    "*globals*.Function.(string)": {
+      "status": "unsupported",
+      "note": "is disabled in the Edge runtime: dynamic code execution is not allowed",
+      "source": "#unsupported-apis"
+    }
+  },
+  "notModelled": ["WebAssembly.instantiate"]
+}

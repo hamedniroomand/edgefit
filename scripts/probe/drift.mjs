@@ -84,7 +84,11 @@ export function driftFor({ runtime, pinned, latest, outcomes, mocked, overrides 
 }
 
 export const hasDrift = drift =>
-  drift.nowPresent.length + drift.stubsNowWork.length + drift.mocksImplemented.length > 0;
+  drift.nowPresent.length +
+    drift.stubsNowWork.length +
+    drift.mocksImplemented.length +
+    (drift.sections?.length ?? 0) >
+  0;
 
 const SHOWN_PER_MODULE = 12;
 
@@ -130,6 +134,7 @@ export function renderIssue(drifts) {
     ),
     ...list('Curated stubs that now work', drift.stubsNowWork),
     ...list('Mocked entries that are now implemented', drift.mocksImplemented),
+    ...(drift.sections ?? []).flatMap(({ title, items }) => list(title, items)),
   ]);
   const body = [
     issueMarker,

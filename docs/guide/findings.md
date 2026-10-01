@@ -156,10 +156,12 @@ if (typeof Deno !== 'undefined') {
 These checks name a runtime:
 
 - `typeof Deno`, `typeof Bun`, `'Deno' in globalThis` and `globalThis.Deno`
+- `typeof EdgeRuntime` (Vercel Edge) and `typeof Netlify` (Netlify Edge Functions), against `'undefined'` or the marker's own type (`'string'` for `EdgeRuntime`, `'object'` for `Deno`, `Bun` and `Netlify`)
+- `process.env.NEXT_RUNTIME === 'edge'` or `'nodejs'`, which Next.js replaces at build time
 - `process.versions.deno` and `process.versions.bun`
 - `navigator.userAgent === 'Cloudflare-Workers'`, and `navigator.userAgent.startsWith('Bun')` or `.includes('Deno')`
 
-The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
+The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
 
 ### Helpers
 

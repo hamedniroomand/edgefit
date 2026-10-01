@@ -4,7 +4,10 @@ import type { ApiRef } from '@/types.ts';
 
 import type { CompatEntry, CompatProvider } from './provider.ts';
 
-export type WebRuntime = 'workerd' | 'bun' | 'deno';
+export type WebRuntime = 'workerd' | 'bun' | 'deno' | 'vercel-edge';
+
+/** The runtime-compat-data keys edgefit reads. Platforms such as Netlify have keys of their own. */
+export type WebKey = 'workerd' | 'bun' | 'deno' | 'netlify' | 'edge-light';
 
 interface SupportStatement {
   version_added: string | boolean | null;
@@ -22,6 +25,14 @@ interface Feature {
 }
 
 const name = 'runtime-compat-data';
+
+// Vercel's Edge runtime is `edge-light` in runtime-compat-data.
+const defaultColumns: Record<WebRuntime, WebKey> = {
+  workerd: 'workerd',
+  bun: 'bun',
+  deno: 'deno',
+  'vercel-edge': 'edge-light',
+};
 
 // Interfaces whose instance members code reaches through a global, e.g. `navigator.gpu`.
 const instanceGlobals = new Map([
@@ -60,7 +71,7 @@ export function apiRefFor(key: string): ApiRef | undefined {
 
 function statusFor(
   statement: CompatStatement | undefined,
-  runtime: WebRuntime,
+  runtime: WebKey,
 ): CompatEntry['status'] | undefined {
   const support = statement?.support[runtime];
   // BCD lists the most relevant statement first.
@@ -87,7 +98,10 @@ function* features(feature: Feature, key: string): Generator<[string, Feature]> 
  * Web API support from runtime-compat-data. The data is auto-generated and not fully accurate,
  * so its problems are reported in their own `web` category.
  */
-export function runtimeCompatDataProvider(runtime: WebRuntime): CompatProvider<CompatEntry[]> {
+export function runtimeCompatDataProvider(
+  runtime: WebRuntime,
+  column: WebKey = defaultColumns[runtime],
+): CompatProvider<CompatEntry[]> {
   return {
     name,
     load: dataDirectory => {
@@ -96,7 +110,7 @@ export function runtimeCompatDataProvider(runtime: WebRuntime): CompatProvider<C
       const source = { provider: name, version: versions.npm ?? 'unknown', url };
       return [...features(data.api, 'api')].flatMap(([key, feature]): CompatEntry[] => {
         const api = apiRefFor(key);
-        const status = statusFor(feature.__compat, runtime);
+        const status = statusFor(feature.__compat, column);
         if (api === undefined || status === undefined) {
           return [];
         }

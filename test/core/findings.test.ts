@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { collectFindings, collectSupported, defaultLevels, findingKey } from '@/core/findings.ts';
 import type { FindingOptions, ModuleUsages } from '@/core/findings.ts';
-import type { Location, TargetKey, Usage } from '@/types.ts';
+import type { Location, Runtime, TargetKey, Usage } from '@/types.ts';
 import { makeFinding, makeUsage, stubTarget } from '~/helpers.ts';
 
 const target = stubTarget({
@@ -187,6 +187,15 @@ describe('collecting guarded findings', () => {
   });
 });
 
+// What each target is, as the real targets declare it.
+const runtimesOf: Partial<Record<TargetKey, readonly Runtime[]>> = {
+  workerd: ['workerd'],
+  bun: ['bun'],
+  deno: ['deno'],
+  'deno-deploy': ['deno'],
+  'netlify-edge': ['deno', 'netlify'],
+};
+
 describe('collecting findings behind a runtime check', () => {
   const onDeno: Usage = { ...watch('a.js', 1), runtimes: [{ runtime: 'deno', present: true }] };
   const notDeno: Usage = { ...watch('b.js', 1), runtimes: [{ runtime: 'deno', present: false }] };
@@ -199,7 +208,7 @@ describe('collecting findings behind a runtime check', () => {
   };
   const forTarget = (key: TargetKey): FindingOptions => ({
     ...options,
-    target: { ...target, info: { ...target.info, key } },
+    target: { ...target, info: { ...target.info, key }, runtimes: runtimesOf[key] ?? [] },
   });
   const modules = [module('a.js', [onDeno]), module('b.js', [notDeno]), module('c.js', [both])];
 
@@ -220,5 +229,33 @@ describe('collecting findings behind a runtime check', () => {
   it('guards code that needs every runtime it names', () => {
     const { findings } = collectFindings(modules, forTarget('bun'));
     expect(findings.map(finding => finding.location.file)).toEqual(['b.js']);
+  });
+});
+
+describe('collecting findings behind a check for Netlify', () => {
+  const on = (file: string, runtime: 'deno' | 'netlify', present: boolean): Usage => ({
+    ...watch(file, 1),
+    runtimes: [{ runtime, present }],
+  });
+  const modules = [
+    module('deno.js', [on('deno.js', 'deno', true)]),
+    module('netlify.js', [on('netlify.js', 'netlify', true)]),
+    module('not-netlify.js', [on('not-netlify.js', 'netlify', false)]),
+  ];
+  const forTarget = (key: TargetKey): FindingOptions => ({
+    ...options,
+    target: { ...target, info: { ...target.info, key }, runtimes: runtimesOf[key] ?? [] },
+  });
+  const files = (key: TargetKey, kind: 'findings' | 'guarded'): string[] =>
+    collectFindings(modules, forTarget(key))[kind].map(finding => finding.location.file);
+
+  it('counts Netlify Edge as both Deno and Netlify', () => {
+    expect(files('netlify-edge', 'findings')).toEqual(['deno.js', 'netlify.js']);
+    expect(files('netlify-edge', 'guarded')).toEqual(['not-netlify.js']);
+  });
+
+  it('does not count plain Deno or Workers as Netlify', () => {
+    expect(files('deno', 'findings')).toEqual(['deno.js', 'not-netlify.js']);
+    expect(files('workerd', 'findings')).toEqual(['not-netlify.js']);
   });
 });

@@ -13,6 +13,7 @@ Everything is in `data`:
 | `runtime-compat-data/`          | The vendored Web API data, as published                                                |
 | `overrides/<target>.json`       | Curated corrections per target                                                         |
 | `suggestions.json`              | Reviewed fixes for packages and APIs, see [Suggested fixes](/contributing/suggestions) |
+| `allowlists/<target>.json`      | For a runtime with no dump: what its documentation allows                              |
 
 `edgefit targets` prints what `source.json` says, so users can see exactly which data produced their results.
 
@@ -55,6 +56,17 @@ The matrix only records whether an API exists. Override files record what happen
 4. In the pull request, link the lines you read.
 
 Entries without a source are not accepted. The whole point of an override is that anyone can check it.
+
+## Runtimes without a dump
+
+Vercel Edge has no matrix dump, so `allowlists/vercel-edge.json` lists what its documentation allows and a provider (`src/data/providers/allowlist.ts`) builds a dump from the Node baseline with everything else removed. The file has one list per kind of evidence:
+
+- `modules` maps each allowed module to the members that exist on it (or to `true` for all of them). The documentation says which modules; the members come from `members.sources`, two pieces of the vendor's own code that list them.
+- `globals` are the names in the documentation's tables, and `Buffer`.
+- `languageGlobals` are the ECMAScript builtins of a fresh V8 context, and `emulatorGlobals` are web globals the vendor's emulator has and the tables omit.
+- `docs.moduleDescriptions` are hashes of the documentation's description of each module, so the weekly check notices a changed sentence. `emulator` pins the emulator release.
+
+A list that falls behind the platform reports an API as missing that exists, never the reverse, so a mistake here shows to users as a false error. Keep the `source.json` date in step with the page you read.
 
 ## Runtime probes
 

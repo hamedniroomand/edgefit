@@ -28,6 +28,9 @@ jobs:
     runs-on: ubuntu-latest
     # A probe finishes in under a minute; a call that never returns should not hold the run.
     timeout-minutes: 15
+    # The netlify-min leg only informs the job summary, so its failure must not make `probe` fail:
+    # the drift issue waits for `probe` to succeed.
+    continue-on-error: ${{ matrix.channel == 'netlify-min' }}
     env:
       # Logs each API before it is probed, so a hang shows where it stopped.
       PROBE_TRACE: '1'
@@ -36,6 +39,11 @@ jobs:
       matrix:
         runtime: [bun, deno, workerd]
         channel: [pinned, latest]
+        include:
+          # The oldest Deno Netlify's bundler supports, to show what the Deno data would get wrong
+          # if Netlify ran it. It only informs the job summary; it never opens an issue.
+          - runtime: deno
+            channel: netlify-min
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -50,6 +58,8 @@ jobs:
         run: |
           if [ "${{ matrix.channel }}" = pinned ]; then
             echo "value=$(node -e "import('./$PROBE/data.mjs').then(m => console.log(m.pinnedVersion('${{ matrix.runtime }}')))")" >> "$GITHUB_OUTPUT"
+          elif [ "${{ matrix.channel }}" = netlify-min ]; then
+            echo "value=$(node -e "import('./$PROBE/data.mjs').then(m => console.log(m.netlifyMinimumDeno()))")" >> "$GITHUB_OUTPUT"
           else
             echo "value=latest" >> "$GITHUB_OUTPUT"
           fi
@@ -57,6 +67,7 @@ jobs:
         run: |
           flags="--drift"
           [ "${{ inputs.discover }}" = true ] && flags="$flags --discover"
+          [ "${{ matrix.channel }}" = netlify-min ] && flags="--presence"
           [ "${{ matrix.channel }}" = latest ] && flags="$flags --mocked"
           node "$PROBE/apis-cli.mjs" ${{ matrix.runtime }} $flags > "$SPEC"
 
@@ -95,11 +106,74 @@ jobs:
             probes/
           if-no-files-found: ignore
 
+  netlify-edge:
+    # Netlify runs Deno, so the Deno probes cover its runtime. This checks the two things that are
+    # Netlify's own: the Deno range its bundler requires and the docs the data was read from.
+    name: netlify-edge
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Compare with Netlify's docs and bundler
+        run: node "$PROBE/netlify/check.mjs" | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: probe-netlify-edge-latest
+          path: drift.json
+          if-no-files-found: ignore
+
+  vercel-edge:
+    # Vercel publishes no runtime to install, so this checks its documentation against the data and
+    # compares @edge-runtime/vm, Vercel's own emulator, with both. It never decides what is true.
+    name: vercel-edge (${{ matrix.channel }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        channel: [pinned, latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Install the emulator
+        working-directory: ${{ runner.temp }}
+        run: |
+          npm init -y > /dev/null
+          if [ "${{ matrix.channel }}" = pinned ]; then
+            version=$(node -e "console.log(require('$GITHUB_WORKSPACE/data/allowlists/vercel-edge.json').emulator.version)")
+          else
+            version=latest
+          fi
+          npm install "@edge-runtime/vm@$version"
+      - name: Probe the emulator
+        working-directory: ${{ runner.temp }}
+        run: node "$GITHUB_WORKSPACE/$PROBE/vercel/emulator-run.mjs" "$RESULTS"
+      - name: Compare with the documentation
+        run: node "$PROBE/vercel/check.mjs" ${{ matrix.channel }} "$RESULTS" | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: probe-vercel-edge-${{ matrix.channel }}
+          path: drift.json
+          if-no-files-found: ignore
+
   report:
     name: Data drift issue
-    needs: probe
-    # Only the weekly run, or a manual one that asks for it, writes to the issue tracker.
-    if: github.event_name == 'schedule' || inputs.open-issue
+    needs: [probe, vercel-edge, netlify-edge]
+    # Only the weekly run, or a manual one that asks for it, writes to the issue tracker. The
+    # Netlify and Vercel jobs fetch pages and fail on purpose when a page changes shape; that must
+    # not stop the runtime drift from being reported, but it must stop the issue from closing.
+    if: ${{ !cancelled() && needs.probe.result == 'success' && (github.event_name == 'schedule' || inputs.open-issue) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -124,6 +198,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           DRIFT: ${{ steps.drift.outputs.drift }}
+          # A platform check that did not finish leaves its drift unknown, so the issue stays open.
+          PARTIAL: ${{ needs.vercel-edge.result != 'success' || needs.netlify-edge.result != 'success' }}
           TITLE: The compatibility data is behind the latest runtimes
         run: |
           number=$(gh issue list --state open --label data --json number,title \
@@ -132,6 +208,6 @@ jobs:
             gh issue create --title "$TITLE" --label data --body-file "$RUNNER_TEMP/body.md"
           elif [ "$DRIFT" = true ]; then
             gh issue edit "$number" --body-file "$RUNNER_TEMP/body.md"
-          elif [ -n "$number" ]; then
+          elif [ -n "$number" ] && [ "$PARTIAL" != true ]; then
             gh issue close "$number" --comment "The pinned data agrees with the latest releases again."
           fi

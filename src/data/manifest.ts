@@ -9,7 +9,10 @@ export interface DataSource {
   versions: Record<string, string>;
   commit?: string;
   generatedAt?: string;
+  /** An SPDX id, or `none` for facts read from documentation that has no open license. */
   license: string;
+  /** What else to know about the source. */
+  note?: string;
   /** Runtime settings the data was generated with, keyed by runtime. */
   settings?: Record<string, unknown>;
 }

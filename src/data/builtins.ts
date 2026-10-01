@@ -19,7 +19,9 @@ export function builtinName(specifier: string): string | undefined {
 
 export function displayApi(module: string, path: readonly string[]): string {
   if (module === '*globals*') {
-    return path.join('.');
+    // A call shown as `Function(string)`, not `Function.(string)`.
+    const last = path.at(-1) ?? '';
+    return last.startsWith('(') ? `${path.slice(0, -1).join('.')}${last}` : path.join('.');
   }
   const members = path[0] === 'default' ? path.slice(1) : path;
   return [`node:${module}`, ...members].join('.');

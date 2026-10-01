@@ -16,6 +16,14 @@ const section = (title, items) =>
 const code = api => `\`${api}\``;
 
 const heading = `## ${runtime} ${version} (${channel}, pinned ${pinnedVersion(runtime)})`;
+// Netlify runs Deno; this run shows what the Deno data gets wrong for the oldest Deno it supports.
+const intro =
+  channel === 'netlify-min'
+    ? [
+        `The oldest Deno Netlify's bundler supports is ${version}, and the data describes ${pinnedVersion(runtime)}. Each line is an API where they differ; Netlify's production version is not documented, so this informs a review and changes no data.`,
+        '',
+      ]
+    : [];
 const proposed = section('Proposed overrides', proposeOverrides(outcomes, overrides).map(code));
 let lines;
 
@@ -47,6 +55,7 @@ if (channel === 'latest') {
   lines = [
     heading,
     '',
+    ...intro,
     ...section('Disagreements with the overrides and the matrix', disagreements),
     ...proposed,
   ];

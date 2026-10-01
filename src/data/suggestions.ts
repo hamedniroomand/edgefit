@@ -29,7 +29,17 @@ interface SuggestionsFile extends SuggestionData {
 }
 
 const fileVersion = 1;
-const targetKeys = new Set<string>(['workerd', 'bun', 'deno', 'deno-deploy']);
+// One key per target: a target added to `TargetKey` without one here does not compile.
+const targetKeys = new Set<string>(
+  Object.keys({
+    workerd: true,
+    bun: true,
+    deno: true,
+    'deno-deploy': true,
+    'netlify-edge': true,
+    'vercel-edge': true,
+  } satisfies Record<TargetKey, true>),
+);
 const kinds = new Set<string>(['replace', 'change']);
 
 function invalid(where: string, problem: string): never {

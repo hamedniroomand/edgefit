@@ -82,6 +82,7 @@ export function createWorkerdTarget(root: string, options: WorkerdOptions = {}):
         ...settingsNotes(settings, dataSettings),
       ],
     },
+    runtimes: ['workerd'],
     resolvePlatform: 'browser',
     defaultEntry: wrangler === undefined ? undefined : mainFrom(root, wrangler),
     globals,

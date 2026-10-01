@@ -32,7 +32,7 @@ export default defineConfig({
 });
 ```
 
-- `targets` defaults to `['workerd']`. The valid names are `workerd`, `bun`, `deno` and `deno-deploy`.
+- `targets` defaults to `['workerd']`. The valid names are `workerd`, `bun`, `deno`, `deno-deploy`, `netlify-edge` and `vercel-edge`.
 - `entry` is relative to the project root. Without it, edgefit uses wrangler's `main`. One entry is scanned for every target, so a project with a wrangler config can check Bun and Deno without repeating it.
 
 ## Ignoring findings
@@ -119,6 +119,16 @@ export default defineConfig({
 ```
 
 Used by both `deno` and `deno-deploy`. By default edgefit looks for `deno.json`, then `deno.jsonc`, in the root. Set `configFile: false` to skip the import map.
+
+### Netlify
+
+```ts
+export default defineConfig({
+  netlify: { configFile: 'netlify.toml' },
+});
+```
+
+Used by `netlify-edge`. By default edgefit looks for `netlify.toml` in the root, for the edge functions and the `deno_import_map` file. Set `configFile: false` to skip it. See [Netlify Edge Functions](/targets/netlify-edge).
 
 ## Export conditions
 

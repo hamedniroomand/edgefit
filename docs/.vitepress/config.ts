@@ -109,6 +109,8 @@ export default defineConfig({
             link('cloud', 'Cloudflare Workers', '/targets/workerd'),
             link('zap', 'Bun', '/targets/bun'),
             link('globe', 'Deno and Deno Deploy', '/targets/deno'),
+            link('network', 'Netlify Edge Functions', '/targets/netlify-edge'),
+            link('layers', 'Vercel Edge', '/targets/vercel-edge'),
           ],
         },
       ],

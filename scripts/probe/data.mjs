@@ -11,6 +11,11 @@ export const pinnedVersion = runtime =>
   readData('source.json').sources.find(source => source.provider === 'workers-nodejs-compat-matrix')
     .versions[runtime];
 
+/** The oldest Deno Netlify's bundler supports, which the data records as the netlify-edge version. */
+export const netlifyMinimumDeno = () =>
+  readData('source.json').sources.find(source => source.provider === 'overrides/netlify-edge')
+    .versions['netlify-edge'];
+
 export const workerdSettings = () =>
   readData('source.json').sources.find(source => source.provider === 'workers-nodejs-compat-matrix')
     .settings.workerd;
