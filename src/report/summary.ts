@@ -33,8 +33,11 @@ export function formatLocation(location: Location): string {
   return `${file}:${location.line}:${location.column}`;
 }
 
-export function ownerName(owned: { package: PackageInfo | undefined }): string {
-  return owned.package === undefined ? 'your code' : formatPackage(owned.package);
+export function ownerName(owned: { package: PackageInfo | undefined; buildOutput?: true }): string {
+  if (owned.package !== undefined) {
+    return formatPackage(owned.package);
+  }
+  return owned.buildOutput === true ? 'build output' : 'your code';
 }
 
 export function chainLine(finding: Finding): string {

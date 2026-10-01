@@ -163,6 +163,18 @@ These checks name a runtime:
 
 The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
 
+### Code a package ships and the target does not run
+
+A bundle can hold code that a target never runs, and that no check in the code shows. Next.js's Edge bundle holds the code for Cache Components, which Next turns off on the Edge runtime, and a timing call that only `next dev` makes. edgefit keeps a reviewed list of such cases in `data/unreached.json`: the package, the releases it was read in, the file, the APIs, the target, why the code does not run and where that is stated. A finding in a listed file is guarded and shows the reason:
+
+```
+guarded  unsupported  setImmediate  (vercel-edge)
+       next@16.3.8  node_modules/next/dist/esm/server/app-render/cache-signal.js:163:23
+       not reached: Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.
+```
+
+It applies to a check of the source and of build output alike. A release outside the listed range is checked as usual, so a new release is not assumed to behave the same. A weekly check reads the latest release and flags an entry whose file or APIs no longer match.
+
 ### Production builds
 
 Every bundler replaces `process.env.NODE_ENV` with a constant for a production build and drops the code that the constant rules out. edgefit does the same on `workerd`, `netlify-edge` and `vercel-edge`, with `production` as the constant. Bun and Deno set no value, so on those targets both branches are checked. A comparison of `process.env.NODE_ENV` with a string decides which branch runs, in an `if`, `?:`, `&&`, `||`, an `else` branch, a guard clause, and a helper or `const` that holds the check. The branch that does not run is not checked, and an `import` or `require` in it is not followed. This is how React's development build, with its `MessageChannel`, stays out of a report.

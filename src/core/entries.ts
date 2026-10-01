@@ -46,8 +46,10 @@ export interface TargetEntries {
   entries: string[];
   /** Where the entries came from, as shown in the settings line. */
   source: string;
-  /** A note for the report, set when the entries were guessed. */
-  note: string | undefined;
+  /** Notes for the report: that the entries were guessed, or that build output is out of date. */
+  notes: string[];
+  /** The entries are build output. */
+  built: boolean;
 }
 
 const explicitSource = '--entry or the config';
@@ -72,7 +74,7 @@ export function entriesFor(
   const configured = [config.entry ?? []].flat();
   if (configured.length > 0) {
     const entries = expandEntries(root, configured);
-    return targets.map(() => ({ entries, source: explicitSource, note: undefined }));
+    return targets.map(() => ({ entries, source: explicitSource, notes: [], built: false }));
   }
   const lender = targets.find(
     target => target.entries.shared && target.entries.exact !== undefined,
@@ -80,18 +82,22 @@ export function entriesFor(
   const found = targets.map((target): TargetEntries | undefined => {
     const { exact, guess, shared } = target.entries;
     if (exact !== undefined) {
-      return { entries: exact.files, source: exact.source, note: undefined };
+      return { entries: exact.files, source: exact.source, notes: exact.notes, built: exact.built };
     }
     if (shared && lender?.entries.exact !== undefined) {
-      const { files, source } = lender.entries.exact;
-      return { entries: files, source: `${lender.info.key}: ${source}`, note: undefined };
+      const { files, source, notes, built } = lender.entries.exact;
+      return { entries: files, source: `${lender.info.key}: ${source}`, notes, built };
     }
     return guess === undefined
       ? undefined
       : {
           entries: guess.files,
           source: guess.source,
-          note: `The entries were guessed from ${guess.source}. Pass --entry if they are wrong.`,
+          notes: [
+            ...guess.notes,
+            `The entries were guessed from ${guess.source}. Pass --entry if they are wrong.`,
+          ],
+          built: guess.built,
         };
   });
   if (found.every(item => item === undefined)) {

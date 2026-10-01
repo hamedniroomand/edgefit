@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "description": "Code that a package ships and a bundler includes, but that does not run on the target. A finding in a listed file for a listed API is reported as guarded, with the reason, and never fails a check. Each entry names the package, the versions it was read in, the file inside the package, the APIs as shown in reports, the target, why the code is not reached, and where the reason is stated. The weekly check flags an entry whose file or APIs no longer match, and a release that no entry covers.",
+  "entries": [
+    {
+      "package": "next",
+      "versions": { "min": "16.3.8", "max": "16.3.8" },
+      "file": "dist/esm/server/app-render/cache-signal.js",
+      "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
+      "target": "vercel-edge",
+      "reason": "Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.",
+      "source": "https://github.com/vercel/next.js/blob/v16.3.8/crates/next-core/src/next_edge/context.rs#L146"
+    },
+    {
+      "package": "next",
+      "versions": { "min": "16.3.8", "max": "16.3.8" },
+      "file": "dist/server/app-render/cache-signal.js",
+      "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
+      "target": "vercel-edge",
+      "reason": "Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.",
+      "source": "https://github.com/vercel/next.js/blob/v16.3.8/crates/next-core/src/next_edge/context.rs#L146"
+    },
+    {
+      "package": "next",
+      "versions": { "min": "16.3.8", "max": "16.3.8" },
+      "file": "dist/esm/build/templates/app-route.js",
+      "apis": ["node:process.hrtime.bigint"],
+      "target": "vercel-edge",
+      "reason": "Runs only when routeModule.isDev is true. isDev is set from __NEXT_DEV_SERVER, which only next dev sets, so a deployed build never runs it.",
+      "source": "https://github.com/vercel/next.js/blob/v16.3.8/packages/next/src/build/templates/app-route.ts#L117"
+    },
+    {
+      "package": "next",
+      "versions": { "min": "16.3.8", "max": "16.3.8" },
+      "file": "dist/build/templates/app-route.js",
+      "apis": ["node:process.hrtime.bigint"],
+      "target": "vercel-edge",
+      "reason": "Runs only when routeModule.isDev is true. isDev is set from __NEXT_DEV_SERVER, which only next dev sets, so a deployed build never runs it.",
+      "source": "https://github.com/vercel/next.js/blob/v16.3.8/packages/next/src/build/templates/app-route.ts#L117"
+    }
+  ]
+}

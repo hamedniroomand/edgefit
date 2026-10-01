@@ -1,0 +1,13 @@
+{
+  "projectId": "prj_sample",
+  "orgId": "team_sample",
+  "settings": {
+    "framework": "nextjs",
+    "buildCommand": null,
+    "devCommand": null,
+    "installCommand": "echo skip",
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "nodeVersion": "22.x"
+  }
+}

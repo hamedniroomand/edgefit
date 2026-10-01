@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import type { ModuleUsages } from '@/core/findings.ts';
@@ -23,6 +24,9 @@ function unmappedNote(count: number): string {
     'to report the original files and lines.'
   );
 }
+
+/** Folders that frameworks and platforms write their build to. */
+const generatedFolder = /^\.(?:svelte-kit|next|nuxt|output|vercel|netlify|astro)\//u;
 
 function withOwner(chain: readonly string[], owner: string): string[] {
   return chain.at(-1) === owner ? [...chain] : [...chain, owner];
@@ -69,9 +73,31 @@ function splitChunk(
   const inChunk = byFile.get('') ?? [];
   byFile.delete('');
   return [
-    { ...chunk, usages: inChunk },
+    { ...chunk, buildOutput: true, usages: inChunk },
     ...[...byFile].map(([file, usages]) => moduleFor(file, usages)),
   ];
+}
+
+/** A module for an original file: owned by its package, the project's own, or build output. */
+function moduleOf(
+  packages: PackageResolver,
+  root: string,
+  chunk: ModuleUsages,
+  file: string,
+  usages: Usage[],
+): ModuleUsages {
+  const owner = packages.packageFor(file);
+  // Code the bundler added has no original file in the project: it is not the project's own. Nor
+  // is a file in a folder a framework generates, which is an earlier stage of the same build.
+  const own =
+    owner === undefined && !generatedFolder.test(file) && existsSync(path.join(root, file));
+  return {
+    file,
+    package: owner,
+    ...(owner === undefined && !own ? { buildOutput: true as const } : {}),
+    chain: withOwner(chunk.chain, owner?.name ?? file),
+    usages,
+  };
 }
 
 /**
@@ -83,10 +109,8 @@ export function attributeOutput(chunks: readonly ModuleUsages[], root: string): 
   const unenvFiles = new Set<string>();
   let unmapped = 0;
 
-  const originalModule = (chunk: ModuleUsages, file: string, usages: Usage[]): ModuleUsages => {
-    const owner = packages.packageFor(file);
-    return { file, package: owner, chain: withOwner(chunk.chain, owner?.name ?? file), usages };
-  };
+  const originalModule = (chunk: ModuleUsages, file: string, usages: Usage[]): ModuleUsages =>
+    moduleOf(packages, root, chunk, file, usages);
 
   const unenvModules = (chunk: ModuleUsages, map: OutputSourceMap): ModuleUsages[] =>
     map.sources.flatMap(source => {
@@ -99,14 +123,14 @@ export function attributeOutput(chunks: readonly ModuleUsages[], root: string): 
   const regionModules = (chunk: ModuleUsages): ModuleUsages[] => {
     const regions = readRegions(path.resolve(root, chunk.file));
     return regions === undefined
-      ? [chunk]
+      ? [{ ...chunk, buildOutput: true as const }]
       : splitChunk(chunk, usagesByRegion(chunk, regions), (file, usages) =>
           originalModule(chunk, file, usages),
         );
   };
 
   const modules = chunks.flatMap(chunk => {
-    const map = OutputSourceMap.read(path.resolve(root, chunk.file));
+    const map = OutputSourceMap.read(path.resolve(root, chunk.file), root);
     if ((map === undefined || map.dropsMappings) && chunk.usages.length > 0) {
       unmapped += 1;
     }

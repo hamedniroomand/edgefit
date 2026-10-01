@@ -2,7 +2,7 @@ import path from 'node:path';
 import process from 'node:process';
 
 import { attributeOutput } from '@/built/attribute.ts';
-import { builtEntry, isBuildOutput } from '@/built/entry.ts';
+import { builtEntries, isBuildOutput } from '@/built/entry.ts';
 import { resolveGraph } from '@/resolve/graph.ts';
 import { createTarget } from '@/targets/index.ts';
 import type { Target, TargetInfo } from '@/targets/index.ts';
@@ -10,7 +10,13 @@ import type { EdgefitConfig, Finding, TargetKey } from '@/types.ts';
 
 import { entriesFor } from './entries.ts';
 import type { TargetEntries } from './entries.ts';
-import { collectFindings, collectSupported, defaultLevels, loadSuggestions } from './findings.ts';
+import {
+  collectFindings,
+  collectSupported,
+  defaultLevels,
+  loadSuggestions,
+  loadUnreached,
+} from './findings.ts';
 import type { SupportedApi } from './findings.ts';
 import { scanModules, toPosix } from './scan.ts';
 
@@ -61,7 +67,7 @@ function describeNodeEnv(nodeEnv: string | undefined, fromConfig: boolean): stri
 
 async function checkTarget(
   target: Target,
-  { entries, source, note }: TargetEntries,
+  { entries, source, notes: entryNotes, built }: TargetEntries,
   root: string,
   options: CheckOptions,
 ): Promise<TargetReport> {
@@ -76,7 +82,7 @@ async function checkTarget(
     nodeEnv,
     plugins: target.resolvePlugins,
   });
-  const isBuilt = options.built !== undefined || entries.some(entry => isBuildOutput(root, entry));
+  const isBuilt = built || entries.some(entry => isBuildOutput(root, entry));
   const scanned = scanModules(graph, root, target.globals, {
     trace: !isBuilt,
     lazyNodeImports: target.lazyNodeImports,
@@ -91,13 +97,14 @@ async function checkTarget(
     levels: { ...defaultLevels, ...config.levels },
     ignore: config.ignore ?? [],
     suggestions: loadSuggestions(),
+    unreached: loadUnreached(),
   });
   return {
     target: {
       ...target.info,
       settings: `${target.info.settings}, entries from ${source}, ${describeNodeEnv(nodeEnv, config.env?.NODE_ENV !== undefined)}`,
       conditions,
-      notes: [...target.info.notes, ...(note === undefined ? [] : [note]), ...notes],
+      notes: [...target.info.notes, ...entryNotes, ...notes],
     },
     entries: graph.entries.map(toPosix),
     modules: graph.modules.size,
@@ -117,11 +124,7 @@ export async function check(options: CheckOptions = {}): Promise<CheckResult> {
   const entries: (TargetEntries | undefined)[] =
     built === undefined
       ? entriesFor(root, targets, config)
-      : targets.map(() => ({
-          entries: [builtEntry(root, built)],
-          source: '--built',
-          note: undefined,
-        }));
+      : targets.map(() => ({ ...builtEntries(root, built), source: '--built', built: true }));
   const pending: Promise<TargetReport>[] = [];
   const skipped: SkippedTarget[] = [];
   for (const [index, target] of targets.entries()) {
