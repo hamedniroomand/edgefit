@@ -1,6 +1,10 @@
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import { describe, expect, it } from 'vite-plus/test';
 
 import { check } from '@/core/check.ts';
+import { extractModule } from '@/extract/index.ts';
 import { sampleApp, sampleAppsInstalled } from '~/helpers.ts';
 
 /**
@@ -54,23 +58,36 @@ describe.skipIf(!installed).each([
 /**
  * Next.js middleware, the main use of vercel-edge, with next installed from npm. Next branches
  * on `process.env.NEXT_RUNTIME`, which its edge build replaces with 'edge', so the Node-only
- * branches (`process.nextTick`, `setImmediate`) must be guarded, not errors. One finding remains
- * and is pinned here so a change is noticed; the middleware does not run it: `process.cwd` is in
- * next's server rendering code, reached through the CommonJS barrel of `next/server`, which is
- * checked in full. React's development build, which has `MessageChannel`, is not reached,
- * because `process.env.NODE_ENV` is `production`.
+ * branches must be guarded, not errors. `next/server` is a CommonJS barrel that requires the
+ * server rendering code for exports the middleware never imports, so that code is not reached:
+ * `process.cwd` sits in a function of `dynamic-rendering.js` that only app rendering calls, and
+ * the guarded `process.nextTick` and `setImmediate` uses sit in the same code. That needs the
+ * barrel and the modules it reaches to be read by export name, which the second test pins. The
+ * guarded usage that remains is pinned so a change is noticed. React's development build, which
+ * has `MessageChannel`, is not reached, because `process.env.NODE_ENV` is `production`.
  */
 describe.skipIf(!installed)('next.js middleware on vercel-edge', () => {
-  it('guards what the edge build removes and reports only the known leftover', async () => {
-    const result = await check({
-      root: sampleApp('next-middleware'),
-      config: { targets: ['vercel-edge'] },
-    });
+  const root = sampleApp('next-middleware');
+
+  it('reports nothing, and keeps only the guarded use that is reached', async () => {
+    const result = await check({ root, config: { targets: ['vercel-edge'] } });
     const [report] = result.reports;
     expect(report?.entry).toBe('middleware.ts');
-    expect(report?.findings.map(finding => finding.api)).toEqual(['node:process.cwd']);
-    expect(report?.guarded.map(finding => finding.api)).toEqual(
-      expect.arrayContaining(['node:process.nextTick', 'setImmediate']),
-    );
+    expect(report?.findings).toEqual([]);
+    expect(report?.guarded.map(finding => finding.api)).toEqual(['reportError']);
+  });
+
+  it.each([
+    'server.js',
+    'dist/server/request/connection.js',
+    'dist/server/app-render/dynamic-rendering.js',
+  ])('reads next/%s by export name, not in full', async file => {
+    const source = await readFile(join(root, 'node_modules/next', file), 'utf8');
+    const { shape } = extractModule(file, source, {
+      globals: new Set(),
+      shape: true,
+      nodeEnv: 'production',
+    });
+    expect(shape?.traceable).toBe(true);
   });
 });

@@ -1,39 +1,14 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, isFunction, isTypeOnly, strip } from '@/extract/ast.ts';
+import { isFunction, isTypeOnly, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { patternNames } from '@/extract/declarations.ts';
 
-/**
- * A top-level piece of a module. Code that runs when the module loads has no `name`. A function
- * or class that does nothing until it is used has one, and only counts once something uses it.
- */
-export interface Unit {
-  start: number;
-  end: number;
-  name: string | undefined;
-  /** Every name the code mentions, which is more than the names it uses. */
-  mentions: Set<string>;
-}
+import { ShapeBuilder, isLazyClass, rootNames } from './builder.ts';
+import type { ModuleShape } from './builder.ts';
+import { collectCommonJsShape } from './cjs.ts';
 
-/** What an export stands for: a name in this module, or something another module exports. */
-export type ExportSource = { local: string } | { specifier: string; imported: string };
-
-export interface ModuleShape {
-  /** False when the exports cannot be told apart, as in CommonJS. All of the module counts. */
-  traceable: boolean;
-  /** In source order. They never overlap. */
-  units: Unit[];
-  /** The lazy units by the name they declare. */
-  declared: Map<string, Unit[]>;
-  /** What each imported local name takes from its module: a name, `default`, or `*` for all. */
-  imports: Map<string, { specifier: string; imported: string }>;
-  /** Every specifier a static `import` or `export … from` names. */
-  specifiers: Set<string>;
-  exports: Map<string, ExportSource>;
-  /** The modules `export * from` re-exports. */
-  stars: string[];
-}
+export type { ExportSource, ModuleShape, Unit } from './builder.ts';
 
 // Names that make a module read its own exports or run code from text, so nothing is known about it.
 const opaqueNames = new Set(['module', 'exports', 'eval']);
@@ -45,76 +20,6 @@ function moduleName(node: Node): string {
     return node.name;
   }
   return node.type === 'Literal' ? String(node.value) : '';
-}
-
-function mentionsIn(node: Node, names = new Set<string>()): Set<string> {
-  if (isTypeOnly(node)) {
-    return names;
-  }
-  if (node.type === 'Identifier' || node.type === 'JSXIdentifier') {
-    names.add(node.name);
-  }
-  for (const child of childNodes(node)) {
-    mentionsIn(child, names);
-  }
-  return names;
-}
-
-function hasDecorator(node: Node): boolean {
-  return node.type === 'Decorator' || childNodes(node).some(child => hasDecorator(child));
-}
-
-/** Whether evaluating the class only defines it, so nothing runs until it is used. */
-function isLazyClass(node: NodeOf<'ClassDeclaration' | 'ClassExpression'>): boolean {
-  const { superClass } = node;
-  const plainSuper =
-    superClass === null ||
-    superClass.type === 'Identifier' ||
-    (superClass.type === 'MemberExpression' && !superClass.computed);
-  return (
-    plainSuper &&
-    !hasDecorator(node) &&
-    node.body.body.every(
-      member =>
-        member.type === 'TSIndexSignature' ||
-        (member.type !== 'StaticBlock' &&
-          !member.computed &&
-          (member.type === 'MethodDefinition' || !member.static)),
-    )
-  );
-}
-
-class ShapeBuilder {
-  public readonly shape: ModuleShape = {
-    traceable: true,
-    units: [],
-    declared: new Map(),
-    imports: new Map(),
-    specifiers: new Set(),
-    exports: new Map(),
-    stars: [],
-  };
-
-  public unit(node: Node, name?: string, mentions?: Set<string>): void {
-    const unit = { start: node.start, end: node.end, name, mentions: mentions ?? mentionsIn(node) };
-    this.shape.units.push(unit);
-    if (name !== undefined) {
-      this.shape.declared.set(name, [...(this.shape.declared.get(name) ?? []), unit]);
-    }
-  }
-
-  /** A statement that holds no code of its own to run or to use. */
-  public bare(node: Node): void {
-    this.unit(node, undefined, new Set());
-  }
-
-  public export(name: string, source: ExportSource): void {
-    this.shape.exports.set(name, source);
-  }
-
-  public importFrom(specifier: string): void {
-    this.shape.specifiers.add(specifier);
-  }
 }
 
 function addImport(builder: ShapeBuilder, node: NodeOf<'ImportDeclaration'>): void {
@@ -239,6 +144,9 @@ function addStatement(builder: ShapeBuilder, node: Node): void {
 
 /** Splits the top level of a module into the pieces that run on load and the pieces that wait to be used. */
 export function collectShape(body: readonly Node[], hasModuleSyntax: boolean): ModuleShape {
+  if (!hasModuleSyntax) {
+    return collectCommonJsShape(body);
+  }
   const builder = new ShapeBuilder();
   for (const statement of body) {
     addStatement(builder, statement);
@@ -247,7 +155,9 @@ export function collectShape(body: readonly Node[], hasModuleSyntax: boolean): M
   shape.units.sort((left, right) => left.start - right.start);
   shape.traceable =
     shape.traceable &&
-    hasModuleSyntax &&
-    !shape.units.some(unit => [...opaqueNames].some(name => unit.mentions.has(name)));
+    !shape.units.some(unit => {
+      const roots = rootNames(unit);
+      return [...opaqueNames].some(name => roots.has(name));
+    });
   return shape;
 }

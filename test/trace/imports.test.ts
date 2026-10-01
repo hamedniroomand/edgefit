@@ -21,9 +21,11 @@ describe('imports that are not a static import of names', () => {
     expect(importedBy("await import('./lib.js');", 'dynamic-import:./lib.js')['lib.js']).toEqual([
       'node:fs.watch',
     ]);
-    expect(importedBy("require('./lib.js');", 'require-call:./lib.js')['lib.js']).toEqual([
-      'node:fs.watch',
-    ]);
+    expect(
+      importedBy("const lib = require('./lib.js');\nlib.upper(lib);", 'require-call:./lib.js')[
+        'lib.js'
+      ],
+    ).toEqual(['node:fs.watch']);
   });
 
   it('keeps everything for an import whose specifier is not in the source', () => {
@@ -35,11 +37,11 @@ describe('imports that are not a static import of names', () => {
     ).toEqual(['node:fs.watch']);
   });
 
-  it('keeps everything in a CommonJS module, and what it requires', () => {
+  it('keeps everything in a CommonJS module that is not read by name, and what it requires', () => {
     const found = reached({
       'index.js': entry("import { upper } from './lib.js';", { './lib.js': 'lib.js' }),
       'lib.js': {
-        code: `const fs = require('node:fs');\nfunction watchDir(dir) {\n  return fs.watch(dir);\n}\nexports.watchDir = watchDir;`,
+        code: `const fs = require('node:fs');\nfunction watchDir(dir) {\n  return fs.watch(dir);\n}\nmodule.exports = watchDir;`,
         imports: { 'require-call:./more.js': 'more.js' },
       },
       'more.js': twoHelpers,
