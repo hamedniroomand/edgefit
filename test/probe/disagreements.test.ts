@@ -14,6 +14,8 @@ const extra = (api: string): { api: string; message: string; dataSaysPresent: bo
 
 const lines = (...args: Parameters<typeof summarizeDisagreements>): string =>
   summarizeDisagreements(...args).join('\n');
+// What a reader sees: the full list is folded away after it.
+const visible = (text: string): string => text.split('<details>')[0] ?? '';
 const listed = (text: string, api: string): boolean => text.includes(`- \`${api}\`: `);
 
 describe('summarizeDisagreements', () => {
@@ -27,10 +29,10 @@ describe('summarizeDisagreements', () => {
       ],
       {},
     );
-    expect(listed(text, 'fs.openAsBlob')).toBe(true);
-    expect(listed(text, 'fs.default.openAsBlob')).toBe(false);
-    expect(listed(text, 'util.parseEnv')).toBe(true);
-    expect(listed(text, 'sys.parseEnv')).toBe(false);
+    expect(visible(text)).toContain('`fs` (1): openAsBlob');
+    expect(visible(text)).toContain('`util` (1): parseEnv');
+    expect(visible(text)).not.toContain('default');
+    expect(visible(text)).not.toContain('sys');
   });
 
   it('keeps an alias whose result differs', () => {
@@ -48,7 +50,7 @@ describe('summarizeDisagreements', () => {
       {},
     );
     expect(text).toContain('`path` (1): matchesGlob');
-    expect(text).not.toContain('posix');
+    expect(visible(text)).not.toContain('posix');
   });
 
   it('keeps one line for aliases when the plain path is not listed', () => {
@@ -64,7 +66,7 @@ describe('summarizeDisagreements sections', () => {
   it('puts the possible false passes first, then what the data lacks', () => {
     const text = lines([extra('fs.F_OK'), gone('zlib.ZstdCompress')], {});
     const missing = text.indexOf('missing at runtime (possible false passes) (1)');
-    const present = text.indexOf('Missing in the data, present at runtime (1)');
+    const present = text.indexOf('Unusable in the data, present at runtime (1)');
     expect(missing).toBeGreaterThan(-1);
     expect(present).toBeGreaterThan(missing);
     expect(text.slice(missing, present)).toContain('zlib');
@@ -84,10 +86,21 @@ describe('summarizeDisagreements sections', () => {
       'stream.default.promises.pipeline': 'present',
       'stream/consumers.default.bytes': 'missing',
     });
-    const named = text.indexOf('missing as a named export');
+    const named = text.indexOf('Missing as a named export only');
     expect(named).toBeGreaterThan(text.indexOf('(possible false passes)'));
     expect(text.slice(named)).toContain('`stream` (1): promises.pipeline');
     expect(text.slice(0, named)).toContain('`stream/consumers` (1): bytes');
+  });
+
+  it('keeps the names as the probe wrote them in the full list', () => {
+    const text = lines([gone('fs.openAsBlob'), gone('fs.default.openAsBlob')], {});
+    expect(listed(text, 'fs.default.openAsBlob')).toBe(true);
+    expect(text).toContain('`fs` (1): openAsBlob');
+  });
+
+  it('only folds repeats of a known alias', () => {
+    const text = lines([gone('a.b.b.c')], {});
+    expect(text).toContain('`a` (1): b.b.c');
   });
 
   it('says nothing when the probe agrees', () => {

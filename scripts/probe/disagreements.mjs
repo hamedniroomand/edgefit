@@ -1,10 +1,14 @@
 const PREVIEW = 6;
 
 // `fs.default.watch` repeats `fs.watch`, and `path` holds itself as `posix` and `win32`.
+const aliasSegments = new Set(['default', 'posix', 'win32']);
 const collapseRepeats = api =>
   api
     .split('.')
-    .filter((segment, index, segments) => segment !== segments[index - 1])
+    .filter(
+      (segment, index, segments) =>
+        !(aliasSegments.has(segment) && segment === segments[index - 1]),
+    )
     .join('.');
 
 function canonical(api) {
@@ -16,15 +20,21 @@ function canonical(api) {
   return [module === 'sys' ? 'util' : pathModule ? 'path' : module, ...kept].join('.');
 }
 
-/** Keeps one line for the aliases of an API that have the same result: the plain name if it is there. */
+/**
+ * Keeps one line for the aliases of an API that have the same result: the plain name if it is
+ * there. `listed` keeps every name as the probe wrote it, for the full list.
+ */
 function withoutAliases(disagreements) {
   const kept = new Map();
   for (const item of disagreements) {
     const api = collapseRepeats(item.api);
     const key = `${canonical(api)}|${item.message}`;
-    if (!kept.has(key) || api === canonical(api)) {
-      kept.set(key, { ...item, api });
-    }
+    const group = kept.get(key);
+    const listed = [...(group?.listed ?? []), item];
+    kept.set(
+      key,
+      !group || api === canonical(api) ? { ...item, api, listed } : { ...group, listed },
+    );
   }
   return [...kept.values()];
 }
@@ -52,7 +62,9 @@ function section(title, items) {
     const shown = members.slice(0, PREVIEW).join(', ');
     return `- \`${module}\` (${members.length}): ${shown}${members.length > PREVIEW ? ', …' : ''}`;
   });
-  const full = items.map(({ api, message }) => `- \`${api}\`: ${message}`);
+  const full = items.flatMap(({ listed }) =>
+    listed.map(({ api, message }) => `- \`${api}\`: ${message}`),
+  );
   return [
     `### ${title} (${items.length})`,
     ...groups,
@@ -80,11 +92,11 @@ export function summarizeDisagreements(disagreements, outcomes) {
       missingAtRuntime.filter(item => !isNamedOnly(item)),
     ),
     ...section(
-      'Present in the data, missing as a named export but present on the default export',
+      'Missing as a named export only (named imports fail, the default import works)',
       missingAtRuntime.filter(isNamedOnly),
     ),
     ...section(
-      'Missing in the data, present at runtime',
+      'Unusable in the data, present at runtime',
       items.filter(item => !item.dataSaysPresent),
     ),
   ];
