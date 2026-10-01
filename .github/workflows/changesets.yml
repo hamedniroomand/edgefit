@@ -39,8 +39,10 @@ jobs:
           run-install: true
       - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
-          version: vp run changeset:version
-          title: 'chore(release): version packages'
-          commit: 'chore(release): version packages'
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+          version-script: vp run changeset:version
+          pr-title: 'chore(release): version packages'
+          commit-message: 'chore(release): version packages'
+          github-token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+          # release.yml publishes, tags and creates the release when a maintainer pushes the tag.
+          create-github-releases: false
+          push-git-tags: false
