@@ -2,79 +2,13 @@ import type { ExtractedModule } from '@/extract/index.ts';
 import type { ModuleGraph } from '@/resolve/graph.ts';
 import type { Usage } from '@/types.ts';
 
-import type { ExportSource, ModuleShape, Unit } from './shape.ts';
+import { analyze } from './analyze.ts';
+import type { Demand } from './analyze.ts';
+import type { ModuleShape, Unit } from './shape.ts';
 
-/** The export names asked of a module, or `all` when any of them may be used. */
-type Demand = Set<string> | 'all';
-
-function merge(asks: Map<string, Demand>, specifier: string, names: Demand): void {
-  const current = asks.get(specifier);
-  if (current !== 'all') {
-    asks.set(specifier, names === 'all' ? 'all' : new Set([...(current ?? []), ...names]));
-  }
-}
-
-/** What using something that stands for `source` asks of the module it comes from. */
-function askOf(source: { specifier: string; imported: string }): [string, Demand] {
-  return [source.specifier, source.imported === '*' ? 'all' : new Set([source.imported])];
-}
-
-interface Analysis {
-  live: Set<Unit>;
-  /** What the module asks of the modules it imports, by specifier. */
-  asks: Map<string, Demand>;
-}
-
-/** Which units of a module are used, given the exports asked of it, and what they ask in turn. */
-function analyze(shape: ModuleShape, demand: Demand): Analysis {
-  const live = new Set<Unit>();
-  const asks = new Map<string, Demand>();
-  const pending: string[] = [];
-  const seen = new Set<string>();
-  const use = (name: string): void => {
-    if (!seen.has(name)) {
-      seen.add(name);
-      pending.push(name);
-    }
-  };
-  const keep = (unit: Unit): void => {
-    if (!live.has(unit)) {
-      live.add(unit);
-      for (const name of unit.mentions) {
-        use(name);
-      }
-    }
-  };
-  const route = (source: ExportSource | undefined): void => {
-    if (source !== undefined && 'local' in source) {
-      use(source.local);
-    } else if (source !== undefined) {
-      merge(asks, ...askOf(source));
-    }
-  };
-
-  // Code that runs when the module loads is always used.
-  for (const unit of shape.units) {
-    if (unit.name === undefined) {
-      keep(unit);
-    }
-  }
-  for (const name of demand === 'all' ? shape.exports.keys() : demand) {
-    route(shape.exports.get(name));
-  }
-  for (const star of shape.stars) {
-    merge(asks, star, demand);
-  }
-  for (let name = pending.pop(); name !== undefined; name = pending.pop()) {
-    for (const unit of shape.declared.get(name) ?? []) {
-      keep(unit);
-    }
-    const source = shape.imports.get(name);
-    if (source !== undefined) {
-      merge(asks, ...askOf(source));
-    }
-  }
-  return { live, asks };
+/** Whether esbuild found the link as `import … from` or as a `require` of a written-out specifier. */
+function isStatic(kind: string): boolean {
+  return kind === 'import-statement' || kind === 'require-call';
 }
 
 class Demands {
@@ -108,7 +42,7 @@ function seedDemands(graph: ModuleGraph, shapes: ReadonlyMap<string, ModuleShape
     for (const link of module.links) {
       const named =
         shape?.traceable === true &&
-        link.kind === 'import-statement' &&
+        isStatic(link.kind) &&
         shape.specifiers.has(link.original ?? '');
       if (!named) {
         demands.raise(link.path, 'all');
@@ -138,7 +72,7 @@ export function traceReach(
     const { live, asks } = analyze(shape, demands.get(file));
     traced.set(file, live);
     for (const link of graph.modules.get(file)?.links ?? []) {
-      const names = link.kind === 'import-statement' ? asks.get(link.original ?? '') : undefined;
+      const names = isStatic(link.kind) ? asks.get(link.original ?? '') : undefined;
       if (names !== undefined && demands.raise(link.path, names)) {
         queue.push(link.path);
       }
