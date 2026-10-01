@@ -61,7 +61,7 @@ describe('Next.js edge build as a witness', () => {
   });
 });
 
-// NativeModuleMap as next 16.3.8 (dist/server/web/sandbox/context.js) and @vercel/node 16.0.2
+// NativeModuleMap as next 16.3.8 (dist/server/web/sandbox/context.js) and @vercel/node 17.0.0
 // (dist/dev-server.mjs) write it, cut to two modules.
 const nextSandbox = `const mods = {
         'node:buffer': (0, _pick.pick)(_nodebuffer.default, [

@@ -225,7 +225,7 @@
       },
       {
         "package": "@vercel/node",
-        "version": "16.0.2",
+        "version": "17.0.0",
         "file": "dist/dev-server.mjs"
       }
     ]
