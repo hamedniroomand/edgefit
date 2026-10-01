@@ -25,7 +25,7 @@ function writeOutput(code: string, files: Record<string, string> = {}): string {
   return file;
 }
 
-/** A project with its output two folders down, whose map points three levels up for a package. */
+/** A project with its output two folders down, whose map points two levels up for a package, which is one level short. */
 function layoutWithMap(): { directory: string; project: string; file: string } {
   const directory = mkdtempSync(path.join(tmpdir(), 'edgefit-map-'));
   const project = path.join(directory, 'project');
@@ -35,7 +35,7 @@ function layoutWithMap(): { directory: string; project: string; file: string } {
   writeFileSync(path.join(directory, 'node_modules/pkg@1/index.js'), '');
   const file = path.join(output, 'index.js');
   writeFileSync(file, 'run();');
-  const sources = ['../../../node_modules/pkg%401/index.js'];
+  const sources = ['../../node_modules/pkg%401/index.js'];
   writeFileSync(`${file}.map`, JSON.stringify({ ...payload, sources }));
   return { directory, project, file };
 }
@@ -86,7 +86,7 @@ describe('OutputSourceMap sources', () => {
     );
     // Without the project root there is nothing to look in, so the path stays where the map put it.
     expect(OutputSourceMap.read(file)?.original(at)?.file).toBe(
-      path.resolve(path.dirname(file), '../../../node_modules/pkg@1/index.js'),
+      path.resolve(path.dirname(file), '../../node_modules/pkg@1/index.js'),
     );
   });
 
@@ -106,9 +106,7 @@ describe('OutputSourceMap sources', () => {
       line: 1,
       column: 1,
     });
-    expect(found?.file).toBe(
-      path.resolve(path.dirname(file), '../../../node_modules/pkg@1/index.js'),
-    );
+    expect(found?.file).toBe(path.resolve(path.dirname(file), '../../node_modules/pkg@1/index.js'));
   });
 
   it('looks up to the root of the repository', () => {
