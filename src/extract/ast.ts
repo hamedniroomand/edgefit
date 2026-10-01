@@ -107,3 +107,37 @@ export function unwrap(node: Node): Node | undefined {
   }
   return node.type === 'AwaitExpression' ? node.argument : undefined;
 }
+
+/** The operand under every wrapper that passes its value through, as `x` in `(await x!)`. */
+export function strip(node: Node): Node {
+  let current = node;
+  for (let inner = unwrap(current); inner !== undefined; inner = unwrap(current)) {
+    current = inner;
+  }
+  return current;
+}
+
+export function stringLiteral(node: Node): string | undefined {
+  const inner = strip(node);
+  return inner.type === 'Literal' && typeof inner.value === 'string' ? inner.value : undefined;
+}
+
+export function isEquality(operator: string): boolean {
+  return operator === '==' || operator === '===';
+}
+
+export function isInequality(operator: string): boolean {
+  return operator === '!=' || operator === '!==';
+}
+
+export type FunctionNode = NodeOf<
+  'FunctionDeclaration' | 'FunctionExpression' | 'ArrowFunctionExpression'
+>;
+
+export function isFunction(node: Node): node is FunctionNode {
+  return (
+    node.type === 'FunctionDeclaration' ||
+    node.type === 'FunctionExpression' ||
+    node.type === 'ArrowFunctionExpression'
+  );
+}

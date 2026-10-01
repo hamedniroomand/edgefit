@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { collectFindings, collectSupported, defaultLevels, findingKey } from '@/core/findings.ts';
 import type { FindingOptions, ModuleUsages } from '@/core/findings.ts';
-import type { Location, Usage } from '@/types.ts';
+import type { Location, TargetKey, Usage } from '@/types.ts';
 import { makeFinding, makeUsage, stubTarget } from '~/helpers.ts';
 
 const target = stubTarget({
@@ -184,5 +184,41 @@ describe('collecting guarded findings', () => {
     );
     expect(guarded).toEqual([]);
     expect(ignored).toBe(1);
+  });
+});
+
+describe('collecting findings behind a runtime check', () => {
+  const onDeno: Usage = { ...watch('a.js', 1), runtimes: [{ runtime: 'deno', present: true }] };
+  const notDeno: Usage = { ...watch('b.js', 1), runtimes: [{ runtime: 'deno', present: false }] };
+  const both: Usage = {
+    ...watch('c.js', 1),
+    runtimes: [
+      { runtime: 'bun', present: false },
+      { runtime: 'deno', present: false },
+    ],
+  };
+  const forTarget = (key: TargetKey): FindingOptions => ({
+    ...options,
+    target: { ...target, info: { ...target.info, key } },
+  });
+  const modules = [module('a.js', [onDeno]), module('b.js', [notDeno]), module('c.js', [both])];
+
+  it('guards what cannot run on the target, even an API that exists and throws', () => {
+    const { findings, guarded } = collectFindings(modules, forTarget('workerd'));
+    expect(findings.map(finding => finding.location.file)).toEqual(['b.js', 'c.js']);
+    expect(guarded.map(finding => finding.location.file)).toEqual(['a.js']);
+  });
+
+  it('counts Deno Deploy as Deno', () => {
+    for (const key of ['deno', 'deno-deploy'] as const) {
+      const { findings, guarded } = collectFindings(modules, forTarget(key));
+      expect(findings.map(finding => finding.location.file)).toEqual(['a.js']);
+      expect(guarded.map(finding => finding.location.file)).toEqual(['b.js', 'c.js']);
+    }
+  });
+
+  it('guards code that needs every runtime it names', () => {
+    const { findings } = collectFindings(modules, forTarget('bun'));
+    expect(findings.map(finding => finding.location.file)).toEqual(['b.js']);
   });
 });

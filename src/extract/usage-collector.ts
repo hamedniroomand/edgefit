@@ -1,11 +1,13 @@
 import { displayApi } from '@/data/builtins.ts';
-import type { ApiRef, Location, Usage } from '@/types.ts';
+import type { ApiRef, Location, RuntimeCondition, Usage } from '@/types.ts';
 
-import { GuardStack } from './guards.ts';
+import { GuardStack } from './guard-stack.ts';
 import { normalizeRef } from './refs.ts';
 
 export class UsageCollector {
   public readonly usages: Usage[] = [];
+  /** Where each usage was found in the source, in the order of `usages`. */
+  public readonly offsets: number[] = [];
   /** The APIs known to exist at the point being visited. */
   public readonly guards = new GuardStack();
   readonly #file: string;
@@ -35,23 +37,32 @@ export class UsageCollector {
   public api(ref: ApiRef, offset: number): void {
     const api = normalizeRef(ref);
     const guarded = this.guards.covers(api);
+    this.offsets.push(offset);
     this.usages.push({
       kind: 'api',
       api,
       display: displayApi(api.module, api.path),
       location: this.location(offset),
       ...(guarded ? { guarded: true as const } : {}),
+      ...this.#runtimes(),
     });
   }
 
   /** Records an access edgefit cannot follow statically. */
   public dynamic(ref: ApiRef | undefined, display: string, reason: string, offset: number): void {
+    this.offsets.push(offset);
     this.usages.push({
       kind: 'dynamic',
       api: ref === undefined ? undefined : normalizeRef(ref),
       display,
       reason,
       location: this.location(offset),
+      ...this.#runtimes(),
     });
+  }
+
+  #runtimes(): { runtimes?: RuntimeCondition[] } {
+    const runtimes = this.guards.runtimes();
+    return runtimes.length === 0 ? {} : { runtimes };
   }
 }

@@ -15,6 +15,8 @@ export interface VisitContext extends BindingContext {
   /** Visits an expression whose value is bound to a name, so it is followed rather than escaping. */
   visitBound: (init: Node) => void;
   inScope: (scope: Scope, body: () => void) => void;
+  /** The parent of the node being visited. */
+  parent: () => Node | undefined;
   /** Runs `body` with `node` on the ancestor stack without dispatching it. */
   withAncestor: (node: Node, body: () => void) => void;
   /**

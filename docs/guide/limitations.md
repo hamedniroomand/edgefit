@@ -8,25 +8,40 @@ edgefit is a static analysis tool, and it is honest about what that means. This 
 
 ## Only some guards are understood
 
-A usage of an API the target lacks, in code that only runs when the API exists, is [guarded](/guide/findings#guarded-usages) and does not fail a check. That covers checks on the API itself: `if (x.y)`, `typeof x.y`, `'y' in x`, `x.y?.()` and guard clauses. A check does not protect an API that exists and throws, such as `fs.watch` on Workers.
+A usage of an API the target lacks, in code that only runs when the API exists, is [guarded](/guide/findings#guarded-usages) and does not fail a check. That covers checks on the API itself (`if (x.y)`, `typeof x.y`, `'y' in x`, `x.y?.()` and guard clauses), a `try` block whose `catch` does not throw again, and code behind a check on the runtime, such as `typeof Deno !== 'undefined'` or `process.versions.bun`. A check does not protect an API that exists and throws, such as `fs.watch` on Workers. Only code that does not run on the target at all is guarded whatever it uses.
 
 Other ways code decides what to do are not understood, and every branch is reported:
 
 ```js
-if (typeof Deno !== 'undefined') {
+import { isDeno } from './runtime.js';
+
+if (isDeno()) {
   // Deno path
-} else if (process.versions?.bun) {
+} else if (globalThis.navigator?.userAgent.match(/bun/i)) {
   // Bun path
 } else {
   require('node:fs').watch(dir, onChange);
 }
 ```
 
-Checks on which runtime this is (`typeof Deno`, `process.versions.bun`, `navigator.userAgent`), `try`/`catch` around a call, and checks hidden behind a helper function all still produce findings. If you have confirmed a branch never runs on your runtime, [ignore](/guide/configuration#ignoring-findings) the finding with a reason.
+- **Helpers from another file.** A helper is followed only when it is in the same file, has no parameters and only returns the check. One that is imported, takes an argument or does more is not.
+- **Other ways to name a runtime.** Only `typeof Deno`, `typeof Bun`, `process.versions.deno`, `process.versions.bun` and `navigator.userAgent` compared with `Cloudflare-Workers`, `Bun` or `Deno` are read. A regular expression, a feature check that happens to tell runtimes apart, and a check on Node are not.
+- **Checks that leave the runtime open.** `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'` says the code runs on one of two runtimes, and edgefit does not follow that.
+- **`try` blocks around an API that exists.** A `catch` stops the error of an API that is missing, so those are guarded. `fs.watch` on Workers exists and throws, or does nothing, and edgefit cannot tell whether the `catch` copes, so it stays a finding.
 
-## Reachability is per module
+If you have confirmed a branch never runs on your runtime, [ignore](/guide/configuration#ignoring-findings) the finding with a reason.
 
-When a module is reached, everything in it is checked, even exports you never import. A utility library that exports one function using `fs.watch` produces a finding even if you only use its string helpers.
+## Reachability follows imported names
+
+edgefit checks the code a project reaches, and traces which exports of each module are imported. A function that only an export nothing imports uses is left out, so a utility library that exports one `fs.watch` helper does not produce a finding when you only import its string helpers.
+
+Everything in a module counts when it cannot be told which parts are used:
+
+- the module runs code when it loads: top-level calls, assignments, and classes with static members, decorators or computed keys. What that code uses counts, and so does every function it names
+- it is imported as a namespace (`import * as lib`), with `import()` or `require()`, or has its exports read as a whole (CommonJS, `module.exports`, `export =`)
+- it is build output. Build output has been through a bundler's own tree shaking, so [`--built`](/guide/built-output) checks it in full
+
+A name counts as used when any used code mentions it. A property or a local variable of the same name also counts, which can only keep a finding, never hide one.
 
 ## Existing is not the same as working
 

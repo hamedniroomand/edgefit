@@ -3,7 +3,7 @@ import type { Node } from 'oxc-parser';
 import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef } from '@/types.ts';
 
-const globalAliases = new Set(['global', 'globalThis', 'self']);
+export const globalAliases = new Set(['global', 'globalThis', 'self']);
 
 // Helpers that wrap `require()` results in Babel, TypeScript, esbuild and Rollup output.
 const interopHelpers = new Set([

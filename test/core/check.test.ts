@@ -183,3 +183,56 @@ describe('check with guarded code', () => {
     ]);
   });
 });
+
+describe('check with runtime branches and try blocks', () => {
+  const describeAll = (findings: Finding[] | undefined): string[] =>
+    (findings ?? []).map(finding => `${finding.api} ${finding.location.line}`);
+
+  it('hides code that only runs on another runtime', async () => {
+    const [report] = (await check({ root: fixture('branch-app') })).reports;
+    expect(describeAll(report?.guarded)).toEqual([
+      'node:fs.watch 16',
+      'node:fs.unwatchFile 29',
+      'FileReader 37',
+    ]);
+    expect(report?.guarded[0]?.otherLocations.map(location => location.line)).toEqual([18]);
+  });
+
+  it('keeps code that can run on Workers, and what a try block does not stop', async () => {
+    const [report] = (await check({ root: fixture('branch-app') })).reports;
+    expect(describeAll(report?.findings)).toEqual([
+      // The last branch of the chain, and `navigator.userAgent === 'Cloudflare-Workers'`.
+      'node:fs.watchFile 20',
+      // `isDeno() || isBun()` does not say which of the two this is.
+      'node:fs.unwatchFile 26',
+      // Exists and throws, so catching the error does not make it fine.
+      'node:fs.watch 43',
+      // A catch that throws again.
+      'FileReader 47',
+    ]);
+    expect(report?.findings[0]?.otherLocations.map(location => location.line)).toEqual([32]);
+  });
+});
+
+describe('check with unused exports', () => {
+  const describeAll = (findings: Finding[] | undefined): string[] =>
+    (findings ?? []).map(finding => `${finding.api} ${finding.package?.name}`);
+
+  it('leaves out a finding that only an export nothing imports would cause', async () => {
+    const [report] = (await check({ root: fixture('reach-app') })).reports;
+    const apis = describeAll(report?.findings);
+    // str-utils exports `watchDir` next to `upper`, and only `upper` is imported.
+    expect(apis).not.toContain('node:fs.watch str-utils');
+    // dir-tools exports `stop` next to `tail`.
+    expect(apis).not.toContain('node:fs.unwatchFile dir-tools');
+  });
+
+  it('keeps what an imported export reaches, and all of a module imported as a namespace', async () => {
+    const [report] = (await check({ root: fixture('reach-app') })).reports;
+    expect(describeAll(report?.findings)).toEqual([
+      'node:fs.watchFile dir-tools',
+      'node:child_process.spawn whole-lib',
+      'node:child_process.spawnSync whole-lib',
+    ]);
+  });
+});

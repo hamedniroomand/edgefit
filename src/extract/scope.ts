@@ -1,3 +1,5 @@
+import type { Node } from 'oxc-parser';
+
 import type { ApiRef } from '@/types.ts';
 
 /**
@@ -6,15 +8,28 @@ import type { ApiRef } from '@/types.ts';
  */
 export type Binding = { ref: ApiRef; recorded: boolean } | 'require' | null;
 
+/** A name that stands for a check, so testing it is the same as testing what it holds. */
+export interface Check {
+  /** The expression the check evaluates: a `const`'s value, or what a helper returns. */
+  test: Node;
+  /** True for a helper called as `name()`, false for a `const` read as `name`. */
+  call: boolean;
+  /** Where `test` is read, since it may name things the caller cannot see. */
+  scope: Scope;
+  /** Set while the check is being read, so a helper that calls itself stops there. */
+  busy: boolean;
+}
+
 export interface Scope {
   names: Map<string, Binding>;
+  checks: Map<string, Check>;
   /** `const` names bound to a plain string, which can stand in for a literal specifier. */
   strings: Map<string, string>;
   parent: Scope | undefined;
 }
 
 export function createScope(parent?: Scope): Scope {
-  return { names: new Map(), strings: new Map(), parent };
+  return { names: new Map(), checks: new Map(), strings: new Map(), parent };
 }
 
 /** The string a `const` holds, unless a nearer declaration of the name shadows it. */
@@ -27,6 +42,18 @@ export function lookupString(scope: Scope | undefined, name: string): string | u
     return value;
   }
   return scope.names.has(name) ? undefined : lookupString(scope.parent, name);
+}
+
+/** The check a name holds, unless a nearer declaration of the name shadows it. */
+export function lookupCheck(scope: Scope | undefined, name: string): Check | undefined {
+  if (scope === undefined) {
+    return undefined;
+  }
+  const check = scope.checks.get(name);
+  if (check !== undefined) {
+    return check;
+  }
+  return scope.names.has(name) ? undefined : lookupCheck(scope.parent, name);
 }
 
 /** Returns `undefined` when no enclosing scope declares the name. */

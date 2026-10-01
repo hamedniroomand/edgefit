@@ -95,14 +95,14 @@ function formatGuarded(report: TargetReport, paint: Paint, verbose: boolean): st
     return [
       paint(
         'dim',
-        `${count} guarded ${count === 1 ? 'usage' : 'usages'} hidden: the code checks for an API this target lacks. Run with --verbose to list them.`,
+        `${count} guarded ${count === 1 ? 'usage' : 'usages'} hidden: the code checks for what this target lacks, or does not run on it. Run with --verbose to list them.`,
       ),
     ];
   }
   return [
     paint(
       'dim',
-      'Guarded: the code checks for an API this target lacks before using it, so these do not fail a check.',
+      'Guarded: the code checks for an API this target lacks before using it, catches the error of its absence, or only runs on another runtime, so these do not fail a check.',
     ),
     ...report.guarded.map(finding => formatFinding(finding, paint).join('\n')),
   ];

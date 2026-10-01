@@ -44,7 +44,7 @@ edgefit check --format json
 }
 ```
 
-`guarded` has the same shape as `findings` and holds usages of an API the target lacks, in code that only runs when the API exists (see [guarded usages](/guide/findings#guarded-usages)). They are not counted in `summary` and never fail a check.
+`guarded` has the same shape as `findings` and holds usages that do not fail the check because the code guards them: it only runs when the API exists, catches the error of its absence, or only runs on another runtime (see [guarded usages](/guide/findings#guarded-usages)). They are not counted in `summary` and never fail a check.
 
 ### Finding
 
