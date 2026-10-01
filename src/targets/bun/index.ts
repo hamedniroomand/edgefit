@@ -1,3 +1,4 @@
+import { detectEntries } from '@/targets/entries.ts';
 import { versionNotes } from '@/targets/runtime-version.ts';
 import { loadTargetData } from '@/targets/target-data.ts';
 import type { Target } from '@/targets/target.ts';
@@ -25,7 +26,7 @@ export function createBunTarget(root: string, options: BunOptions = {}): Target 
     runtimes: ['bun'],
     resolvePlatform: 'node',
     nodeEnv: undefined,
-    defaultEntries: [],
+    entries: detectEntries([], true),
     globals,
     lookup: api => index.lookup(api),
     hasProblemsBelow: api => index.hasProblemsBelow(api),

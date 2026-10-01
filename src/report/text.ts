@@ -1,6 +1,7 @@
 import { styleText } from 'node:util';
 
 import type { CheckResult, TargetReport } from '@/core/check.ts';
+import { describeEntries } from '@/core/entries.ts';
 import { formatPackage } from '@/resolve/packages.ts';
 import type { Finding } from '@/types.ts';
 
@@ -28,18 +29,6 @@ const indent = '       ';
 export function painter(options: TextOptions): Paint {
   return (style, text) =>
     options.color ? styleText(style, text, { validateStream: false }) : text;
-}
-
-const shownEntries = 3;
-
-/** `entry a.ts`, or `entries a.ts, b.ts, c.ts +2 more` when there are more than a few. */
-export function describeEntries(entries: readonly string[]): string {
-  if (entries.length === 1) {
-    return `entry ${entries[0]}`;
-  }
-  const rest = entries.length - shownEntries;
-  const more = rest > 0 ? ` +${rest} more` : '';
-  return `entries ${entries.slice(0, shownEntries).join(', ')}${more}`;
 }
 
 function formatHeader(report: TargetReport, paint: Paint): string[] {

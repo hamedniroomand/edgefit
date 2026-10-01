@@ -116,7 +116,7 @@ export function stubTarget(
     runtimes: ['workerd'],
     resolvePlatform: 'node',
     nodeEnv: undefined,
-    defaultEntries: [],
+    entries: { exact: undefined, guess: undefined, searched: [], shared: true },
     globals: new Set(),
     lookup: api => results[keyOf(api)] ?? { status: 'supported' },
     hasProblemsBelow: api => problemsBelow.includes(keyOf(api)),

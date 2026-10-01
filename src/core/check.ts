@@ -8,7 +8,7 @@ import { createTarget } from '@/targets/index.ts';
 import type { Target, TargetInfo } from '@/targets/index.ts';
 import type { EdgefitConfig, Finding } from '@/types.ts';
 
-import { entriesFor } from './entries.ts';
+import { describeEntries, entriesFor } from './entries.ts';
 import type { TargetEntries } from './entries.ts';
 import { collectFindings, collectSupported, defaultLevels, loadSuggestions } from './findings.ts';
 import type { SupportedApi } from './findings.ts';
@@ -53,7 +53,7 @@ function describeNodeEnv(nodeEnv: string | undefined, fromConfig: boolean): stri
 
 async function checkTarget(
   target: Target,
-  { entries, note }: TargetEntries,
+  { entries, source, note }: TargetEntries,
   root: string,
   options: CheckOptions,
 ): Promise<TargetReport> {
@@ -87,7 +87,7 @@ async function checkTarget(
   return {
     target: {
       ...target.info,
-      settings: `${target.info.settings}, ${describeNodeEnv(nodeEnv, config.env?.NODE_ENV !== undefined)}`,
+      settings: `${target.info.settings}, ${describeEntries(entries)} (from ${source}), ${describeNodeEnv(nodeEnv, config.env?.NODE_ENV !== undefined)}`,
       conditions,
       notes: [...target.info.notes, ...(note === undefined ? [] : [note]), ...notes],
     },
@@ -109,11 +109,20 @@ export async function check(options: CheckOptions = {}): Promise<CheckResult> {
   const entries: TargetEntries[] =
     built === undefined
       ? entriesFor(root, targets, config)
-      : targets.map(() => ({ entries: [builtEntry(root, built)], note: undefined }));
+      : targets.map(() => ({
+          entries: [builtEntry(root, built)],
+          source: '--built',
+          note: undefined,
+        }));
   const pending: Promise<TargetReport>[] = [];
   for (const [index, target] of targets.entries()) {
     pending.push(
-      checkTarget(target, entries[index] ?? { entries: [], note: undefined }, root, options),
+      checkTarget(
+        target,
+        entries[index] ?? { entries: [], source: '', note: undefined },
+        root,
+        options,
+      ),
     );
   }
   const reports = await Promise.all(pending);

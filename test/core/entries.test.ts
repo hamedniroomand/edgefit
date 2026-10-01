@@ -3,9 +3,8 @@ import { describe, expect, it } from 'vite-plus/test';
 import { parseCheckArgs } from '@/cli/args.ts';
 import { run } from '@/cli/run.ts';
 import { check } from '@/core/check.ts';
-import { expandEntries } from '@/core/entries.ts';
+import { describeEntries, expandEntries } from '@/core/entries.ts';
 import { formatJson } from '@/report/json.ts';
-import { describeEntries } from '@/report/text.ts';
 import { captureIo, edgefitError, fixture } from '~/helpers.ts';
 
 const root = fixture('entries');
@@ -84,8 +83,10 @@ describe('entries per target', () => {
     const [workerd, bun] = result.reports;
     expect(workerd?.entries).toEqual(['src/index.ts']);
     expect(bun?.entries).toEqual(['src/index.ts']);
-    expect(bun?.target.notes.join('\n')).toContain('entries of workerd: src/index.ts');
-    expect(workerd?.target.notes.join('\n')).not.toContain('entries of workerd');
+    expect(bun?.target.settings).toContain(
+      'entry src/index.ts (from workerd: wrangler.jsonc "main")',
+    );
+    expect(workerd?.target.settings).toContain('entry src/index.ts (from wrangler.jsonc "main")');
   });
 
   it('lets an explicit entry win for every target', async () => {

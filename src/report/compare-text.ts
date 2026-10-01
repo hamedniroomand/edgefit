@@ -1,9 +1,10 @@
 import type { CheckResult } from '@/core/check.ts';
+import { describeEntries } from '@/core/entries.ts';
 
 import { compareRows } from './compare.ts';
 import type { CompareCell, CompareOptions, CompareRow } from './compare.ts';
 import { summaryLine } from './summary.ts';
-import { describeEntries, formatFinding, painter } from './text.ts';
+import { formatFinding, painter } from './text.ts';
 import type { Paint, TextOptions } from './text.ts';
 
 export interface CompareTextOptions extends TextOptions, CompareOptions {

@@ -7,6 +7,8 @@ import { EdgefitError } from '@/errors.ts';
 import { readImportMapFile } from '@/targets/deno/deno-config.ts';
 import type { ImportMap } from '@/targets/deno/import-map.ts';
 import { createDenoTarget } from '@/targets/deno/index.ts';
+import { detectEntries } from '@/targets/entries.ts';
+import type { EntryDetection } from '@/targets/entries.ts';
 import type { Target } from '@/targets/target.ts';
 import type { NetlifyOptions } from '@/types.ts';
 
@@ -77,13 +79,9 @@ function functionFile(directory: string, name: string): string | undefined {
 }
 
 interface EntryResult {
-  entries: string[];
+  entries: EntryDetection;
   notes: string[];
-  /** What to tell the user when there is no entry. */
-  hint: string | undefined;
 }
-
-const passEntry = 'Pass --entry, or set `entry` in edgefit.config.ts.';
 
 /** Every function Netlify would run: source files in the directory, and `name/index.ts` folders. */
 function listFunctions(directory: string): string[] {
@@ -104,33 +102,40 @@ function findEntries(root: string, config: NetlifyConfig | undefined): EntryResu
     config?.directory ?? defaultDirectory,
   );
   const shown = path.relative(root, directory);
-  if (!existsSync(directory)) {
-    const message = `No ${shown} directory found.`;
-    return {
-      entries: [],
-      notes: [`${message} Pass --entry.`],
-      hint: `${message} ${passEntry}`,
-    };
-  }
-  const declared = [...new Set(config?.functions ?? [])];
-  const found = declared.map(name => ({ name, file: functionFile(directory, name) }));
-  const notes = found.flatMap(({ name, file }) =>
-    file === undefined
+  const exists = existsSync(directory);
+  const declared = [...new Set(config?.functions ?? [])].map(name => ({
+    name,
+    file: exists ? functionFile(directory, name) : undefined,
+  }));
+  const listed = exists ? listFunctions(directory) : [];
+  const toEntries = (files: string[]): string[] =>
+    files.map(file => path.relative(root, file)).sort();
+  const notes = declared.flatMap(({ name, file }) =>
+    exists && file === undefined
       ? [`Function ${name} is declared in netlify.toml but not found in ${shown}.`]
       : [],
   );
-  const files =
-    declared.length > 0 ? found.flatMap(({ file }) => file ?? []) : listFunctions(directory);
-  const entries = files.map(file => path.relative(root, file)).sort();
-  if (entries.length === 0) {
-    const message = `No edge function found in ${shown}.`;
-    return {
-      entries,
-      notes: [...notes, `${message} Pass --entry.`],
-      hint: `${message} ${passEntry}`,
-    };
+  if (!exists) {
+    notes.push(`No ${shown} directory found.`);
+  } else if (listed.length === 0) {
+    notes.push(`No edge function found in ${shown}.`);
   }
-  return { entries, notes, hint: undefined };
+  const entries = detectEntries(
+    [
+      {
+        label: '[[edge_functions]] in netlify.toml',
+        guessed: false,
+        find: (): string[] => toEntries(declared.flatMap(({ file }) => file ?? [])),
+      },
+      {
+        label: `the ${shown} directory${exists ? '' : ' (not found)'}`,
+        guessed: false,
+        find: (): string[] => toEntries(listed),
+      },
+    ],
+    false,
+  );
+  return { entries, notes };
 }
 
 interface ImportMapResult {
@@ -165,7 +170,7 @@ function loadImportMap(root: string, config: NetlifyConfig | undefined): ImportM
 
 export function createNetlifyEdgeTarget(root: string, netlify: NetlifyOptions = {}): Target {
   const config = loadConfig(root, netlify.configFile);
-  const { entries, notes, hint } = findEntries(root, config);
+  const { entries, notes } = findEntries(root, config);
   const map = loadImportMap(root, config);
   let configNote = 'no netlify.toml found, no import map';
   if (config !== undefined) {
@@ -175,8 +180,7 @@ export function createNetlifyEdgeTarget(root: string, netlify: NetlifyOptions = 
   return createDenoTarget(root, {
     netlify: {
       importMap: map.importMap,
-      defaultEntries: entries,
-      entryHint: hint,
+      entries,
       notes: [
         'Packages are resolved with the `node` condition: @netlify/edge-bundler 16.1.1 bundles npm dependencies with esbuild for the node platform and passes no conditions (dist/node/npm_dependencies.js). It also picks `module`, `browser` then `main` fields and defines `process.env.NODE_ENV` as production, which edgefit does not apply.',
         "Netlify's docs name no blocked Node.js APIs. The Deno version is the minimum @netlify/edge-bundler requires, not the one Netlify runs.",

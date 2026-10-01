@@ -126,17 +126,14 @@ describe('vercel-edge target info', () => {
 
   it('names the docs date and says the data is not from production', () => {
     expect(target.info.data).toContain('allowlist/vercel-edge (vercel-edge 2026-08-03)');
-    expect(target.info.settings).toBe(
-      'Vercel Edge runtime as documented on 2026-08-03, no middleware file found',
-    );
+    expect(target.info.settings).toBe('Vercel Edge runtime as documented on 2026-08-03');
     expect(target.info.notes.join('\n')).toContain('not on a run in production');
     expect(target.info.notes.join('\n')).toContain('recommends the Node.js runtime');
   });
 
   it('uses middleware.ts as the entry', () => {
-    const { info, defaultEntries } = createVercelEdgeTarget(fixture('vercel-app'));
-    expect(defaultEntries).toEqual(['middleware.ts']);
-    expect(info.settings).toContain('entry middleware.ts');
+    const { entries } = createVercelEdgeTarget(fixture('vercel-app'));
+    expect(entries.exact?.files).toEqual(['middleware.ts']);
   });
 });
 
@@ -190,7 +187,7 @@ describe('vercel-edge without an entry', () => {
     const error = await edgefitError(
       check({ root: emptyProject, config: { targets: ['vercel-edge'] } }),
     );
-    expect(error.hint).toContain('No middleware file found.');
+    expect(error.hint).toContain('vercel-edge: middleware.{ts,js,mts,mjs}');
     expect(error.hint).not.toContain('wrangler');
   });
 });
@@ -198,8 +195,7 @@ describe('vercel-edge without an entry', () => {
 describe('vercel-edge middleware that picks its own runtime', () => {
   it('skips a middleware that sets runtime nodejs, and says why', async () => {
     const target = createVercelEdgeTarget(fixture('vercel-node-middleware'));
-    expect(target.defaultEntries).toEqual([]);
-    expect(target.info.settings).toContain('middleware.ts runs on Node.js');
+    expect(target.entries.exact).toBeUndefined();
     expect(target.info.notes.join('\n')).toContain("middleware.ts sets runtime 'nodejs'");
     const error = await edgefitError(
       check({ root: fixture('vercel-node-middleware'), config: { targets: ['vercel-edge'] } }),
@@ -208,10 +204,12 @@ describe('vercel-edge middleware that picks its own runtime', () => {
   });
 
   it('keeps a middleware that sets runtime edge, or no runtime', () => {
-    expect(createVercelEdgeTarget(fixture('vercel-edge-config')).defaultEntries).toEqual([
+    expect(createVercelEdgeTarget(fixture('vercel-edge-config')).entries.exact?.files).toEqual([
       'middleware.ts',
     ]);
-    expect(createVercelEdgeTarget(fixture('vercel-app')).defaultEntries).toEqual(['middleware.ts']);
+    expect(createVercelEdgeTarget(fixture('vercel-app')).entries.exact?.files).toEqual([
+      'middleware.ts',
+    ]);
   });
 });
 
