@@ -38,8 +38,11 @@ edgefit checks the code a project reaches, and traces which exports of each modu
 Everything in a module counts when it cannot be told which parts are used:
 
 - the module runs code when it loads: top-level calls, assignments, and classes with static members, decorators or computed keys. What that code uses counts, and so does every function it names
-- it is imported as a namespace (`import * as lib`), with `import()` or `require()`, or has its exports read as a whole (CommonJS, `module.exports`, `export =`)
+- it is imported as a namespace (`import * as lib`), with `import()`, or with a `require()` whose result is used as a whole, or has its exports read as a whole (`export =`)
+- it is CommonJS and its exports cannot be read by name. These are read: `exports.name = …`, `module.exports = { … }`, `module.exports = require('…')`, `Object.defineProperty(exports, 'name', …)`, and the getter helpers that TypeScript and SWC emit (`_export(exports, { … })`, `_export_star`). A computed export name, `module.exports` set to something else, code that reads `exports` or `module` in any other way, or a mix of `module.exports =` and `exports.name =` writes counts as a whole
 - it is build output. Build output has been through a bundler's own tree shaking, so [`--built`](/guide/built-output) checks it in full
+
+What a CommonJS module asks of a module it `require`s is the members that are read from the result (`const dep = require('dep')` with `dep.name`, `const { name } = require('dep')`, `require('dep').name`, also through `_interop_require_default` and `_interop_require_wildcard`). The result used in any other way asks for all of it.
 
 A name counts as used when any used code mentions it. A property or a local variable of the same name also counts, which can only keep a finding, never hide one.
 
