@@ -1,5 +1,3 @@
-import path from 'node:path';
-
 import { build } from 'esbuild';
 import type { Loader, Message, Metafile, Plugin } from 'esbuild';
 
@@ -125,12 +123,6 @@ export async function resolveGraph(options: ResolveOptions): Promise<ModuleGraph
     const externals = input.imports.filter(item => item.external === true).map(item => item.path);
     modules.set(file, { imports, links, externals });
   }
-  const bundled = Object.values(metafile.outputs).flatMap(output => output.entryPoint ?? []);
-  const entries =
-    bundled.length > 0
-      ? bundled
-      : options.entries.map(entry =>
-          path.relative(options.root, path.resolve(options.root, entry)),
-        );
+  const entries = Object.values(metafile.outputs).flatMap(output => output.entryPoint ?? []);
   return { entries: [...new Set(entries)], modules };
 }

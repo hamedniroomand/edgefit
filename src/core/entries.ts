@@ -8,11 +8,7 @@ import type { EdgefitConfig } from '@/types.ts';
 const globCharacters = /[*?[\]{}]/u;
 
 function isFile(file: string): boolean {
-  try {
-    return statSync(file).isFile();
-  } catch {
-    return false;
-  }
+  return statSync(file, { throwIfNoEntry: false })?.isFile() === true;
 }
 
 function matchPattern(root: string, pattern: string): string[] {

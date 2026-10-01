@@ -1,4 +1,4 @@
-import { mkdtempSync } from 'node:fs';
+import { mkdirSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -72,6 +72,16 @@ describe('netlify-edge entry detection', () => {
     expect(target.defaultEntries).toEqual([]);
     expect(target.info.settings).toContain('no netlify.toml found');
     expect(target.info.notes.join('\n')).toContain('No netlify/edge-functions directory');
+  });
+
+  it('reports an edge functions directory that holds no function', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'edgefit-netlify-'));
+    mkdirSync(path.join(root, 'netlify/edge-functions'), { recursive: true });
+    const target = createNetlifyEdgeTarget(root);
+    expect(target.defaultEntries).toEqual([]);
+    expect(target.info.notes.join('\n')).toContain(
+      'No edge function found in netlify/edge-functions.',
+    );
   });
 
   it('ignores netlify.toml when configFile is false', () => {

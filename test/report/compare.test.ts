@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import type { CheckResult, TargetReport } from '@/core/check.ts';
+import { formatCompareText } from '@/report/compare-text.ts';
 import { compareRows } from '@/report/compare.ts';
 import type { Category, Finding, PackageInfo, TargetKey } from '@/types.ts';
 
@@ -77,5 +78,30 @@ describe('compare rows', () => {
       'node:fs.watch',
       'node:net.connect',
     ]);
+  });
+});
+
+describe('compare header', () => {
+  const options = { color: false, all: false, verbose: false };
+
+  it('names the entries once when every target checks the same ones', () => {
+    const same: CheckResult = {
+      root: '/project',
+      reports: [report('workerd', {}), report('bun', {})],
+    };
+    expect(formatCompareText(same, options)).toContain('edgefit compare · entry src/index.ts');
+  });
+
+  it('names the entries of each target when they differ', () => {
+    const differ: CheckResult = {
+      root: '/project',
+      reports: [
+        report('workerd', {}),
+        report('netlify-edge', { entries: ['netlify/a.ts', 'netlify/b.ts'] }),
+      ],
+    };
+    const text = formatCompareText(differ, options);
+    expect(text).toContain('  workerd: entry src/index.ts\n');
+    expect(text).toContain('  netlify-edge: entries netlify/a.ts, netlify/b.ts\n');
   });
 });
