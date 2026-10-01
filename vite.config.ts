@@ -58,8 +58,10 @@ export default defineConfig({
     },
     jsPlugins: [{ name: 'vite-plus', specifier: 'vite-plus/oxlint-plugin' }],
     options: { typeAware: true, typeCheck: true },
-    plugins: ['vue', 'import', 'oxc', 'promise', 'unicorn', 'typescript', 'eslint'],
+    plugins: ['vue', 'import', 'oxc', 'promise', 'unicorn', 'typescript', 'eslint', 'vitest'],
     rules: {
+      'vitest/no-conditional-in-test': 'off',
+      'vitest/require-test-timeout': 'off',
       'vite-plus/prefer-vite-plus-imports': 'error',
       'prefer-const': ['error', { destructuring: 'all' }],
       'prefer-template': 'error',
@@ -116,5 +118,9 @@ export default defineConfig({
         },
       },
     ],
+    coverage: {
+      reporter: ['text', 'html', 'clover', 'json', 'lcov'],
+      thresholds: { statements: 93, branches: 88, functions: 95, lines: 93 },
+    },
   },
 });
