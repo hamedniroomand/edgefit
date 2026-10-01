@@ -1,0 +1,7 @@
+{
+  // A library that picks its development or production build with process.env.NODE_ENV, as React does.
+  "name": "fixture-node-env-app",
+  "main": "src/index.js",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}

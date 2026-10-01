@@ -25,6 +25,7 @@ export interface ScanOptions {
   trace: boolean;
   /** The target's platform stubs out a Node.js module it lacks, so only reading from one fails. */
   lazyNodeImports?: boolean;
+  nodeEnv: string | undefined;
 }
 
 /** Extracts runtime API usages from every script in the graph, with its package and import chain. */
@@ -47,6 +48,7 @@ export function scanModules(
           globals,
           shape: options.trace,
           lazyNodeImports: options.lazyNodeImports,
+          nodeEnv: options.nodeEnv,
         }),
         unchecked: uncheckedImports(posixFile, source, module.externals),
       };

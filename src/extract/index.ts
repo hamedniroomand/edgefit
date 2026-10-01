@@ -11,6 +11,8 @@ import { Walker } from './walker.ts';
 export interface ExtractOptions {
   /** Global names worth tracking, such as `process` and `Buffer`. */
   globals: ReadonlySet<string>;
+  /** What `process.env.NODE_ENV` is replaced with, or `undefined` when it is not fixed. */
+  nodeEnv: string | undefined;
   /** Also split the module into the pieces that run on load and the pieces that wait to be used. */
   shape?: boolean;
   /** The target's platform stubs out a Node.js module it lacks, so only reading from one fails. */
@@ -75,7 +77,7 @@ export function extractModule(
     );
     return { usages: collector.usages, offsets: collector.offsets, shape: undefined };
   }
-  new Walker(collector, options.globals).visit(result.program as Node);
+  new Walker(collector, options.globals, options.nodeEnv).visit(result.program as Node);
   return {
     usages: collector.usages,
     offsets: collector.offsets,

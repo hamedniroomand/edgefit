@@ -236,3 +236,40 @@ describe('check with unused exports', () => {
     ]);
   });
 });
+
+describe('check with process.env.NODE_ENV', () => {
+  it('does not follow the development build of a library', async () => {
+    const [report] = (await check({ root: fixture('node-env-app') })).reports;
+    expect(report?.findings).toEqual([]);
+    expect(report?.modules).toBe(3);
+  });
+
+  it('says which NODE_ENV the result assumes', async () => {
+    const [workerd] = (await check({ root: fixture('node-env-app') })).reports;
+    expect(workerd?.target.settings).toContain("NODE_ENV production (as the platform's build)");
+    const config = {
+      targets: ['bun' as const],
+      entry: 'src/index.js',
+      env: { NODE_ENV: 'development' },
+    };
+    const [bun] = (await check({ root: fixture('node-env-app'), config })).reports;
+    expect(bun?.target.settings).toContain('NODE_ENV development (from the config)');
+  });
+
+  it('follows both branches on Bun and Deno, which set no NODE_ENV', async () => {
+    const root = fixture('node-env-app');
+    const bun = await check({ root, config: { targets: ['bun'], entry: 'src/index.js' } });
+    const deno = await check({ root, config: { targets: ['deno'], entry: 'src/index.js' } });
+    const results = [bun, deno];
+    for (const { reports } of results) {
+      expect(reports[0]?.modules).toBe(4);
+      expect(reports[0]?.target.settings).toContain('NODE_ENV not fixed');
+    }
+  });
+
+  it('checks the development build when the config asks for it', async () => {
+    const config = { env: { NODE_ENV: 'development' } };
+    const [report] = (await check({ root: fixture('node-env-app'), config })).reports;
+    expect(report?.findings.map(finding => finding.api)).toEqual(['node:fs.watch']);
+  });
+});

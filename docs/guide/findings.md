@@ -163,6 +163,12 @@ These checks name a runtime:
 
 The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
 
+### Production builds
+
+Every bundler replaces `process.env.NODE_ENV` with a constant for a production build and drops the code that the constant rules out. edgefit does the same on `workerd`, `netlify-edge` and `vercel-edge`, with `production` as the constant. Bun and Deno set no value, so on those targets both branches are checked. A comparison of `process.env.NODE_ENV` with a string decides which branch runs, in an `if`, `?:`, `&&`, `||`, an `else` branch, a guard clause, and a helper or `const` that holds the check. The branch that does not run is not checked, and an `import` or `require` in it is not followed. This is how React's development build, with its `MessageChannel`, stays out of a report.
+
+To check the development build, set `env: { NODE_ENV: 'development' }` in the [config](/guide/configuration#environment).
+
 ### Helpers
 
 A check kept in a helper is understood when the helper is in the same file, has no parameters, is not `async`, and does nothing but return the check. So is a `const` that holds one:

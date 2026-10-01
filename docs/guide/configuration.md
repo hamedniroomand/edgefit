@@ -130,6 +130,16 @@ export default defineConfig({
 
 Used by `netlify-edge`. By default edgefit looks for `netlify.toml` in the root, for the edge functions and the `deno_import_map` file. Set `configFile: false` to skip it. See [Netlify Edge Functions](/targets/netlify-edge).
 
+## Environment
+
+edgefit treats `process.env.NODE_ENV` as a constant, as the platform's production build does, so code that only runs in development is not checked. The default is what the platform's build uses: `production` on `workerd`, `netlify-edge` and `vercel-edge`. Bun and Deno set no value, so on `bun`, `deno` and `deno-deploy` both branches of a check are followed. The report says which one was used. To set a value, for example to check the development build:
+
+```ts
+export default defineConfig({
+  env: { NODE_ENV: 'development' },
+});
+```
+
 ## Export conditions
 
 Add conditions that are checked before the target's own, for example when your bundler is configured with a custom one:

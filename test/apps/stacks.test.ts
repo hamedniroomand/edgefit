@@ -54,25 +54,21 @@ describe.skipIf(!installed).each([
 /**
  * Next.js middleware, the main use of vercel-edge, with next installed from npm. Next branches
  * on `process.env.NEXT_RUNTIME`, which its edge build replaces with 'edge', so the Node-only
- * branches (`process.nextTick`, `setImmediate`) must be guarded, not errors. Two findings remain
- * and are pinned here so a change is noticed; neither is something the middleware runs:
- * - `process.cwd` is in next's server rendering code, reached through the CommonJS barrel of
- *   `next/server`, which is checked in full.
- * - `MessageChannel` is in React's development build, which every bundler drops for production.
- *   edgefit follows `process.env.NODE_ENV !== 'production'` branches on every target.
+ * branches (`process.nextTick`, `setImmediate`) must be guarded, not errors. One finding remains
+ * and is pinned here so a change is noticed; the middleware does not run it: `process.cwd` is in
+ * next's server rendering code, reached through the CommonJS barrel of `next/server`, which is
+ * checked in full. React's development build, which has `MessageChannel`, is not reached,
+ * because `process.env.NODE_ENV` is `production`.
  */
 describe.skipIf(!installed)('next.js middleware on vercel-edge', () => {
-  it('guards what the edge build removes and reports only the two known leftovers', async () => {
+  it('guards what the edge build removes and reports only the known leftover', async () => {
     const result = await check({
       root: sampleApp('next-middleware'),
       config: { targets: ['vercel-edge'] },
     });
     const [report] = result.reports;
     expect(report?.entry).toBe('middleware.ts');
-    expect(report?.findings.map(finding => finding.api)).toEqual([
-      'node:process.cwd',
-      'MessageChannel',
-    ]);
+    expect(report?.findings.map(finding => finding.api)).toEqual(['node:process.cwd']);
     expect(report?.guarded.map(finding => finding.api)).toEqual(
       expect.arrayContaining(['node:process.nextTick', 'setImmediate']),
     );

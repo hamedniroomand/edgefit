@@ -30,6 +30,7 @@ export default defineConfig({
 | `bun`        | `BunOptions`                       |                 | Bun settings                                                                              |
 | `deno`       | `DenoOptions`                      |                 | Settings for `deno` and `deno-deploy`                                                     |
 | `netlify`    | `NetlifyOptions`                   |                 | Settings for `netlify-edge`                                                               |
+| `env`        | `EnvOptions`                       |                 | Constants a bundler replaces, see below                                                   |
 
 ## `ignore`
 
@@ -76,6 +77,12 @@ Each rule needs `package`, `api`, or both.
 | Field        | Type              | Default                                                         |
 | ------------ | ----------------- | --------------------------------------------------------------- |
 | `configFile` | `string \| false` | `netlify.toml` in the root. `false` skips it and its import map |
+
+## `env`
+
+| Field      | Type     | Default   | Description                                                                                                                                                                                      |
+| ---------- | -------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NODE_ENV` | `string` | by target | What `process.env.NODE_ENV` is replaced with. Code the value rules out is not checked. `production` on `workerd`, `netlify-edge` and `vercel-edge`; not fixed on `bun`, `deno` and `deno-deploy` |
 
 ## Validation
 

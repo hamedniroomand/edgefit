@@ -115,12 +115,9 @@ export function markerType(node: Node, context: BindingContext): string | undefi
   return markerTypes.get(name) ?? (versionRuntimes.has(name) ? 'string' : undefined);
 }
 
-function isNextRuntime(node: Node, context: BindingContext): boolean {
+function isEnvVariable(node: Node, name: string, context: BindingContext): boolean {
   const inner = strip(node);
-  if (
-    inner.type !== 'MemberExpression' ||
-    staticKey(inner.property, inner.computed) !== 'NEXT_RUNTIME'
-  ) {
+  if (inner.type !== 'MemberExpression' || staticKey(inner.property, inner.computed) !== name) {
     return false;
   }
   const env = strip(inner.object);
@@ -129,6 +126,25 @@ function isNextRuntime(node: Node, context: BindingContext): boolean {
     staticKey(env.property, env.computed) === 'env' &&
     isProcess(env.object, context)
   );
+}
+
+function isNextRuntime(node: Node, context: BindingContext): boolean {
+  return isEnvVariable(node, 'NEXT_RUNTIME', context);
+}
+
+/**
+ * Whether a comparison of `process.env.NODE_ENV` with a string is true, as a bundler sees it: it
+ * replaces the variable with a constant. Returns `undefined` for any other comparison.
+ */
+export function nodeEnvMatches(node: Node, context: BindingContext): boolean | undefined {
+  if (node.type !== 'BinaryExpression') {
+    return undefined;
+  }
+  const [value, literal] = isEnvVariable(node.left, 'NODE_ENV', context)
+    ? [node.left, node.right]
+    : [node.right, node.left];
+  const text = isEnvVariable(value, 'NODE_ENV', context) ? stringLiteral(literal) : undefined;
+  return text === undefined || context.nodeEnv === undefined ? undefined : text === context.nodeEnv;
 }
 
 /**

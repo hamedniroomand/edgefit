@@ -23,6 +23,8 @@ export interface Target {
   readonly resolvePlatform: 'browser' | 'node';
   /** esbuild plugins for specifiers only this target understands, such as Deno's `npm:`. */
   readonly resolvePlugins?: readonly Plugin[];
+  /** What the platform's build replaces `process.env.NODE_ENV` with, or `undefined` when it sets none. */
+  readonly nodeEnv: string | undefined;
   /** An entry point the target's own config declares, such as wrangler's `main`. */
   readonly defaultEntry: string | undefined;
   /**

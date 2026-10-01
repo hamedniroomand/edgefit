@@ -21,7 +21,12 @@ export interface RuntimeGuard {
   condition: RuntimeCondition;
 }
 
-export type Guard = ApiGuard | RuntimeGuard;
+/** The code never runs, because a bundler removes it: `process.env.NODE_ENV` is a constant. */
+export interface DeadGuard {
+  kind: 'dead';
+}
+
+export type Guard = ApiGuard | RuntimeGuard | DeadGuard;
 
 /** Whether `ref` is `guard.ref` or something below it. */
 function isCovered(guard: ApiGuard, ref: ApiRef): boolean {
@@ -113,6 +118,9 @@ export class GuardStack {
   /** Whether `ref` is only used where it exists, or where a `catch` stops the error of its absence. */
   public readonly covers = (ref: ApiRef): boolean =>
     this.#caught > 0 || this.#guards.some(guard => guard.kind === 'api' && isCovered(guard, ref));
+
+  /** Whether a bundler removes the code at this point. */
+  public readonly dead = (): boolean => this.#guards.some(guard => guard.kind === 'dead');
 
   /** What is known of the runtime at this point. */
   public readonly runtimes = (): RuntimeCondition[] =>

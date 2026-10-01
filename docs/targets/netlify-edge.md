@@ -47,7 +47,7 @@ edgefit applies that file to your own code, so this target ignores `deno.json` a
 
 Packages are resolved with the `node` condition, then `import` and `default`, and not with `deno`. `@netlify/edge-bundler` bundles npm dependencies with esbuild for the node platform and passes no conditions (`dist/node/npm_dependencies.js` in 16.1.1), so a package's `deno` build is not what Netlify uses.
 
-Two other things the bundler does are not applied: it reads the `module`, `browser` and then `main` fields, and it defines `process.env.NODE_ENV` as `production`, which drops development branches. It also injects `process`, `Buffer` and `setImmediate` for npm dependencies.
+The bundler defines `process.env.NODE_ENV` as `production`, and so does edgefit. Two other things it does are not applied: it reads the `module`, `browser` and then `main` fields, and it injects `process`, `Buffer` and `setImmediate` for npm dependencies.
 
 ## Runtime checks
 

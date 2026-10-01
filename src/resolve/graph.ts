@@ -35,6 +35,8 @@ export interface ResolveOptions {
   entry: string;
   conditions: readonly string[];
   platform: 'browser' | 'node';
+  /** What `process.env.NODE_ENV` is replaced with, so an import in a removed branch is not followed. */
+  nodeEnv: string | undefined;
   /** Target resolvers that run before edgefit's own. */
   plugins?: readonly Plugin[];
 }
@@ -78,6 +80,10 @@ function isBuildFailure(error: unknown): error is { errors: Message[] } {
 }
 
 async function bundleMetafile(options: ResolveOptions): Promise<Metafile> {
+  const define: Record<string, string> = {};
+  if (options.nodeEnv !== undefined) {
+    define['process.env.NODE_ENV'] = JSON.stringify(options.nodeEnv);
+  }
   try {
     const result = await build({
       absWorkingDir: options.root,
@@ -91,6 +97,7 @@ async function bundleMetafile(options: ResolveOptions): Promise<Metafile> {
       conditions: [...options.conditions],
       mainFields: mainFields[options.platform],
       loader: assetLoaders,
+      define,
       logLevel: 'silent',
       plugins: [...(options.plugins ?? []), runtimeExternals],
     });

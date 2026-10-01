@@ -14,6 +14,7 @@ import {
   markerType,
   memberRuntime,
   nextRuntimeEdge,
+  nodeEnvMatches,
   runtimeMarker,
 } from './runtimes.ts';
 import { isTracked, lookup, lookupCheck } from './scope.ts';
@@ -97,6 +98,10 @@ function comparisonGuard(
     return undefined;
   }
   const equal = isEquality(node.operator) ? truth : !truth;
+  const matches = nodeEnvMatches(node, context);
+  if (matches !== undefined) {
+    return matches === equal ? [] : [{ kind: 'dead' }];
+  }
   const typed = typeofGuard(node, truth, context);
   if (typed !== undefined) {
     return typed;
@@ -131,7 +136,11 @@ function checkGuards(node: Node, truth: boolean, context: BindingContext): Guard
   }
   check.busy = true;
   try {
-    return guardsWhen(check.test, truth, { scope: check.scope, globals: context.globals });
+    return guardsWhen(check.test, truth, {
+      scope: check.scope,
+      globals: context.globals,
+      nodeEnv: context.nodeEnv,
+    });
   } finally {
     check.busy = false;
   }

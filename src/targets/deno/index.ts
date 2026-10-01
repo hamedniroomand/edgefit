@@ -120,6 +120,7 @@ export function createDenoTarget(root: string, options: DenoTargetOptions = {}):
     },
     runtimes,
     resolvePlatform: 'node',
+    nodeEnv: netlify ? 'production' : undefined,
     resolvePlugins: [denoSpecifiers(netlify ? netlify.importMap : config?.importMap)],
     defaultEntry: netlify?.defaultEntry,
     entryHint: netlify?.entryHint,

@@ -30,7 +30,7 @@ export function reached(
   for (const [file, { code, imports = {} }] of Object.entries(files)) {
     const links = linksOf(imports);
     graph.modules.set(file, { imports: links.map(link => link.path), links, externals: [] });
-    modules.set(file, extractModule(file, code, { globals, shape: true }));
+    modules.set(file, extractModule(file, code, { globals, shape: true, nodeEnv: 'production' }));
   }
   return Object.fromEntries(
     [...reachedUsages(graph, modules)].map(([file, usages]) => [
