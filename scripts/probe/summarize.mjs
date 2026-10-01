@@ -5,6 +5,7 @@ import path from 'node:path';
 
 import { compareOutcomes, proposeOverrides } from './compare.mjs';
 import { pinnedVersion, readMatrix, readOverrides } from './data.mjs';
+import { summarizeDisagreements } from './disagreements.mjs';
 import { driftFor } from './drift.mjs';
 
 const [runtime, channel, resultsFile, probesDirectory] = process.argv.slice(2);
@@ -20,7 +21,7 @@ const heading = `## ${runtime} ${version} (${channel}, pinned ${pinnedVersion(ru
 const intro =
   channel === 'netlify-min'
     ? [
-        `The oldest Deno Netlify's bundler supports is ${version}, and the data describes ${pinnedVersion(runtime)}. Each line is an API where they differ; Netlify's production version is not documented, so this informs a review and changes no data.`,
+        `The oldest Deno Netlify's bundler supports is ${version}, and the data describes ${pinnedVersion(runtime)}. The APIs where they differ are grouped by module below, with the full list folded away. Netlify's production version is not documented, so this informs a review and changes no data.`,
         '',
       ]
     : [];
@@ -49,16 +50,8 @@ if (channel === 'latest') {
     ...proposed,
   ];
 } else {
-  const disagreements = compareOutcomes(outcomes, overrides, readMatrix(runtime)).map(
-    ({ api, message }) => `\`${api}\`: ${message}`,
-  );
-  lines = [
-    heading,
-    '',
-    ...intro,
-    ...section('Disagreements with the overrides and the matrix', disagreements),
-    ...proposed,
-  ];
+  const disagreements = compareOutcomes(outcomes, overrides, readMatrix(runtime));
+  lines = [heading, '', ...intro, ...summarizeDisagreements(disagreements, outcomes), ...proposed];
 }
 console.log(lines.length > 2 ? lines.join('\n') : `${lines.join('\n')}\nNo disagreements.\n`);
 

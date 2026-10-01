@@ -16,7 +16,11 @@ describe('compareOutcomes', () => {
         {},
       ),
     ).toEqual([
-      { api: 'v8.takeCoverage', message: 'override says `unsupported`, probe says `implemented`' },
+      {
+        api: 'v8.takeCoverage',
+        message: 'override says `unsupported`, probe says `implemented`',
+        dataSaysPresent: false,
+      },
     ]);
   });
 
@@ -30,12 +34,18 @@ describe('compareOutcomes', () => {
       1,
     );
   });
+});
 
+describe('compareOutcomes against the matrix', () => {
   it('reports matrix disagreements only for APIs without an override', () => {
     const matrix = { a: { x: 'function' } };
     expect(compareOutcomes({ 'a.x': 'missing', 'a.y': 'implemented' }, {}, matrix)).toEqual([
-      { api: 'a.x', message: 'matrix says `present`, probe says `missing`' },
-      { api: 'a.y', message: 'matrix says `missing`, probe says `implemented`' },
+      { api: 'a.x', message: 'matrix says `present`, probe says `missing`', dataSaysPresent: true },
+      {
+        api: 'a.y',
+        message: 'matrix says `missing`, probe says `implemented`',
+        dataSaysPresent: false,
+      },
     ]);
     expect(
       compareOutcomes({ 'a.x': 'missing' }, { 'a.x': override('unsupported') }, matrix),
