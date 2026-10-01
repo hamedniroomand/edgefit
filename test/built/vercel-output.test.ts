@@ -23,7 +23,10 @@ describe('reading a Vercel Build Output API layout', () => {
       `${functions}/api/edge.func/server/index.js`,
       `${functions}/middleware.func/index.js`,
     ]);
-    expect(unreadable).toEqual([`${functions}/bad.func/.vc-config.json`]);
+    expect(unreadable).toEqual([
+      `${functions}/bad.func/.vc-config.json`,
+      `${functions}/null.func/.vc-config.json`,
+    ]);
   });
 
   it('skips Node.js functions, a missing entrypoint and a symlink to a function', () => {
