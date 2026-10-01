@@ -1,6 +1,6 @@
 import { styleText } from 'node:util';
 
-import type { CheckResult, TargetReport } from '@/core/check.ts';
+import type { CheckResult, SkippedTarget, TargetReport } from '@/core/check.ts';
 import { describeEntries } from '@/core/entries.ts';
 import { formatPackage } from '@/resolve/packages.ts';
 import type { Finding } from '@/types.ts';
@@ -11,6 +11,7 @@ import {
   fixSourceLine,
   formatLocation,
   ownerName,
+  skippedMessage,
   summaryLine,
 } from './summary.ts';
 
@@ -125,11 +126,10 @@ function formatGuarded(report: TargetReport, paint: Paint, verbose: boolean): st
 }
 
 /** One line for each target left out because it has no entry. */
-export function formatSkipped(result: CheckResult, paint: Paint): string[] {
-  return result.skipped.map(({ key, searched }) => {
-    const where = searched.length > 0 ? ` Searched: ${searched.join(', ')}.` : '';
-    return paint('yellow', `edgefit · ${key} skipped: no entry found.${where}`);
-  });
+export function formatSkipped(skipped: readonly SkippedTarget[], paint: Paint): string[] {
+  return skipped.map(target =>
+    paint('yellow', `edgefit · ${target.key} skipped: ${skippedMessage(target)}`),
+  );
 }
 
 export function formatText(result: CheckResult, options: TextOptions): string {
@@ -150,7 +150,7 @@ export function formatText(result: CheckResult, options: TextOptions): string {
     const tail = guarded.length > 0 ? `\n\n${guarded.join('\n\n')}` : '';
     return `${formatHeader(report, paint).join('\n')}\n\n${body}${tail}`;
   });
-  const skipped = formatSkipped(result, paint);
+  const skipped = formatSkipped(result.skipped, paint);
   const all = [...sections, ...(skipped.length > 0 ? [skipped.join('\n')] : [])];
   return `${all.join('\n\n')}\n\n${summaryLine(result)}\n`;
 }

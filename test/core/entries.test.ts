@@ -117,13 +117,12 @@ describe('a target without an entry', () => {
   it('is skipped, and the report says what it searched', async () => {
     const result = await check({ root: fixture('worker'), config });
     expect(result.reports.map(report => report.target.key)).toEqual(['workerd']);
-    expect(result.skipped).toEqual([
-      { key: 'vercel-edge', searched: ['middleware.{ts,js,mts,mjs}'] },
-    ]);
+    expect(result.skipped.map(({ key }) => key)).toEqual(['vercel-edge']);
+    expect(result.skipped[0]?.searched[0]).toContain('middleware.{ts,js,mts,mjs}');
     const io = captureIo(fixture('worker'));
     await run(['check', '--target', 'workerd', '--target', 'vercel-edge', '--no-color'], io);
     expect(io.output()).toContain(
-      'edgefit · vercel-edge skipped: no entry found. Searched: middleware.{ts,js,mts,mjs}.',
+      'edgefit · vercel-edge skipped: No entry found. Searched: middleware.{ts,js,mts,mjs}',
     );
   });
 

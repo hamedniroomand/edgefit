@@ -84,6 +84,7 @@ edgefit check --format json
 {
   "version": 2,
   "targets": ["workerd", "bun", "deno"],
+  "skipped": [],
   "apis": [
     {
       "api": "node:fs.watch",
@@ -94,7 +95,7 @@ edgefit check --format json
 }
 ```
 
-Each value in `results` is a category or `supported`. A target that does not reach the API, or where the finding was ignored or turned off, is left out of `results`.
+`skipped` is the same list as in the `check` report. Each value in `results` is a category or `supported`. A target that does not reach the API, or where the finding was ignored or turned off, is left out of `results`.
 
 ## package
 
@@ -133,8 +134,9 @@ The table's `results.json` lists one row per package with `name`, `file`, `resol
   "targets": ["workerd"],
   "new": [],
   "fixed": [],
-  "unchanged": []
+  "unchanged": [],
+  "skipped": []
 }
 ```
 
-Each list holds findings in the same shape as `check`. `targets` are the head report's targets.
+Each list holds findings in the same shape as `check`. `targets` are the head report's targets, and `skipped` is the head report's `skipped`: the targets left out because they have no entry. The text and GitHub output print them, so the Action's pull request comment shows them. A report written before `skipped` existed has none.

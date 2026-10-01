@@ -126,7 +126,7 @@ describe('netlify-edge without an entry', () => {
     const error = await edgefitError(check({ root, config: { targets: ['netlify-edge'] } }));
     expect(error.message).toBe('No entry point to scan.');
     expect(error.hint).toContain(
-      'netlify-edge: [[edge_functions]] in netlify.toml, the netlify/edge-functions directory (not found)',
+      'netlify-edge: [[edge_functions]] in netlify.toml, and functions that export config with a path, the netlify/edge-functions directory (not found)',
     );
     expect(error.hint).not.toContain('wrangler');
   });

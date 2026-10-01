@@ -1,0 +1,1 @@
+{ "name": "a", "scripts": { "start": "NODE_ENV=production bun run --hot src/app.ts" } }

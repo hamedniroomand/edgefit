@@ -37,6 +37,7 @@ describe('edgefit compare', () => {
     expect(JSON.parse(output)).toEqual({
       version: 2,
       targets: ['workerd', 'bun'],
+      skipped: [],
       apis: [
         {
           api: 'node:fs.watch',

@@ -73,7 +73,7 @@ export function formatCompareText(result: CheckResult, options: CompareTextOptio
     ...result.reports.flatMap(report =>
       report.target.notes.map(note => paint('yellow', `note (${report.target.key}): ${note}`)),
     ),
-    ...formatSkipped(result, paint),
+    ...formatSkipped(result.skipped, paint),
   ];
   if (rows.length === 0) {
     const clean = paint('green', 'No known incompatible reachable APIs found.');

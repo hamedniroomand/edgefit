@@ -1,0 +1,1 @@
+{ "tasks": { "start": "deno task dev", "dev": "deno serve -A server.ts" } }

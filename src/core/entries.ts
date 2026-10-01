@@ -1,21 +1,14 @@
-import { globSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 import { EdgefitError } from '@/errors.ts';
+import { globFiles } from '@/targets/glob-files.ts';
 import type { Target } from '@/targets/index.ts';
 import type { EdgefitConfig } from '@/types.ts';
 
 const globCharacters = /[*?[\]{}]/u;
 
-function isFile(file: string): boolean {
-  return statSync(file, { throwIfNoEntry: false })?.isFile() === true;
-}
-
 function matchPattern(root: string, pattern: string): string[] {
-  const matches = globSync(pattern, {
-    cwd: root,
-    exclude: name => path.basename(name) === 'node_modules',
-  }).filter(match => isFile(path.resolve(root, match)));
+  const matches = globFiles(root, pattern);
   if (matches.length === 0) {
     throw new EdgefitError(
       `No file matches the entry pattern ${pattern}.`,

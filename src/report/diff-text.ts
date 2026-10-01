@@ -2,7 +2,7 @@ import type { Finding } from '@/types.ts';
 
 import type { ReportDiff } from './diff.ts';
 import { chainLine, fixLine, fixSourceLine, formatLocation, ownerName } from './summary.ts';
-import { painter } from './text.ts';
+import { formatSkipped, painter } from './text.ts';
 import type { Paint, TextOptions } from './text.ts';
 
 export function diffSummaryLine(diff: ReportDiff): string {
@@ -53,5 +53,13 @@ export function formatDiffText(diff: ReportDiff, options: TextOptions): string {
     ...diff.added.map(finding => formatAdded(finding, paint)),
     ...diff.fixed.map(finding => formatFixed(finding, paint)),
   ];
-  return [header, ...blocks, diffSummaryLine(diff)].join('\n\n').concat('\n');
+  const skipped = formatSkipped(diff.skipped, paint);
+  return [
+    header,
+    ...blocks,
+    ...(skipped.length > 0 ? [skipped.join('\n')] : []),
+    diffSummaryLine(diff),
+  ]
+    .join('\n\n')
+    .concat('\n');
 }

@@ -8,6 +8,7 @@ export function formatCompareJson(result: CheckResult, options: CompareOptions):
   const report = {
     version: jsonReportVersion,
     targets: result.reports.map(report => report.target.key),
+    skipped: result.skipped,
     apis: compareRows(result, options).map(({ api, packages, results }) => ({
       api,
       packages,
