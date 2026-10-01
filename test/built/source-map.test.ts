@@ -1,5 +1,5 @@
 import { Buffer } from 'node:buffer';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -23,6 +23,21 @@ function writeOutput(code: string, files: Record<string, string> = {}): string {
   const file = path.join(directory, 'index.mjs');
   writeFileSync(file, code);
   return file;
+}
+
+/** A project with its output two folders down, whose map points three levels up for a package. */
+function layoutWithMap(): { directory: string; project: string; file: string } {
+  const directory = mkdtempSync(path.join(tmpdir(), 'edgefit-map-'));
+  const project = path.join(directory, 'project');
+  const output = path.join(project, '.out/functions');
+  mkdirSync(output, { recursive: true });
+  mkdirSync(path.join(directory, 'node_modules/pkg@1'), { recursive: true });
+  writeFileSync(path.join(directory, 'node_modules/pkg@1/index.js'), '');
+  const file = path.join(output, 'index.js');
+  writeFileSync(file, 'run();');
+  const sources = ['../../../node_modules/pkg%401/index.js'];
+  writeFileSync(`${file}.map`, JSON.stringify({ ...payload, sources }));
+  return { directory, project, file };
 }
 
 describe('OutputSourceMap', () => {
@@ -59,5 +74,27 @@ describe('OutputSourceMap', () => {
     expect(OutputSourceMap.read(writeOutput('watch();'))).toBeUndefined();
     const broken = writeOutput('watch();', { 'index.mjs.map': '{' });
     expect(OutputSourceMap.read(broken)).toBeUndefined();
+  });
+});
+
+describe('OutputSourceMap sources', () => {
+  it('decodes a percent-encoded source, and finds a source that is not where the map says', () => {
+    const { directory, project, file } = layoutWithMap();
+    const at = { file: 'index.js', line: 1, column: 1 };
+    expect(OutputSourceMap.read(file, project)?.original(at)?.file).toBe(
+      path.join(directory, 'node_modules/pkg@1/index.js'),
+    );
+    // Without the project root there is nothing to look in, so the path stays where the map put it.
+    expect(OutputSourceMap.read(file)?.original(at)?.file).toBe(
+      path.resolve(path.dirname(file), '../../../node_modules/pkg@1/index.js'),
+    );
+  });
+
+  it('uses a source that is not valid as a URL as it is written', () => {
+    const file = writeOutput('watch();', {
+      'index.mjs.map': JSON.stringify({ ...payload, sources: ['100%zz.ts'] }),
+    });
+    const found = OutputSourceMap.read(file)?.original({ file: 'index.mjs', line: 1, column: 1 });
+    expect(found?.file).toBe(path.resolve(path.dirname(file), '100%zz.ts'));
   });
 });

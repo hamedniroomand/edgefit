@@ -106,7 +106,7 @@ export function attributeOutput(chunks: readonly ModuleUsages[], root: string): 
   };
 
   const modules = chunks.flatMap(chunk => {
-    const map = OutputSourceMap.read(path.resolve(root, chunk.file));
+    const map = OutputSourceMap.read(path.resolve(root, chunk.file), root);
     if ((map === undefined || map.dropsMappings) && chunk.usages.length > 0) {
       unmapped += 1;
     }
