@@ -2,7 +2,6 @@ import { styleText } from 'node:util';
 
 import type { CheckResult, SkippedTarget, TargetReport } from '@/core/check.ts';
 import { describeEntries } from '@/core/entries.ts';
-import { formatPackage } from '@/resolve/packages.ts';
 import type { Finding } from '@/types.ts';
 
 import {
@@ -77,6 +76,12 @@ export function formatFinding(finding: Finding, paint: Paint): string[] {
   if (finding.source !== undefined) {
     lines.push(paint('dim', `${indent}see ${finding.source}`));
   }
+  if (finding.unreached !== undefined) {
+    lines.push(
+      paint('dim', `${indent}not reached: ${finding.unreached.reason}`),
+      paint('dim', `${indent}see ${finding.unreached.source}`),
+    );
+  }
   return lines;
 }
 
@@ -88,7 +93,7 @@ function isFoldable(finding: Finding): boolean {
 function formatUnknown(findings: readonly Finding[], paint: Paint): string[] {
   const byOwner = new Map<string, Finding[]>();
   for (const finding of findings) {
-    const owner = finding.package === undefined ? 'your code' : formatPackage(finding.package);
+    const owner = ownerName(finding);
     byOwner.set(owner, [...(byOwner.get(owner) ?? []), finding]);
   }
   const lines = [...byOwner].map(([owner, group]) => {
@@ -119,7 +124,7 @@ function formatGuarded(report: TargetReport, paint: Paint, verbose: boolean): st
   return [
     paint(
       'dim',
-      'Guarded: the code checks for an API this target lacks before using it, catches the error of its absence, or only runs on another runtime, so these do not fail a check.',
+      'Guarded: the code checks for an API this target lacks before using it, catches the error of its absence, only runs on another runtime, or is listed as not reached, so these do not fail a check.',
     ),
     ...report.guarded.map(finding => formatFinding(finding, paint).join('\n')),
   ];

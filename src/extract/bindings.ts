@@ -62,7 +62,59 @@ export function interopArgument(node: NodeOf<'CallExpression'>): Node | undefine
   return argument;
 }
 
+/**
+ * Turbopack loads a Node.js built-in in its output as `e.x("node:timers", () => require("node:timers"), !0)`.
+ * The call returns the module, so what it is assigned to is the module. Only this shape counts: a
+ * `node:` name, and an arrow function that returns a `require` of the same name.
+ */
+function wrappedModule(node: NodeOf<'CallExpression'>, scope: Scope): string | undefined {
+  const [name, factory] = node.arguments;
+  const specifier = name === undefined ? undefined : staticString(name);
+  if (specifier?.startsWith('node:') !== true || factory?.type !== 'ArrowFunctionExpression') {
+    return undefined;
+  }
+  const body = factory.expression ? (unwrap(factory.body) ?? factory.body) : undefined;
+  const [argument] = body?.type === 'CallExpression' ? body.arguments : [];
+  const same = argument !== undefined && staticString(argument) === specifier;
+  return body?.type === 'CallExpression' && isRequire(body.callee, scope) && same
+    ? builtinName(specifier)
+    : undefined;
+}
+
+/**
+ * Turbopack's output for `await import('node:timers')` is
+ * `await Promise.resolve().then(() => e.x("node:timers", () => require("node:timers"), !0))`.
+ */
+function lazyWrappedModule(node: NodeOf<'CallExpression'>, scope: Scope): string | undefined {
+  const callee = node.callee;
+  const [handler] = node.arguments;
+  if (
+    callee.type !== 'MemberExpression' ||
+    staticKey(callee.property, callee.computed) !== 'then' ||
+    handler?.type !== 'ArrowFunctionExpression' ||
+    !handler.expression
+  ) {
+    return undefined;
+  }
+  const receiver = unwrap(callee.object) ?? callee.object;
+  const start =
+    receiver.type === 'CallExpression' ? (unwrap(receiver.callee) ?? receiver.callee) : undefined;
+  const isPromiseResolve =
+    start?.type === 'MemberExpression' &&
+    start.object.type === 'Identifier' &&
+    start.object.name === 'Promise' &&
+    staticKey(start.property, start.computed) === 'resolve';
+  const body = unwrap(handler.body) ?? handler.body;
+  return isPromiseResolve && body.type === 'CallExpression'
+    ? wrappedModule(body, scope)
+    : undefined;
+}
+
 function resolveCall(node: NodeOf<'CallExpression'>, context: BindingContext): Binding | undefined {
+  const wrapped = wrappedModule(node, context.scope) ?? lazyWrappedModule(node, context.scope);
+  if (wrapped !== undefined) {
+    return tracked(moduleRef(wrapped));
+  }
   const module = requiredModule(node, context.scope);
   if (module !== undefined) {
     return tracked(moduleRef(module));

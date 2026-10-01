@@ -1,0 +1,8 @@
+# Built by a framework or a platform CLI, in CI or by hand: see README.md
+**/.next
+**/.svelte-kit
+**/.netlify
+**/.vercel/*
+!**/.vercel/project.json
+# The Netlify adapter publishes here
+/sveltekit-netlify/build

@@ -20,6 +20,11 @@ export interface ApiRef {
   module: string;
   /** Member path below the module, e.g. `['promises', 'watch']`. Empty for the module itself. */
   path: string[];
+  /**
+   * Set on a `process` reference that came from the global, not from importing `node:process`.
+   * Most runtimes expose both the same way. Vercel's Edge runtime has only the global.
+   */
+  global?: true;
 }
 
 export interface Location {
@@ -89,6 +94,13 @@ export interface Finding {
   suggestion?: Suggestion;
   /** Set when the code only runs if the API exists, or on another runtime. Guarded findings never fail a check. */
   guarded?: true;
+  /** Set on a guarded finding that edgefit's data says is not reached on the target, with why. */
+  unreached?: { reason: string; source: string };
+  /**
+   * Set when the code is in build output that no sourcemap maps to a file of the project, such as
+   * the code a bundler adds around your modules. It has no owner, and is not your code.
+   */
+  buildOutput?: true;
 }
 
 export interface IgnoreRule {

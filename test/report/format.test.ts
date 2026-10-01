@@ -164,6 +164,20 @@ describe('guarded findings', () => {
     expect(text).toContain('0 errors, 0 warnings');
   });
 
+  it('say why a listed case is not reached, with --verbose and in the JSON report', () => {
+    const unreached = {
+      reason: 'Only used with Cache Components.',
+      source: 'https://example.com/why',
+    };
+    const listed = makeFinding('node:fs.watch', { guarded: true, unreached });
+    const text = formatText(resultOf([], 0, [listed]), { color: false, verbose: true });
+    expect(text).toContain('not reached: Only used with Cache Components.');
+    expect(text).toContain('see https://example.com/why');
+    expect(JSON.stringify(JSON.parse(formatJson(resultOf([], 0, [listed]))))).toContain(
+      'Only used with Cache Components.',
+    );
+  });
+
   it('are in the JSON report next to the findings', () => {
     const report = JSON.parse(formatJson(resultOf([], 0, [guarded]))) as {
       summary: { errors: number };

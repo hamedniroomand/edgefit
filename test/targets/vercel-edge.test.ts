@@ -71,7 +71,8 @@ describe('vercel-edge members of events, buffer and assert', () => {
 
 describe('vercel-edge built-ins outside the allowlist', () => {
   it('reports every Node built-in outside the allowlist as unsupported, not silently fine', () => {
-    const allowed = new Set(['events', 'buffer', 'assert', 'async_hooks', 'util']);
+    // `process` is allowed for its `env` member only: the global is read as the module.
+    const allowed = new Set(['events', 'buffer', 'assert', 'async_hooks', 'util', 'process']);
     const builtins = builtinModules
       .map(name => name.replace(/^node:/u, ''))
       .filter(name => !name.startsWith('_') && !name.startsWith('internal/') && !allowed.has(name));
@@ -98,6 +99,20 @@ describe('vercel-edge globals', () => {
     expect(status('*globals*', 'Buffer')).toBe('supported');
     expect(status('*globals*', 'process', 'env')).toBe('supported');
     expect(status('*globals*', 'process', 'cwd')).toBe('unsupported');
+  });
+
+  it('allows env on the global process, and on nothing else of process', () => {
+    const global = (...path: string[]): string =>
+      target.lookup({ module: 'process', path, global: true }).status;
+    expect(global('env')).toBe('supported');
+    expect(global('env', 'FOO')).toBe('supported');
+    expect(global('cwd')).toBe('unsupported');
+    expect(global('nextTick')).toBe('unsupported');
+  });
+
+  it('does not allow node:process, which is not one of the allowed modules', () => {
+    expect(status('process', 'env')).toBe('unsupported');
+    expect(status('process', 'env', 'FOO')).toBe('unsupported');
   });
 
   it('blocks dynamic code and compiling WebAssembly from bytes', () => {

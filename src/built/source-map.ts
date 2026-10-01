@@ -5,6 +5,7 @@ import type { SourceMapPayload } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { isWorkspaceRoot } from '@/targets/entry-sources.ts';
 import type { Location } from '@/types.ts';
 
 export interface OriginalPosition {
@@ -18,6 +19,20 @@ const mappingUrlComment = /\/\/[#@]\s*sourceMappingURL=(\S+)\s*$/u;
 
 // URLs other than `file:`, such as `webpack://`, name no file on disk.
 const urlScheme = /^[a-z][\d+.a-z-]*:/iu;
+
+/** The root of a workspace (pnpm, npm or Deno) or of a Git repository. */
+function isBoundary(directory: string): boolean {
+  return existsSync(path.join(directory, '.git')) || isWorkspaceRoot(directory);
+}
+
+/** Sources are URLs, so `@` can arrive as `%40`. A source that is not valid is used as written. */
+function safeDecode(url: string): string {
+  try {
+    return decodeURIComponent(url);
+  } catch {
+    return url;
+  }
+}
 
 function decodeDataUrl(url: string): string {
   const comma = url.indexOf(',');
@@ -53,18 +68,23 @@ export class OutputSourceMap {
   readonly #map: SourceMap;
   readonly #directory: string;
 
-  private constructor(map: SourceMap, directory: string) {
+  readonly #projectRoot: string | undefined;
+  readonly #resolved = new Map<string, string | undefined>();
+
+  private constructor(map: SourceMap, directory: string, projectRoot: string | undefined) {
     this.#map = map;
     this.#directory = directory;
+    this.#projectRoot = projectRoot;
   }
 
-  public static read(file: string): OutputSourceMap | undefined {
+  /** `projectRoot` lets a source that does not exist beside the map be found from the project. */
+  public static read(file: string, projectRoot?: string): OutputSourceMap | undefined {
     const payload = readPayload(file);
     if (payload === undefined) {
       return undefined;
     }
     try {
-      return new OutputSourceMap(new SourceMap(payload), path.dirname(file));
+      return new OutputSourceMap(new SourceMap(payload), path.dirname(file), projectRoot);
     } catch {
       return undefined;
     }
@@ -84,7 +104,11 @@ export class OutputSourceMap {
   public original(location: Location): OriginalPosition | undefined {
     const entry = this.#map.findEntry(location.line - 1, location.column - 1);
     // `findEntry` falls back to the closest mapping on an earlier line, which is other code.
-    if (!('originalSource' in entry) || entry.generatedLine !== location.line - 1) {
+    if (
+      !('originalSource' in entry) ||
+      typeof entry.originalSource !== 'string' ||
+      entry.generatedLine !== location.line - 1
+    ) {
       return undefined;
     }
     const file = this.#resolve(entry.originalSource);
@@ -94,6 +118,36 @@ export class OutputSourceMap {
   }
 
   #resolve(source: string): string | undefined {
+    if (!this.#resolved.has(source)) {
+      this.#resolved.set(source, this.#locate(source));
+    }
+    return this.#resolved.get(source);
+  }
+
+  /**
+   * Some builds write sources relative to where they built, and a platform then copies the output
+   * somewhere deeper: Next.js's `../../../node_modules/…` ends up inside `.vercel/output`. When the
+   * file is not where the map says, the same path is looked for above the project root, up to the
+   * workspace or repository root.
+   */
+  #fromProject(file: string, url: string): string {
+    if (existsSync(file) || this.#projectRoot === undefined) {
+      return file;
+    }
+    const rest = url.replace(/^(?:\.\.\/)+/u, '');
+    // The search stops at the workspace or the repository, so it never matches a file outside it.
+    for (let directory = this.#projectRoot; ; directory = path.dirname(directory)) {
+      const candidate = path.join(directory, rest);
+      if (existsSync(candidate)) {
+        return candidate;
+      }
+      if (isBoundary(directory) || path.dirname(directory) === directory) {
+        return file;
+      }
+    }
+  }
+
+  #locate(source: string): string | undefined {
     // The payload type declares `sourceRoot`, but most maps leave it out.
     const root = (this.#map.payload.sourceRoot as string | undefined) ?? '';
     const url = root === '' || root.endsWith('/') ? `${root}${source}` : `${root}/${source}`;
@@ -104,6 +158,7 @@ export class OutputSourceMap {
     if (url.includes('\0') || (!path.isAbsolute(url) && urlScheme.test(url))) {
       return undefined;
     }
-    return path.resolve(this.#directory, url);
+    const decoded = safeDecode(url);
+    return this.#fromProject(path.resolve(this.#directory, decoded), decoded);
   }
 }

@@ -44,7 +44,7 @@ export function moduleRef(module: string): ApiRef {
 }
 
 export function memberRef(ref: ApiRef, key: string): ApiRef {
-  return { module: ref.module, path: [...ref.path, key] };
+  return { ...ref, path: [...ref.path, key] };
 }
 
 export function globalRef(name: string): ApiRef {
@@ -67,7 +67,7 @@ export function normalizeRef(ref: ApiRef): ApiRef {
   }
   const path = ref.path.slice(start);
   return path[0] === 'process'
-    ? { module: 'process', path: path.slice(1) }
+    ? { module: 'process', path: path.slice(1), global: true }
     : { module: '*globals*', path };
 }
 

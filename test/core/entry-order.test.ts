@@ -8,8 +8,14 @@ import { edgefitError, fixture, stubTarget } from '~/helpers.ts';
 const root = fixture('entries');
 
 const none = { exact: undefined, guess: undefined, searched: [], shared: true };
-const exact = { files: ['src/main.ts'], source: 'wrangler "main"', guessed: false };
-const guess = { files: ['index.ts'], source: 'index.ts', guessed: true };
+const exact = {
+  files: ['src/main.ts'],
+  source: 'wrangler "main"',
+  guessed: false,
+  built: false,
+  notes: [],
+};
+const guess = { files: ['index.ts'], source: 'index.ts', guessed: true, built: false, notes: [] };
 
 function target(key: TargetKey, entries: Partial<Target['entries']>): Target {
   const stub = stubTarget();
@@ -40,7 +46,7 @@ describe('entry order', () => {
   it('keeps the guess of a target that has no exact match, and notes it', () => {
     const [found] = entriesFor(root, [target('bun', { guess })], {});
     expect(found).toMatchObject({ entries: ['index.ts'], source: 'index.ts' });
-    expect(found?.note).toContain('guessed from index.ts');
+    expect(found?.notes.join('\n')).toContain('guessed from index.ts');
   });
 });
 

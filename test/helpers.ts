@@ -32,6 +32,14 @@ export function sampleAppsInstalled(): boolean {
   return installed;
 }
 
+/**
+ * Whether a sample app has been built by its framework or platform CLI. CI builds them in their
+ * own job, so a build that is not there is a skip, not an error. See `apps/README.md`.
+ */
+export function sampleAppBuilt(name: string, output: string): boolean {
+  return existsSync(path.join(sampleApp(name), output));
+}
+
 const defaultGlobals = new Set([
   'process',
   'Buffer',

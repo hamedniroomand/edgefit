@@ -30,7 +30,7 @@ interface SuggestionsFile extends SuggestionData {
 
 const fileVersion = 1;
 // One key per target: a target added to `TargetKey` without one here does not compile.
-const targetKeys = new Set<string>(
+export const targetKeys = new Set<string>(
   Object.keys({
     workerd: true,
     bun: true,
