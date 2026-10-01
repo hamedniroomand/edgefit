@@ -31,3 +31,5 @@ dist-ssr
 *.sln
 *.sw?
 docs/public/packages/
+
+coverage
