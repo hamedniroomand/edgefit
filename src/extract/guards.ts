@@ -6,6 +6,7 @@ import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
+import { constantOf } from './constants.ts';
 import type { Guard } from './guard-stack.ts';
 import { memberRef, normalizeRef } from './refs.ts';
 import {
@@ -149,6 +150,10 @@ function checkGuards(node: Node, truth: boolean, context: BindingContext): Guard
 /** The APIs that must exist, and what is known of the runtime, whenever `test` evaluates to `truth`. */
 export function guardsWhen(test: Node, truth: boolean, context: BindingContext): Guard[] {
   const node = strip(test);
+  const constant = constantOf(node);
+  if (constant !== undefined) {
+    return Boolean(constant.value) === truth ? [] : [{ kind: 'dead' }];
+  }
   if (node.type === 'UnaryExpression' && node.operator === '!') {
     return guardsWhen(node.argument, !truth, context);
   }
