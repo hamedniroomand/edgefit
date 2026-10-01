@@ -38,7 +38,7 @@ export default defineConfig({
 
 ## How entries are found
 
-An `--entry` or a config `entry` always wins. Without one, each target looks in these places. A declaration beats a guess, and the settings line of the report names the source. A guess adds a note.
+An `--entry` or a config `entry` always wins. Without one, each target looks in these places. A declaration beats a guess, and the settings line of the report names the source. A guess adds a note. The order is by certainty, not by specificity: a declared `package.json` `main` beats a guessed `scripts.start`, even for Bun.
 
 | Target                   | Declared                                                                                                         | Guessed                                                                          |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
