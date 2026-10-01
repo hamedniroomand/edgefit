@@ -67,14 +67,15 @@ function explain(target: Target): string[] {
 /**
  * An entry from the CLI or the config applies to every target. Without one, a target uses, in
  * order: its own exact match, the exact match of the first other shared target that has one, and
- * its own guess. A guess is never lent to another target. A target left without entries fails the
- * run, and the error lists where each such target looked.
+ * its own guess. A guess is never lent to another target. A target left without entries gets
+ * `undefined` and is skipped, unless no target has any: then the run fails and the error lists
+ * where each target looked.
  */
 export function entriesFor(
   root: string,
   targets: readonly Target[],
   config: EdgefitConfig,
-): TargetEntries[] {
+): (TargetEntries | undefined)[] {
   const configured = [config.entry ?? []].flat();
   if (configured.length > 0) {
     const entries = expandEntries(root, configured);
@@ -100,9 +101,8 @@ export function entriesFor(
           note: `The entries were guessed from ${guess.source}. Pass --entry if they are wrong.`,
         };
   });
-  const missing = targets.filter((_target, index) => found[index] === undefined);
-  if (missing.length > 0) {
-    const searched = missing.flatMap(target => explain(target));
+  if (found.every(item => item === undefined)) {
+    const searched = targets.flatMap(target => explain(target));
     throw new EdgefitError(
       'No entry point to scan.',
       [
@@ -111,5 +111,5 @@ export function entriesFor(
       ].join('\n'),
     );
   }
-  return found.flatMap(item => item ?? []);
+  return found;
 }

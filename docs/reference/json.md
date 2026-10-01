@@ -54,6 +54,8 @@ edgefit check --format json
 }
 ```
 
+`skipped` lists the targets left out because they have no entry, each as `{ key, searched }`, where `searched` names the places the target looked. It is empty when every target ran.
+
 `entries` lists every entry the target was checked from, relative to the root, sorted. A target that has no entry of its own and uses another target's lists those.
 
 `guarded` has the same shape as `findings` and holds usages that do not fail the check because the code guards them: it only runs when the API exists, catches the error of its absence, or only runs on another runtime (see [guarded usages](/guide/findings#guarded-usages)). They are not counted in `summary` and never fail a check.

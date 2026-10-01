@@ -4,7 +4,7 @@ import { describeEntries } from '@/core/entries.ts';
 import { compareRows } from './compare.ts';
 import type { CompareCell, CompareOptions, CompareRow } from './compare.ts';
 import { summaryLine } from './summary.ts';
-import { formatFinding, painter } from './text.ts';
+import { formatFinding, formatSkipped, painter } from './text.ts';
 import type { Paint, TextOptions } from './text.ts';
 
 export interface CompareTextOptions extends TextOptions, CompareOptions {
@@ -69,9 +69,12 @@ export function formatCompareText(result: CheckResult, options: CompareTextOptio
   const entries = result.reports.map(report => describeEntries(report.entries));
   const header = compareHeader(result, entries, paint);
   const rows = compareRows(result, options);
-  const notes = result.reports.flatMap(report =>
-    report.target.notes.map(note => paint('yellow', `note (${report.target.key}): ${note}`)),
-  );
+  const notes = [
+    ...result.reports.flatMap(report =>
+      report.target.notes.map(note => paint('yellow', `note (${report.target.key}): ${note}`)),
+    ),
+    ...formatSkipped(result, paint),
+  ];
   if (rows.length === 0) {
     const clean = paint('green', 'No known incompatible reachable APIs found.');
     return [header, '', clean, ...notes, '', summaryLine(result), ''].join('\n');

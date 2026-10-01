@@ -19,6 +19,7 @@ export function formatJson(result: CheckResult): string {
   const report = {
     version: jsonReportVersion,
     summary: countLevels(result),
+    skipped: result.skipped,
     targets: result.reports.map(targetReport => ({
       ...targetReport.target,
       entries: targetReport.entries,

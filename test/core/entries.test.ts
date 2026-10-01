@@ -5,6 +5,7 @@ import { run } from '@/cli/run.ts';
 import { check } from '@/core/check.ts';
 import { describeEntries, expandEntries } from '@/core/entries.ts';
 import { formatJson } from '@/report/json.ts';
+import type { TargetKey } from '@/types.ts';
 import { captureIo, edgefitError, fixture } from '~/helpers.ts';
 
 const root = fixture('entries');
@@ -83,10 +84,8 @@ describe('entries per target', () => {
     const [workerd, bun] = result.reports;
     expect(workerd?.entries).toEqual(['src/index.ts']);
     expect(bun?.entries).toEqual(['src/index.ts']);
-    expect(bun?.target.settings).toContain(
-      'entry src/index.ts (from workerd: wrangler.jsonc "main")',
-    );
-    expect(workerd?.target.settings).toContain('entry src/index.ts (from wrangler.jsonc "main")');
+    expect(bun?.target.settings).toContain('entries from workerd: wrangler.jsonc "main"');
+    expect(workerd?.target.settings).toContain('entries from wrangler.jsonc "main"');
   });
 
   it('lets an explicit entry win for every target', async () => {
@@ -109,6 +108,29 @@ describe('entries per target', () => {
       'netlify/edge-functions/a.ts',
       'netlify/edge-functions/b.ts',
     ]);
+  });
+});
+
+describe('a target without an entry', () => {
+  const config = { targets: ['workerd', 'vercel-edge'] as TargetKey[] };
+
+  it('is skipped, and the report says what it searched', async () => {
+    const result = await check({ root: fixture('worker'), config });
+    expect(result.reports.map(report => report.target.key)).toEqual(['workerd']);
+    expect(result.skipped).toEqual([
+      { key: 'vercel-edge', searched: ['middleware.{ts,js,mts,mjs}'] },
+    ]);
+    const io = captureIo(fixture('worker'));
+    await run(['check', '--target', 'workerd', '--target', 'vercel-edge', '--no-color'], io);
+    expect(io.output()).toContain(
+      'edgefit · vercel-edge skipped: no entry found. Searched: middleware.{ts,js,mts,mjs}.',
+    );
+  });
+
+  it('is listed in the JSON report', async () => {
+    const result = await check({ root: fixture('worker'), config });
+    const report = JSON.parse(formatJson(result)) as { skipped: unknown };
+    expect(report.skipped).toEqual(result.skipped);
   });
 });
 

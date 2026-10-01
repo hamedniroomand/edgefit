@@ -124,6 +124,14 @@ function formatGuarded(report: TargetReport, paint: Paint, verbose: boolean): st
   ];
 }
 
+/** One line for each target left out because it has no entry. */
+export function formatSkipped(result: CheckResult, paint: Paint): string[] {
+  return result.skipped.map(({ key, searched }) => {
+    const where = searched.length > 0 ? ` Searched: ${searched.join(', ')}.` : '';
+    return paint('yellow', `edgefit · ${key} skipped: no entry found.${where}`);
+  });
+}
+
 export function formatText(result: CheckResult, options: TextOptions): string {
   const paint = painter(options);
   const sections = result.reports.map(report => {
@@ -142,5 +150,7 @@ export function formatText(result: CheckResult, options: TextOptions): string {
     const tail = guarded.length > 0 ? `\n\n${guarded.join('\n\n')}` : '';
     return `${formatHeader(report, paint).join('\n')}\n\n${body}${tail}`;
   });
-  return `${sections.join('\n\n')}\n\n${summaryLine(result)}\n`;
+  const skipped = formatSkipped(result, paint);
+  const all = [...sections, ...(skipped.length > 0 ? [skipped.join('\n')] : [])];
+  return `${all.join('\n\n')}\n\n${summaryLine(result)}\n`;
 }

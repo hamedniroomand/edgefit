@@ -6,9 +6,9 @@ import { builtEntry, isBuildOutput } from '@/built/entry.ts';
 import { resolveGraph } from '@/resolve/graph.ts';
 import { createTarget } from '@/targets/index.ts';
 import type { Target, TargetInfo } from '@/targets/index.ts';
-import type { EdgefitConfig, Finding } from '@/types.ts';
+import type { EdgefitConfig, Finding, TargetKey } from '@/types.ts';
 
-import { describeEntries, entriesFor } from './entries.ts';
+import { entriesFor } from './entries.ts';
 import type { TargetEntries } from './entries.ts';
 import { collectFindings, collectSupported, defaultLevels, loadSuggestions } from './findings.ts';
 import type { SupportedApi } from './findings.ts';
@@ -39,9 +39,17 @@ export interface TargetReport {
   supported: SupportedApi[];
 }
 
+/** A target left out of the run because it has no entry. */
+export interface SkippedTarget {
+  key: TargetKey;
+  /** What the target looked at, so the user can see where an entry would be found. */
+  searched: string[];
+}
+
 export interface CheckResult {
   root: string;
   reports: TargetReport[];
+  skipped: SkippedTarget[];
 }
 
 function describeNodeEnv(nodeEnv: string | undefined, fromConfig: boolean): string {
@@ -87,7 +95,7 @@ async function checkTarget(
   return {
     target: {
       ...target.info,
-      settings: `${target.info.settings}, ${describeEntries(entries)} (from ${source}), ${describeNodeEnv(nodeEnv, config.env?.NODE_ENV !== undefined)}`,
+      settings: `${target.info.settings}, entries from ${source}, ${describeNodeEnv(nodeEnv, config.env?.NODE_ENV !== undefined)}`,
       conditions,
       notes: [...target.info.notes, ...(note === undefined ? [] : [note]), ...notes],
     },
@@ -106,7 +114,7 @@ export async function check(options: CheckOptions = {}): Promise<CheckResult> {
   const config = options.config ?? {};
   const targets = (config.targets ?? ['workerd']).map(key => createTarget(key, root, config));
   const built = options.built;
-  const entries: TargetEntries[] =
+  const entries: (TargetEntries | undefined)[] =
     built === undefined
       ? entriesFor(root, targets, config)
       : targets.map(() => ({
@@ -115,18 +123,17 @@ export async function check(options: CheckOptions = {}): Promise<CheckResult> {
           note: undefined,
         }));
   const pending: Promise<TargetReport>[] = [];
+  const skipped: SkippedTarget[] = [];
   for (const [index, target] of targets.entries()) {
-    pending.push(
-      checkTarget(
-        target,
-        entries[index] ?? { entries: [], source: '', note: undefined },
-        root,
-        options,
-      ),
-    );
+    const own = entries[index];
+    if (own === undefined) {
+      skipped.push({ key: target.info.key, searched: target.entries.searched });
+    } else {
+      pending.push(checkTarget(target, own, root, options));
+    }
   }
   const reports = await Promise.all(pending);
-  return { root, reports };
+  return { root, reports, skipped };
 }
 
 export function countLevels(result: CheckResult): { errors: number; warnings: number } {
