@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "package": "@supabase/supabase-js",
+  "resolved": "2.117.2",
+  "checkedAt": "2026-10-01T12:51:36.417Z",
+  "edgefit": "0.5.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.4.2",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "fail",
+    "bun": "fail",
+    "deno": "error"
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "@supabase/supabase-js",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 3
+        },
+        "bun": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./cors",
+      "specifier": "@supabase/supabase-js/cors",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./tracing",
+      "specifier": "@supabase/supabase-js/tracing",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@supabase/supabase-js/dist/tracing.mjs:2:38: Could not resolve \"@opentelemetry/api\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@supabase/supabase-js/dist/tracing.mjs:2:38: Could not resolve \"@opentelemetry/api\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@supabase/supabase-js/dist/tracing.mjs:2:38: Could not resolve \"@opentelemetry/api\""
+        }
+      }
+    }
+  ]
+}

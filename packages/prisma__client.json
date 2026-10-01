@@ -1,0 +1,251 @@
+{
+  "version": 1,
+  "package": "@prisma/client",
+  "resolved": "7.10.0",
+  "checkedAt": "2026-10-01T12:51:20.764Z",
+  "edgefit": "0.5.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.4.2",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "error",
+    "bun": "error",
+    "deno": "error"
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "@prisma/client",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/default.js:2:14: Could not resolve \".prisma/client/default\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/default.js:2:14: Could not resolve \".prisma/client/default\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/default.js:2:14: Could not resolve \".prisma/client/default\""
+        }
+      }
+    },
+    {
+      "subpath": "./extension",
+      "specifier": "@prisma/client/extension",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./index-browser",
+      "specifier": "@prisma/client/index-browser",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/index-browser.js:1:24: Could not resolve \".prisma/client/index-browser\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/index-browser.js:1:24: Could not resolve \".prisma/client/index-browser\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/index-browser.js:1:24: Could not resolve \".prisma/client/index-browser\""
+        }
+      }
+    },
+    {
+      "subpath": "./index",
+      "specifier": "@prisma/client/index",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/index.js:3:14: Could not resolve \".prisma/client/default\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/index.js:3:14: Could not resolve \".prisma/client/default\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/index.js:3:14: Could not resolve \".prisma/client/default\""
+        }
+      }
+    },
+    {
+      "subpath": "./edge",
+      "specifier": "@prisma/client/edge",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/edge.js:3:14: Could not resolve \".prisma/client/edge\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/edge.js:3:14: Could not resolve \".prisma/client/edge\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/edge.js:3:14: Could not resolve \".prisma/client/edge\""
+        }
+      }
+    },
+    {
+      "subpath": "./runtime/client",
+      "specifier": "@prisma/client/runtime/client",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./runtime/wasm-compiler-edge",
+      "specifier": "@prisma/client/runtime/wasm-compiler-edge",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./runtime/index-browser",
+      "specifier": "@prisma/client/runtime/index-browser",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./sql",
+      "specifier": "@prisma/client/sql",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/sql.mjs:1:15: Could not resolve \"../../.prisma/client/sql/index.mjs\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/sql.mjs:1:15: Could not resolve \"../../.prisma/client/sql/index.mjs\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/@prisma/client/sql.mjs:1:15: Could not resolve \"../../.prisma/client/sql/index.mjs\""
+        }
+      }
+    }
+  ]
+}

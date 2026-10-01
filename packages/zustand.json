@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "package": "zustand",
+  "resolved": "5.0.15",
+  "checkedAt": "2026-10-01T12:51:39.029Z",
+  "edgefit": "0.5.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.4.2",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "error",
+    "bun": "error",
+    "deno": "error"
+  },
+  "context": {},
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "zustand",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/zustand/esm/react.mjs:1:19: Could not resolve \"react\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/zustand/esm/react.mjs:1:19: Could not resolve \"react\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/zustand/esm/react.mjs:1:19: Could not resolve \"react\""
+        }
+      }
+    }
+  ]
+}

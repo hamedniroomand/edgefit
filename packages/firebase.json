@@ -1,0 +1,719 @@
+{
+  "version": 1,
+  "package": "firebase",
+  "resolved": "12.19.0",
+  "checkedAt": "2026-10-01T12:52:01.177Z",
+  "edgefit": "0.5.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.4.2",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "warn",
+    "bun": "warn",
+    "deno": "fail"
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": "./analytics",
+      "specifier": "firebase/analytics",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./app",
+      "specifier": "firebase/app",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./app-check",
+      "specifier": "firebase/app-check",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./auth",
+      "specifier": "firebase/auth",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./auth/cordova",
+      "specifier": "firebase/auth/cordova",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./auth/web-extension",
+      "specifier": "firebase/auth/web-extension",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./database",
+      "specifier": "firebase/database",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./data-connect",
+      "specifier": "firebase/data-connect",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./firestore",
+      "specifier": "firebase/firestore",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 2
+        }
+      }
+    },
+    {
+      "subpath": "./firestore/pipelines",
+      "specifier": "firebase/firestore/pipelines",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 2
+        }
+      }
+    },
+    {
+      "subpath": "./firestore/lite",
+      "specifier": "firebase/firestore/lite",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./firestore/lite/pipelines",
+      "specifier": "firebase/firestore/lite/pipelines",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./functions",
+      "specifier": "firebase/functions",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./installations",
+      "specifier": "firebase/installations",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./messaging",
+      "specifier": "firebase/messaging",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./messaging/sw",
+      "specifier": "firebase/messaging/sw",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./performance",
+      "specifier": "firebase/performance",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./remote-config",
+      "specifier": "firebase/remote-config",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./storage",
+      "specifier": "firebase/storage",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./ai",
+      "specifier": "firebase/ai",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./compat/analytics",
+      "specifier": "firebase/compat/analytics",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./compat/app",
+      "specifier": "firebase/compat/app",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./compat/app-check",
+      "specifier": "firebase/compat/app-check",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./compat/auth",
+      "specifier": "firebase/compat/auth",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./compat/database",
+      "specifier": "firebase/compat/database",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./compat/firestore",
+      "specifier": "firebase/compat/firestore",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 2
+        }
+      }
+    },
+    {
+      "subpath": "./compat/functions",
+      "specifier": "firebase/compat/functions",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./compat/installations",
+      "specifier": "firebase/compat/installations",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./compat/messaging",
+      "specifier": "firebase/compat/messaging",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./compat/performance",
+      "specifier": "firebase/compat/performance",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./compat/remote-config",
+      "specifier": "firebase/compat/remote-config",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./compat/storage",
+      "specifier": "firebase/compat/storage",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    }
+  ]
+}

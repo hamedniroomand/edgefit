@@ -1,0 +1,185 @@
+{
+  "version": 1,
+  "package": "@sentry/node",
+  "resolved": "11.2.0",
+  "checkedAt": "2026-10-01T12:52:53.100Z",
+  "edgefit": "0.5.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.4.2",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "fail",
+    "bun": "fail",
+    "deno": "fail"
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "@sentry/node",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 10,
+          "warnings": 12
+        },
+        "bun": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 6
+        },
+        "deno": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 5
+        }
+      }
+    },
+    {
+      "subpath": "./import",
+      "specifier": "@sentry/node/import",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 2
+        },
+        "bun": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./vite",
+      "specifier": "@sentry/node/vite",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        }
+      }
+    },
+    {
+      "subpath": "./rollup",
+      "specifier": "@sentry/node/rollup",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        }
+      }
+    },
+    {
+      "subpath": "./webpack",
+      "specifier": "@sentry/node/webpack",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        }
+      }
+    },
+    {
+      "subpath": "./esbuild",
+      "specifier": "@sentry/node/esbuild",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+        }
+      }
+    }
+  ]
+}

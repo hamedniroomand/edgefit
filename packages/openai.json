@@ -1,0 +1,845 @@
+{
+  "version": 1,
+  "package": "openai",
+  "resolved": "7.25.0",
+  "checkedAt": "2026-10-01T12:51:31.193Z",
+  "edgefit": "0.5.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.4.2",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "warn",
+    "bun": "warn",
+    "deno": "warn"
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "openai",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./auth",
+      "specifier": "openai/auth",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./api-promise",
+      "specifier": "openai/api-promise",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./api-promise.js",
+      "specifier": "openai/api-promise.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./api-promise.mjs",
+      "specifier": "openai/api-promise.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./azure",
+      "specifier": "openai/azure",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./azure.js",
+      "specifier": "openai/azure.js",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./azure.mjs",
+      "specifier": "openai/azure.mjs",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./bedrock",
+      "specifier": "openai/bedrock",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./bedrock.js",
+      "specifier": "openai/bedrock.js",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./bedrock.mjs",
+      "specifier": "openai/bedrock.mjs",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./client",
+      "specifier": "openai/client",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./client.js",
+      "specifier": "openai/client.js",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./client.mjs",
+      "specifier": "openai/client.mjs",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./error",
+      "specifier": "openai/error",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./error.js",
+      "specifier": "openai/error.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./error.mjs",
+      "specifier": "openai/error.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./index",
+      "specifier": "openai/index",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./index.js",
+      "specifier": "openai/index.js",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./index.mjs",
+      "specifier": "openai/index.mjs",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./pagination",
+      "specifier": "openai/pagination",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./pagination.js",
+      "specifier": "openai/pagination.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./pagination.mjs",
+      "specifier": "openai/pagination.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./resource",
+      "specifier": "openai/resource",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./resource.js",
+      "specifier": "openai/resource.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./resource.mjs",
+      "specifier": "openai/resource.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./resources",
+      "specifier": "openai/resources",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./resources.js",
+      "specifier": "openai/resources.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./resources.mjs",
+      "specifier": "openai/resources.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./streaming",
+      "specifier": "openai/streaming",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./streaming.js",
+      "specifier": "openai/streaming.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./streaming.mjs",
+      "specifier": "openai/streaming.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./uploads",
+      "specifier": "openai/uploads",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./uploads.js",
+      "specifier": "openai/uploads.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./uploads.mjs",
+      "specifier": "openai/uploads.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./version",
+      "specifier": "openai/version",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./version.js",
+      "specifier": "openai/version.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./version.mjs",
+      "specifier": "openai/version.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    }
+  ]
+}

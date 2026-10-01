@@ -1,0 +1,740 @@
+{
+  "version": 1,
+  "package": "@anthropic-ai/sdk",
+  "resolved": "0.131.0",
+  "checkedAt": "2026-10-01T12:51:32.434Z",
+  "edgefit": "0.5.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.4.2",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "pass",
+    "bun": "warn",
+    "deno": "warn"
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "@anthropic-ai/sdk",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./api-promise",
+      "specifier": "@anthropic-ai/sdk/api-promise",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./api-promise.js",
+      "specifier": "@anthropic-ai/sdk/api-promise.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./api-promise.mjs",
+      "specifier": "@anthropic-ai/sdk/api-promise.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./client",
+      "specifier": "@anthropic-ai/sdk/client",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./client.js",
+      "specifier": "@anthropic-ai/sdk/client.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./client.mjs",
+      "specifier": "@anthropic-ai/sdk/client.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./error",
+      "specifier": "@anthropic-ai/sdk/error",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./error.js",
+      "specifier": "@anthropic-ai/sdk/error.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./error.mjs",
+      "specifier": "@anthropic-ai/sdk/error.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./index",
+      "specifier": "@anthropic-ai/sdk/index",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./index.js",
+      "specifier": "@anthropic-ai/sdk/index.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./index.mjs",
+      "specifier": "@anthropic-ai/sdk/index.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./pagination",
+      "specifier": "@anthropic-ai/sdk/pagination",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./pagination.js",
+      "specifier": "@anthropic-ai/sdk/pagination.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./pagination.mjs",
+      "specifier": "@anthropic-ai/sdk/pagination.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./resource",
+      "specifier": "@anthropic-ai/sdk/resource",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./resource.js",
+      "specifier": "@anthropic-ai/sdk/resource.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./resource.mjs",
+      "specifier": "@anthropic-ai/sdk/resource.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./resources",
+      "specifier": "@anthropic-ai/sdk/resources",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./resources.js",
+      "specifier": "@anthropic-ai/sdk/resources.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./resources.mjs",
+      "specifier": "@anthropic-ai/sdk/resources.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./streaming",
+      "specifier": "@anthropic-ai/sdk/streaming",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./streaming.js",
+      "specifier": "@anthropic-ai/sdk/streaming.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./streaming.mjs",
+      "specifier": "@anthropic-ai/sdk/streaming.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./uploads",
+      "specifier": "@anthropic-ai/sdk/uploads",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./uploads.js",
+      "specifier": "@anthropic-ai/sdk/uploads.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./uploads.mjs",
+      "specifier": "@anthropic-ai/sdk/uploads.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./version",
+      "specifier": "@anthropic-ai/sdk/version",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./version.js",
+      "specifier": "@anthropic-ai/sdk/version.js",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./version.mjs",
+      "specifier": "@anthropic-ai/sdk/version.mjs",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./tools/agent-toolset/node",
+      "specifier": "@anthropic-ai/sdk/tools/agent-toolset/node",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 3
+        }
+      }
+    },
+    {
+      "subpath": "./tools/memory/node",
+      "specifier": "@anthropic-ai/sdk/tools/memory/node",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    }
+  ]
+}

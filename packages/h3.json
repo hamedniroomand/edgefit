@@ -1,0 +1,302 @@
+{
+  "version": 1,
+  "package": "h3",
+  "resolved": "2.0.1-rc.32",
+  "checkedAt": "2026-10-01T12:51:20.591Z",
+  "edgefit": "0.5.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.4.2",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "fail",
+    "bun": "error",
+    "deno": "error"
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "h3",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./deno",
+      "specifier": "h3/deno",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./bun",
+      "specifier": "h3/bun",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./cloudflare",
+      "specifier": "h3/cloudflare",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./service-worker",
+      "specifier": "h3/service-worker",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./node",
+      "specifier": "h3/node",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 2
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 2
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./generic",
+      "specifier": "h3/generic",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./tracing",
+      "specifier": "h3/tracing",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./rules",
+      "specifier": "h3/rules",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./rules/cache",
+      "specifier": "h3/rules/cache",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/h3/dist/rules/cache.mjs:4:58: Could not resolve \"ocache\""
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/h3/dist/rules/cache.mjs:4:58: Could not resolve \"ocache\""
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/h3/dist/rules/cache.mjs:4:58: Could not resolve \"ocache\""
+        }
+      }
+    },
+    {
+      "subpath": "./rules/proxy",
+      "specifier": "h3/rules/proxy",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./rules/compiler",
+      "specifier": "h3/rules/compiler",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    }
+  ]
+}

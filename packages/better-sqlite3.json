@@ -1,0 +1,261 @@
+{
+  "version": 1,
+  "package": "better-sqlite3",
+  "resolved": "13.0.3",
+  "checkedAt": "2026-10-01T12:52:06.359Z",
+  "edgefit": "0.5.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.4.2",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "error",
+    "bun": "error",
+    "deno": "error"
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "better-sqlite3",
+      "results": {
+        "workerd": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        }
+      }
+    },
+    {
+      "subpath": "./linux-x64",
+      "specifier": "better-sqlite3/linux-x64",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linux-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linux-x64.node"
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linux-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linux-x64.node"
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linux-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linux-x64.node"
+        }
+      }
+    },
+    {
+      "subpath": "./linux-arm64",
+      "specifier": "better-sqlite3/linux-arm64",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linux-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linux-arm64.node"
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linux-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linux-arm64.node"
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linux-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linux-arm64.node"
+        }
+      }
+    },
+    {
+      "subpath": "./linuxmusl-x64",
+      "specifier": "better-sqlite3/linuxmusl-x64",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linuxmusl-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linuxmusl-x64.node"
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linuxmusl-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linuxmusl-x64.node"
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linuxmusl-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linuxmusl-x64.node"
+        }
+      }
+    },
+    {
+      "subpath": "./linuxmusl-arm64",
+      "specifier": "better-sqlite3/linuxmusl-arm64",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linuxmusl-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linuxmusl-arm64.node"
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linuxmusl-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linuxmusl-arm64.node"
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/linuxmusl-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/linuxmusl-arm64.node"
+        }
+      }
+    },
+    {
+      "subpath": "./darwin-x64",
+      "specifier": "better-sqlite3/darwin-x64",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/darwin-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/darwin-x64.node"
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/darwin-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/darwin-x64.node"
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/darwin-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/darwin-x64.node"
+        }
+      }
+    },
+    {
+      "subpath": "./darwin-arm64",
+      "specifier": "better-sqlite3/darwin-arm64",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/darwin-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/darwin-arm64.node"
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/darwin-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/darwin-arm64.node"
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/darwin-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/darwin-arm64.node"
+        }
+      }
+    },
+    {
+      "subpath": "./win32-x64",
+      "specifier": "better-sqlite3/win32-x64",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/win32-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/win32-x64.node"
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/win32-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/win32-x64.node"
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/win32-x64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/win32-x64.node"
+        }
+      }
+    },
+    {
+      "subpath": "./win32-arm64",
+      "specifier": "better-sqlite3/win32-arm64",
+      "results": {
+        "workerd": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/win32-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/win32-arm64.node"
+        },
+        "bun": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/win32-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/win32-arm64.node"
+        },
+        "deno": {
+          "status": "error",
+          "errors": 0,
+          "warnings": 0,
+          "message": "Could not resolve the module graph:\nnode_modules/better-sqlite3/lib/win32-arm64.js:2:54: No loader is configured for \".node\" files: node_modules/better-sqlite3/prebuilds/win32-arm64.node"
+        }
+      }
+    }
+  ],
+  "notes": "Native addon."
+}

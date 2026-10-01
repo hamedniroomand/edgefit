@@ -1,0 +1,843 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-01T12:53:18.853Z",
+  "edgefit": "0.5.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.4.2",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "packages": [
+    {
+      "name": "hono",
+      "file": "hono",
+      "resolved": "4.13.12",
+      "summary": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 75
+    },
+    {
+      "name": "itty-router",
+      "file": "itty-router",
+      "resolved": "5.0.24",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 19
+    },
+    {
+      "name": "elysia",
+      "file": "elysia",
+      "resolved": "1.4.30",
+      "summary": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 30
+    },
+    {
+      "name": "h3",
+      "file": "h3",
+      "resolved": "2.0.1-rc.32",
+      "summary": {
+        "workerd": "fail",
+        "bun": "error",
+        "deno": "error"
+      },
+      "subpaths": 12
+    },
+    {
+      "name": "zod",
+      "file": "zod",
+      "resolved": "4.6.5",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 10
+    },
+    {
+      "name": "valibot",
+      "file": "valibot",
+      "resolved": "1.5.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "jose",
+      "file": "jose",
+      "resolved": "6.2.12",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 9
+    },
+    {
+      "name": "oauth4webapi",
+      "file": "oauth4webapi",
+      "resolved": "3.8.8",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "bcryptjs",
+      "file": "bcryptjs",
+      "resolved": "3.0.3",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "pg",
+      "file": "pg",
+      "resolved": "8.23.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "postgres",
+      "file": "postgres",
+      "resolved": "3.4.9",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "@neondatabase/serverless",
+      "file": "neondatabase__serverless",
+      "resolved": "1.1.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "drizzle-orm",
+      "file": "drizzle-orm",
+      "resolved": "0.45.3",
+      "summary": {
+        "workerd": "error",
+        "bun": "error",
+        "deno": "error"
+      },
+      "subpaths": 447
+    },
+    {
+      "name": "@prisma/client",
+      "file": "prisma__client",
+      "resolved": "7.10.0",
+      "summary": {
+        "workerd": "error",
+        "bun": "error",
+        "deno": "error"
+      },
+      "subpaths": 9
+    },
+    {
+      "name": "mysql2",
+      "file": "mysql2",
+      "resolved": "3.24.5",
+      "summary": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "fail"
+      },
+      "subpaths": 3
+    },
+    {
+      "name": "ioredis",
+      "file": "ioredis",
+      "resolved": "6.0.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "@upstash/redis",
+      "file": "upstash__redis",
+      "resolved": "1.39.0",
+      "summary": {
+        "workerd": "warn",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 8
+    },
+    {
+      "name": "stripe",
+      "file": "stripe",
+      "resolved": "23.0.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "openai",
+      "file": "openai",
+      "resolved": "7.25.0",
+      "summary": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 38
+    },
+    {
+      "name": "@anthropic-ai/sdk",
+      "file": "anthropic-ai__sdk",
+      "resolved": "0.131.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 33
+    },
+    {
+      "name": "@aws-sdk/client-s3",
+      "file": "aws-sdk__client-s3",
+      "resolved": "3.1144.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "lodash",
+      "file": "lodash",
+      "resolved": "4.18.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "lodash-es",
+      "file": "lodash-es",
+      "resolved": "4.18.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "date-fns",
+      "file": "date-fns",
+      "resolved": "4.4.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 740
+    },
+    {
+      "name": "dayjs",
+      "file": "dayjs",
+      "resolved": "1.11.23",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "nanoid",
+      "file": "nanoid",
+      "resolved": "6.0.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 2
+    },
+    {
+      "name": "uuid",
+      "file": "uuid",
+      "resolved": "14.0.2",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "axios",
+      "file": "axios",
+      "resolved": "1.20.0",
+      "summary": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "warn"
+      },
+      "subpaths": 13
+    },
+    {
+      "name": "node-fetch",
+      "file": "node-fetch",
+      "resolved": "3.3.2",
+      "summary": {
+        "workerd": "warn",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "ws",
+      "file": "ws",
+      "resolved": "8.22.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "sharp",
+      "file": "sharp",
+      "resolved": "0.35.5",
+      "summary": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 1,
+      "notes": "Native addon."
+    },
+    {
+      "name": "bcrypt",
+      "file": "bcrypt",
+      "resolved": "6.0.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1,
+      "notes": "Native addon; bcryptjs is the pure-JS alternative."
+    },
+    {
+      "name": "chokidar",
+      "file": "chokidar",
+      "resolved": "5.0.0",
+      "summary": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 2,
+      "notes": "Watches the file system."
+    },
+    {
+      "name": "express",
+      "file": "express",
+      "resolved": "5.2.1",
+      "summary": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "fastify",
+      "file": "fastify",
+      "resolved": "5.12.5",
+      "summary": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "koa",
+      "file": "koa",
+      "resolved": "3.2.1",
+      "summary": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "cors",
+      "file": "cors",
+      "resolved": "2.8.6",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "jsonwebtoken",
+      "file": "jsonwebtoken",
+      "resolved": "9.0.3",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "cookie",
+      "file": "cookie",
+      "resolved": "2.0.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "jsdom",
+      "file": "jsdom",
+      "resolved": "30.1.1",
+      "summary": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "cheerio",
+      "file": "cheerio",
+      "resolved": "1.2.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 3
+    },
+    {
+      "name": "marked",
+      "file": "marked",
+      "resolved": "18.0.14",
+      "summary": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "fail"
+      },
+      "subpaths": 2
+    },
+    {
+      "name": "yaml",
+      "file": "yaml",
+      "resolved": "2.9.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 2
+    },
+    {
+      "name": "zustand",
+      "file": "zustand",
+      "resolved": "5.0.15",
+      "summary": {
+        "workerd": "error",
+        "bun": "error",
+        "deno": "error"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "ky",
+      "file": "ky",
+      "resolved": "2.1.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "warn",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "got",
+      "file": "got",
+      "resolved": "16.0.0",
+      "summary": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "undici",
+      "file": "undici",
+      "resolved": "8.11.2",
+      "summary": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "graphql",
+      "file": "graphql",
+      "resolved": "17.0.2",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 7
+    },
+    {
+      "name": "graphql-yoga",
+      "file": "graphql-yoga",
+      "resolved": "5.24.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "@trpc/server",
+      "file": "trpc__server",
+      "resolved": "11.19.0",
+      "summary": {
+        "workerd": "error",
+        "bun": "error",
+        "deno": "error"
+      },
+      "subpaths": 15
+    },
+    {
+      "name": "@supabase/supabase-js",
+      "file": "supabase__supabase-js",
+      "resolved": "2.117.2",
+      "summary": {
+        "workerd": "fail",
+        "bun": "fail",
+        "deno": "error"
+      },
+      "subpaths": 3
+    },
+    {
+      "name": "firebase",
+      "file": "firebase",
+      "resolved": "12.19.0",
+      "summary": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "fail"
+      },
+      "subpaths": 32
+    },
+    {
+      "name": "@sentry/node",
+      "file": "sentry__node",
+      "resolved": "11.2.0",
+      "summary": {
+        "workerd": "fail",
+        "bun": "fail",
+        "deno": "fail"
+      },
+      "subpaths": 6
+    },
+    {
+      "name": "mongodb",
+      "file": "mongodb",
+      "resolved": "7.7.0",
+      "summary": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "mongoose",
+      "file": "mongoose",
+      "resolved": "9.10.3",
+      "summary": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "better-sqlite3",
+      "file": "better-sqlite3",
+      "resolved": "13.0.3",
+      "summary": {
+        "workerd": "error",
+        "bun": "error",
+        "deno": "error"
+      },
+      "subpaths": 9,
+      "notes": "Native addon."
+    },
+    {
+      "name": "sqlite3",
+      "file": "sqlite3",
+      "resolved": "6.0.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1,
+      "notes": "Native addon."
+    },
+    {
+      "name": "redis",
+      "file": "redis",
+      "resolved": "6.3.0",
+      "summary": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "kysely",
+      "file": "kysely",
+      "resolved": "0.29.6",
+      "summary": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 7
+    },
+    {
+      "name": "@libsql/client",
+      "file": "libsql__client",
+      "resolved": "0.18.0",
+      "summary": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 6
+    },
+    {
+      "name": "@planetscale/database",
+      "file": "planetscale__database",
+      "resolved": "2.0.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "resend",
+      "file": "resend",
+      "resolved": "6.31.0",
+      "summary": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "nodemailer",
+      "file": "nodemailer",
+      "resolved": "10.0.13",
+      "summary": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "warn"
+      },
+      "subpaths": 21
+    },
+    {
+      "name": "pino",
+      "file": "pino",
+      "resolved": "10.3.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "winston",
+      "file": "winston",
+      "resolved": "3.19.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "fail"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "ajv",
+      "file": "ajv",
+      "resolved": "8.20.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "@sinclair/typebox",
+      "file": "sinclair__typebox",
+      "resolved": "0.34.52",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 8
+    },
+    {
+      "name": "superstruct",
+      "file": "superstruct",
+      "resolved": "2.0.2",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "ohash",
+      "file": "ohash",
+      "resolved": "2.0.12",
+      "summary": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 3
+    },
+    {
+      "name": "ofetch",
+      "file": "ofetch",
+      "resolved": "1.5.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 2
+    },
+    {
+      "name": "@octokit/rest",
+      "file": "octokit__rest",
+      "resolved": "22.0.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "tweetnacl",
+      "file": "tweetnacl",
+      "resolved": "1.0.3",
+      "summary": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "@noble/hashes",
+      "file": "noble__hashes",
+      "resolved": "2.4.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 17
+    },
+    {
+      "name": "@noble/curves",
+      "file": "noble__curves",
+      "resolved": "2.4.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 23
+    }
+  ]
+}
