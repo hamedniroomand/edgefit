@@ -25,6 +25,9 @@ function unmappedNote(count: number): string {
   );
 }
 
+/** Folders that frameworks and platforms write their build to. */
+const generatedFolder = /^\.(?:svelte-kit|next|nuxt|output|vercel|netlify|astro)\//u;
+
 function withOwner(chain: readonly string[], owner: string): string[] {
   return chain.at(-1) === owner ? [...chain] : [...chain, owner];
 }
@@ -84,8 +87,10 @@ function moduleOf(
   usages: Usage[],
 ): ModuleUsages {
   const owner = packages.packageFor(file);
-  // Code the bundler added has no original file in the project: it is not the project's own.
-  const own = owner === undefined && existsSync(path.join(root, file));
+  // Code the bundler added has no original file in the project: it is not the project's own. Nor
+  // is a file in a folder a framework generates, which is an earlier stage of the same build.
+  const own =
+    owner === undefined && !generatedFolder.test(file) && existsSync(path.join(root, file));
   return {
     file,
     package: owner,
