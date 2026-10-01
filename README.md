@@ -10,6 +10,10 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/edgefit"><img src="https://img.shields.io/npm/v/edgefit?color=f06a2f&label=npm" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/edgefit"><img src="https://img.shields.io/npm/dm/edgefit?color=f06a2f&label=downloads" alt="npm downloads"></a>
+  <a href="https://www.npmjs.com/package/edgefit"><img src="https://img.shields.io/node/v/edgefit?color=f06a2f&label=node" alt="Node version"></a>
+  <a href="https://www.npmjs.com/package/edgefit"><img src="https://img.shields.io/npm/types/edgefit?color=f06a2f&label=types" alt="TypeScript types"></a>
+  <a href="https://edgefit.kitdev.space/"><img src="https://img.shields.io/badge/runtimes-workerd%20%7C%20bun%20%7C%20deno%20%7C%20netlify%20%7C%20vercel-f06a2f" alt="Supported runtimes"></a>
   <a href="https://github.com/hamedniroomand/edgefit/actions/workflows/ci.yml"><img src="https://github.com/hamedniroomand/edgefit/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://github.com/hamedniroomand/edgefit/blob/main/LICENSE"><img src="https://img.shields.io/github/license/hamedniroomand/edgefit?color=f06a2f" alt="MIT license"></a>
   <a href="https://edgefit.kitdev.space/"><img src="https://img.shields.io/badge/docs-edgefit-f06a2f" alt="Documentation"></a>
@@ -32,9 +36,9 @@ edgefit follows your code and every dependency from the entry point, finds the N
 ## Quick start
 
 ```sh
-npx edgefit check                                  # entry and settings from wrangler.jsonc
+npx edgefit check  # entry and settings from wrangler.jsonc
 npx edgefit check --entry src/index.ts --target bun
-npx edgefit compare --entry src/index.ts           # every runtime side by side
+npx edgefit compare --entry src/index.ts  # every runtime side by side
 ```
 
 On pull requests, with the GitHub Action:
