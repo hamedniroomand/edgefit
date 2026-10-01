@@ -150,6 +150,6 @@ describe('Netlify entries', () => {
       'netlify/edge-functions/c.ts',
       'netlify/edge-functions/d.js',
     ]);
-    expect(exact?.source).toContain('[[edge_functions]] in netlify.toml');
+    expect(exact?.source).toBe('netlify.toml and inline config');
   });
 });

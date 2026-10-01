@@ -5,6 +5,7 @@ import { EdgefitError } from '@/errors.ts';
 import { findVercelSources } from '@/targets/vercel/entries.ts';
 import { findWranglerConfig, readWranglerConfig } from '@/targets/workerd/wrangler.ts';
 
+import { isNetlifyOutput, readNetlifyOutput } from './netlify-output.ts';
 import { staleNote } from './stale.ts';
 import { isVercelOutput, readVercelOutput } from './vercel-output.ts';
 
@@ -45,10 +46,31 @@ function vercelEntries(root: string, built: string, output: string): BuiltEntrie
   };
 }
 
+/** The entries of a Netlify framework output, or `undefined` when the folder is not one. */
+function netlifyEntries(root: string, built: string, output: string): BuiltEntries | undefined {
+  if (!isNetlifyOutput(root, output)) {
+    return undefined;
+  }
+  const { files, unreadable } = readNetlifyOutput(root, output);
+  if (files.length === 0) {
+    throw new EdgefitError(
+      `No edge functions found in ${built}.`,
+      'Netlify framework output has a manifest.json that names its functions, or files in .netlify/v1/edge-functions. Pass the entry file itself to check another one.',
+    );
+  }
+  return {
+    entries: files,
+    notes: [
+      ...staleNote(root, files, ['netlify.toml']),
+      ...unreadable.map(file => `${file} could not be read, so its functions were skipped.`),
+    ],
+  };
+}
+
 /**
  * The entries of a build output, given as an entry file, or as the directory holding one or
  * several: a Nitro or adapter output has one entry, a Vercel Build Output API layout has one for
- * each Edge function.
+ * each Edge function, and a Netlify framework output has one for each edge function it wrote.
  */
 export function builtEntries(root: string, built: string): BuiltEntries {
   const output = path.resolve(root, built);
@@ -58,9 +80,9 @@ export function builtEntries(root: string, built: string): BuiltEntries {
   if (isFile(output)) {
     return { entries: [path.relative(root, output)], notes: [] };
   }
-  const vercel = vercelEntries(root, built, output);
-  if (vercel !== undefined) {
-    return vercel;
+  const platform = vercelEntries(root, built, output) ?? netlifyEntries(root, built, output);
+  if (platform !== undefined) {
+    return platform;
   }
   const candidates = [manifestEntry(output), ...entryNames.map(name => path.join(output, name))];
   const entry = candidates.find(file => file !== undefined && isFile(file));

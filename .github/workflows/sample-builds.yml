@@ -26,9 +26,23 @@ concurrency:
 
 jobs:
   build:
-    name: Next.js on Vercel
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Next.js on Vercel
+            app: next-edge
+            build: npm run build:vercel
+            cache: apps/next-edge/.vercel/output
+          - name: SvelteKit on Netlify
+            app: sveltekit-netlify
+            build: npm run build:netlify
+            cache: |
+              apps/sveltekit-netlify/.netlify
+              apps/sveltekit-netlify/.svelte-kit
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -45,14 +59,14 @@ jobs:
         id: build-cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: apps/next-edge/.vercel/output
+          path: ${{ matrix.cache }}
           # The weekly run has no cache to hit, so it builds again with whatever is newest.
-          key: next-edge-${{ hashFiles('apps/pnpm-lock.yaml', 'apps/next-edge/**') }}-${{ github.event_name == 'schedule' && github.run_id || 'cached' }}
-      - name: Build with the Vercel CLI
+          key: ${{ matrix.app }}-${{ hashFiles('apps/pnpm-lock.yaml', format('apps/{0}/**', matrix.app)) }}-${{ github.event_name == 'schedule' && github.run_id || 'cached' }}
+      - name: Build the app
         if: steps.build-cache.outputs.cache-hit != 'true'
-        working-directory: apps/next-edge
+        working-directory: apps/${{ matrix.app }}
         env:
           VERCEL_TELEMETRY_DISABLED: '1'
-        run: npm run build:vercel
+        run: ${{ matrix.build }}
       - name: Test against the build
         run: vp test --project apps
