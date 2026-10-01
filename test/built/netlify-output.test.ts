@@ -43,6 +43,22 @@ describe('reading Netlify framework output', () => {
   });
 });
 
+describe('a manifest next to functions that can be read', () => {
+  const mixed = fixture('netlify-output-mixed');
+
+  it('skips the manifest, says so, and keeps the functions', async () => {
+    expect(readNetlifyOutput(mixed, '.netlify')).toEqual({
+      files: [`${frameworks}/a.ts`],
+      unreadable: [`${manifest}/manifest.json`],
+    });
+    const note = `${manifest}/manifest.json could not be read, so its functions were skipped.`;
+    expect(builtEntries(mixed, '.netlify').notes).toContain(note);
+    const [report] = (await check({ root: mixed, config: { targets: ['netlify-edge'] } })).reports;
+    expect(report?.target.notes).toContain(note);
+    expect(JSON.stringify(report)).not.toContain('marker-fake-value');
+  });
+});
+
 describe('--built with Netlify framework output', () => {
   it.each([
     [legacy, '.netlify', `${manifest}/render.js`],
