@@ -3,11 +3,12 @@ import path from 'node:path';
 
 export const sourceExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.mts'];
 
-/** A source file for an edge function: `name.ts`, or `name/index.ts`. */
+/** A source file for an edge function: `name.ts`, `name/index.ts` or `name/name.ts`. */
 export function functionFile(directory: string, name: string): string | undefined {
   const candidates = sourceExtensions.flatMap(extension => [
     path.join(directory, `${name}${extension}`),
     path.join(directory, name, `index${extension}`),
+    path.join(directory, name, `${name}${extension}`),
   ]);
   return candidates.find(candidate => existsSync(candidate));
 }

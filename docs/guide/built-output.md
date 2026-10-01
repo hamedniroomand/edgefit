@@ -58,9 +58,9 @@ npx edgefit check --target netlify-edge --built .netlify
 ```
 
 - **`.netlify/edge-functions/manifest.json`.** The older layout, which SvelteKit's `@sveltejs/adapter-netlify` writes with `edge: true`. The manifest names each function in `functions`, and the file is beside it (`render.js` for `"function": "render"`). Only those names are read, and a manifest that cannot be read is named in a note, without its content.
-- **`.netlify/v1/edge-functions/`.** The Frameworks API layout. Every function file in it is a function that sets its own routes with `export const config`. Maps and `import_map.json` are not functions.
+- **`.netlify/v1/edge-functions/`.** The Frameworks API layout. Every function in it is a function that sets its own routes with `export const config`, as `name.ts`, `name/index.ts` or `name/name.ts`. Maps and `import_map.json` are not functions.
 
-With the `netlify-edge` target, the output is found without `--built`, and it is added to the functions of the project: Netlify deploys both, so both are entries. The settings line says `… and .netlify (build output)`, and a note says when the output is older than `netlify.toml`, a function of the project, the lockfile or `package.json`.
+With the `netlify-edge` target, the output is found without `--built`, and it is added to the functions of the project: Netlify deploys both, so both are entries. The settings line says `entries from netlify.toml, inline config and .netlify (build output)`, and a note says when the output is older than `netlify.toml`, a function of the project, the lockfile or `package.json`.
 
 ## Turn on sourcemaps
 

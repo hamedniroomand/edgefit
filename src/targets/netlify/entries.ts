@@ -13,8 +13,7 @@ import { hasInlineRoute } from './inline-config.ts';
 
 const defaultDirectory = 'netlify/edge-functions';
 const outputDirectory = '.netlify';
-const sourceLabel =
-  '[[edge_functions]] in netlify.toml, and functions that export config with a path';
+const sourceLabel = 'netlify.toml and inline config';
 
 type EntryResult = {
   entries: EntryDetection;
@@ -74,7 +73,9 @@ function routedSource(
   const hasOutput = output.files.length > 0;
   const configFile = config === undefined ? [] : [path.relative(root, config.file)];
   return {
-    label: hasOutput ? `${sourceLabel}, and ${outputDirectory} (build output)` : sourceLabel,
+    label: hasOutput
+      ? `netlify.toml, inline config and ${outputDirectory} (build output)`
+      : sourceLabel,
     guessed: false,
     built: hasOutput,
     find: (): string[] => [...new Set([...own, ...output.files])].toSorted(),

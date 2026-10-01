@@ -19,10 +19,11 @@ describe('reading Netlify framework output', () => {
     });
   });
 
-  it('takes every function file in the Frameworks API folder, and no map or import map', () => {
+  it('takes every function in the Frameworks API folder, as name.ts, name/index.ts or name/name.ts, and no map or import map', () => {
     expect(readNetlifyOutput(v1, '.netlify').files).toEqual([
       `${frameworks}/a.ts`,
       `${frameworks}/b/index.js`,
+      `${frameworks}/c/c.js`,
     ]);
   });
 
@@ -97,7 +98,11 @@ describe('finding Netlify framework output without --built', () => {
 
   it('reads the Frameworks API folder too', async () => {
     const [report] = (await check({ root: v1, config })).reports;
-    expect(report?.entries).toEqual([`${frameworks}/a.ts`, `${frameworks}/b/index.js`]);
+    expect(report?.entries).toEqual([
+      `${frameworks}/a.ts`,
+      `${frameworks}/b/index.js`,
+      `${frameworks}/c/c.js`,
+    ]);
   });
 
   it('checks the project functions and the framework ones together', async () => {
