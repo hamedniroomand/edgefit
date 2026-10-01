@@ -30,6 +30,23 @@ For a directory, edgefit uses the `main` of a wrangler config inside it. Otherwi
 
 From there it follows static and dynamic imports between the output chunks.
 
+## Vercel Build Output API
+
+`vercel build`, and the frameworks that target Vercel, write `.vercel/output`. Every function there is a `.func` folder with a `.vc-config.json`, and the ones with `"runtime": "edge"` run on the Edge runtime. `--built` takes the output folder, or its `functions` folder, and checks each Edge function:
+
+```sh
+npx vercel build
+npx edgefit check --target vercel-edge --built .vercel/output
+```
+
+- The entry of each function is its `entrypoint`. Functions on the Node.js runtime, and a `.func` folder that is a symlink to another, are not checked twice or at all.
+- Only `runtime` and `entrypoint` are read. The file also holds environment variables and secrets, so nothing else is kept, and a file that cannot be read is named in a note without its content.
+- The settings line says `entries from .vercel/output (build output)`. A note says when the output is older than a source, the lockfile, `package.json` or the newest top-level entry of `src/`, so a report of old code is not taken for a fresh one.
+
+With the `vercel-edge` target, the output is found without `--built` when the source gives no entry: the order is `--entry` or the config, then the middleware and the Edge routes in the source, then `.vercel/output`. `--built` always uses the output.
+
+Next.js 16 builds `middleware.ts` as an Edge function and `proxy.ts` as a Node.js one, so only the first is checked. The Edge bundles ship with sourcemaps, and findings are mapped to `next` and your own files. The bundle also holds Next's own runtime code, and [`data/unreached.json`](/guide/findings#code-a-package-ships-and-the-target-does-not-run) says which of its uses do not run on Vercel.
+
 ## Turn on sourcemaps
 
 Without sourcemaps, findings point into the build chunks, which is rarely where you want to fix anything. With them, each finding is mapped back to the original file and package, and the chunks it was reached through become its chain:

@@ -50,9 +50,11 @@ Code behind one of these checks is treated as running on Vercel's Edge runtime o
 
 ## Next.js middleware
 
-Next.js middleware is the main use of this target. A middleware that only imports `NextResponse` from `next/server` reports one finding today, and it does not run in the middleware: `process.cwd` in Next's server rendering code, which `next/server` reaches through a CommonJS barrel that edgefit checks in full.
+Next.js middleware is the main use of this target. A middleware that only imports `NextResponse` from `next/server` reports no finding from its source. Built with `vercel build`, the middleware and an Edge route report no error: the Edge route has four guarded findings in Next's own code, each with a reason (see [code a package ships and the target does not run](/guide/findings#code-a-package-ships-and-the-target-does-not-run)). Check the output with `edgefit check --target vercel-edge --built .vercel/output`. See [Framework build output](/guide/built-output#vercel-build-output-api).
 
-Add an [`ignore` rule](/guide/configuration) for it if you need a clean report.
+## `process`
+
+Only the global `process.env` exists on this runtime. `process.env` is allowed as a whole (`Object.keys(process.env)`, `const { FOO } = process.env`), and the rest of `process` is not. An import of `node:process`, with `import process from 'node:process'` or `import { env } from 'node:process'`, is reported, because `node:process` is not one of the allowed modules.
 
 ## What is not checked
 

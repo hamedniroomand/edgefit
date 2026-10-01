@@ -1,0 +1,5 @@
+---
+'edgefit': minor
+---
+
+`--built` takes a Vercel Build Output API layout. `edgefit check --target vercel-edge --built .vercel/output` checks every Edge function in it, from the `runtime` and `entrypoint` of each `.vc-config.json`, and nothing else in that file is read. The `vercel-edge` target also finds the output on its own when the source has no entry, after the middleware and the Edge routes in the source. A note says when the output is older than the code, the lockfile or `package.json`. Findings in a bundle are mapped through the sourcemaps Next.js writes beside it, including sources written as relative paths from where it built. A new `data/unreached.json` lists code that a package ships and a target never runs, and findings in it are guarded with the reason. It covers four uses in Next.js 16.3.8's Edge bundle, which are the only findings of a built Next.js middleware and Edge route.
