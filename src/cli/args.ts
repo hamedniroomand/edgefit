@@ -2,6 +2,8 @@ import { parseArgs } from 'node:util';
 import type { ParseArgsConfig } from 'node:util';
 
 import { EdgefitError } from '@/errors.ts';
+import { parsePackageSpec } from '@/package/spec.ts';
+import type { PackageSpec } from '@/package/spec.ts';
 import { failOnValues } from '@/report/diff.ts';
 import type { FailOn } from '@/report/diff.ts';
 import { isReportFormat } from '@/report/index.ts';
@@ -38,6 +40,20 @@ export interface DiffArgs {
   format: ReportFormat;
   color: boolean;
   failOn: FailOn;
+}
+
+export interface PackageArgs {
+  spec: PackageSpec;
+  /** `undefined` checks the compared targets. */
+  targets: TargetKey[] | undefined;
+  format: CompareFormat;
+  color: boolean;
+  exports: string[];
+  skip: string[];
+  keep: boolean;
+  registry: string | undefined;
+  /** Where to write the badge SVG. */
+  badge: string | undefined;
 }
 
 export type CompareFormat = Extract<ReportFormat, 'text' | 'json'>;
@@ -170,5 +186,45 @@ export function parseDiffArgs(argv: string[]): DiffArgs {
     format: parseFormat(values.format),
     color: values.color ?? true,
     failOn: parseFailOn(values['fail-on']),
+  };
+}
+
+export function parsePackageArgs(argv: string[]): PackageArgs {
+  const { values, positionals } = parse({
+    args: argv,
+    allowPositionals: true,
+    allowNegative: true,
+    options: {
+      target: { type: 'string', multiple: true },
+      format: projectOptions.format,
+      color: projectOptions.color,
+      export: { type: 'string', multiple: true },
+      skip: { type: 'string', multiple: true },
+      keep: { type: 'boolean' },
+      registry: { type: 'string' },
+      badge: { type: 'string' },
+    },
+  });
+  const [spec, ...extra] = positionals;
+  if (spec === undefined || extra.length > 0) {
+    throw new EdgefitError(
+      'package takes one package: <name[@version]>, a directory or a .tgz file.',
+      usageHint,
+    );
+  }
+  const format = parseFormat(values.format);
+  if (format === 'github') {
+    throw new EdgefitError('package supports the text and json formats.', usageHint);
+  }
+  return {
+    spec: parsePackageSpec(spec),
+    targets: parseTargets(values.target),
+    format,
+    color: values.color ?? true,
+    exports: values.export ?? [],
+    skip: values.skip ?? [],
+    keep: values.keep ?? false,
+    registry: values.registry,
+    badge: values.badge,
   };
 }

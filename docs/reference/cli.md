@@ -8,6 +8,7 @@ edgefit <command> [options]
 | --------------------- | ----------------------------------------------------------- |
 | [`check`](#check)     | Scan a project from its entry point                         |
 | [`compare`](#compare) | Show the reached APIs side by side across targets           |
+| [`package`](#package) | Check a published package or a local one                    |
 | [`diff`](#diff)       | Show what changed between two `check --format json` reports |
 | [`targets`](#targets) | List the supported targets and the data behind each         |
 | `help`                | Show the help text                                          |
@@ -66,6 +67,26 @@ edgefit diff <base.json> <head.json> [options]
 | `--no-color`        | Disable colors                                                                        |
 
 Both files must be written by `edgefit check --format json` with the same edgefit version. See [Pull request checks](/guide/ci).
+
+## package
+
+```sh
+edgefit package <name[@version]|directory|file.tgz> [options]
+```
+
+Installs the package into a temporary project with `npm install --ignore-scripts`, then checks each public entry point with every export used. `name`, `name@1.2.3`, `name@^1`, `@scope/name` and `@scope/name@tag` are accepted. A directory is packed with `npm pack` first, so the files are the ones you would publish. See [Checking packages](/guide/packages) for what a result means.
+
+| Option               | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| `--target <name>`    | Target runtime, repeatable. Default: `workerd`, `bun`, `deno`     |
+| `--export <subpath>` | Check only this `exports` subpath, such as `./client`. Repeatable |
+| `--skip <subpath>`   | Leave out a subpath. Repeatable                                   |
+| `--badge <file>`     | Also write a badge SVG                                            |
+| `--registry <url>`   | npm registry to install from                                      |
+| `--keep`             | Keep the temporary project and print where it is                  |
+| `--format <format>`  | `text` or `json`. Default: `text`                                 |
+
+Exits with 1 if any target fails or could not be checked.
 
 ## targets
 
