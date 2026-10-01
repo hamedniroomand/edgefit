@@ -1,6 +1,6 @@
 {
   "name": "edgefit",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Check whether a project and its dependencies will run on edge and alternative JS runtimes",
   "keywords": [
     "bun",
