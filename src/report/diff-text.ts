@@ -1,7 +1,7 @@
 import type { Finding } from '@/types.ts';
 
 import type { ReportDiff } from './diff.ts';
-import { chainLine, formatLocation, ownerName } from './summary.ts';
+import { chainLine, fixLine, fixSourceLine, formatLocation, ownerName } from './summary.ts';
 import { painter } from './text.ts';
 import type { Paint, TextOptions } from './text.ts';
 
@@ -26,6 +26,14 @@ function formatAdded(finding: Finding, paint: Paint): string {
   ];
   if (finding.chain.length > 1) {
     lines.push(paint('dim', `  via ${chainLine(finding)}`));
+  }
+  const fix = fixLine(finding);
+  if (fix !== undefined) {
+    lines.push(`  ${paint('green', fix)}`);
+  }
+  const why = fixSourceLine(finding);
+  if (why !== undefined) {
+    lines.push(paint('dim', `  ${why}`));
   }
   return lines.join('\n');
 }

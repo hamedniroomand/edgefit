@@ -42,11 +42,64 @@ describe('nodejs_compat setting', () => {
   });
 });
 
+describe('suggesting nodejs_compat', () => {
+  const buffer = { module: '*globals*', path: ['Buffer'] };
+
+  it('says to add the flag when it is missing', () => {
+    const result = checkSettings(buffer, settings('2026-04-24', []));
+    expect(result?.suggestion).toMatchObject({
+      setting: { name: 'compatibility_flags', value: 'nodejs_compat' },
+    });
+  });
+
+  it('says to remove no_nodejs_compat when that is all that turns it off', () => {
+    const result = checkSettings(buffer, settings('2026-09-01', ['no_nodejs_compat']));
+    expect(result?.suggestion?.setting).toEqual({
+      name: 'compatibility_flags',
+      value: 'no_nodejs_compat',
+      remove: true,
+    });
+  });
+
+  it('says to replace no_nodejs_compat before the date it is on by default', () => {
+    const result = checkSettings(buffer, settings('2026-04-24', ['no_nodejs_compat']));
+    expect(result?.suggestion?.text).toContain('Replace `no_nodejs_compat`');
+    expect(result?.suggestion?.setting).toEqual({
+      name: 'compatibility_flags',
+      value: 'nodejs_compat',
+    });
+  });
+});
+
 describe('workerd module gates', () => {
   it('reports modules as mocked before their compatibility date', () => {
     const result = checkSettings({ module: 'fs', path: ['readFileSync'] }, settings('2025-09-14'));
     expect(result?.status).toBe('mocked');
-    expect(result?.note).toContain('2025-09-15');
+    expect(result?.suggestion?.setting).toEqual({
+      name: 'compatibility_date',
+      value: '2025-09-15',
+    });
+  });
+
+  it('says to remove a disable flag that closes a gate the date would open', () => {
+    const closed = settings('2026-09-01', ['nodejs_compat', 'disable_nodejs_fs_module']);
+    const result = checkSettings({ module: 'fs', path: ['readFileSync'] }, closed);
+    expect(result?.status).toBe('mocked');
+    expect(result?.suggestion?.setting).toEqual({
+      name: 'compatibility_flags',
+      value: 'disable_nodejs_fs_module',
+      remove: true,
+    });
+  });
+
+  it('says to replace a disable flag when the date is too early to open the gate', () => {
+    const closed = settings('2025-09-14', ['nodejs_compat', 'disable_nodejs_fs_module']);
+    const result = checkSettings({ module: 'fs', path: ['readFileSync'] }, closed);
+    expect(result?.suggestion?.text).toContain('Replace `disable_nodejs_fs_module`');
+    expect(result?.suggestion?.setting).toEqual({
+      name: 'compatibility_flags',
+      value: 'enable_nodejs_fs_module',
+    });
   });
 
   it('accepts modules on or after their compatibility date', () => {

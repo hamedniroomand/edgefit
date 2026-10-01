@@ -33,3 +33,14 @@ export function ownerName(owned: { package: PackageInfo | undefined }): string {
 export function chainLine(finding: Finding): string {
   return finding.chain.join(' > ');
 }
+
+/** What to do about a finding, as one sentence, or nothing when edgefit has no fix for it. */
+export function fixLine(finding: Finding): string | undefined {
+  return finding.suggestion === undefined ? undefined : `fix: ${finding.suggestion.text}`;
+}
+
+/** The link behind the fix, unless the finding already shows the same one. */
+export function fixSourceLine(finding: Finding): string | undefined {
+  const source = finding.suggestion?.source;
+  return source === undefined || source === finding.source ? undefined : `why ${source}`;
+}

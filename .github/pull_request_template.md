@@ -12,4 +12,4 @@
 - [ ] Tests cover the change
 - [ ] Docs updated, if behavior or options changed
 - [ ] `CHANGELOG.md` entry added, if users will notice
-- [ ] Data changes link the runtime source they were read from
+- [ ] Data changes and suggested fixes link the source they were read from

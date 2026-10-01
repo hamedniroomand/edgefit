@@ -1,7 +1,15 @@
 import type { LookupResult } from '@/data/dump.ts';
 import type { ApiRef } from '@/types.ts';
 
-import { flagsSource, gatedFlags, gatesFor, hasNodeCompat, isGateOpen } from './gates.ts';
+import {
+  flagsSource,
+  gatedFlags,
+  gatesFor,
+  hasNodeCompat,
+  isGateOpen,
+  nodeCompatDefaultDate,
+} from './gates.ts';
+import type { Gate } from './gates.ts';
 
 export interface WorkerdSettings {
   compatibilityDate: string;
@@ -25,15 +33,75 @@ function unsupported(note: string, source?: string): LookupResult {
     : { status: 'unsupported', note, source };
 }
 
+/** What to do so `nodejs_compat` is on, given how it came to be off. */
+function nodeCompatSuggestion(settings: WorkerdSettings): NonNullable<LookupResult['suggestion']> {
+  const off = settings.compatibilityFlags.includes('no_nodejs_compat');
+  if (off && settings.compatibilityDate >= nodeCompatDefaultDate) {
+    // From this date it is on unless that flag turns it off, so taking the flag out is enough.
+    return {
+      kind: 'setting',
+      text: 'Remove `no_nodejs_compat` from `compatibility_flags`.',
+      setting: { name: 'compatibility_flags', value: 'no_nodejs_compat', remove: true },
+      source: flagsSource,
+    };
+  }
+  return {
+    kind: 'setting',
+    text: off
+      ? 'Replace `no_nodejs_compat` with `nodejs_compat` in `compatibility_flags`.'
+      : 'Add `nodejs_compat` to `compatibility_flags`.',
+    setting: { name: 'compatibility_flags', value: 'nodejs_compat' },
+    source: flagsSource,
+  };
+}
+
 /** An API a missing flag leaves undefined: code that checks for it first never reaches it. */
-function withoutFlag(note: string): LookupResult {
-  return { ...unsupported(note, flagsSource), absent: true };
+function withoutFlag(note: string, settings: WorkerdSettings): LookupResult {
+  return {
+    ...unsupported(note, flagsSource),
+    absent: true,
+    suggestion: nodeCompatSuggestion(settings),
+  };
+}
+
+/**
+ * What opens a closed gate. Setting both an `enable_` and a `disable_` flag makes workerd refuse
+ * to start, so a `disable_` flag is taken out, and swapped for the `enable_` flag when the
+ * compatibility date alone would not open the gate.
+ */
+function gateSuggestion(
+  gate: Gate,
+  settings: WorkerdSettings,
+): NonNullable<LookupResult['suggestion']> {
+  const disable = gate.flag.replace(/^enable_/u, 'disable_');
+  if (!settings.compatibilityFlags.includes(disable)) {
+    return {
+      kind: 'setting',
+      text: `Set \`compatibility_date\` to ${gate.date} or later, or add the \`${gate.flag}\` flag.`,
+      setting: { name: 'compatibility_date', value: gate.date },
+      source: flagsSource,
+    };
+  }
+  if (settings.compatibilityDate >= gate.date) {
+    return {
+      kind: 'setting',
+      text: `Remove the \`${disable}\` flag from \`compatibility_flags\`.`,
+      setting: { name: 'compatibility_flags', value: disable, remove: true },
+      source: flagsSource,
+    };
+  }
+  return {
+    kind: 'setting',
+    text: `Replace \`${disable}\` with \`${gate.flag}\` in \`compatibility_flags\`.`,
+    setting: { name: 'compatibility_flags', value: gate.flag },
+    source: flagsSource,
+  };
 }
 
 function checkGlobal(api: ApiRef, settings: WorkerdSettings): LookupResult | undefined {
   const [name] = api.path;
   if (name !== undefined && nodeCompatGlobals.has(name) && !hasNodeCompat(settings)) {
-    return withoutFlag('is only defined with the nodejs_compat compatibility flag');
+    return withoutFlag('is only defined with the nodejs_compat compatibility flag', settings);
   }
   return undefined;
 }
@@ -54,7 +122,7 @@ export function checkSettings(api: ApiRef, settings: WorkerdSettings): LookupRes
       api.module === 'async_hooks' && settings.compatibilityFlags.includes('nodejs_als');
     return alsOnly
       ? undefined
-      : withoutFlag('needs the nodejs_compat compatibility flag, which is not set');
+      : withoutFlag('needs the nodejs_compat compatibility flag, which is not set', settings);
   }
   const gate = gatesFor(api).find(candidate => !isGateOpen(candidate, settings));
   if (gate === undefined) {
@@ -65,9 +133,9 @@ export function checkSettings(api: ApiRef, settings: WorkerdSettings): LookupRes
     status: 'mocked',
     note:
       `is not native at compatibility date ${settings.compatibilityDate}, so wrangler substitutes ` +
-      `an unenv polyfill that may no-op or throw; set compatibility_date to ${gate.date} or later, ` +
-      `or add the ${gate.flag} flag`,
+      'an unenv polyfill that may no-op or throw',
     source: flagsSource,
+    suggestion: gateSuggestion(gate, settings),
   };
 }
 

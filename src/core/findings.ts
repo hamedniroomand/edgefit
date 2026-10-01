@@ -1,3 +1,5 @@
+import { findSuggestion } from '@/data/suggestions.ts';
+import type { SuggestionData } from '@/data/suggestions.ts';
 import type { Target } from '@/targets/index.ts';
 import type {
   Category,
@@ -6,11 +8,16 @@ import type {
   Level,
   PackageInfo,
   Runtime,
+  Suggestion,
   TargetKey,
   Usage,
 } from '@/types.ts';
 
 import { classify } from './classify.ts';
+import type { Classification } from './classify.ts';
+
+/** Re-exported so the check reads the shipped suggestions through the same module that applies them. */
+export { loadSuggestions } from '@/data/suggestions.ts';
 
 export const defaultLevels: Record<Category, Level> = {
   unsupported: 'error',
@@ -46,6 +53,8 @@ export interface FindingOptions {
   target: Target;
   levels: Record<Category, Level>;
   ignore: readonly IgnoreRule[];
+  /** Reviewed fixes for packages and APIs. Findings get none without them. */
+  suggestions?: SuggestionData;
 }
 
 /** A reached API the target fully supports. */
@@ -94,6 +103,30 @@ function withoutRedundantModules(findings: readonly Finding[]): Finding[] {
   );
 }
 
+/**
+ * A change to a setting comes first, because it is the smallest change. Then the reviewed fix for
+ * the package or API. A warning that something cannot be checked has nothing to fix.
+ */
+function suggest(
+  module: ModuleUsages,
+  usage: Usage,
+  classification: Classification,
+  options: FindingOptions,
+): Suggestion | undefined {
+  const target = options.target.info.key;
+  if (classification.suggestion !== undefined) {
+    return { ...classification.suggestion, target };
+  }
+  if (classification.category === 'unknown' || options.suggestions === undefined) {
+    return undefined;
+  }
+  return findSuggestion(options.suggestions, {
+    api: usage.display,
+    package: module.package?.name,
+    target,
+  });
+}
+
 function toFinding(
   module: ModuleUsages,
   usage: Usage,
@@ -108,6 +141,9 @@ function toFinding(
     return undefined;
   }
   const target: TargetKey = options.target.info.key;
+  const guarded =
+    (usage.guarded === true && classification.absent) || isOtherRuntime(usage, target);
+  const suggestion = guarded ? undefined : suggest(module, usage, classification, options);
   return {
     category: classification.category,
     level,
@@ -120,11 +156,10 @@ function toFinding(
     otherLocations: [],
     chain: module.chain,
     ...(classification.source === undefined ? {} : { source: classification.source }),
+    ...(suggestion === undefined ? {} : { suggestion }),
     // A check only protects code from an API the target lacks; one that exists and throws still fails.
     // Code that only runs on another runtime is never reached, whatever it uses.
-    ...((usage.guarded === true && classification.absent) || isOtherRuntime(usage, target)
-      ? { guarded: true as const }
-      : {}),
+    ...(guarded ? { guarded: true as const } : {}),
   };
 }
 

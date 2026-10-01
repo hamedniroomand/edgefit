@@ -50,6 +50,23 @@ export interface Usage {
   runtimes?: RuntimeCondition[];
 }
 
+/** How to get rid of a finding: swap a package, change a setting, or change code or config. */
+export interface Suggestion {
+  kind: 'replace' | 'setting' | 'change';
+  /** One sentence telling the user what to do. */
+  text: string;
+  /** For `replace`: the package to use instead. */
+  package?: string;
+  /**
+   * For `setting`: the exact key and value, such as `compatibility_date` and `2025-09-15`.
+   * With `remove`, the value is to be taken out of the setting, as `no_nodejs_compat` is.
+   */
+  setting?: { name: string; value: string; remove?: true };
+  target: TargetKey;
+  /** Where the fix is documented or verified. */
+  source: string;
+}
+
 export interface Finding {
   category: Category;
   level: Exclude<Level, 'off'>;
@@ -68,6 +85,8 @@ export interface Finding {
   chain: string[];
   /** Link to the curated source behind this result, when there is one. */
   source?: string;
+  /** What to do about it, when edgefit knows. Never set on guarded findings. */
+  suggestion?: Suggestion;
   /** Set when the code only runs if the API exists, or on another runtime. Guarded findings never fail a check. */
   guarded?: true;
 }

@@ -70,7 +70,7 @@ export const gatedFlags = new Set(
 );
 
 // From this compatibility date nodejs_compat is on unless `no_nodejs_compat` turns it off.
-const nodeCompatDefaultDate = '2026-08-04';
+export const nodeCompatDefaultDate = '2026-08-04';
 
 export function hasNodeCompat(settings: WorkerdSettings): boolean {
   const flags = settings.compatibilityFlags;
