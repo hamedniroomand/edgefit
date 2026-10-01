@@ -49,6 +49,19 @@ Next.js 16 builds `middleware.ts` as an Edge function and `proxy.ts` as a Node.j
 
 Turbopack loads a Node.js built-in as `e.x("node:timers", () => require("node:timers"), !0)`, and `await import('node:timers')` as a `Promise.resolve().then(…)` around it. edgefit reads both as the module, so a read from a Node.js module Vercel lacks is reported in the bundle, at the file of yours that wrote it. A static import of such a module does not build in a route, only in a middleware, so a route has to import it lazily to be built at all. The bundle also holds Next's own runtime code, and [`data/unreached.json`](/guide/findings#code-a-package-ships-and-the-target-does-not-run) says which of its uses do not run on Vercel.
 
+## Netlify framework output
+
+Frameworks that deploy to Netlify Edge write their functions to `.netlify`, in one of two layouts. `--built` takes `.netlify` or either folder:
+
+```sh
+npx edgefit check --target netlify-edge --built .netlify
+```
+
+- **`.netlify/edge-functions/manifest.json`.** The older layout, which SvelteKit's `@sveltejs/adapter-netlify` writes with `edge: true`. The manifest names each function in `functions`, and the file is beside it (`render.js` for `"function": "render"`). Only those names are read, and a manifest that cannot be read is named in a note, without its content.
+- **`.netlify/v1/edge-functions/`.** The Frameworks API layout. Every function file in it is a function that sets its own routes with `export const config`. Maps and `import_map.json` are not functions.
+
+With the `netlify-edge` target, the output is found without `--built`, and it is added to the functions of the project: Netlify deploys both, so both are entries. The settings line says `… and .netlify (build output)`, and a note says when the output is older than `netlify.toml`, a function of the project, the lockfile or `package.json`.
+
 ## Turn on sourcemaps
 
 Without sourcemaps, findings point into the build chunks, which is rarely where you want to fix anything. With them, each finding is mapped back to the original file and package, and the chunks it was reached through become its chain:
