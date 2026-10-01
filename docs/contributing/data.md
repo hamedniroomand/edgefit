@@ -6,12 +6,13 @@ The quality of edgefit's results is the quality of its data. This page explains 
 
 Everything is in `data`:
 
-| Path                            | What it is                                                    |
-| ------------------------------- | ------------------------------------------------------------- |
-| `source.json`                   | Every data source with its URL, version, commit and license   |
-| `workers-nodejs-compat-matrix/` | The vendored matrix: a Node baseline and one dump per runtime |
-| `runtime-compat-data/`          | The vendored Web API data, as published                       |
-| `overrides/<target>.json`       | Curated corrections per target                                |
+| Path                            | What it is                                                                             |
+| ------------------------------- | -------------------------------------------------------------------------------------- |
+| `source.json`                   | Every data source with its URL, version, commit and license                            |
+| `workers-nodejs-compat-matrix/` | The vendored matrix: a Node baseline and one dump per runtime                          |
+| `runtime-compat-data/`          | The vendored Web API data, as published                                                |
+| `overrides/<target>.json`       | Curated corrections per target                                                         |
+| `suggestions.json`              | Reviewed fixes for packages and APIs, see [Suggested fixes](/contributing/suggestions) |
 
 `edgefit targets` prints what `source.json` says, so users can see exactly which data produced their results.
 

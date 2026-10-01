@@ -9,7 +9,7 @@ import { createTarget } from '@/targets/index.ts';
 import type { Target, TargetInfo } from '@/targets/index.ts';
 import type { EdgefitConfig, Finding } from '@/types.ts';
 
-import { collectFindings, collectSupported, defaultLevels } from './findings.ts';
+import { collectFindings, collectSupported, defaultLevels, loadSuggestions } from './findings.ts';
 import type { SupportedApi } from './findings.ts';
 import { scanModules, toPosix } from './scan.ts';
 
@@ -81,6 +81,7 @@ async function checkTarget(
     target,
     levels: { ...defaultLevels, ...config.levels },
     ignore: config.ignore ?? [],
+    suggestions: loadSuggestions(),
   });
   return {
     target: { ...target.info, conditions, notes: [...target.info.notes, ...notes] },

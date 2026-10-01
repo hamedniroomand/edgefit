@@ -1,0 +1,54 @@
+name: Suggested fix
+description: Propose or correct the fix edgefit suggests for a package or API.
+labels: [data]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggestions live in `data/suggestions.json`, and every one links its source. See [Suggested fixes](https://edgefit.kitdev.space/contributing/suggestions) for the format.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is this about?
+      options:
+        - A new suggestion
+        - A suggestion that is wrong or out of date
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      options: [workerd, bun, deno, deno-deploy]
+    validations:
+      required: true
+  - type: input
+    id: subject
+    attributes:
+      label: Package or API
+      description: The package the finding is in, or the API as reports show it.
+      placeholder: cross-spawn, or node:child_process.spawn
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: The fix
+      description: One sentence that says what to do. If it replaces a package, name the package.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: A link to the code or documentation that supports the fix, pinned to a version.
+      placeholder: https://github.com/…/blob/v1.2.3/…
+    validations:
+      required: true
+  - type: textarea
+    id: verified
+    attributes:
+      label: How you checked it
+      description: For a package replacement, edgefit must report nothing for the replacement. Say how you ran it.
+    validations:
+      required: false

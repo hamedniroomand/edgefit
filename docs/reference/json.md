@@ -36,7 +36,13 @@ edgefit check --format json
           "location": { "file": "node_modules/chokidar/index.js", "line": 5, "column": 13 },
           "otherLocations": [],
           "chain": ["src/index.ts", "src/dev/reload.ts", "chokidar"],
-          "source": "https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node/internal/internal_fs_callback.ts"
+          "source": "https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node/internal/internal_fs_callback.ts",
+          "suggestion": {
+            "kind": "change",
+            "text": "chokidar watches files, which Workers cannot do. Import it from development tooling only, and keep it out of what the Worker's entry imports.",
+            "target": "workerd",
+            "source": "https://github.com/paulmillr/chokidar/blob/4.0.3/README.md"
+          }
         }
       ]
     }
@@ -48,20 +54,21 @@ edgefit check --format json
 
 ### Finding
 
-| Field            | Type                  | Description                                                         |
-| ---------------- | --------------------- | ------------------------------------------------------------------- |
-| `category`       | `string`              | `unsupported`, `mocked`, `mismatch`, `web` or `unknown`             |
-| `level`          | `string`              | `error` or `warning`                                                |
-| `api`            | `string`              | The API, such as `node:fs.watch` or `require(<expression>)`         |
-| `target`         | `string`              | The target key                                                      |
-| `message`        | `string`              | A full sentence, including the API                                  |
-| `detail`         | `string`              | What is wrong, without the API                                      |
-| `package`        | `object \| undefined` | `{ name, version }` of the owning package. Absent for your own code |
-| `location`       | `object`              | `{ file, line, column }`, relative to the root, with `/` separators |
-| `otherLocations` | `object[]`            | Other places the same package uses the same API                     |
-| `chain`          | `string[]`            | Import chain from the entry                                         |
-| `source`         | `string \| undefined` | Link to the runtime source behind a curated result                  |
-| `guarded`        | `true \| undefined`   | Set on entries of `guarded`                                         |
+| Field            | Type                  | Description                                                                                                                                                                                                                    |
+| ---------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `category`       | `string`              | `unsupported`, `mocked`, `mismatch`, `web` or `unknown`                                                                                                                                                                        |
+| `level`          | `string`              | `error` or `warning`                                                                                                                                                                                                           |
+| `api`            | `string`              | The API, such as `node:fs.watch` or `require(<expression>)`                                                                                                                                                                    |
+| `target`         | `string`              | The target key                                                                                                                                                                                                                 |
+| `message`        | `string`              | A full sentence, including the API                                                                                                                                                                                             |
+| `detail`         | `string`              | What is wrong, without the API                                                                                                                                                                                                 |
+| `package`        | `object \| undefined` | `{ name, version }` of the owning package. Absent for your own code                                                                                                                                                            |
+| `location`       | `object`              | `{ file, line, column }`, relative to the root, with `/` separators                                                                                                                                                            |
+| `otherLocations` | `object[]`            | Other places the same package uses the same API                                                                                                                                                                                |
+| `chain`          | `string[]`            | Import chain from the entry                                                                                                                                                                                                    |
+| `source`         | `string \| undefined` | Link to the runtime source behind a curated result                                                                                                                                                                             |
+| `suggestion`     | `object \| undefined` | What to do about it: `{ kind, text, target, source }`, plus `package` for a `replace` and `setting` (`{ name, value }`, with `remove: true` when the value is to be taken out) for a `setting`. Never set on `guarded` entries |
+| `guarded`        | `true \| undefined`   | Set on entries of `guarded`                                                                                                                                                                                                    |
 
 ## compare
 

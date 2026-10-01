@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
+import { formatDiffGithub } from '@/report/diff-github.ts';
+import { formatDiffText } from '@/report/diff-text.ts';
 import { diffFails, diffReports } from '@/report/diff.ts';
 import type { JsonReport } from '@/report/json.ts';
 import type { Finding, PackageInfo } from '@/types.ts';
@@ -85,5 +87,22 @@ describe('diff fail-on', () => {
     expect(diffFails(newError, 'new-errors')).toBe(true);
     expect(diffFails(onlyOld, 'errors')).toBe(true);
     expect(diffFails(newError, 'never')).toBe(false);
+  });
+});
+
+describe('suggested fixes in a diff', () => {
+  const fixed = finding('node:fs.watch', chokidar, {
+    suggestion: {
+      kind: 'change',
+      text: 'Watch in development only.',
+      target: 'workerd',
+      source: 'https://example.com/watch',
+    },
+  });
+  const diff = diffReports(report(), report(fixed));
+
+  it('show for a new finding in the text and in the annotation', () => {
+    expect(formatDiffText(diff, { color: false })).toContain('fix: Watch in development only.');
+    expect(formatDiffGithub(diff)).toContain('fix: Watch in development only.');
   });
 });

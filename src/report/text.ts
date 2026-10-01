@@ -4,7 +4,14 @@ import type { CheckResult, TargetReport } from '@/core/check.ts';
 import { formatPackage } from '@/resolve/packages.ts';
 import type { Finding } from '@/types.ts';
 
-import { chainLine, formatLocation, ownerName, summaryLine } from './summary.ts';
+import {
+  chainLine,
+  fixLine,
+  fixSourceLine,
+  formatLocation,
+  ownerName,
+  summaryLine,
+} from './summary.ts';
 
 type Style = Parameters<typeof styleText>[0];
 
@@ -56,6 +63,14 @@ export function formatFinding(finding: Finding, paint: Paint): string[] {
   ];
   if (finding.chain.length > 1) {
     lines.push(paint('dim', `${indent}via ${chainLine(finding)}`));
+  }
+  const fix = fixLine(finding);
+  if (fix !== undefined) {
+    lines.push(`${indent}${paint('green', fix)}`);
+  }
+  const why = fixSourceLine(finding);
+  if (why !== undefined) {
+    lines.push(paint('dim', `${indent}${why}`));
   }
   if (finding.source !== undefined) {
     lines.push(paint('dim', `${indent}see ${finding.source}`));

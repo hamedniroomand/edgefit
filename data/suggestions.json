@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "description": "Reviewed fixes for packages and APIs that do not fit a target. Every entry links the source that supports it. See docs/contributing/suggestions.md.",
+  "packages": {
+    "chokidar": [
+      {
+        "targets": ["workerd"],
+        "kind": "change",
+        "text": "chokidar watches files, which Workers cannot do. Import it from development tooling only, and keep it out of what the Worker's entry imports.",
+        "apis": ["node:fs.*", "node:fs/promises.*"],
+        "source": "https://github.com/paulmillr/chokidar/blob/4.0.3/README.md",
+        "reviewed": "2026-09-30"
+      }
+    ],
+    "cross-spawn": [
+      {
+        "targets": ["workerd"],
+        "kind": "change",
+        "text": "cross-spawn starts child processes, which Workers cannot do. Do that work outside the Worker, at build time or in a service the Worker calls with fetch.",
+        "apis": ["node:child_process.*"],
+        "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/node/child_process.ts",
+        "reviewed": "2026-09-30"
+      }
+    ]
+  },
+  "apis": {
+    "node:child_process*": [
+      {
+        "targets": ["workerd"],
+        "kind": "change",
+        "text": "Workers cannot start processes. Do that work outside the Worker, at build time or in a service the Worker calls with fetch.",
+        "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/node/child_process.ts",
+        "reviewed": "2026-09-30"
+      }
+    ],
+    "node:fs.watch*": [
+      {
+        "targets": ["workerd"],
+        "kind": "change",
+        "text": "Workers do not implement file watching. Run it in development tooling, not in code the Worker bundles.",
+        "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/node/internal/internal_fs_callback.ts",
+        "reviewed": "2026-09-30"
+      }
+    ],
+    "node:fs.unwatchFile": [
+      {
+        "targets": ["workerd"],
+        "kind": "change",
+        "text": "Workers do not implement file watching. Run it in development tooling, not in code the Worker bundles.",
+        "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/node/internal/internal_fs_callback.ts",
+        "reviewed": "2026-09-30"
+      }
+    ],
+    "node:fs.promises.watch": [
+      {
+        "targets": ["workerd"],
+        "kind": "change",
+        "text": "Workers do not implement file watching. Run it in development tooling, not in code the Worker bundles.",
+        "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/node/internal/internal_fs_promises.ts",
+        "reviewed": "2026-09-30"
+      }
+    ],
+    "node:fs/promises.watch": [
+      {
+        "targets": ["workerd"],
+        "kind": "change",
+        "text": "Workers do not implement file watching. Run it in development tooling, not in code the Worker bundles.",
+        "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/node/internal/internal_fs_promises.ts",
+        "reviewed": "2026-09-30"
+      }
+    ]
+  }
+}

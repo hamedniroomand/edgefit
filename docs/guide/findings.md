@@ -74,6 +74,25 @@ warning  unknown  jose@6.2.12  1 access that cannot be checked: globalThis[<expr
 
 `--verbose` lists each one with its location and chain. The JSON report always has every finding, and the summary still counts them as warnings. An `unknown` you turned into an error with `levels` is listed in full.
 
+## Suggested fixes
+
+When edgefit knows what to do about a finding, it says so under it:
+
+```
+error    unsupported  node:child_process.spawn  (workerd)
+       every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes
+       cross-spawn@7.0.6  node_modules/cross-spawn/index.js:12:24
+       fix: cross-spawn starts child processes, which Workers cannot do. Do that work outside the Worker, at build time or in a service the Worker calls with fetch.
+            https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/node/child_process.ts
+```
+
+Two kinds of fix exist:
+
+- **A setting.** When a config change makes the finding go away, the fix gives the exact value: `Add nodejs_compat to compatibility_flags`, or `Set compatibility_date to 2025-09-15 or later, or add the enable_nodejs_fs_module flag`. The JSON report has it as `setting`, with a `name` and a `value`.
+- **A reviewed fix.** A curated list maps packages and APIs to what to do, each with a link to the evidence. Anyone can [add or correct an entry](/contributing/suggestions).
+
+A finding has at most one fix, and a setting wins over a reviewed fix. Most findings have none, since edgefit only suggests what it can source. Guarded usages and `unknown` warnings never do.
+
 ## Guarded usages
 
 Code often checks for an API before it uses it:

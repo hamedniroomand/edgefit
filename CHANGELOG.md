@@ -4,6 +4,7 @@
 
 ### Added
 
+- Findings suggest a fix. A change of setting is worked out from the check: a finding that the `nodejs_compat` flag removes says to add it, and a module gated by a compatibility date says which date, or which flag, to use. Reviewed fixes for packages and APIs come from the new `data/suggestions.json`, each with a source link, and start with file watching and process spawning on Workers. The fix shows as a `fix:` line in the text report, as `suggestion` on each finding in the JSON report, and in the GitHub annotations and the pull request comment. See [Suggested fixes](https://edgefit.kitdev.space/contributing/suggestions) to add one.
 - Code that only runs on another runtime is guarded on this one. `typeof Deno`, `typeof Bun`, `'Deno' in globalThis`, `process.versions.deno`, `process.versions.bun` and `navigator.userAgent` tests are read, in an `if`, `?:`, `&&` or guard clause and in the `else` branch, so `else if (process.versions?.bun) …` chains are followed. Everything such code uses is guarded, an API that exists and throws included.
 - A `try` block whose `catch` does not throw again guards the APIs the target lacks that it uses. `await import()` counts; functions defined in the block and an `import()` nothing awaits do not.
 - A helper in the same file that only returns a check (`const isDeno = () => typeof Deno !== 'undefined'`, `function hasWatch() { return !!fs.watch; }`), and a `const` that holds one, stand in for the check they hold.
@@ -11,6 +12,7 @@
 
 ### Changed
 
+- The message for a module that is not native at the project's compatibility date no longer ends with what to set. That is now the finding's `suggestion`.
 - The GitHub Action's warning about a base commit it could not check now says to build in `install-command` when the entry is build output, and the action docs explain why the base needs its own build.
 
 ## 0.4.0

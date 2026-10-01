@@ -46,6 +46,45 @@ const chokidar = makeFinding('node:fs.watch', {
   source: 'https://example.com/fs',
 });
 
+const withFix = makeFinding('node:fs.watch', {
+  suggestion: {
+    kind: 'change',
+    text: 'Watch in development only.',
+    target: 'workerd',
+    source: 'https://example.com/watch',
+  },
+});
+
+describe('suggested fixes', () => {
+  it('show in the text report with their source', () => {
+    const text = formatText(resultOf([withFix]), { color: false });
+    expect(text).toContain('fix: Watch in development only.');
+    expect(text).toContain('https://example.com/watch');
+    expect(formatText(resultOf([chokidar]), { color: false })).not.toContain('fix:');
+  });
+
+  it('show a link that the finding already shows only once', () => {
+    const same = { ...withFix, source: 'https://example.com/watch' };
+    const text = formatText(resultOf([same]), { color: false });
+    expect(text.match(/https:\/\/example\.com\/watch/gu)).toHaveLength(1);
+    expect(annotation(same).match(/example\.com\/watch/gu)).toHaveLength(1);
+  });
+
+  it('show in the GitHub annotation', () => {
+    expect(annotation(withFix)).toContain(
+      '%0Afix: Watch in development only.%0Awhy https://example.com/watch',
+    );
+    expect(annotation(chokidar)).not.toContain('fix');
+  });
+
+  it('are a field of the JSON report', () => {
+    const report = JSON.parse(formatJson(resultOf([withFix]))) as {
+      targets: { findings: Finding[] }[];
+    };
+    expect(report.targets[0]?.findings[0]?.suggestion).toEqual(withFix.suggestion);
+  });
+});
+
 describe('summary line', () => {
   it('pluralizes counts and shows ignored findings only when there are some', () => {
     const warning = makeFinding('node:fs.cp', { level: 'warning' });

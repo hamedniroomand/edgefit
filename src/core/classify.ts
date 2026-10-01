@@ -1,6 +1,6 @@
 import type { LookupResult, Status } from '@/data/dump.ts';
 import type { Target } from '@/targets/index.ts';
-import type { Category, Usage } from '@/types.ts';
+import type { Category, Suggestion, Usage } from '@/types.ts';
 
 export interface Classification {
   category: Category;
@@ -8,6 +8,8 @@ export interface Classification {
   source: string | undefined;
   /** The target lacks the API, so code that checks for it first never reaches it. */
   absent: boolean;
+  /** A change to a setting that makes this go away. The target is not added yet. */
+  suggestion?: Omit<Suggestion, 'target'>;
 }
 
 const categoryByStatus: Partial<Record<Status, Category>> = {
@@ -39,6 +41,7 @@ function classifyApi(usage: Usage, target: Target): Classification | undefined {
     detail: describe(result),
     source: result.source,
     absent: result.absent === true,
+    ...(result.suggestion === undefined ? {} : { suggestion: result.suggestion }),
   };
 }
 

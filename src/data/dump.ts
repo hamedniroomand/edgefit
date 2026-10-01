@@ -1,4 +1,4 @@
-import type { Category } from '@/types.ts';
+import type { Category, Suggestion } from '@/types.ts';
 
 /**
  * A node in a compatibility-matrix dump: a leaf holding the value's type (`function`,
@@ -19,6 +19,8 @@ export interface LookupResult {
   category?: Category;
   /** The API is missing on the target, so a check for it fails. False for one that exists and throws. */
   absent?: true;
+  /** A change to a setting that makes the result go away. The caller adds the target. */
+  suggestion?: Omit<Suggestion, 'target'>;
 }
 
 const functionLike = new Set(['function', 'class']);

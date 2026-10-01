@@ -84,4 +84,4 @@ Use one step per project:
     targets: workerd, bun
 ```
 
-Each combination of working directory and targets gets its own comment.
+Each combination of working directory and targets gets its own comment. A new finding with a [suggested fix](/guide/findings#suggested-fixes) shows it under the finding, in the comment and in the annotation.
