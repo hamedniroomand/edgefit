@@ -35,7 +35,7 @@ describe('edgefit compare', () => {
   it('prints versioned JSON', async () => {
     const { output } = await compare(['workerd', 'bun', '--format', 'json']);
     expect(JSON.parse(output)).toEqual({
-      version: 1,
+      version: 2,
       targets: ['workerd', 'bun'],
       apis: [
         {

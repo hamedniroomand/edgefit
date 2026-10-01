@@ -134,8 +134,8 @@ describe('vercel-edge target info', () => {
   });
 
   it('uses middleware.ts as the entry', () => {
-    const { info, defaultEntry } = createVercelEdgeTarget(fixture('vercel-app'));
-    expect(defaultEntry).toBe('middleware.ts');
+    const { info, defaultEntries } = createVercelEdgeTarget(fixture('vercel-app'));
+    expect(defaultEntries).toEqual(['middleware.ts']);
     expect(info.settings).toContain('entry middleware.ts');
   });
 });
@@ -198,7 +198,7 @@ describe('vercel-edge without an entry', () => {
 describe('vercel-edge middleware that picks its own runtime', () => {
   it('skips a middleware that sets runtime nodejs, and says why', async () => {
     const target = createVercelEdgeTarget(fixture('vercel-node-middleware'));
-    expect(target.defaultEntry).toBeUndefined();
+    expect(target.defaultEntries).toEqual([]);
     expect(target.info.settings).toContain('middleware.ts runs on Node.js');
     expect(target.info.notes.join('\n')).toContain("middleware.ts sets runtime 'nodejs'");
     const error = await edgefitError(
@@ -208,10 +208,10 @@ describe('vercel-edge middleware that picks its own runtime', () => {
   });
 
   it('keeps a middleware that sets runtime edge, or no runtime', () => {
-    expect(createVercelEdgeTarget(fixture('vercel-edge-config')).defaultEntry).toBe(
+    expect(createVercelEdgeTarget(fixture('vercel-edge-config')).defaultEntries).toEqual([
       'middleware.ts',
-    );
-    expect(createVercelEdgeTarget(fixture('vercel-app')).defaultEntry).toBe('middleware.ts');
+    ]);
+    expect(createVercelEdgeTarget(fixture('vercel-app')).defaultEntries).toEqual(['middleware.ts']);
   });
 });
 

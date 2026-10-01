@@ -4,12 +4,15 @@ import { EdgefitError } from '@/errors.ts';
 import type { Finding, TargetKey } from '@/types.ts';
 
 /** Bumped on any breaking change to the JSON shape. */
-export const jsonReportVersion = 1;
+export const jsonReportVersion = 2;
+
+/** The versions `parseJsonReport` reads. Version 1 has `entry` where version 2 has `entries`. */
+const readableVersions: readonly number[] = [1, jsonReportVersion];
 
 /** The parts of a `check --format json` report that other commands read back. */
 export interface JsonReport {
   version: number;
-  targets: { key: TargetKey; findings: Finding[] }[];
+  targets: { key: TargetKey; entries: string[]; findings: Finding[] }[];
 }
 
 export function formatJson(result: CheckResult): string {
@@ -18,7 +21,7 @@ export function formatJson(result: CheckResult): string {
     summary: countLevels(result),
     targets: result.reports.map(targetReport => ({
       ...targetReport.target,
-      entry: targetReport.entry,
+      entries: targetReport.entries,
       modules: targetReport.modules,
       ignored: targetReport.ignored,
       findings: targetReport.findings,
@@ -26,6 +29,14 @@ export function formatJson(result: CheckResult): string {
     })),
   };
   return `${JSON.stringify(report, null, 2)}\n`;
+}
+
+/** Version 1 names one `entry`, which version 2 lists as `entries`. */
+function entriesOf(target: { entries?: unknown; entry?: unknown }): string[] {
+  if (Array.isArray(target.entries)) {
+    return target.entries.filter(entry => typeof entry === 'string');
+  }
+  return typeof target.entry === 'string' ? [target.entry] : [];
 }
 
 function isJsonReport(value: unknown): value is JsonReport {
@@ -52,11 +63,18 @@ export function parseJsonReport(text: string, source: string): JsonReport {
       'Write one with `edgefit check --format json`.',
     );
   }
-  if (value.version !== jsonReportVersion) {
+  if (!readableVersions.includes(value.version)) {
     throw new EdgefitError(
-      `${source} has report version ${value.version}; this edgefit reads version ${jsonReportVersion}.`,
+      `${source} has report version ${value.version}; this edgefit reads versions ${readableVersions.join(' and ')}.`,
       'Write both reports with the same edgefit version.',
     );
   }
-  return value;
+  return {
+    ...value,
+    targets: value.targets.map(target => ({
+      key: target.key,
+      entries: entriesOf(target),
+      findings: target.findings,
+    })),
+  };
 }

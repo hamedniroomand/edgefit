@@ -49,7 +49,8 @@ describe('validating config shape', () => {
   const invalid: [string, unknown, string][] = [
     ['a non-object config', [], 'the default export must be an object'],
     ['empty targets', { targets: [] }, '`targets` must be a non-empty array'],
-    ['a non-string entry', { entry: 1 }, '`entry` must be a string'],
+    ['a non-string entry', { entry: 1 }, '`entry` must be a string or an array of strings'],
+    ['a non-string entry item', { entry: ['a.ts', 1] }, '`entry` must be a string or an array'],
     ['non-string conditions', { conditions: [1] }, '`conditions` must be an array of strings'],
     ['unknown level categories', { levels: { loud: 'off' } }, 'unknown category `loud`'],
     ['non-array ignore', { ignore: {} }, '`ignore` must be an array'],
@@ -64,7 +65,7 @@ describe('validating config shape', () => {
   it('accepts a complete valid config', () => {
     const config = {
       targets: ['workerd', 'bun'],
-      entry: 'src/index.ts',
+      entry: ['src/index.ts', 'src/routes/*.ts'],
       conditions: ['custom'],
       levels: { unknown: 'off' },
       ignore: [{ package: 'chokidar', reason: 'dev only' }],

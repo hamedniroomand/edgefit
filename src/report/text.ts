@@ -30,13 +30,25 @@ export function painter(options: TextOptions): Paint {
     options.color ? styleText(style, text, { validateStream: false }) : text;
 }
 
+const shownEntries = 3;
+
+/** `entry a.ts`, or `entries a.ts, b.ts, c.ts +2 more` when there are more than a few. */
+export function describeEntries(entries: readonly string[]): string {
+  if (entries.length === 1) {
+    return `entry ${entries[0]}`;
+  }
+  const rest = entries.length - shownEntries;
+  const more = rest > 0 ? ` +${rest} more` : '';
+  return `entries ${entries.slice(0, shownEntries).join(', ')}${more}`;
+}
+
 function formatHeader(report: TargetReport, paint: Paint): string[] {
   const { target } = report;
   const lines = [
     paint('bold', `edgefit · ${target.key} (${target.platform})`),
     paint(
       'dim',
-      `  entry ${report.entry} · ${report.modules} modules · conditions ${target.conditions.join(', ')}`,
+      `  ${describeEntries(report.entries)} · ${report.modules} modules · conditions ${target.conditions.join(', ')}`,
     ),
     paint('dim', `  data ${target.data}`),
     paint('dim', `  settings ${target.settings}`),

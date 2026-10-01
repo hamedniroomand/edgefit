@@ -36,7 +36,9 @@ class Demands {
  */
 function seedDemands(graph: ModuleGraph, shapes: ReadonlyMap<string, ModuleShape>): Demands {
   const demands = new Demands();
-  demands.raise(graph.entry, 'all');
+  for (const entry of graph.entries) {
+    demands.raise(entry, 'all');
+  }
   for (const [file, module] of graph.modules) {
     const shape = shapes.get(file);
     for (const link of module.links) {

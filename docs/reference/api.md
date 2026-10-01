@@ -38,7 +38,7 @@ interface CheckResult {
 
 interface TargetReport {
   target: TargetInfo;
-  entry: string;
+  entries: string[];
   modules: number;
   findings: Finding[];
   /** Findings in code that only runs when the API exists. They never fail a check. */

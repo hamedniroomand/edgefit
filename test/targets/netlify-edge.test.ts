@@ -55,39 +55,41 @@ describe('netlify-edge target', () => {
 describe('netlify-edge entry detection', () => {
   it('uses the function declared in netlify.toml as the entry', () => {
     const target = createNetlifyEdgeTarget(fixture('netlify-app'));
-    expect(target.defaultEntry).toBe('netlify/edge-functions/hello.ts');
+    expect(target.defaultEntries).toEqual(['netlify/edge-functions/hello.ts']);
   });
 
-  it('asks for --entry when several functions exist', () => {
+  it('uses every function when several exist', () => {
     const target = createNetlifyEdgeTarget(fixture('netlify-multi'));
-    expect(target.defaultEntry).toBeUndefined();
-    expect(target.info.notes.join('\n')).toContain('Found 2 edge functions');
+    expect(target.defaultEntries).toEqual([
+      'netlify/edge-functions/a.ts',
+      'netlify/edge-functions/b.ts',
+    ]);
   });
 
   it('reports a project with no edge functions directory', () => {
     const root = mkdtempSync(path.join(tmpdir(), 'edgefit-netlify-'));
     const target = createNetlifyEdgeTarget(root);
-    expect(target.defaultEntry).toBeUndefined();
+    expect(target.defaultEntries).toEqual([]);
     expect(target.info.settings).toContain('no netlify.toml found');
     expect(target.info.notes.join('\n')).toContain('No netlify/edge-functions directory');
   });
 
   it('ignores netlify.toml when configFile is false', () => {
     const target = createNetlifyEdgeTarget(fixture('netlify-app'), { configFile: false });
-    // Two files, no declaration: ambiguous.
-    expect(target.defaultEntry).toBeUndefined();
+    // Two files, no declaration: both run.
+    expect(target.defaultEntries).toHaveLength(2);
   });
 });
 
 describe('netlify-edge config problems', () => {
   it('finds a function in a name/index.ts folder without a declaration', () => {
     const target = createNetlifyEdgeTarget(fixture('netlify-nested'));
-    expect(target.defaultEntry).toBe('netlify/edge-functions/hello/index.ts');
+    expect(target.defaultEntries).toEqual(['netlify/edge-functions/hello/index.ts']);
   });
 
   it('says which declared function and import map are missing, and uses the one that exists', () => {
     const target = createNetlifyEdgeTarget(fixture('netlify-missing'));
-    expect(target.defaultEntry).toBe('netlify/edge-functions/a.ts');
+    expect(target.defaultEntries).toEqual(['netlify/edge-functions/a.ts']);
     const notes = target.info.notes.join('\n');
     expect(notes).toContain('Function gone is declared in netlify.toml but not found');
     expect(notes).toContain('The import map nope.json named in netlify.toml was not found');
@@ -110,11 +112,10 @@ describe('netlify-edge config problems', () => {
 
 describe('netlify-edge without an entry', () => {
   it('says what it found, in its own terms, before any report exists', async () => {
-    const error = await edgefitError(
-      check({ root: fixture('netlify-multi'), config: { targets: ['netlify-edge'] } }),
-    );
+    const root = mkdtempSync(path.join(tmpdir(), 'edgefit-netlify-'));
+    const error = await edgefitError(check({ root, config: { targets: ['netlify-edge'] } }));
     expect(error.message).toBe('No entry point to scan.');
-    expect(error.hint).toContain('Found 2 edge functions in netlify/edge-functions (a.ts, b.ts).');
+    expect(error.hint).toContain('No netlify/edge-functions directory found.');
     expect(error.hint).not.toContain('wrangler');
   });
 

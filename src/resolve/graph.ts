@@ -24,15 +24,16 @@ export interface GraphModule {
 }
 
 export interface ModuleGraph {
-  /** The entry, as a key of `modules`. */
-  entry: string;
+  /** The entries, as keys of `modules`. */
+  entries: string[];
   /** Modules reached from the entry, keyed by path relative to the project root. */
   modules: Map<string, GraphModule>;
 }
 
 export interface ResolveOptions {
   root: string;
-  entry: string;
+  /** One or more entries, relative to the root. Each one is bundled as its own entry point. */
+  entries: readonly string[];
   conditions: readonly string[];
   platform: 'browser' | 'node';
   /** What `process.env.NODE_ENV` is replaced with, so an import in a removed branch is not followed. */
@@ -87,11 +88,13 @@ async function bundleMetafile(options: ResolveOptions): Promise<Metafile> {
   try {
     const result = await build({
       absWorkingDir: options.root,
-      entryPoints: [options.entry],
+      entryPoints: [...new Set(options.entries)],
       bundle: true,
       write: false,
       metafile: true,
       outdir: 'edgefit-out',
+      // Two entries named `index.ts` in different directories must not clash on one output file.
+      entryNames: '[dir]/[name]-[hash]',
       platform: options.platform,
       format: 'esm',
       conditions: [...options.conditions],
@@ -122,10 +125,12 @@ export async function resolveGraph(options: ResolveOptions): Promise<ModuleGraph
     const externals = input.imports.filter(item => item.external === true).map(item => item.path);
     modules.set(file, { imports, links, externals });
   }
-  const bundledEntry = Object.values(metafile.outputs).find(
-    output => output.entryPoint !== undefined,
-  )?.entryPoint;
-  const entry =
-    bundledEntry ?? path.relative(options.root, path.resolve(options.root, options.entry));
-  return { entry, modules };
+  const bundled = Object.values(metafile.outputs).flatMap(output => output.entryPoint ?? []);
+  const entries =
+    bundled.length > 0
+      ? bundled
+      : options.entries.map(entry =>
+          path.relative(options.root, path.resolve(options.root, entry)),
+        );
+  return { entries: [...new Set(entries)], modules };
 }

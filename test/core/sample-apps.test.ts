@@ -81,7 +81,7 @@ describe('an adapter _worker.js directory', () => {
   it('finds the entry in the directory and follows its chunks', async () => {
     const built = '.svelte-kit/cloudflare';
     const [report] = (await check({ root: fixture('adapter-worker'), built })).reports;
-    expect(report?.entry).toBe('.svelte-kit/cloudflare/_worker.js/index.js');
+    expect(report?.entries).toEqual(['.svelte-kit/cloudflare/_worker.js/index.js']);
     expect(report?.findings.map(finding => finding.api)).toEqual(['node:fs.watch']);
   });
 });

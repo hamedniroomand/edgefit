@@ -21,7 +21,7 @@ function findMiddleware(root: string): string | undefined {
 }
 
 interface Entry {
-  entry: string | undefined;
+  entries: string[];
   settings: string;
   notes: string[];
   hint: string | undefined;
@@ -37,7 +37,7 @@ function findEntry(root: string): Entry {
   const middleware = findMiddleware(root);
   if (middleware === undefined) {
     return {
-      entry: undefined,
+      entries: [],
       settings: 'no middleware file found',
       notes: [],
       hint: `No middleware file found. ${passEntry}`,
@@ -46,19 +46,19 @@ function findEntry(root: string): Entry {
   if (readRuntimeSetting(path.join(root, middleware)) === 'nodejs') {
     const message = `${middleware} sets runtime 'nodejs', so it does not run on Vercel's Edge runtime.`;
     return {
-      entry: undefined,
+      entries: [],
       settings: `${middleware} runs on Node.js`,
       notes: [`${message} The vercel-edge target does not apply to it.`],
       hint: `${message} ${passEntry}`,
     };
   }
-  return { entry: middleware, settings: `entry ${middleware}`, notes: [], hint: undefined };
+  return { entries: [middleware], settings: `entry ${middleware}`, notes: [], hint: undefined };
 }
 
 export function createVercelEdgeTarget(root: string): Target {
   const { index, matrixSource, description, globals } = loadTargetData('vercel-edge');
   const docsDate = matrixSource.versions['vercel-edge'] ?? 'unknown';
-  const { entry, settings, notes, hint } = findEntry(root);
+  const { entries, settings, notes, hint } = findEntry(root);
 
   return {
     info: {
@@ -80,7 +80,7 @@ export function createVercelEdgeTarget(root: string): Target {
     runtimes: ['vercel-edge'],
     resolvePlatform: 'browser',
     nodeEnv: 'production',
-    defaultEntry: entry,
+    defaultEntries: entries,
     entryHint: hint,
     lazyNodeImports: true,
     globals,

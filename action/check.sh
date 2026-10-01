@@ -23,9 +23,11 @@ args=(check --format json --root "$WORKING_DIRECTORY")
 for target in ${TARGETS//,/ }; do
   args+=(--target "$target")
 done
-if [ -n "$ENTRY" ]; then
-  args+=(--entry "$ENTRY")
-fi
+while IFS= read -r entry; do
+  if [ -n "$entry" ]; then
+    args+=(--entry "$entry")
+  fi
+done <<< "$ENTRY"
 
 # Exit code 1 only means the report has errors; `edgefit diff` decides whether they fail the run.
 status=0

@@ -70,10 +70,6 @@ Netlify Edge Functions run Deno, but Netlify does not document which version or 
 
 edgefit checks Node built-ins and standard Web APIs. It does not check runtime-specific APIs such as Workers bindings, `Bun.serve` or `Deno.readFile`, and it does not check that your bundle fits the runtime's size limits, memory or CPU time.
 
-## One entry per run
-
-edgefit scans from one entry point. A project with several entries, such as several Workers, needs a run for each, and the config's `entry` holds one file.
-
 ## Framework build output
 
 Build output is tested with Nitro and Nuxt. edgefit also looks for the entry files of SvelteKit's and Astro's Cloudflare adapters and of OpenNext, but only the directory layout is covered by a test, not real adapter output, so treat their results as less proven. Nothing marks those layouts as build output, so pass `--built`.

@@ -33,7 +33,8 @@ export default defineConfig({
 ```
 
 - `targets` defaults to `['workerd']`. The valid names are `workerd`, `bun`, `deno`, `deno-deploy`, `netlify-edge` and `vercel-edge`.
-- `entry` is relative to the project root. Without it, edgefit uses wrangler's `main`. One entry is scanned for every target, so a project with a wrangler config can check Bun and Deno without repeating it.
+- `entry` is a path or a glob, or an array of them, relative to the project root. Globs skip `node_modules`. An `entry` in the config applies to every target.
+- Without `entry`, each target finds its own: wrangler's `main` for workerd, every function for Netlify Edge, the middleware file for Vercel Edge. A target that finds none uses the entries of the first target that has some, and the report says so. A project with a wrangler config can check Bun and Deno without repeating the entry.
 
 ## Ignoring findings
 

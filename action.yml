@@ -10,7 +10,7 @@ inputs:
     description: "Targets to check, separated by commas or spaces. Default: the config file's targets, then workerd"
     default: ''
   entry:
-    description: "Entry point. Default: the config file's entry, then wrangler's main"
+    description: "Entry points, one per line, globs allowed. Default: the config file's entry, then each target's own"
     default: ''
   working-directory:
     description: Project root, relative to the repository root

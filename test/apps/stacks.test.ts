@@ -50,7 +50,7 @@ describe.skipIf(!installed).each([
 ] as const)('hono on %s', (target, name, entry) => {
   it('reports nothing, from the entry the platform config names', async () => {
     const result = await check({ root: sampleApp(name), config: { targets: [target] } });
-    expect(result.reports[0]?.entry).toBe(entry);
+    expect(result.reports[0]?.entries).toEqual([entry]);
     expect(result.reports[0]?.findings).toEqual([]);
   });
 });
@@ -72,7 +72,7 @@ describe.skipIf(!installed)('next.js middleware on vercel-edge', () => {
   it('reports nothing, and keeps only the guarded use that is reached', async () => {
     const result = await check({ root, config: { targets: ['vercel-edge'] } });
     const [report] = result.reports;
-    expect(report?.entry).toBe('middleware.ts');
+    expect(report?.entries).toEqual(['middleware.ts']);
     expect(report?.findings).toEqual([]);
     expect(report?.guarded.map(finding => finding.api)).toEqual(['reportError']);
   });

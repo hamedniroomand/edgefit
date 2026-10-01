@@ -2,11 +2,21 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { jsonReportVersion, parseJsonReport } from '@/report/json.ts';
 
-const valid = { version: jsonReportVersion, targets: [{ key: 'workerd', findings: [] }] };
+const valid = {
+  version: jsonReportVersion,
+  targets: [{ key: 'workerd', entries: ['src/index.ts'], findings: [] }],
+};
 
 describe('reading JSON reports', () => {
   it('reads back a report', () => {
     expect(parseJsonReport(JSON.stringify(valid), 'base.json')).toEqual(valid);
+  });
+
+  it('reads a version 1 report, mapping its entry to entries', () => {
+    const v1 = { version: 1, targets: [{ key: 'workerd', entry: 'src/index.ts', findings: [] }] };
+    expect(parseJsonReport(JSON.stringify(v1), 'base.json').targets).toEqual([
+      { key: 'workerd', entries: ['src/index.ts'], findings: [] },
+    ]);
   });
 
   it('rejects text that is not JSON', () => {

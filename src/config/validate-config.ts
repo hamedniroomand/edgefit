@@ -98,8 +98,8 @@ export function validateConfig(value: unknown, file: string): EdgefitConfig {
   if (value.targets !== undefined) {
     validateTargets(value.targets, file);
   }
-  if (value.entry !== undefined && typeof value.entry !== 'string') {
-    fail(file, '`entry` must be a string');
+  if (value.entry !== undefined && typeof value.entry !== 'string' && !isStringArray(value.entry)) {
+    fail(file, '`entry` must be a string or an array of strings');
   }
   if (value.conditions !== undefined && !isStringArray(value.conditions)) {
     fail(file, '`conditions` must be an array of strings');

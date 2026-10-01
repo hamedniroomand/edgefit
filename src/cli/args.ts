@@ -13,7 +13,7 @@ import type { TargetKey } from '@/types.ts';
 
 export interface CheckArgs {
   targets: TargetKey[] | undefined;
-  entry: string | undefined;
+  entry: string[] | undefined;
   built: string | undefined;
   root: string | undefined;
   config: string | undefined;
@@ -25,7 +25,7 @@ export interface CheckArgs {
 export interface CompareArgs {
   /** From positionals. `undefined` compares the default set. */
   targets: TargetKey[] | undefined;
-  entry: string | undefined;
+  entry: string[] | undefined;
   root: string | undefined;
   config: string | undefined;
   format: CompareFormat;
@@ -61,7 +61,7 @@ export type CompareFormat = Extract<ReportFormat, 'text' | 'json'>;
 const usageHint = 'Run `edgefit help` for usage.';
 
 const projectOptions = {
-  entry: { type: 'string' },
+  entry: { type: 'string', multiple: true },
   root: { type: 'string' },
   config: { type: 'string' },
   format: { type: 'string' },

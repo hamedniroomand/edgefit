@@ -26,7 +26,7 @@ export function reached(
   entry = 'index.js',
 ): Record<string, string[]> {
   const modules = new Map<string, ExtractedModule>();
-  const graph: ModuleGraph = { entry, modules: new Map<string, GraphModule>() };
+  const graph: ModuleGraph = { entries: [entry], modules: new Map<string, GraphModule>() };
   for (const [file, { code, imports = {} }] of Object.entries(files)) {
     const links = linksOf(imports);
     graph.modules.set(file, { imports: links.map(link => link.path), links, externals: [] });

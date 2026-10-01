@@ -24,7 +24,7 @@ export interface DenoTargetOptions extends DenoOptions {
   deploy?: boolean;
   /** Applies Netlify Edge's override layer and Web API data on top of the Deno CLI's data. */
   netlify?: {
-    defaultEntry: string | undefined;
+    defaultEntries: readonly string[];
     entryHint: string | undefined;
     notes: readonly string[];
     /** Netlify reads its import map from `netlify.toml`, never from `deno.json`. */
@@ -122,7 +122,7 @@ export function createDenoTarget(root: string, options: DenoTargetOptions = {}):
     resolvePlatform: 'node',
     nodeEnv: netlify ? 'production' : undefined,
     resolvePlugins: [denoSpecifiers(netlify ? netlify.importMap : config?.importMap)],
-    defaultEntry: netlify?.defaultEntry,
+    defaultEntries: netlify?.defaultEntries ?? [],
     entryHint: netlify?.entryHint,
     globals,
     lookup: api => index.lookup(api),

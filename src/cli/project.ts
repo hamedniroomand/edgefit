@@ -8,7 +8,7 @@ export interface ProjectArgs {
   root: string | undefined;
   config: string | undefined;
   targets: TargetKey[] | undefined;
-  entry: string | undefined;
+  entry: string[] | undefined;
 }
 
 /** The project root and its config file, with command-line flags taking precedence. */

@@ -24,7 +24,7 @@ function finding(api: string, category: Category, owner?: PackageInfo): Finding 
 function report(key: TargetKey, parts: Partial<TargetReport>): TargetReport {
   return {
     target: { key, platform: key, conditions: [], data: '', settings: '', notes: [] },
-    entry: 'src/index.ts',
+    entries: ['src/index.ts'],
     modules: 1,
     findings: [],
     guarded: [],

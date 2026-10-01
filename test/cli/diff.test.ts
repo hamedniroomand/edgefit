@@ -76,7 +76,7 @@ describe('edgefit diff formats and input', () => {
   it('prints versioned JSON', async () => {
     const { output } = await diff(['base.json', 'head.json', '--format', 'json']);
     const report = JSON.parse(output) as Record<string, unknown[]>;
-    expect(report.version).toBe(1);
+    expect(report.version).toBe(2);
     expect(report.targets).toEqual(['workerd']);
     expect([report.new, report.fixed, report.unchanged].map(list => list?.length)).toEqual([
       0, 1, 1,

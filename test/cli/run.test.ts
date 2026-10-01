@@ -19,7 +19,7 @@ describe('edgefit check', () => {
     const io = captureIo(fixture('worker'));
     await run(['check', '--format', 'json'], io);
     const report = JSON.parse(io.output()) as { version: number; summary: unknown };
-    expect(report.version).toBe(1);
+    expect(report.version).toBe(2);
     expect(report.summary).toEqual({ errors: 1, warnings: 1 });
   });
 

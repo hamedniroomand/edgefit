@@ -22,16 +22,16 @@ With no base, `fail-on: new-errors` fails on any error, since every finding is n
 
 ## Inputs
 
-| Input               | Default                                    | Description                                                                  |
-| ------------------- | ------------------------------------------ | ---------------------------------------------------------------------------- |
-| `targets`           | the config's `targets`, then `workerd`     | Targets, separated by commas or spaces                                       |
-| `entry`             | the config's `entry`, then wrangler `main` | Entry point                                                                  |
-| `working-directory` | `.`                                        | Project root, relative to the repository root                                |
-| `fail-on`           | `new-errors`                               | `new-errors`, `errors` or `never`                                            |
-| `install-command`   | chosen from the lockfile                   | Installs dependencies in the repository root, for both the base and the head |
-| `edgefit-version`   | the version the action was released with   | edgefit version to run, for example `0.4.0`                                  |
-| `edgefit-package`   |                                            | Path to a tarball to install instead, to test a package before publishing    |
-| `github-token`      | `github.token`                             | Token for the comment. Needs `pull-requests: write`                          |
+| Input               | Default                                  | Description                                                                  |
+| ------------------- | ---------------------------------------- | ---------------------------------------------------------------------------- |
+| `targets`           | the config's `targets`, then `workerd`   | Targets, separated by commas or spaces                                       |
+| `entry`             | the config's `entry`, then each target's | Entry points, one per line. Globs are allowed                                |
+| `working-directory` | `.`                                      | Project root, relative to the repository root                                |
+| `fail-on`           | `new-errors`                             | `new-errors`, `errors` or `never`                                            |
+| `install-command`   | chosen from the lockfile                 | Installs dependencies in the repository root, for both the base and the head |
+| `edgefit-version`   | the version the action was released with | edgefit version to run, for example `0.4.0`                                  |
+| `edgefit-package`   |                                          | Path to a tarball to install instead, to test a package before publishing    |
+| `github-token`      | `github.token`                           | Token for the comment. Needs `pull-requests: write`                          |
 
 ## Build output
 
