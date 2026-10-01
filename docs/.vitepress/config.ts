@@ -7,7 +7,7 @@ const repository = 'https://github.com/hamedniroomand/edgefit';
 const site = 'https://edgefit.kitdev.space';
 const title = 'edgefit';
 const description =
-  'Find out whether your project and its dependencies will run on Cloudflare Workers, Bun and Deno before you deploy.';
+  'Find out whether your project and its dependencies will run on Cloudflare Workers, Bun, Deno, Netlify and Vercel Edge before you deploy.';
 
 function link(name: string, text: string, path: string): DefaultTheme.SidebarItem {
   return { text: icon(name) + text, link: path };

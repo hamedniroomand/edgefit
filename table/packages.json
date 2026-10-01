@@ -1,5 +1,5 @@
 {
-  "description": "Packages checked by the compatibility table. See docs/contributing/packages.md.",
+  "description": "Packages checked by the compatibility table. See docs/guide/packages.md.",
   "packages": [
     {
       "name": "hono"

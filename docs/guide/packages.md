@@ -43,6 +43,22 @@ Packages in the table have badges at `https://edgefit.kitdev.space/packages/badg
 
 For shields.io styling, use `https://img.shields.io/endpoint?url=https://edgefit.kitdev.space/packages/badges/<name>.json`.
 
+## Popular libraries
+
+A snapshot from `edgefit package` on 2026-10-01 (the data pinned in 0.5.0), for each package's main entry point. `workerd` assumes the `nodejs_compat` flag. The live results are in the [package table](/packages/).
+
+| Package                                                  | workerd | Bun | Deno | Why                                                                                                  |
+| -------------------------------------------------------- | ------- | --- | ---- | ---------------------------------------------------------------------------------------------------- |
+| `hono`, `zod`, `drizzle-orm`, `jose`, `stripe`, `lodash` | ✓       | ✓   | ✓    |                                                                                                      |
+| `pg`, `postgres`, `bcryptjs`                             | ✓       | ✓   | ✓    |                                                                                                      |
+| `axios`, `ws`                                            | ✓       | ✓   | ⚠    | An access to `node:http` or `node:events` that edgefit cannot check                                  |
+| `openai`                                                 | ⚠       | ⚠   | ⚠    | A `globalThis[...]` access that edgefit cannot check                                                 |
+| `express`                                                | ✗       | ⚠   | ⚠    | `process.binding`, which Workers do not implement, reached through `body-parser`. Use `hono` instead |
+| `chokidar`                                               | ✗       | ✓   | ✓    | Watches files, which Workers cannot do. Keep it out of the Worker                                    |
+| `sharp`                                                  | ✗       | ⚠   | ⚠    | A native addon that starts processes (`detect-libc`). Use an image service instead                   |
+
+A ✓ is only as good as [what a pass means](#what-a-pass-means). The `⚠` rows are not failures: edgefit reports what it cannot analyze as `unknown`.
+
 ## Adding a package to the table
 
 Open an issue with the package request form, or a pull request that adds one line to `table/packages.json`. CI runs `edgefit package` on the added package, so the pull request shows its result.

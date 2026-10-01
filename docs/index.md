@@ -6,8 +6,8 @@ hero:
   text: Know it runs on the edge before you deploy.
   tagline: >-
     edgefit follows your code and every dependency from the entry point and
-    tells you which Node and Web APIs Cloudflare Workers, Bun or Deno will not
-    run, down to the package, the line and the import chain.
+    tells you which Node and Web APIs Cloudflare Workers, Bun, Deno, Netlify or Vercel
+    Edge will not run, down to the package, the line and the import chain.
   image:
     src: /hero.svg
     alt: edgefit

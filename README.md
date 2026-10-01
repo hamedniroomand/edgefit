@@ -5,7 +5,7 @@
 <h1 align="center">edgefit</h1>
 
 <p align="center">
-  Know your project runs on Cloudflare Workers, Bun or Deno before you deploy.
+  Know your project runs on Cloudflare Workers, Bun, Deno, Netlify or Vercel Edge before you deploy.
 </p>
 
 <p align="center">

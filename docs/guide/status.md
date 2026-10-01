@@ -34,6 +34,8 @@ Two parts are older than the rest, and the [limitations](/guide/limitations#the-
 
 - Node built-in modules and their members, and Web API globals, for Cloudflare Workers, Bun, Deno, Deno Deploy, Netlify Edge Functions and (experimental) Vercel Edge.
 - Your code and every dependency, resolved the way the target's bundler does, with the import chain behind each finding.
+- Suggested fixes for findings, from a reviewed list of packages and APIs and from the settings of the target.
+- Published packages, with `edgefit package` and the [package table](/packages/).
 - Framework build output from Nitro and Nuxt, mapped to packages with sourcemaps or, without them, with the build's region markers.
 - Pull request checks with the GitHub Action, JSON reports, and `diff` between two reports.
 
