@@ -122,6 +122,11 @@ export interface NetlifyOptions {
   configFile?: string | false;
 }
 
+export interface EnvOptions {
+  /** What `process.env.NODE_ENV` is replaced with. Default `production`. */
+  NODE_ENV?: string;
+}
+
 export interface EdgefitConfig {
   targets?: TargetKey[];
   entry?: string;
@@ -135,4 +140,6 @@ export interface EdgefitConfig {
   levels?: Partial<Record<Category, Level>>;
   /** Extra export conditions to resolve with, before the target's own. */
   conditions?: string[];
+  /** Variables a bundler replaces with a constant. Code a constant removes is not checked. */
+  env?: EnvOptions;
 }

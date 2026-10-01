@@ -52,7 +52,7 @@ export function usagesOf(
   source: string,
   file = 'src/input.ts',
   globals: ReadonlySet<string> = defaultGlobals,
-  options: { lazyNodeImports?: boolean } = {},
+  options: { lazyNodeImports?: boolean; nodeEnv?: string } = {},
 ): string[] {
   return extractUsages(file, source, { globals, ...options }).map(
     usage =>

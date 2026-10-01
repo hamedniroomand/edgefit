@@ -38,6 +38,9 @@ export class UsageCollector {
   }
 
   public api(ref: ApiRef, offset: number): void {
+    if (this.guards.dead()) {
+      return;
+    }
     // A module as a whole is never read in this mode, so it is not a use that can fail.
     if (this.lazyNodeImports && ref.module !== '*globals*' && ref.path.length === 0) {
       return;
@@ -57,6 +60,9 @@ export class UsageCollector {
 
   /** Records an access edgefit cannot follow statically. */
   public dynamic(ref: ApiRef | undefined, display: string, reason: string, offset: number): void {
+    if (this.guards.dead()) {
+      return;
+    }
     this.offsets.push(offset);
     this.usages.push({
       kind: 'dynamic',

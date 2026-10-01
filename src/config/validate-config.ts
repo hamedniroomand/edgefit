@@ -81,6 +81,15 @@ function validateNetlify(value: unknown, file: string): void {
   }
 }
 
+function validateEnv(value: unknown, file: string): void {
+  if (!isRecord(value)) {
+    fail(file, '`env` must be an object');
+  }
+  if (value.NODE_ENV !== undefined && typeof value.NODE_ENV !== 'string') {
+    fail(file, '`env.NODE_ENV` must be a string');
+  }
+}
+
 /** Checks the shape of a loaded config, since a config file is not type checked at runtime. */
 export function validateConfig(value: unknown, file: string): EdgefitConfig {
   if (!isRecord(value)) {
@@ -112,6 +121,9 @@ export function validateConfig(value: unknown, file: string): EdgefitConfig {
   }
   if (value.netlify !== undefined) {
     validateNetlify(value.netlify, file);
+  }
+  if (value.env !== undefined) {
+    validateEnv(value.env, file);
   }
   return value as EdgefitConfig;
 }

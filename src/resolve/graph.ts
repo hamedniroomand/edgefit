@@ -35,6 +35,8 @@ export interface ResolveOptions {
   entry: string;
   conditions: readonly string[];
   platform: 'browser' | 'node';
+  /** What `process.env.NODE_ENV` is replaced with, so an import in a removed branch is not followed. */
+  nodeEnv: string;
   /** Target resolvers that run before edgefit's own. */
   plugins?: readonly Plugin[];
 }
@@ -91,6 +93,7 @@ async function bundleMetafile(options: ResolveOptions): Promise<Metafile> {
       conditions: [...options.conditions],
       mainFields: mainFields[options.platform],
       loader: assetLoaders,
+      define: { 'process.env.NODE_ENV': JSON.stringify(options.nodeEnv) },
       logLevel: 'silent',
       plugins: [...(options.plugins ?? []), runtimeExternals],
     });

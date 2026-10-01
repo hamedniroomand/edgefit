@@ -66,17 +66,20 @@ async function checkTarget(
 ): Promise<TargetReport> {
   const config = options.config ?? {};
   const conditions = [...(config.conditions ?? []), ...target.info.conditions];
+  const nodeEnv = config.env?.NODE_ENV ?? 'production';
   const graph = await resolveGraph({
     root,
     entry,
     conditions,
     platform: target.resolvePlatform,
+    nodeEnv,
     plugins: target.resolvePlugins,
   });
   const isBuilt = options.built !== undefined || isBuildOutput(root, entry);
   const scanned = scanModules(graph, root, target.globals, {
     trace: !isBuilt,
     lazyNodeImports: target.lazyNodeImports,
+    nodeEnv,
   });
   const { modules, notes } = isBuilt
     ? attributeOutput(scanned, root)

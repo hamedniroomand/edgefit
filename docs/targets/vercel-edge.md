@@ -50,12 +50,9 @@ Code behind one of these checks is treated as running on Vercel's Edge runtime o
 
 ## Next.js middleware
 
-Next.js middleware is the main use of this target. A middleware that only imports `NextResponse` from `next/server` reports two findings today, and neither runs in the middleware:
+Next.js middleware is the main use of this target. A middleware that only imports `NextResponse` from `next/server` reports one finding today, and it does not run in the middleware: `process.cwd` in Next's server rendering code, which `next/server` reaches through a CommonJS barrel that edgefit checks in full.
 
-- `process.cwd` in Next's server rendering code, which `next/server` reaches through a CommonJS barrel that edgefit checks in full.
-- `MessageChannel` in React's development build, which every bundler drops for production. edgefit follows `process.env.NODE_ENV !== 'production'` branches on every target.
-
-Add an [`ignore` rule](/guide/configuration) for them if you need a clean report.
+Add an [`ignore` rule](/guide/configuration) for it if you need a clean report.
 
 ## What is not checked
 

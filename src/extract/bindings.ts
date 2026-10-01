@@ -12,6 +12,8 @@ import type { Binding, Scope } from './scope.ts';
 export interface BindingContext {
   scope: Scope;
   globals: ReadonlySet<string>;
+  /** What bundlers replace `process.env.NODE_ENV` with. */
+  nodeEnv: string;
 }
 
 function tracked(ref: ApiRef): Binding {

@@ -236,3 +236,17 @@ describe('check with unused exports', () => {
     ]);
   });
 });
+
+describe('check with process.env.NODE_ENV', () => {
+  it('does not follow the development build of a library', async () => {
+    const [report] = (await check({ root: fixture('node-env-app') })).reports;
+    expect(report?.findings).toEqual([]);
+    expect(report?.modules).toBe(3);
+  });
+
+  it('checks the development build when the config asks for it', async () => {
+    const config = { env: { NODE_ENV: 'development' } };
+    const [report] = (await check({ root: fixture('node-env-app'), config })).reports;
+    expect(report?.findings.map(finding => finding.api)).toEqual(['node:fs.watch']);
+  });
+});
