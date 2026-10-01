@@ -11,5 +11,5 @@
 - [ ] `vp run ready` passes
 - [ ] Tests cover the change
 - [ ] Docs updated, if behavior or options changed
-- [ ] `CHANGELOG.md` entry added, if users will notice
+- [ ] Changeset added (`vp run changeset`), if users will notice
 - [ ] Data changes and suggested fixes link the source they were read from

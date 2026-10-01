@@ -28,7 +28,7 @@ The [contributing guide](https://edgefit.kitdev.space/contributing/) covers the 
 - Open an issue first for anything larger than a small fix, so we can agree on the approach.
 - Keep each pull request to one change, and add a test that shows it.
 - Changes to `data/overrides` need a link to the runtime source they were read from, at the pinned version.
-- Add a line under `## Unreleased` in [CHANGELOG.md](CHANGELOG.md) for anything users will notice.
+- Add a [changeset](.changeset/README.md) for anything users will notice: run `vp run changeset`, choose the bump and describe the change in a sentence or two. Docs, tests and CI changes need none.
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/), for example `fix(edgefit): resolve browser field for workerd`. A git hook checks this.
 
 By contributing, you agree that your work is released under the [MIT License](LICENSE), and to follow the [Code of Conduct](CODE_OF_CONDUCT.md).

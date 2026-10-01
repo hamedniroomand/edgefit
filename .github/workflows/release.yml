@@ -68,6 +68,24 @@ jobs:
             found && /^## / { exit }
             found { print }
           ' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          # Append the issues closed by the pull requests in this release. The changelog section
+          # already links the pull requests. The release is already published to npm, so a failure
+          # here only drops this section.
+          {
+            gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" -f tag_name="$GITHUB_REF_NAME" \
+              --jq .body > "$RUNNER_TEMP/generated.md"
+            prs=$(grep -oE "/pull/[0-9]+" "$RUNNER_TEMP/generated.md" | cut -d/ -f3 | sort -un)
+            issues=""
+            for pr in $prs; do
+              issues+=$(gh api graphql -F owner="${GITHUB_REPOSITORY%/*}" -F repo="${GITHUB_REPOSITORY#*/}" -F pr="$pr" \
+                -f query='query($owner: String!, $repo: String!, $pr: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $pr) { closingIssuesReferences(first: 20) { nodes { number title } } } } }' \
+                --jq '.data.repository.pullRequest.closingIssuesReferences.nodes[] | "- #\(.number) \(.title)"')$'\n'
+            done
+            issues=$(echo "$issues" | sed '/^$/d' | sort -u)
+            if [ -n "$issues" ]; then
+              printf '\n## Issues closed\n\n%s\n' "$issues" >> "$RUNNER_TEMP/notes.md"
+            fi
+          } || echo "::warning::Could not list the issues closed in the release notes"
           prerelease=()
           case "$GITHUB_REF_NAME" in *-*) prerelease=(--prerelease) ;; esac
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
