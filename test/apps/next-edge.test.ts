@@ -25,14 +25,26 @@ describe.skipIf(!built)('next.js on vercel-edge, from the build output', () => {
   it('checks the middleware and the Edge route, and leaves the Node.js route out', async () => {
     expect((await report())?.entries).toEqual([
       `${output}/functions/api/edge.func/index.js`,
+      `${output}/functions/api/timers.func/index.js`,
       `${output}/functions/middleware.func/index.js`,
     ]);
   });
 
-  it('reports no error, and maps findings to next through the sourcemaps', async () => {
+  // Turbopack loads a Node.js module as `e.x("node:timers", () => require("node:timers"), !0)`, and a
+  // lazy import as `Promise.resolve().then(() => …)` around it. Both bind to the module, so a read
+  // from a module Vercel lacks is reported in the bundle, at the file that wrote it.
+  it('reports the reads of a Node.js module Vercel lacks, at the files that wrote them', async () => {
     const found = await report();
-    expect(found?.findings.filter(finding => finding.level === 'error')).toEqual([]);
-    expect(found?.guarded.every(finding => finding.package?.name === 'next')).toBe(true);
+    const errors = found?.findings.filter(finding => finding.level === 'error') ?? [];
+    expect(errors.map(finding => `${finding.api} ${finding.location.file}`).toSorted()).toEqual([
+      'node:timers.setTimeout app/api/timers/route.js',
+      'node:timers.setTimeout middleware.js',
+    ]);
+    expect(errors.every(finding => finding.package === undefined && finding.buildOutput === undefined)).toBe(true);
+  });
+
+  it('maps the guarded findings to next through the sourcemaps', async () => {
+    expect((await report())?.guarded.every(finding => finding.package?.name === 'next')).toBe(true);
   });
 
   it('keeps the four guarded findings, each with a reason and a source', async () => {
@@ -53,13 +65,11 @@ describe.skipIf(!built)('next.js on vercel-edge, from the build output', () => {
   // a computed `import()`. That code is in the bundle, with no file of the project behind it.
   it('puts the code of the bundler under build output, not under your code', async () => {
     const warnings = ((await report())?.findings ?? []).filter(finding => finding.level === 'warning');
-    expect(warnings.map(finding => `${finding.api} ${finding.buildOutput === true}`).toSorted()).toEqual([
-      'import(<expression>) true',
-      'import(<expression>) true',
-      'node:async_hooks true',
-      'node:async_hooks true',
-      'node:buffer true',
-      'node:buffer true',
+    const owners = warnings.map(finding => `${finding.api} ${finding.buildOutput === true}`);
+    expect(owners.toSorted()).toEqual([
+      ...Array.from({ length: 3 }, () => 'import(<expression>) true'),
+      ...Array.from({ length: 3 }, () => 'node:async_hooks true'),
+      ...Array.from({ length: 3 }, () => 'node:buffer true'),
     ]);
     expect(warnings.every(finding => finding.package === undefined)).toBe(true);
   });
