@@ -1,0 +1,2 @@
+vp test --coverage
+node scripts/patch-coverage.mjs
