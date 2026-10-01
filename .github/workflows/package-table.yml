@@ -1,0 +1,98 @@
+name: Package table
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '43 4 * * 2'
+
+permissions:
+  contents: read
+
+# One run at a time: the results branch is written at the end.
+concurrency:
+  group: package-table
+  cancel-in-progress: false
+
+env:
+  TABLE: scripts/package-table
+
+jobs:
+  check:
+    name: Shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: voidzero-dev/setup-vp@3754dd7dbdb32bd8f6d28b6043de13ad3a75f21f # v1.21.1
+        with:
+          node-version: '24'
+          cache: true
+          run-install: true
+      - run: vp pack
+      # Packages are installed with --ignore-scripts and never run. A package that fails or times
+      # out becomes an error row, never a failed run.
+      - run: node "$TABLE/run.mjs" dist/cli/main.mjs shard-out ${{ matrix.shard }} 8
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: shard-${{ matrix.shard }}
+          path: shard-out/
+
+  publish:
+    name: Merge and publish
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: voidzero-dev/setup-vp@3754dd7dbdb32bd8f6d28b6043de13ad3a75f21f # v1.21.1
+        with:
+          node-version: '24'
+          cache: true
+          run-install: true
+      - run: vp pack
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: shards
+      - name: Fetch the previous results
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git clone --quiet --depth 1 --branch package-results \
+            "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" results 2>/dev/null \
+            || { mkdir results && git -C results init --quiet -b package-results; }
+          git -C results remote remove origin 2>/dev/null || true
+          git -C results remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+      - name: Merge
+        run: |
+          previous=""
+          [ -f results/results.json ] && previous=results
+          node "$TABLE/merge.mjs" dist/index.mjs shards merged $previous
+      - name: Publish to the package-results branch
+        run: |
+          cd results
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -r ../merged/. .
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit --quiet -m "chore: package table $(date -u +%F)"
+            git push origin HEAD:package-results
+          fi
+      - name: Rebuild the docs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run docs.yml --ref main --repo "${{ github.repository }}"

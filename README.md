@@ -45,6 +45,16 @@ On pull requests, with the GitHub Action:
     targets: workerd
 ```
 
+## Package compatibility
+
+`npx edgefit package <name>` checks a published package, and the [package table](https://edgefit.kitdev.space/packages/) lists popular ones. Add a badge to your README, linking to what it means:
+
+```md
+[![edgefit](https://edgefit.kitdev.space/packages/badges/<name>.svg)](https://edgefit.kitdev.space/packages/#<name>)
+```
+
+For a package that is not on the table, run `npx edgefit package . --badge badge.svg` and commit the result.
+
 ## Status
 
 edgefit is a 0.x release and reads your code statically, so a clean run is not a guarantee: see the [limitations](https://edgefit.kitdev.space/guide/limitations). Its data is pinned to workerd 1.20260929.1, Bun 1.4.2 and Deno 2.9.7 and compared with the newest releases every week: see the [status page](https://edgefit.kitdev.space/guide/status).

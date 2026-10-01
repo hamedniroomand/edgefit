@@ -1,4 +1,4 @@
-import { readDataFile } from './data-directory.ts';
+import { findDataDirectory, readDataFile } from './data-directory.ts';
 
 /** One entry of `data/source.json`: a vendored or curated source and the version it is pinned to. */
 export interface DataSource {
@@ -23,6 +23,15 @@ interface Manifest {
 
 export function readSources(dataDirectory: string): DataSource[] {
   return readDataFile<Manifest>(dataDirectory, 'source.json').sources;
+}
+
+/** Every runtime the pinned data describes, with its version. */
+export function readRuntimeVersions(): Record<string, string> {
+  const versions: Record<string, string> = {};
+  for (const source of readSources(findDataDirectory())) {
+    Object.assign(versions, source.versions);
+  }
+  return versions;
 }
 
 export function findSource(dataDirectory: string, provider: string): DataSource {

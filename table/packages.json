@@ -1,0 +1,232 @@
+{
+  "description": "Packages checked by the compatibility table. See docs/contributing/packages.md.",
+  "packages": [
+    {
+      "name": "hono"
+    },
+    {
+      "name": "itty-router"
+    },
+    {
+      "name": "elysia"
+    },
+    {
+      "name": "h3"
+    },
+    {
+      "name": "zod"
+    },
+    {
+      "name": "valibot"
+    },
+    {
+      "name": "jose"
+    },
+    {
+      "name": "oauth4webapi"
+    },
+    {
+      "name": "bcryptjs"
+    },
+    {
+      "name": "pg"
+    },
+    {
+      "name": "postgres"
+    },
+    {
+      "name": "@neondatabase/serverless"
+    },
+    {
+      "name": "drizzle-orm"
+    },
+    {
+      "name": "@prisma/client"
+    },
+    {
+      "name": "mysql2"
+    },
+    {
+      "name": "ioredis"
+    },
+    {
+      "name": "@upstash/redis"
+    },
+    {
+      "name": "stripe"
+    },
+    {
+      "name": "openai"
+    },
+    {
+      "name": "@anthropic-ai/sdk"
+    },
+    {
+      "name": "@aws-sdk/client-s3"
+    },
+    {
+      "name": "lodash"
+    },
+    {
+      "name": "lodash-es"
+    },
+    {
+      "name": "date-fns"
+    },
+    {
+      "name": "dayjs"
+    },
+    {
+      "name": "nanoid"
+    },
+    {
+      "name": "uuid"
+    },
+    {
+      "name": "axios"
+    },
+    {
+      "name": "node-fetch"
+    },
+    {
+      "name": "ws"
+    },
+    {
+      "name": "sharp",
+      "notes": "Native addon."
+    },
+    {
+      "name": "bcrypt",
+      "notes": "Native addon; bcryptjs is the pure-JS alternative."
+    },
+    {
+      "name": "chokidar",
+      "notes": "Watches the file system."
+    },
+    {
+      "name": "express"
+    },
+    {
+      "name": "fastify"
+    },
+    {
+      "name": "koa"
+    },
+    {
+      "name": "cors"
+    },
+    {
+      "name": "jsonwebtoken"
+    },
+    {
+      "name": "cookie"
+    },
+    {
+      "name": "jsdom"
+    },
+    {
+      "name": "cheerio"
+    },
+    {
+      "name": "marked"
+    },
+    {
+      "name": "yaml"
+    },
+    {
+      "name": "zustand"
+    },
+    {
+      "name": "ky"
+    },
+    {
+      "name": "got"
+    },
+    {
+      "name": "undici"
+    },
+    {
+      "name": "graphql"
+    },
+    {
+      "name": "graphql-yoga"
+    },
+    {
+      "name": "@trpc/server"
+    },
+    {
+      "name": "@supabase/supabase-js"
+    },
+    {
+      "name": "firebase"
+    },
+    {
+      "name": "@sentry/node"
+    },
+    {
+      "name": "mongodb"
+    },
+    {
+      "name": "mongoose"
+    },
+    {
+      "name": "better-sqlite3",
+      "notes": "Native addon."
+    },
+    {
+      "name": "sqlite3",
+      "notes": "Native addon."
+    },
+    {
+      "name": "redis"
+    },
+    {
+      "name": "kysely"
+    },
+    {
+      "name": "@libsql/client"
+    },
+    {
+      "name": "@planetscale/database"
+    },
+    {
+      "name": "resend"
+    },
+    {
+      "name": "nodemailer"
+    },
+    {
+      "name": "pino"
+    },
+    {
+      "name": "winston"
+    },
+    {
+      "name": "ajv"
+    },
+    {
+      "name": "@sinclair/typebox"
+    },
+    {
+      "name": "superstruct"
+    },
+    {
+      "name": "ohash"
+    },
+    {
+      "name": "ofetch"
+    },
+    {
+      "name": "@octokit/rest"
+    },
+    {
+      "name": "tweetnacl"
+    },
+    {
+      "name": "@noble/hashes"
+    },
+    {
+      "name": "@noble/curves"
+    }
+  ]
+}

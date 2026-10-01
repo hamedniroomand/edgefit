@@ -5,6 +5,7 @@ import { EdgefitError } from '@/errors.ts';
 import { runCheck } from './commands/check.ts';
 import { runCompare } from './commands/compare.ts';
 import { runDiff } from './commands/diff.ts';
+import { runPackage } from './commands/package.ts';
 import { runTargets } from './commands/targets.ts';
 import { helpText } from './help.ts';
 import type { CliIo } from './io.ts';
@@ -22,6 +23,9 @@ function dispatch(argv: string[], io: CliIo): Promise<number> | number {
     }
     case 'diff': {
       return runDiff(rest, io);
+    }
+    case 'package': {
+      return runPackage(rest, io);
     }
     case 'targets': {
       return runTargets(io);

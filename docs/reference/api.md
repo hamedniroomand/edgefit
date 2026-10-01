@@ -50,6 +50,16 @@ interface TargetReport {
 
 `Finding` has the same fields as in the [JSON report](/reference/json#finding).
 
+## checkPackage(spec, options?)
+
+Installs a package without running it and checks each public entry point. Returns the [package result](/reference/json#package).
+
+```ts
+function checkPackage(spec: string, options?: CheckPackageOptions): Promise<PackageResult>;
+```
+
+`spec` is what `edgefit package` takes. The options are `targets`, `subpaths`, `skip`, `registry` and `keep`. `renderBadge(result, { target? })`, `badgeMessage` and `shieldsEndpoint` build the badge from a result.
+
 ## loadConfig(root, file?)
 
 Finds and loads `edgefit.config.{ts,mts,js,mjs}` in `root`, or the given file, and validates it.
