@@ -1,0 +1,58 @@
+name: Sample builds
+
+# Sample apps that a framework or a platform CLI builds, so edgefit is checked against real build
+# output. The build is cached on the lockfile and the app, and rebuilt every week. The tests that
+# need the output skip when it is not there, so the main CI does not build them.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - 'apps/**'
+      - 'src/built/**'
+      - 'src/targets/**'
+      - 'data/unreached.json'
+      - '.github/workflows/sample-builds.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '23 4 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sample-builds-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Next.js on Vercel
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: voidzero-dev/setup-vp@3754dd7dbdb32bd8f6d28b6043de13ad3a75f21f # v1.21.1
+        with:
+          node-version: '24'
+          cache: true
+          run-install: true
+      - name: Install the sample apps
+        working-directory: apps
+        run: vp install --frozen-lockfile
+      - name: Restore the build
+        id: build-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: apps/next-edge/.vercel/output
+          # The weekly run has no cache to hit, so it builds again with whatever is newest.
+          key: next-edge-${{ hashFiles('apps/pnpm-lock.yaml', 'apps/next-edge/**') }}-${{ github.event_name == 'schedule' && github.run_id || 'cached' }}
+      - name: Build with the Vercel CLI
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        working-directory: apps/next-edge
+        env:
+          VERCEL_TELEMETRY_DISABLED: '1'
+        run: npm run build:vercel
+      - name: Test against the build
+        run: vp test --project apps
