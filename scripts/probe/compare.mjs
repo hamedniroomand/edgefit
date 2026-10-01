@@ -31,7 +31,10 @@ function overrideDisagreement(override, outcome) {
   }
   return stub === probedAsStub
     ? undefined
-    : `override says \`${override.status}\`, probe says \`${outcome}\``;
+    : {
+        message: `override says \`${override.status}\`, probe says \`${outcome}\``,
+        dataSaysPresent: !stub,
+      };
 }
 
 /**
@@ -46,11 +49,11 @@ export function compareOutcomes(outcomes, overrides, matrix) {
       continue;
     }
     const override = overrides[api];
-    const message = override
+    const found = override
       ? overrideDisagreement(override, outcome)
       : matrixDisagreement(matrix, api, outcome);
-    if (message) {
-      disagreements.push({ api, message });
+    if (found) {
+      disagreements.push({ api, ...found });
     }
   }
   return disagreements;
@@ -62,7 +65,10 @@ function matrixDisagreement(matrix, api, outcome) {
   if (inMatrix === probed) {
     return undefined;
   }
-  return `matrix says \`${inMatrix ? 'present' : 'missing'}\`, probe says \`${outcome}\``;
+  return {
+    message: `matrix says \`${inMatrix ? 'present' : 'missing'}\`, probe says \`${outcome}\``,
+    dataSaysPresent: inMatrix,
+  };
 }
 
 /** Probed `unsupported` APIs that no override covers, as candidates for a person to review. */

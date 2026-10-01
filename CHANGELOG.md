@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1
+
+The weekly probe's summary for the oldest Netlify Deno is short enough to review. The package itself does not change.
+
+### Changed
+
+- The probe job summary groups where a runtime and the data disagree by module, with a count, and folds the full list away. It leaves out aliases that repeat another line with the same result (`x.default.y`, `sys` for `util`, the nested `path.posix` and `path.win32` names). It has three sections: present in the data but missing at runtime (possible false passes), missing as a named export only, and unusable in the data but present at runtime. The `deno (netlify-min)` summary went from about 680 lines to 48.
+
 ## 0.5.0
 
 Fewer false alarms, suggested fixes, Netlify Edge and Vercel Edge targets, and `edgefit package` with a compatibility table.

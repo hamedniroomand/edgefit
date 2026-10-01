@@ -230,7 +230,7 @@ After a bump, a few tests fail because the data moved. That is the signal to loo
 2. If the Deno range changed, set the `netlify-edge` version in `source.json` to the range's lowest version, and update `bundler` in the override file.
 3. Update the hashes in the override file.
 
-The `deno (netlify-min)` run of the probe looks up every API in the oldest Deno Netlify supports and lists where it differs from the data. It only informs the job summary. If Netlify starts documenting the version it runs, use that version in place of the minimum.
+The `deno (netlify-min)` run of the probe looks up every API in the oldest Deno Netlify supports and lists where it differs from the data. The summary leaves out aliases (`x.default.y`, `sys` and the nested `path` names) and groups the rest by module, in three sections: present in the data but missing at runtime (possible false passes), missing as a named export only (`import stream from 'node:stream'` works, `import { promises }` fails), and unusable in the data (missing or a stub) but present at runtime. The full list, with every name as the probe wrote it, is folded away. It only informs the job summary. If Netlify starts documenting the version it runs, use that version in place of the minimum.
 
 ## Vercel Edge
 
