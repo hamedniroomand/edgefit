@@ -16,6 +16,8 @@ describe('Bun entries', () => {
       files: ['src/server.ts'],
       source: 'package.json "module"',
       guessed: false,
+      built: false,
+      notes: [],
     });
   });
 
@@ -45,6 +47,8 @@ describe('Deno entries', () => {
       files: ['mod.ts', 'extra.ts'],
       source: 'deno.json "exports"',
       guessed: false,
+      built: false,
+      notes: [],
     });
   });
 

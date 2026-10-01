@@ -1,0 +1,1 @@
+{ "runtime": "edge", "entrypoint": "index.js", "environment": { "SECRET_KEY": "s3cr3t-fake-value" } }
