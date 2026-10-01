@@ -1,31 +1,17 @@
 import type { Node } from 'oxc-parser';
 
-import type { ApiRef } from '@/types.ts';
+import type { Runtime } from '@/types.ts';
 
-import { unwrap } from './ast.ts';
+import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
-import { normalizeRef, memberRef } from './refs.ts';
-import { isTracked, lookup } from './scope.ts';
-
-/** An API that is known to exist inside the code a check protects. */
-export interface Guard {
-  ref: ApiRef;
-  /** The local name the check started from, so reassigning it can end the guard. */
-  root: string | undefined;
-  active: boolean;
-}
+import type { Guard } from './guard-stack.ts';
+import { memberRef, normalizeRef } from './refs.ts';
+import { agentRuntime, isUnbound, memberRuntime, runtimeMarker } from './runtimes.ts';
+import { isTracked, lookup, lookupCheck } from './scope.ts';
 
 const jumps = new Set(['ReturnStatement', 'ThrowStatement', 'ContinueStatement', 'BreakStatement']);
-
-function strip(node: Node): Node {
-  let current = node;
-  for (let inner = unwrap(current); inner !== undefined; inner = unwrap(current)) {
-    current = inner;
-  }
-  return current;
-}
 
 function rootName(node: Node): string | undefined {
   const inner = strip(node);
@@ -43,7 +29,7 @@ function guardFor(node: Node, context: BindingContext, key?: string): Guard[] {
   const name = rootName(node);
   const ref = normalizeRef(key === undefined ? binding.ref : memberRef(binding.ref, key));
   const local = name !== undefined && lookup(context.scope, name) !== undefined;
-  return [{ ref, root: local ? name : undefined, active: true }];
+  return [{ kind: 'api', ref, root: local ? name : undefined, active: true }];
 }
 
 function isNullish(node: Node): boolean {
@@ -55,17 +41,18 @@ function isNullish(node: Node): boolean {
   );
 }
 
-function stringLiteral(node: Node): string | undefined {
-  const inner = strip(node);
-  return inner.type === 'Literal' && typeof inner.value === 'string' ? inner.value : undefined;
+function runtimeGuard(runtime: Runtime | undefined, present: boolean): Guard[] {
+  return runtime === undefined ? [] : [{ kind: 'runtime', condition: { runtime, present } }];
 }
 
-function isEquality(operator: string): boolean {
-  return operator === '==' || operator === '===';
-}
-
-function isInequality(operator: string): boolean {
-  return operator === '!=' || operator === '!==';
+/**
+ * What is known when `node` exists (`present`) or does not. The marker of a runtime says
+ * which runtime this is either way; any other API only says something when it exists.
+ */
+function presence(node: Node, present: boolean, context: BindingContext, key?: string): Guard[] {
+  const runtime =
+    key === undefined ? runtimeMarker(node, context) : memberRuntime(node, key, context);
+  return [...(present ? guardFor(node, context, key) : []), ...runtimeGuard(runtime, present)];
 }
 
 function typeofGuard(
@@ -82,7 +69,11 @@ function typeofGuard(
   }
   const equal = isEquality(node.operator) ? truth : !truth;
   const exists = equal ? text !== 'undefined' : text === 'undefined';
-  return exists ? guardFor(call.argument, context) : [];
+  if (exists) {
+    return presence(call.argument, true, context);
+  }
+  // Only `typeof x === 'undefined'` says the value is missing; `!== 'string'` says nothing.
+  return equal ? presence(call.argument, false, context) : [];
 }
 
 function comparisonGuard(
@@ -93,19 +84,44 @@ function comparisonGuard(
   if (!isEquality(node.operator) && !isInequality(node.operator)) {
     return undefined;
   }
+  const equal = isEquality(node.operator) ? truth : !truth;
   const typed = typeofGuard(node, truth, context);
   if (typed !== undefined) {
     return typed;
+  }
+  const agent = agentRuntime(node, context);
+  if (agent !== undefined) {
+    return runtimeGuard(agent, equal);
   }
   const left = isNullish(node.left);
   if (!left && !isNullish(node.right)) {
     return undefined;
   }
-  const equal = isEquality(node.operator) ? truth : !truth;
-  return equal ? [] : guardFor(left ? node.right : node.left, context);
+  return presence(left ? node.right : node.left, !equal, context);
 }
 
-/** The APIs that must exist whenever `test` evaluates to `truth`. */
+/** What a call of a helper, or a read of a `const`, tells: the facts of the check it holds. */
+function checkGuards(node: Node, truth: boolean, context: BindingContext): Guard[] {
+  let name: string | undefined;
+  if (node.type === 'Identifier') {
+    name = node.name;
+  } else if (node.type === 'CallExpression' && node.arguments.length === 0) {
+    const callee = strip(node.callee);
+    name = callee.type === 'Identifier' ? callee.name : undefined;
+  }
+  const check = name === undefined ? undefined : lookupCheck(context.scope, name);
+  if (check === undefined || check.call !== (node.type === 'CallExpression') || check.busy) {
+    return [];
+  }
+  check.busy = true;
+  try {
+    return guardsWhen(check.test, truth, { scope: check.scope, globals: context.globals });
+  } finally {
+    check.busy = false;
+  }
+}
+
+/** The APIs that must exist, and what is known of the runtime, whenever `test` evaluates to `truth`. */
 export function guardsWhen(test: Node, truth: boolean, context: BindingContext): Guard[] {
   const node = strip(test);
   if (node.type === 'UnaryExpression' && node.operator === '!') {
@@ -121,21 +137,28 @@ export function guardsWhen(test: Node, truth: boolean, context: BindingContext):
   if (node.type === 'BinaryExpression') {
     if (node.operator === 'in') {
       const key = stringLiteral(node.left);
-      return truth && key !== undefined ? guardFor(node.right, context, key) : [];
+      return key === undefined ? [] : presence(node.right, truth, context, key);
     }
     return comparisonGuard(node, truth, context) ?? [];
   }
-  return truth ? guardFor(node, context) : [];
-}
-
-/** Whether `ref` is `guard.ref` or something below it. */
-function isCovered(guard: Guard, ref: ApiRef): boolean {
-  const target = normalizeRef(ref);
-  return (
-    guard.active &&
-    guard.ref.module === target.module &&
-    guard.ref.path.every((segment, index) => target.path[index] === segment)
-  );
+  if (node.type === 'CallExpression') {
+    const [only] = node.arguments;
+    // `Boolean(x)` is truthy exactly when `x` is.
+    if (
+      node.arguments.length === 1 &&
+      only?.type !== 'SpreadElement' &&
+      only !== undefined &&
+      strip(node.callee).type === 'Identifier' &&
+      isUnbound(strip(node.callee), 'Boolean', context)
+    ) {
+      return guardsWhen(only, truth, context);
+    }
+    const agent = agentRuntime(node, context);
+    if (agent !== undefined) {
+      return runtimeGuard(agent, truth);
+    }
+  }
+  return [...checkGuards(node, truth, context), ...presence(node, truth, context)];
 }
 
 /** Whether a branch always leaves the code around it, so what follows only runs without it. */
@@ -154,43 +177,4 @@ export function guardsAfter(node: NodeOf<'IfStatement'>, context: BindingContext
     return [];
   }
   return guardsWhen(node.test, alternate, context);
-}
-
-/** The guards in force at the point being visited. */
-export class GuardStack {
-  readonly #guards: Guard[] = [];
-
-  /** Runs `body` with `guards` added, and removes them afterwards. */
-  public readonly within = (guards: readonly Guard[], body: () => void): void => {
-    const depth = this.#guards.length;
-    this.#guards.push(...guards);
-    try {
-      body();
-    } finally {
-      this.#guards.length = depth;
-    }
-  };
-
-  /** Runs `body`, which may add guards that last for the rest of a block. */
-  public readonly scoped = (body: (add: (guards: readonly Guard[]) => void) => void): void => {
-    const depth = this.#guards.length;
-    try {
-      body(guards => {
-        this.#guards.push(...guards);
-      });
-    } finally {
-      this.#guards.length = depth;
-    }
-  };
-
-  public readonly drop = (name: string): void => {
-    for (const guard of this.#guards) {
-      if (guard.root === name) {
-        guard.active = false;
-      }
-    }
-  };
-
-  public readonly covers = (ref: ApiRef): boolean =>
-    this.#guards.some(guard => isCovered(guard, ref));
 }

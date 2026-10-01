@@ -5,6 +5,15 @@ export type Level = 'error' | 'warning' | 'off';
 
 export type TargetKey = 'workerd' | 'bun' | 'deno' | 'deno-deploy';
 
+/** The runtime a target runs code on. `deno` covers Deno Deploy too. */
+export type Runtime = 'workerd' | 'bun' | 'deno';
+
+/** Code that only runs when the runtime is (`present`) or is not (`!present`) `runtime`. */
+export interface RuntimeCondition {
+  runtime: Runtime;
+  present: boolean;
+}
+
 /** A reference to a runtime API, such as `fs.watch` or the `process.binding` global. */
 export interface ApiRef {
   /** The built-in module without the `node:` prefix (`fs`, `fs/promises`), or `*globals*` for globals. */
@@ -37,6 +46,8 @@ export interface Usage {
   location: Location;
   /** Set when the code only runs if the API exists, for example inside `if (x.y)`. */
   guarded?: true;
+  /** Set when the code sits behind runtime checks, such as `typeof Deno !== 'undefined'`. All must hold. */
+  runtimes?: RuntimeCondition[];
 }
 
 export interface Finding {
@@ -57,7 +68,7 @@ export interface Finding {
   chain: string[];
   /** Link to the curated source behind this result, when there is one. */
   source?: string;
-  /** Set when the code only runs if the API exists. Guarded findings never fail a check. */
+  /** Set when the code only runs if the API exists, or on another runtime. Guarded findings never fail a check. */
   guarded?: true;
 }
 

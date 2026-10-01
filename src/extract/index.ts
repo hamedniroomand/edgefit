@@ -1,6 +1,8 @@
 import { parseSync } from 'oxc-parser';
 import type { Node, ParseResult, ParserOptions } from 'oxc-parser';
 
+import { collectShape } from '@/trace/shape.ts';
+import type { ModuleShape } from '@/trace/shape.ts';
 import type { Usage } from '@/types.ts';
 
 import { UsageCollector } from './usage-collector.ts';
@@ -9,6 +11,16 @@ import { Walker } from './walker.ts';
 export interface ExtractOptions {
   /** Global names worth tracking, such as `process` and `Buffer`. */
   globals: ReadonlySet<string>;
+  /** Also split the module into the pieces that run on load and the pieces that wait to be used. */
+  shape?: boolean;
+}
+
+export interface ExtractedModule {
+  usages: Usage[];
+  /** Where each usage was found in the source. */
+  offsets: number[];
+  /** Set when `shape` was asked for and the file could be parsed. */
+  shape: ModuleShape | undefined;
 }
 
 function languageFor(file: string): ParserOptions['lang'] {
@@ -43,8 +55,12 @@ function parse(file: string, source: string): ParseResult {
   return retry.errors.length === 0 ? retry : result;
 }
 
-/** Parses a file and returns every runtime API use in it. */
-export function extractUsages(file: string, source: string, options: ExtractOptions): Usage[] {
+/** Parses a file and returns every runtime API use in it, and where each one is. */
+export function extractModule(
+  file: string,
+  source: string,
+  options: ExtractOptions,
+): ExtractedModule {
   const collector = new UsageCollector(file, source);
   const result = parse(file, source);
   const [error] = result.errors;
@@ -55,8 +71,20 @@ export function extractUsages(file: string, source: string, options: ExtractOpti
       `the file could not be parsed: ${error.message}`,
       error.labels[0]?.start ?? 0,
     );
-    return collector.usages;
+    return { usages: collector.usages, offsets: collector.offsets, shape: undefined };
   }
   new Walker(collector, options.globals).visit(result.program as Node);
-  return collector.usages;
+  return {
+    usages: collector.usages,
+    offsets: collector.offsets,
+    shape:
+      options.shape === true
+        ? collectShape(result.program.body as Node[], result.module.hasModuleSyntax)
+        : undefined,
+  };
+}
+
+/** Parses a file and returns every runtime API use in it. */
+export function extractUsages(file: string, source: string, options: ExtractOptions): Usage[] {
+  return extractModule(file, source, options).usages;
 }

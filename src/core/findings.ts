@@ -5,6 +5,7 @@ import type {
   IgnoreRule,
   Level,
   PackageInfo,
+  Runtime,
   TargetKey,
   Usage,
 } from '@/types.ts';
@@ -18,6 +19,21 @@ export const defaultLevels: Record<Category, Level> = {
   web: 'warning',
   unknown: 'warning',
 };
+
+const runtimeOf: Record<TargetKey, Runtime> = {
+  workerd: 'workerd',
+  bun: 'bun',
+  deno: 'deno',
+  'deno-deploy': 'deno',
+};
+
+/** Whether the runtime checks around a usage rule out the target's runtime, so the code never runs on it. */
+function isOtherRuntime(usage: Usage, target: TargetKey): boolean {
+  return (
+    usage.runtimes?.some(({ runtime, present }) => (runtime === runtimeOf[target]) !== present) ??
+    false
+  );
+}
 
 export interface ModuleUsages {
   file: string;
@@ -105,7 +121,10 @@ function toFinding(
     chain: module.chain,
     ...(classification.source === undefined ? {} : { source: classification.source }),
     // A check only protects code from an API the target lacks; one that exists and throws still fails.
-    ...(usage.guarded === true && classification.absent ? { guarded: true as const } : {}),
+    // Code that only runs on another runtime is never reached, whatever it uses.
+    ...((usage.guarded === true && classification.absent) || isOtherRuntime(usage, target)
+      ? { guarded: true as const }
+      : {}),
   };
 }
 

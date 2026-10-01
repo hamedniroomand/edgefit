@@ -53,6 +53,14 @@ export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node,
   }
   const module = builtinName(specifier);
   if (module !== undefined) {
-    context.useRef(moduleRef(module), node.source.start);
+    // Only an awaited import can be caught by a `try`; a promise nothing awaits fails on its own.
+    const record = (): void => {
+      context.useRef(moduleRef(module), node.source.start);
+    };
+    if (context.parent()?.type === 'AwaitExpression') {
+      record();
+    } else {
+      context.collector.guards.deferred(record);
+    }
   }
 };

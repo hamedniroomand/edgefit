@@ -25,18 +25,21 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
     names.push(...collectBlockNames(body.body));
   }
   declare(scope, names);
-  context.inScope(scope, () => {
-    for (const param of node.params) {
-      context.visitPattern(param);
-    }
-    if (body?.type === 'BlockStatement') {
-      // The body shares the function's scope instead of opening a block scope.
-      context.withAncestor(body, () => {
-        visitStatements(body.body, context);
-      });
-    } else {
-      context.visit(body);
-    }
+  // A function may be called after the `try` block around it has ended.
+  context.collector.guards.deferred(() => {
+    context.inScope(scope, () => {
+      for (const param of node.params) {
+        context.visitPattern(param);
+      }
+      if (body?.type === 'BlockStatement') {
+        // The body shares the function's scope instead of opening a block scope.
+        context.withAncestor(body, () => {
+          visitStatements(body.body, context);
+        });
+      } else {
+        context.visit(body);
+      }
+    });
   });
 };
 
@@ -45,7 +48,11 @@ export const visitClass: Visitor<NodeOf<'ClassDeclaration' | 'ClassExpression'>>
   context,
 ) => {
   context.visitAll(node.decorators);
-  context.visitAll([node.superClass, node.body]);
+  context.visit(node.superClass);
+  // Field initializers run when an instance is made, not where the class is written.
+  context.collector.guards.deferred(() => {
+    context.visit(node.body);
+  });
 };
 
 export const visitBlock: Visitor<NodeOf<'BlockStatement' | 'StaticBlock'>> = (node, context) => {

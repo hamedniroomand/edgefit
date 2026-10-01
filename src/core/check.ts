@@ -71,8 +71,8 @@ async function checkTarget(
     platform: target.resolvePlatform,
     plugins: target.resolvePlugins,
   });
-  const scanned = scanModules(graph, root, target.globals);
   const isBuilt = options.built !== undefined || isBuildOutput(root, entry);
+  const scanned = scanModules(graph, root, target.globals, { trace: !isBuilt });
   const { modules, notes } = isBuilt
     ? attributeOutput(scanned, root)
     : { modules: scanned, notes: [] };

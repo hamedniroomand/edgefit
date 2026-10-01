@@ -40,6 +40,12 @@ const defaultGlobals = new Set([
   'BroadcastChannel',
 ]);
 
+function runtimeTags(usage: Usage): string {
+  return (usage.runtimes ?? [])
+    .map(({ runtime, present }) => ` [${present ? '' : 'not '}${runtime}]`)
+    .join('');
+}
+
 /** Extracts usages from a snippet as compact `kind display` strings. */
 export function usagesOf(
   source: string,
@@ -47,7 +53,8 @@ export function usagesOf(
   globals: ReadonlySet<string> = defaultGlobals,
 ): string[] {
   return extractUsages(file, source, { globals }).map(
-    usage => `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}`,
+    usage =>
+      `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${runtimeTags(usage)}`,
   );
 }
 

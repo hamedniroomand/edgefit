@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Added
+
+- Code that only runs on another runtime is guarded on this one. `typeof Deno`, `typeof Bun`, `'Deno' in globalThis`, `process.versions.deno`, `process.versions.bun` and `navigator.userAgent` tests are read, in an `if`, `?:`, `&&` or guard clause and in the `else` branch, so `else if (process.versions?.bun) …` chains are followed. Everything such code uses is guarded, an API that exists and throws included.
+- A `try` block whose `catch` does not throw again guards the APIs the target lacks that it uses. `await import()` counts; functions defined in the block and an `import()` nothing awaits do not.
+- A helper in the same file that only returns a check (`const isDeno = () => typeof Deno !== 'undefined'`, `function hasWatch() { return !!fs.watch; }`), and a `const` that holds one, stand in for the check they hold.
+- Only the exports a project imports are checked. A function that only an unused export uses, such as one `fs.watch` helper in a utility library, no longer produces a finding. Modules that are imported as a namespace, with `import()` or `require()`, or that are CommonJS are still checked in full, and so is build output. A module that runs code when it loads keeps that code and what it uses, and drops its unused exports.
+
 ### Changed
 
 - The GitHub Action's warning about a base commit it could not check now says to build in `install-command` when the entry is build output, and the action docs explain why the base needs its own build.

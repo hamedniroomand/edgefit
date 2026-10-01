@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { extractUsages } from '@/extract/index.ts';
+import { extractModule } from '@/extract/index.ts';
 import type { ModuleGraph } from '@/resolve/graph.ts';
 import { PackageResolver } from '@/resolve/packages.ts';
+import { reachedUsages } from '@/trace/reach.ts';
 
 import { ImportChains } from './chains.ts';
 import type { ModuleUsages } from './findings.ts';
@@ -16,27 +17,41 @@ export function toPosix(file: string): string {
   return file.split(path.sep).join('/');
 }
 
+export interface ScanOptions {
+  /**
+   * Leave out what only unused exports use. Build output has been through that already,
+   * and its exports are not the ones the source names.
+   */
+  trace: boolean;
+}
+
 /** Extracts runtime API usages from every script in the graph, with its package and import chain. */
 export function scanModules(
   graph: ModuleGraph,
   root: string,
   globals: ReadonlySet<string>,
+  options: ScanOptions,
 ): ModuleUsages[] {
   const packages = new PackageResolver(root);
   const chains = new ImportChains(graph, packages);
-  return [...graph.modules]
+  const scripts = [...graph.modules]
     .filter(([file]) => scriptFile.test(file))
     .map(([file, module]) => {
-      const posixFile = toPosix(file);
       const source = readFileSync(path.resolve(root, file), 'utf8');
+      const posixFile = toPosix(file);
       return {
         file,
-        package: packages.packageFor(file),
-        chain: chains.chainTo(file),
-        usages: [
-          ...extractUsages(posixFile, source, { globals }),
-          ...uncheckedImports(posixFile, source, module.externals),
-        ],
+        found: extractModule(posixFile, source, { globals, shape: options.trace }),
+        unchecked: uncheckedImports(posixFile, source, module.externals),
       };
     });
+  const reached = options.trace
+    ? reachedUsages(graph, new Map(scripts.map(({ file, found }) => [file, found])))
+    : new Map(scripts.map(({ file, found }) => [file, found.usages]));
+  return scripts.map(({ file, unchecked }) => ({
+    file,
+    package: packages.packageFor(file),
+    chain: chains.chainTo(file),
+    usages: [...(reached.get(file) ?? []), ...unchecked],
+  }));
 }

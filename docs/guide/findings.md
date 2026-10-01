@@ -87,7 +87,9 @@ await subtle.getPublicKey(key, []);
 
 When the target does not have the API, a usage that only runs after such a check is a guarded finding. It is left out of the list and does not fail a check. The report counts them (`1 guarded usage hidden`), and `--verbose` lists them. In JSON they are under `guarded`, next to `findings`.
 
-A check does not protect an API that exists and throws or does nothing, such as `fs.watch` on Workers, because the check passes and the call still fails. Those stay findings, and so do `mocked` and `mismatch` results.
+A check does not protect an API that exists and throws or does nothing, such as `fs.watch` on Workers, because the check passes and the call still fails. Those stay findings, and so do `mocked` and `mismatch` results. Code that does not run at all on the target is the exception, see [Runtime checks](#runtime-checks).
+
+### Checks for an API
 
 These checks are understood:
 
@@ -96,7 +98,62 @@ These checks are understood:
 - `x.y?.()`
 - a guard clause such as `if (!x.y) throw …` or `return`, for the rest of the block
 
-A check only covers the API it names, and anything below it. `if (fs.watchFile)` does not guard `fs.watch`. See [Limitations](/guide/limitations) for the checks that are not understood yet.
+A check only covers the API it names, and anything below it. `if (fs.watchFile)` does not guard `fs.watch`.
+
+### Try blocks
+
+Using an API the target lacks throws, and a `try` block whose `catch` does not throw again stops that:
+
+```js
+try {
+  const { DatabaseSync } = require('node:sqlite');
+  return new DatabaseSync(path);
+} catch {
+  return openFallback(path);
+}
+```
+
+Usages in the `try` block are guarded, for the APIs the target lacks. Like a check, it does not protect an API that exists and throws. These are not guarded:
+
+- a `try` with no `catch`, or a `catch` that throws again, even only on some errors
+- the `catch` and `finally` blocks themselves
+- a function defined in the block, which may run after the block has ended, and a class body
+- an `import()` that nothing awaits, since its error does not reach the block. `await import(…)` does
+
+### Runtime checks
+
+Code that only runs on another runtime is never reached on this one, so everything it uses is guarded, an API that exists and throws included:
+
+```js
+if (typeof Deno !== 'undefined') {
+  // Guarded on Workers and Bun
+} else if (process.versions?.bun) {
+  // Guarded on Workers and Deno
+} else {
+  // Not guarded on Workers
+}
+```
+
+These checks name a runtime:
+
+- `typeof Deno`, `typeof Bun`, `'Deno' in globalThis` and `globalThis.Deno`
+- `process.versions.deno` and `process.versions.bun`
+- `navigator.userAgent === 'Cloudflare-Workers'`, and `navigator.userAgent.startsWith('Bun')` or `.includes('Deno')`
+
+The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
+
+### Helpers
+
+A check kept in a helper is understood when the helper is in the same file, has no parameters, is not `async`, and does nothing but return the check. So is a `const` that holds one:
+
+```js
+const isDeno = typeof Deno !== 'undefined';
+const hasWatch = () => typeof fs.watch === 'function';
+
+if (hasWatch() && !isDeno) fs.watch(dir, onChange);
+```
+
+Helpers can call other helpers. A helper imported from another file, one with parameters, and one that does more than return a check are not followed. See [Limitations](/guide/limitations).
 
 ## Clean runs
 

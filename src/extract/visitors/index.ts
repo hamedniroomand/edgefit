@@ -4,7 +4,7 @@ import type { Visitor } from '@/extract/context.ts';
 
 import { visitCall, visitImportExpression } from './calls.ts';
 import { visitDeclaration, visitDeclarator } from './declarators.ts';
-import { visitConditional, visitIf, visitLogical } from './guards.ts';
+import { visitConditional, visitIf, visitLogical, visitTry } from './guards.ts';
 import { visitExportAll, visitExportNamed, visitImport, visitImportEquals } from './modules.ts';
 import {
   skip,
@@ -47,6 +47,7 @@ const visitors: VisitorMap = {
   ExportAllDeclaration: visitExportAll,
   TSImportEqualsDeclaration: visitImportEquals,
   IfStatement: visitIf,
+  TryStatement: visitTry,
   ConditionalExpression: visitConditional,
   LogicalExpression: visitLogical,
   CallExpression: visitCall,

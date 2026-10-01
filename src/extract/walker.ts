@@ -76,6 +76,8 @@ export class Walker implements VisitContext {
     }
   };
 
+  public readonly parent = (): Node | undefined => this.#stack.at(-2);
+
   public readonly withAncestor = (node: Node, body: () => void): void => {
     this.#stack.push(node);
     try {

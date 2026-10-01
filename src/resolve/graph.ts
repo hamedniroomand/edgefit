@@ -6,8 +6,19 @@ import type { Loader, Message, Metafile, Plugin } from 'esbuild';
 import { toResolveError } from './errors.ts';
 import { runtimeExternals } from './runtime-externals.ts';
 
+/** An import of a module in the graph, as esbuild resolved it. */
+export interface ImportLink {
+  /** The imported module, as a key of `ModuleGraph.modules`. */
+  path: string;
+  /** The specifier as written in the source, when esbuild kept it. */
+  original: string | undefined;
+  /** esbuild's kind: `import-statement`, `dynamic-import`, `require-call`, and others. */
+  kind: string;
+}
+
 export interface GraphModule {
   imports: string[];
+  links: ImportLink[];
   /** Imports left out of the graph, such as `node:fs` or `jsr:@std/path@^1`. */
   externals: string[];
 }
@@ -94,9 +105,15 @@ export async function resolveGraph(options: ResolveOptions): Promise<ModuleGraph
   const metafile = await bundleMetafile(options);
   const modules = new Map<string, GraphModule>();
   for (const [file, input] of Object.entries(metafile.inputs)) {
-    const imports = input.imports.filter(item => item.external !== true).map(item => item.path);
+    const internal = input.imports.filter(item => item.external !== true);
+    const imports = internal.map(item => item.path);
+    const links = internal.map(item => ({
+      path: item.path,
+      original: item.original,
+      kind: item.kind,
+    }));
     const externals = input.imports.filter(item => item.external === true).map(item => item.path);
-    modules.set(file, { imports, externals });
+    modules.set(file, { imports, links, externals });
   }
   const bundledEntry = Object.values(metafile.outputs).find(
     output => output.entryPoint !== undefined,
