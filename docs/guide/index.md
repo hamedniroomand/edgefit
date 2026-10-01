@@ -1,6 +1,6 @@
 # What is edgefit?
 
-edgefit checks whether a JavaScript or TypeScript project, including everything it imports from `node_modules`, will run on an edge or alternative runtime such as Cloudflare Workers, Bun or Deno.
+edgefit checks whether a JavaScript or TypeScript project, including everything it imports from `node_modules`, will run on an edge or alternative runtime such as Cloudflare Workers, Bun, Deno, Netlify Edge Functions or Vercel Edge.
 
 ## The problem
 
