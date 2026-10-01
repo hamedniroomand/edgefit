@@ -1,5 +1,7 @@
 import { findSuggestion } from '@/data/suggestions.ts';
 import type { SuggestionData } from '@/data/suggestions.ts';
+import { findUnreached } from '@/data/unreached.ts';
+import type { UnreachedEntry } from '@/data/unreached.ts';
 import type { Target } from '@/targets/index.ts';
 import type {
   Category,
@@ -17,6 +19,7 @@ import type { Classification } from './classify.ts';
 
 /** Re-exported so the check reads the shipped suggestions through the same module that applies them. */
 export { loadSuggestions } from '@/data/suggestions.ts';
+export { loadUnreached } from '@/data/unreached.ts';
 
 export const defaultLevels: Record<Category, Level> = {
   unsupported: 'error',
@@ -47,6 +50,8 @@ export interface FindingOptions {
   ignore: readonly IgnoreRule[];
   /** Reviewed fixes for packages and APIs. Findings get none without them. */
   suggestions?: SuggestionData;
+  /** Cases of code a package ships that the target never runs. Matching findings are guarded. */
+  unreached?: readonly UnreachedEntry[];
 }
 
 /** A reached API the target fully supports. */
@@ -119,6 +124,24 @@ function suggest(
   });
 }
 
+function unreachedFor(
+  module: ModuleUsages,
+  usage: Usage,
+  options: FindingOptions,
+): UnreachedEntry | undefined {
+  const version = module.package?.version;
+  if (options.unreached === undefined || module.package === undefined || version === undefined) {
+    return undefined;
+  }
+  return findUnreached(options.unreached, {
+    package: module.package.name,
+    version,
+    file: usage.location.file,
+    api: usage.display,
+    target: options.target.info.key,
+  });
+}
+
 function toFinding(
   module: ModuleUsages,
   usage: Usage,
@@ -133,8 +156,11 @@ function toFinding(
     return undefined;
   }
   const target: TargetKey = options.target.info.key;
+  const unreached = unreachedFor(module, usage, options);
   const guarded =
-    (usage.guarded === true && classification.absent) || isOtherRuntime(usage, options.target);
+    (usage.guarded === true && classification.absent) ||
+    isOtherRuntime(usage, options.target) ||
+    unreached !== undefined;
   const suggestion = guarded ? undefined : suggest(module, usage, classification, options);
   return {
     category: classification.category,
@@ -152,6 +178,9 @@ function toFinding(
     // A check only protects code from an API the target lacks; one that exists and throws still fails.
     // Code that only runs on another runtime is never reached, whatever it uses.
     ...(guarded ? { guarded: true as const } : {}),
+    ...(unreached === undefined
+      ? {}
+      : { unreached: { reason: unreached.reason, source: unreached.source } }),
   };
 }
 

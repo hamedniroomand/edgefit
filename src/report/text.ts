@@ -77,6 +77,12 @@ export function formatFinding(finding: Finding, paint: Paint): string[] {
   if (finding.source !== undefined) {
     lines.push(paint('dim', `${indent}see ${finding.source}`));
   }
+  if (finding.unreached !== undefined) {
+    lines.push(
+      paint('dim', `${indent}not reached: ${finding.unreached.reason}`),
+      paint('dim', `${indent}see ${finding.unreached.source}`),
+    );
+  }
   return lines;
 }
 
@@ -119,7 +125,7 @@ function formatGuarded(report: TargetReport, paint: Paint, verbose: boolean): st
   return [
     paint(
       'dim',
-      'Guarded: the code checks for an API this target lacks before using it, catches the error of its absence, or only runs on another runtime, so these do not fail a check.',
+      'Guarded: the code checks for an API this target lacks before using it, catches the error of its absence, only runs on another runtime, or is listed as not reached, so these do not fail a check.',
     ),
     ...report.guarded.map(finding => formatFinding(finding, paint).join('\n')),
   ];

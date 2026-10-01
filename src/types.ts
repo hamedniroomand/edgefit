@@ -94,6 +94,8 @@ export interface Finding {
   suggestion?: Suggestion;
   /** Set when the code only runs if the API exists, or on another runtime. Guarded findings never fail a check. */
   guarded?: true;
+  /** Set on a guarded finding that edgefit's data says is not reached on the target, with why. */
+  unreached?: { reason: string; source: string };
 }
 
 export interface IgnoreRule {
