@@ -122,7 +122,7 @@ describe('a target without an entry', () => {
     const io = captureIo(fixture('worker'));
     await run(['check', '--target', 'workerd', '--target', 'vercel-edge', '--no-color'], io);
     expect(io.output()).toContain(
-      'edgefit · vercel-edge skipped: no entry found. Searched: middleware.{ts,js,mts,mjs}',
+      'edgefit · vercel-edge skipped: No entry found. Searched: middleware.{ts,js,mts,mjs}',
     );
   });
 

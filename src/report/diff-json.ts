@@ -8,6 +8,7 @@ export function formatDiffJson(diff: ReportDiff): string {
     new: diff.added,
     fixed: diff.fixed,
     unchanged: diff.unchanged,
+    skipped: diff.skipped,
   };
   return `${JSON.stringify(report, null, 2)}\n`;
 }

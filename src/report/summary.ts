@@ -1,10 +1,17 @@
 import { countLevels } from '@/core/check.ts';
-import type { CheckResult } from '@/core/check.ts';
+import type { CheckResult, SkippedTarget } from '@/core/check.ts';
 import { formatPackage } from '@/resolve/packages.ts';
 import type { Finding, Location, PackageInfo } from '@/types.ts';
 
 function plural(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? '' : 's'}`;
+}
+
+/** Why a target was left out, and where it looked for an entry. */
+export function skippedMessage({ searched }: SkippedTarget): string {
+  return searched.length > 0
+    ? `No entry found. Searched: ${searched.join(', ')}`
+    : 'No entry found.';
 }
 
 export function summaryLine(result: CheckResult): string {

@@ -4,6 +4,7 @@ import { jsonReportVersion, parseJsonReport } from '@/report/json.ts';
 
 const valid = {
   version: jsonReportVersion,
+  skipped: [],
   targets: [{ key: 'workerd', entries: ['src/index.ts'], findings: [] }],
 };
 
@@ -17,6 +18,7 @@ describe('reading JSON reports', () => {
     expect(parseJsonReport(JSON.stringify(v1), 'base.json').targets).toEqual([
       { key: 'workerd', entries: ['src/index.ts'], findings: [] },
     ]);
+    expect(parseJsonReport(JSON.stringify(v1), 'base.json').skipped).toEqual([]);
   });
 
   it('rejects text that is not JSON', () => {

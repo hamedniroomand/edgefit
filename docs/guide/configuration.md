@@ -52,7 +52,7 @@ An `--entry` or a config `entry` always wins. Without one, each target looks in 
 - A `scripts` or `tasks` command is read for `bun run file`, `bun file`, `deno run file` and `deno serve file`, after any `KEY=value`. Only the first command of a chain counts, and the file must exist.
 - Only the project root is read. At a workspace root (`workspaces` in `package.json`, `pnpm-workspace.yaml`, or `workspace` in `deno.json`) nothing is guessed, so edgefit never picks an entry from another package. Run it in a package, or pass `--entry`.
 - A `workerd`, Bun or Deno target with no entry of its own uses the declared entries of another such target. A guess is never lent. Netlify Edge and Vercel Edge never use another target's entries.
-- A target with no entry is skipped, and the report lists where it looked. The run fails when no target has one.
+- A target with no entry is skipped, and the report lists where it looked. The text report prints a line, `--format github` prints a `::warning` for each, and `compare`, `diff` and the Action's comment show them too. The run fails when no target has one.
 
 ## Ignoring findings
 
