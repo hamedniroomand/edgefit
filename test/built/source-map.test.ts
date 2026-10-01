@@ -97,4 +97,28 @@ describe('OutputSourceMap sources', () => {
     const found = OutputSourceMap.read(file)?.original({ file: 'index.mjs', line: 1, column: 1 });
     expect(found?.file).toBe(path.resolve(path.dirname(file), '100%zz.ts'));
   });
+
+  it('stops looking at the root of a workspace, so it never matches a file outside it', () => {
+    const { project, file } = layoutWithMap();
+    writeFileSync(path.join(project, 'pnpm-workspace.yaml'), '');
+    const found = OutputSourceMap.read(file, project)?.original({
+      file: 'index.js',
+      line: 1,
+      column: 1,
+    });
+    expect(found?.file).toBe(
+      path.resolve(path.dirname(file), '../../../node_modules/pkg@1/index.js'),
+    );
+  });
+
+  it('looks up to the root of the repository', () => {
+    const { directory, project, file } = layoutWithMap();
+    mkdirSync(path.join(directory, '.git'));
+    const found = OutputSourceMap.read(file, project)?.original({
+      file: 'index.js',
+      line: 1,
+      column: 1,
+    });
+    expect(found?.file).toBe(path.join(directory, 'node_modules/pkg@1/index.js'));
+  });
 });

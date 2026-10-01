@@ -40,6 +40,8 @@ function isOtherRuntime(usage: Usage, target: Target): boolean {
 export interface ModuleUsages {
   file: string;
   package: PackageInfo | undefined;
+  /** The code is build output with no original file in the project: see `Finding.buildOutput`. */
+  buildOutput?: true;
   chain: string[];
   usages: Usage[];
 }
@@ -59,6 +61,7 @@ export interface SupportedApi {
   api: string;
   /** Owning package, or `undefined` for the project's own code. */
   package: PackageInfo | undefined;
+  buildOutput?: true;
 }
 
 export interface FindingSet {
@@ -181,6 +184,7 @@ function toFinding(
     ...(unreached === undefined
       ? {}
       : { unreached: { reason: unreached.reason, source: unreached.source } }),
+    ...(module.buildOutput === true ? { buildOutput: true as const } : {}),
   };
 }
 
@@ -244,7 +248,11 @@ export function collectSupported(modules: readonly ModuleUsages[], target: Targe
     for (const usage of module.usages) {
       const key = `${usage.display}\0${module.package?.name ?? '.'}`;
       if (usage.kind === 'api' && !supported.has(key) && classify(usage, target) === undefined) {
-        supported.set(key, { api: usage.display, package: module.package });
+        supported.set(key, {
+          api: usage.display,
+          package: module.package,
+          ...(module.buildOutput === true ? { buildOutput: true as const } : {}),
+        });
       }
     }
   }

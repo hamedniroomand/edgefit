@@ -45,7 +45,7 @@ npx edgefit check --target vercel-edge --built .vercel/output
 
 With the `vercel-edge` target, the output is found without `--built` when the source gives no entry: the order is `--entry` or the config, then the middleware and the Edge routes in the source, then `.vercel/output`. `--built` always uses the output.
 
-Next.js 16 builds `middleware.ts` as an Edge function and `proxy.ts` as a Node.js one, so only the first is checked. The Edge bundles ship with sourcemaps, and findings are mapped to `next` and your own files. The bundle also holds Next's own runtime code, and [`data/unreached.json`](/guide/findings#code-a-package-ships-and-the-target-does-not-run) says which of its uses do not run on Vercel.
+Next.js 16 builds `middleware.ts` as an Edge function and `proxy.ts` as a Node.js one, so only the first is checked. The Edge bundles ship with sourcemaps, and findings are mapped to `next` and your own files. Code that a bundler adds around your modules, such as Turbopack's `e.x("node:…", () => require(…))` wrappers and its computed `import()` of chunks, has no file in the project. It is listed under `build output`, not `your code`, so a warning about it is not a warning about your code. The bundle also holds Next's own runtime code, and [`data/unreached.json`](/guide/findings#code-a-package-ships-and-the-target-does-not-run) says which of its uses do not run on Vercel.
 
 ## Turn on sourcemaps
 

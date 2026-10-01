@@ -2,7 +2,6 @@ import { styleText } from 'node:util';
 
 import type { CheckResult, SkippedTarget, TargetReport } from '@/core/check.ts';
 import { describeEntries } from '@/core/entries.ts';
-import { formatPackage } from '@/resolve/packages.ts';
 import type { Finding } from '@/types.ts';
 
 import {
@@ -94,7 +93,7 @@ function isFoldable(finding: Finding): boolean {
 function formatUnknown(findings: readonly Finding[], paint: Paint): string[] {
   const byOwner = new Map<string, Finding[]>();
   for (const finding of findings) {
-    const owner = finding.package === undefined ? 'your code' : formatPackage(finding.package);
+    const owner = ownerName(finding);
     byOwner.set(owner, [...(byOwner.get(owner) ?? []), finding]);
   }
   const lines = [...byOwner].map(([owner, group]) => {

@@ -96,6 +96,11 @@ export interface Finding {
   guarded?: true;
   /** Set on a guarded finding that edgefit's data says is not reached on the target, with why. */
   unreached?: { reason: string; source: string };
+  /**
+   * Set when the code is in build output that no sourcemap maps to a file of the project, such as
+   * the code a bundler adds around your modules. It has no owner, and is not your code.
+   */
+  buildOutput?: true;
 }
 
 export interface IgnoreRule {

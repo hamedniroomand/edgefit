@@ -5,6 +5,7 @@ import type { SourceMapPayload } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { isWorkspaceRoot } from '@/targets/entry-sources.ts';
 import type { Location } from '@/types.ts';
 
 export interface OriginalPosition {
@@ -18,6 +19,11 @@ const mappingUrlComment = /\/\/[#@]\s*sourceMappingURL=(\S+)\s*$/u;
 
 // URLs other than `file:`, such as `webpack://`, name no file on disk.
 const urlScheme = /^[a-z][\d+.a-z-]*:/iu;
+
+/** The root of a workspace (pnpm, npm or Deno) or of a Git repository. */
+function isBoundary(directory: string): boolean {
+  return existsSync(path.join(directory, '.git')) || isWorkspaceRoot(directory);
+}
 
 /** Sources are URLs, so `@` can arrive as `%40`. A source that is not valid is used as written. */
 function safeDecode(url: string): string {
@@ -121,24 +127,24 @@ export class OutputSourceMap {
   /**
    * Some builds write sources relative to where they built, and a platform then copies the output
    * somewhere deeper: Next.js's `../../../node_modules/…` ends up inside `.vercel/output`. When the
-   * file is not where the map says, the same path is looked for above the project root.
+   * file is not where the map says, the same path is looked for above the project root, up to the
+   * workspace or repository root.
    */
   #fromProject(file: string, url: string): string {
     if (existsSync(file) || this.#projectRoot === undefined) {
       return file;
     }
     const rest = url.replace(/^(?:\.\.\/)+/u, '');
-    for (
-      let directory = this.#projectRoot;
-      path.dirname(directory) !== directory;
-      directory = path.dirname(directory)
-    ) {
+    // The search stops at the workspace or the repository, so it never matches a file outside it.
+    for (let directory = this.#projectRoot; ; directory = path.dirname(directory)) {
       const candidate = path.join(directory, rest);
       if (existsSync(candidate)) {
         return candidate;
       }
+      if (isBoundary(directory) || path.dirname(directory) === directory) {
+        return file;
+      }
     }
-    return file;
   }
 
   #locate(source: string): string | undefined {

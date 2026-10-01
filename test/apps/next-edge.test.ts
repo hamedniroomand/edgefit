@@ -48,4 +48,19 @@ describe.skipIf(!built)('next.js on vercel-edge, from the build output', () => {
       expect(finding.unreached?.source).toMatch(/^https:\/\/github\.com\/vercel\/next\.js\//u);
     }
   });
+
+  // Turbopack wraps each Node.js module in `e.x("node:…", () => require(…))` and loads chunks with
+  // a computed `import()`. That code is in the bundle, with no file of the project behind it.
+  it('puts the code of the bundler under build output, not under your code', async () => {
+    const warnings = ((await report())?.findings ?? []).filter(finding => finding.level === 'warning');
+    expect(warnings.map(finding => `${finding.api} ${finding.buildOutput === true}`).toSorted()).toEqual([
+      'import(<expression>) true',
+      'import(<expression>) true',
+      'node:async_hooks true',
+      'node:async_hooks true',
+      'node:buffer true',
+      'node:buffer true',
+    ]);
+    expect(warnings.every(finding => finding.package === undefined)).toBe(true);
+  });
 });
