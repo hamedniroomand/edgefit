@@ -247,7 +247,7 @@ A difference between the emulator and the documentation that is already understo
 ## After merging
 
 1. The next Probe run should close the drift issue. If it still lists entries, they are real: handle them or mark them `validatesFirst` with a reason.
-2. Cut a release when the data change is worth shipping: update `version` and the changelog, merge, and tag `vX.Y.Z`. The Release workflow publishes.
+2. Cut a release when the data change is worth shipping: add a changeset, merge the release pull request, and tag `vX.Y.Z`. The Release workflow publishes.
 
 ## Checklist
 

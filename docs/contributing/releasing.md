@@ -76,15 +76,24 @@ keeps working, and a leaked token can no longer publish.
 
 If the text report changed shape, re-record the demo first: `vp pack && vhs docs/demo.tape` (needs `vhs`, and `vp install` in `apps/`).
 
-1. Update `version` in `package.json` and rename the `## Unreleased` section of `CHANGELOG.md` to
-   `## <version>`. Changes merged between releases add their line under `## Unreleased`.
-2. Commit and merge to `main`.
-3. Tag and push:
+Changes are described with [changesets](https://github.com/changesets/changesets): each pull request that users will notice adds a file in `.changeset/` (`vp run changeset`).
+
+1. When changesets reach `main`, the **Release PR** workflow opens or updates one pull request,
+   `chore(release): version packages`. It bumps `version` in `package.json` and writes the new
+   `CHANGELOG.md` section from the changesets. Read the section and edit the changeset files or
+   the generated text if it needs it.
+2. Merge that pull request.
+3. Tag the merge commit and push the tag:
 
    ```sh
+   git switch main && git pull
    git tag v0.2.0
    git push origin v0.2.0
    ```
+
+The Release PR workflow opens its pull request with `GITHUB_TOKEN`, which does not start other workflows, so CI does not run on it. Store a fine-grained token (contents and pull requests: write) as the `RELEASE_PR_TOKEN` secret to get CI on that pull request, or close and reopen it to run the checks.
+
+For a pre-release, run `vp run changeset pre enter beta` on a branch, merge, and leave with `vp run changeset pre exit`; tag `v0.2.0-beta.1` as below.
 
 The workflow then:
 
@@ -92,7 +101,7 @@ The workflow then:
 2. runs `vp run ready` (format, lint, type check, tests, build),
 3. packs the package with pnpm and publishes it with npm 11.5.1 or later through trusted
    publishing,
-4. creates the GitHub release from the changelog section.
+4. creates the GitHub release from the changelog section, plus the issues the release closes.
 
 A tag with a pre-release suffix, such as `v0.2.0-beta.1`, is published under the `next` dist-tag
 and marked as a pre-release on GitHub.

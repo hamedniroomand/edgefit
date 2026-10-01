@@ -1,0 +1,46 @@
+name: Release PR
+
+# Opens or updates one pull request that versions the package from the changesets on main:
+# it bumps package.json and writes the new CHANGELOG.md section. Merging it does not publish.
+# A maintainer then pushes the version tag, which starts release.yml (see
+# docs/contributing/releasing.md).
+#
+# A pull request opened with GITHUB_TOKEN does not start other workflows, so CI would not run on
+# it. Set the RELEASE_PR_TOKEN secret (fine-grained token, contents and pull requests: write) to
+# get CI on the release pull request; without it, close and reopen the pull request.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-pr
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          # changelog-github finds the pull request of each changeset from the git history.
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: voidzero-dev/setup-vp@3754dd7dbdb32bd8f6d28b6043de13ad3a75f21f # v1.21.1
+        with:
+          node-version: '24'
+          cache: true
+          run-install: true
+      - uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        with:
+          version: vp run changeset:version
+          title: 'chore(release): version packages'
+          commit: 'chore(release): version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
