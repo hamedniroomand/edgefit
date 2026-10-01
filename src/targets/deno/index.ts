@@ -9,6 +9,7 @@ import type { DenoOptions, Runtime, TargetKey } from '@/types.ts';
 
 import { findDenoConfig, readDenoConfig } from './deno-config.ts';
 import type { DenoConfig } from './deno-config.ts';
+import { denoEntrySources } from './entries.ts';
 import type { ImportMap } from './import-map.ts';
 import { denoSpecifiers } from './specifiers-plugin.ts';
 
@@ -123,7 +124,7 @@ export function createDenoTarget(root: string, options: DenoTargetOptions = {}):
     resolvePlatform: 'node',
     nodeEnv: netlify ? 'production' : undefined,
     resolvePlugins: [denoSpecifiers(netlify ? netlify.importMap : config?.importMap)],
-    entries: netlify?.entries ?? detectEntries([], true),
+    entries: netlify?.entries ?? detectEntries(denoEntrySources(root, config?.file), true),
     globals,
     lookup: api => index.lookup(api),
     hasProblemsBelow: api => index.hasProblemsBelow(api),

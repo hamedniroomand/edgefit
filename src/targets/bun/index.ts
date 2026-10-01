@@ -4,6 +4,7 @@ import { loadTargetData } from '@/targets/target-data.ts';
 import type { Target } from '@/targets/target.ts';
 import type { BunOptions } from '@/types.ts';
 
+import { bunEntrySources } from './entries.ts';
 import { resolveBunVersion } from './version.ts';
 
 // Bun's resolver takes whichever of these a package lists first, then `import`/`require` and `default`.
@@ -26,7 +27,7 @@ export function createBunTarget(root: string, options: BunOptions = {}): Target 
     runtimes: ['bun'],
     resolvePlatform: 'node',
     nodeEnv: undefined,
-    entries: detectEntries([], true),
+    entries: detectEntries(bunEntrySources(root), true),
     globals,
     lookup: api => index.lookup(api),
     hasProblemsBelow: api => index.hasProblemsBelow(api),

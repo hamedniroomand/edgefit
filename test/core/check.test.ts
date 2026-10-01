@@ -52,7 +52,7 @@ describe('check', () => {
   });
 
   it('fails with a hint when there is no entry', async () => {
-    const run = check({ root: fixture('worker'), config: { workerd: { wranglerConfig: false } } });
+    const run = check({ root: fixture('entries'), config: { workerd: { wranglerConfig: false } } });
     await expect(run).rejects.toThrow('No entry point to scan.');
   });
 

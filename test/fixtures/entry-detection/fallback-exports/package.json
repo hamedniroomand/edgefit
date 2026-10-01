@@ -1,0 +1,1 @@
+{ "name": "a", "exports": { "./sub": "./sub.ts", ".": { "types": "./i.d.ts", "import": "./src/main.mjs" } } }
