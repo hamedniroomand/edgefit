@@ -1,6 +1,10 @@
 # JSON reports
 
-Every command that takes `--format json` prints a versioned object. `version` changes only on breaking changes to the shape, and `edgefit diff` refuses to compare reports of different versions.
+Every command that takes `--format json` prints a versioned object. `version` changes only on breaking changes to the shape. `edgefit diff` reads reports of version 1 and 2, so a base report written before version 2 still works as the base.
+
+| Version | Change                                                                                                                                     |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2       | Each target lists `entries` where version 1 had one `entry`. A version 1 report is read as `entries: [entry]`. `compare` and `diff` follow |
 
 ## check
 
@@ -10,7 +14,7 @@ edgefit check --format json
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "summary": { "errors": 1, "warnings": 1 },
   "targets": [
     {
@@ -20,7 +24,7 @@ edgefit check --format json
       "data": "workers-nodejs-compat-matrix@ee58120 (workerd 1.20260929.1), ...",
       "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from wrangler.jsonc)",
       "notes": [],
-      "entry": "src/index.ts",
+      "entries": ["src/index.ts"],
       "modules": 5,
       "ignored": 0,
       "guarded": [],
@@ -50,6 +54,8 @@ edgefit check --format json
 }
 ```
 
+`entries` lists every entry the target was checked from, relative to the root, sorted. A target that has no entry of its own and uses another target's lists those.
+
 `guarded` has the same shape as `findings` and holds usages that do not fail the check because the code guards them: it only runs when the API exists, catches the error of its absence, or only runs on another runtime (see [guarded usages](/guide/findings#guarded-usages)). They are not counted in `summary` and never fail a check.
 
 ### Finding
@@ -74,7 +80,7 @@ edgefit check --format json
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "targets": ["workerd", "bun", "deno"],
   "apis": [
     {
@@ -121,7 +127,7 @@ The table's `results.json` lists one row per package with `name`, `file`, `resol
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "targets": ["workerd"],
   "new": [],
   "fixed": [],

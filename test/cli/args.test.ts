@@ -27,7 +27,7 @@ describe('parsing check arguments', () => {
     ]);
     expect(args).toMatchObject({
       targets: ['bun', 'deno'],
-      entry: 'src/main.ts',
+      entry: ['src/main.ts'],
       format: 'json',
       color: false,
     });

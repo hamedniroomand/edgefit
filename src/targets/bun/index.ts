@@ -25,7 +25,7 @@ export function createBunTarget(root: string, options: BunOptions = {}): Target 
     runtimes: ['bun'],
     resolvePlatform: 'node',
     nodeEnv: undefined,
-    defaultEntry: undefined,
+    defaultEntries: [],
     globals,
     lookup: api => index.lookup(api),
     hasProblemsBelow: api => index.hasProblemsBelow(api),

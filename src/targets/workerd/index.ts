@@ -85,7 +85,9 @@ export function createWorkerdTarget(root: string, options: WorkerdOptions = {}):
     runtimes: ['workerd'],
     resolvePlatform: 'browser',
     nodeEnv: 'production',
-    defaultEntry: wrangler === undefined ? undefined : mainFrom(root, wrangler),
+    defaultEntries: [wrangler === undefined ? undefined : mainFrom(root, wrangler)].flatMap(
+      main => main ?? [],
+    ),
     globals,
     lookup,
     hasProblemsBelow: api =>

@@ -22,7 +22,7 @@ edgefit check [options]
 | Option              | Description                                                                                                                                                          |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--target <name>`   | Target runtime: `workerd`, `bun`, `deno`, `deno-deploy`, `netlify-edge`, `vercel-edge`. Repeat it for more than one. Default: the config's `targets`, then `workerd` |
-| `--entry <file>`    | Entry point. Default: the config's `entry`, then wrangler's `main`                                                                                                   |
+| `--entry <file>`    | Entry point or glob. Repeat it for more than one. Default: the config's `entry`, then each target's own, such as wrangler's `main`                                   |
 | `--built <path>`    | Scan build output instead of source: its entry file or directory. See [build output](/guide/built-output)                                                            |
 | `--root <dir>`      | Project root. Default: the current directory                                                                                                                         |
 | `--config <file>`   | Config file. Default: `edgefit.config.{ts,mts,js,mjs}` in the root                                                                                                   |

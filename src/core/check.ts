@@ -3,12 +3,13 @@ import process from 'node:process';
 
 import { attributeOutput } from '@/built/attribute.ts';
 import { builtEntry, isBuildOutput } from '@/built/entry.ts';
-import { EdgefitError } from '@/errors.ts';
 import { resolveGraph } from '@/resolve/graph.ts';
 import { createTarget } from '@/targets/index.ts';
 import type { Target, TargetInfo } from '@/targets/index.ts';
 import type { EdgefitConfig, Finding } from '@/types.ts';
 
+import { entriesFor } from './entries.ts';
+import type { TargetEntries } from './entries.ts';
 import { collectFindings, collectSupported, defaultLevels, loadSuggestions } from './findings.ts';
 import type { SupportedApi } from './findings.ts';
 import { scanModules, toPosix } from './scan.ts';
@@ -28,7 +29,7 @@ export interface CheckOptions {
 
 export interface TargetReport {
   target: TargetInfo;
-  entry: string;
+  entries: string[];
   modules: number;
   findings: Finding[];
   /** Findings in code that only runs when the API exists, kept out of `findings`. */
@@ -43,21 +44,6 @@ export interface CheckResult {
   reports: TargetReport[];
 }
 
-/** One entry for every target, so a target without its own config can reuse wrangler's `main`. */
-function entryFor(targets: readonly Target[], config: EdgefitConfig): string {
-  const entry =
-    config.entry ?? targets.find(target => target.defaultEntry !== undefined)?.defaultEntry;
-  if (entry === undefined) {
-    // A target that looked for an entry and found none or several says why, in its own terms.
-    throw new EdgefitError(
-      'No entry point to scan.',
-      targets.find(target => target.entryHint !== undefined)?.entryHint ??
-        'Pass --entry, set `entry` in edgefit.config.ts, or set `main` in the wrangler config.',
-    );
-  }
-  return entry;
-}
-
 function describeNodeEnv(nodeEnv: string | undefined, fromConfig: boolean): string {
   if (nodeEnv === undefined) {
     return 'NODE_ENV not fixed, so both branches of a check are followed';
@@ -67,7 +53,7 @@ function describeNodeEnv(nodeEnv: string | undefined, fromConfig: boolean): stri
 
 async function checkTarget(
   target: Target,
-  entry: string,
+  { entries, note }: TargetEntries,
   root: string,
   options: CheckOptions,
 ): Promise<TargetReport> {
@@ -76,13 +62,13 @@ async function checkTarget(
   const nodeEnv = config.env?.NODE_ENV ?? target.nodeEnv;
   const graph = await resolveGraph({
     root,
-    entry,
+    entries,
     conditions,
     platform: target.resolvePlatform,
     nodeEnv,
     plugins: target.resolvePlugins,
   });
-  const isBuilt = options.built !== undefined || isBuildOutput(root, entry);
+  const isBuilt = options.built !== undefined || entries.some(entry => isBuildOutput(root, entry));
   const scanned = scanModules(graph, root, target.globals, {
     trace: !isBuilt,
     lazyNodeImports: target.lazyNodeImports,
@@ -103,9 +89,9 @@ async function checkTarget(
       ...target.info,
       settings: `${target.info.settings}, ${describeNodeEnv(nodeEnv, config.env?.NODE_ENV !== undefined)}`,
       conditions,
-      notes: [...target.info.notes, ...notes],
+      notes: [...target.info.notes, ...(note === undefined ? [] : [note]), ...notes],
     },
-    entry: toPosix(graph.entry),
+    entries: graph.entries.map(toPosix),
     modules: graph.modules.size,
     findings,
     guarded,
@@ -119,11 +105,16 @@ export async function check(options: CheckOptions = {}): Promise<CheckResult> {
   const root = path.resolve(options.root ?? process.cwd());
   const config = options.config ?? {};
   const targets = (config.targets ?? ['workerd']).map(key => createTarget(key, root, config));
-  const entry =
-    options.built === undefined ? entryFor(targets, config) : builtEntry(root, options.built);
+  const built = options.built;
+  const entries: TargetEntries[] =
+    built === undefined
+      ? entriesFor(root, targets, config)
+      : targets.map(() => ({ entries: [builtEntry(root, built)], note: undefined }));
   const pending: Promise<TargetReport>[] = [];
-  for (const target of targets) {
-    pending.push(checkTarget(target, entry, root, options));
+  for (const [index, target] of targets.entries()) {
+    pending.push(
+      checkTarget(target, entries[index] ?? { entries: [], note: undefined }, root, options),
+    );
   }
   const reports = await Promise.all(pending);
   return { root, reports };

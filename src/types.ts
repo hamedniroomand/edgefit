@@ -129,7 +129,8 @@ export interface EnvOptions {
 
 export interface EdgefitConfig {
   targets?: TargetKey[];
-  entry?: string;
+  /** One entry, or several. Globs are allowed. Applies to every target. */
+  entry?: string | string[];
   workerd?: WorkerdOptions;
   bun?: BunOptions;
   /** Used by both the `deno` and `deno-deploy` targets. */

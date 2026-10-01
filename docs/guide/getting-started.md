@@ -102,7 +102,7 @@ Remove the import that pulls the package in, swap it for one that supports the r
 
 ## Check more than one runtime
 
-Pass `--target` more than once. The same entry is used for every target.
+Pass `--target` more than once. An `--entry` is used for every target. Without one, a target without its own entry uses the first target's entries.
 
 ```sh
 npx edgefit check --target workerd --target bun --target deno

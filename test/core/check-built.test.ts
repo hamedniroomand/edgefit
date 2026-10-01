@@ -29,7 +29,7 @@ describe('check --built', () => {
   it('maps findings through sourcemaps to the original package', async () => {
     const result = await check({ root: fixture('nitro-app'), built: '.output/server' });
     const [report] = result.reports;
-    expect(report?.entry).toBe('.output/server/index.mjs');
+    expect(report?.entries).toEqual(['.output/server/index.mjs']);
     const locks = report?.findings.find(finding => finding.api === 'navigator.locks.request');
     expect(locks).toMatchObject({
       category: 'unsupported',
@@ -72,7 +72,7 @@ describe('check --built without sourcemaps', () => {
 describe('check --built entries', () => {
   it('accepts the entry file itself', async () => {
     const result = await check({ root: fixture('nitro-app'), built: '.output/server/index.mjs' });
-    expect(result.reports[0]?.entry).toBe('.output/server/index.mjs');
+    expect(result.reports[0]?.entries).toEqual(['.output/server/index.mjs']);
   });
 
   it('fails with a hint when the output has no entry', async () => {

@@ -138,7 +138,7 @@ describe('what a missing nodejs_compat flag leaves undefined', () => {
 describe('workerd target', () => {
   it('reads settings and the entry from the wrangler config', () => {
     const target = createWorkerdTarget(fixture('worker'));
-    expect(target.defaultEntry).toBe('src/index.ts');
+    expect(target.defaultEntries).toEqual(['src/index.ts']);
     expect(target.info.settings).toContain('from wrangler.jsonc');
   });
 
@@ -163,21 +163,21 @@ describe('workerd target with a deploy redirect', () => {
   });
 
   it('resolves main against the config it was written in', () => {
-    expect(createWorkerdTarget(fixture('nitro-redirect')).defaultEntry).toBe(
+    expect(createWorkerdTarget(fixture('nitro-redirect')).defaultEntries).toEqual([
       '.output/server/index.mjs',
-    );
+    ]);
   });
 
   it('resolves main of an explicit config against that config', () => {
     const target = createWorkerdTarget(fixture('nitro-redirect'), {
       wranglerConfig: '.output/server/wrangler.json',
     });
-    expect(target.defaultEntry).toBe('.output/server/index.mjs');
+    expect(target.defaultEntries).toEqual(['.output/server/index.mjs']);
   });
 
   it('is skipped when the wrangler config is turned off', () => {
     const target = createWorkerdTarget(fixture('nitro-redirect'), { wranglerConfig: false });
-    expect(target.defaultEntry).toBeUndefined();
+    expect(target.defaultEntries).toEqual([]);
   });
 });
 

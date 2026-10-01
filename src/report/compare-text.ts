@@ -3,7 +3,7 @@ import type { CheckResult } from '@/core/check.ts';
 import { compareRows } from './compare.ts';
 import type { CompareCell, CompareOptions, CompareRow } from './compare.ts';
 import { summaryLine } from './summary.ts';
-import { formatFinding, painter } from './text.ts';
+import { describeEntries, formatFinding, painter } from './text.ts';
 import type { Paint, TextOptions } from './text.ts';
 
 export interface CompareTextOptions extends TextOptions, CompareOptions {
@@ -49,12 +49,24 @@ function formatVerbose(row: CompareRow, paint: Paint): string[] {
   return [packages, ...findings];
 }
 
+/** The entries when every target checks the same ones, else each target's own. */
+function compareHeader(result: CheckResult, entries: readonly string[], paint: Paint): string {
+  const title = paint('bold', 'edgefit compare');
+  if (new Set(entries).size <= 1) {
+    return paint('bold', `edgefit compare · ${entries[0] ?? ''}`);
+  }
+  const perTarget = result.reports.map(
+    (report, index) => `  ${report.target.key}: ${entries[index]}`,
+  );
+  return [title, ...perTarget.map(line => paint('dim', line))].join('\n');
+}
+
 /** One table of the reached APIs across targets. */
 export function formatCompareText(result: CheckResult, options: CompareTextOptions): string {
   const paint = painter(options);
   const keys = result.reports.map(report => report.target.key);
-  const entry = result.reports[0]?.entry ?? '';
-  const header = paint('bold', `edgefit compare · entry ${entry}`);
+  const entries = result.reports.map(report => describeEntries(report.entries));
+  const header = compareHeader(result, entries, paint);
   const rows = compareRows(result, options);
   const notes = result.reports.flatMap(report =>
     report.target.notes.map(note => paint('yellow', `note (${report.target.key}): ${note}`)),

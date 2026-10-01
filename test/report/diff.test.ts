@@ -23,7 +23,7 @@ function finding(api: string, owner?: PackageInfo, parts: Partial<Finding> = {})
 }
 
 function report(...findings: Finding[]): JsonReport {
-  return { version: 1, targets: [{ key: 'workerd', findings }] };
+  return { version: 1, targets: [{ key: 'workerd', entries: [], findings }] };
 }
 
 const chokidar = { name: 'chokidar', version: '4.0.1' };

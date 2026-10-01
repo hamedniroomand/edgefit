@@ -18,7 +18,8 @@ Run edgefit --version (or -v) to print the installed version.
 
 Options for check:
   --target <name>    Target runtime (repeatable): ${targetKeys.join(', ')}. Default: workerd
-  --entry <file>     Entry point. Default: config \`entry\`, then wrangler \`main\`
+  --entry <file>     Entry point or glob (repeatable). Default: config \`entry\`, then each
+                     target's own, such as wrangler \`main\`
   --built <path>     Scan build output instead: its entry file or directory, e.g.
                      .output/server. Sourcemaps map findings to the original files
   --root <dir>       Project root. Default: the current directory

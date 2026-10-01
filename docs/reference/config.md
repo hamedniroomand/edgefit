@@ -19,18 +19,18 @@ export default defineConfig({
 
 ## Top level
 
-| Option       | Type                               | Default         | Description                                                                               |
-| ------------ | ---------------------------------- | --------------- | ----------------------------------------------------------------------------------------- |
-| `targets`    | `TargetKey[]`                      | `['workerd']`   | `workerd`, `bun`, `deno`, `deno-deploy`, `netlify-edge`, `vercel-edge`. Must not be empty |
-| `entry`      | `string`                           | wrangler `main` | Entry point, relative to the root                                                         |
-| `ignore`     | `IgnoreRule[]`                     | `[]`            | Findings to leave out of the report                                                       |
-| `levels`     | `Partial<Record<Category, Level>>` | see below       | Level per category: `error`, `warning` or `off`                                           |
-| `conditions` | `string[]`                         | `[]`            | Extra export conditions, checked before the target's own                                  |
-| `workerd`    | `WorkerdOptions`                   |                 | Cloudflare Workers settings                                                               |
-| `bun`        | `BunOptions`                       |                 | Bun settings                                                                              |
-| `deno`       | `DenoOptions`                      |                 | Settings for `deno` and `deno-deploy`                                                     |
-| `netlify`    | `NetlifyOptions`                   |                 | Settings for `netlify-edge`                                                               |
-| `env`        | `EnvOptions`                       |                 | Constants a bundler replaces, see below                                                   |
+| Option       | Type                               | Default       | Description                                                                               |
+| ------------ | ---------------------------------- | ------------- | ----------------------------------------------------------------------------------------- |
+| `targets`    | `TargetKey[]`                      | `['workerd']` | `workerd`, `bun`, `deno`, `deno-deploy`, `netlify-edge`, `vercel-edge`. Must not be empty |
+| `entry`      | `string \| string[]`               | each target's | Entry points or globs, relative to the root. Applies to every target                      |
+| `ignore`     | `IgnoreRule[]`                     | `[]`          | Findings to leave out of the report                                                       |
+| `levels`     | `Partial<Record<Category, Level>>` | see below     | Level per category: `error`, `warning` or `off`                                           |
+| `conditions` | `string[]`                         | `[]`          | Extra export conditions, checked before the target's own                                  |
+| `workerd`    | `WorkerdOptions`                   |               | Cloudflare Workers settings                                                               |
+| `bun`        | `BunOptions`                       |               | Bun settings                                                                              |
+| `deno`       | `DenoOptions`                      |               | Settings for `deno` and `deno-deploy`                                                     |
+| `netlify`    | `NetlifyOptions`                   |               | Settings for `netlify-edge`                                                               |
+| `env`        | `EnvOptions`                       |               | Constants a bundler replaces, see below                                                   |
 
 ## `ignore`
 

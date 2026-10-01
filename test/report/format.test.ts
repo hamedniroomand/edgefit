@@ -27,7 +27,7 @@ function resultOf(
     reports: [
       {
         target: info,
-        entry: 'src/index.ts',
+        entries: ['src/index.ts'],
         modules: 3,
         findings,
         guarded,
