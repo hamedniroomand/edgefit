@@ -4,3 +4,5 @@
 **/.netlify
 **/.vercel/*
 !**/.vercel/project.json
+# The Netlify adapter publishes here
+/sveltekit-netlify/build

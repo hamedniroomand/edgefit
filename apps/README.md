@@ -21,8 +21,9 @@ output is never committed: it is ignored, and the tests for it skip when it is m
 | App | Build | Output |
 | --- | --- | --- |
 | `next-edge` | `npm run build:vercel` in the app | `.vercel/output` |
+| `sveltekit-netlify` | `npm run build:netlify` in the app | `.netlify` |
 
-The build needs the network the first time (`npx` fetches the Vercel CLI, pinned in the script).
+The build of `next-edge` needs the network the first time (`npx` fetches the Vercel CLI, pinned in the script).
 The `.vercel/project.json` in the app holds the project settings, so `vercel build` needs no login.
 
 CI builds them in `.github/workflows/sample-builds.yml`, caches the build on the lockfile and the
