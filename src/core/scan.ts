@@ -50,7 +50,7 @@ export function scanModules(
           lazyNodeImports: options.lazyNodeImports,
           nodeEnv: options.nodeEnv,
         }),
-        unchecked: uncheckedImports(posixFile, source, module.externals),
+        unchecked: uncheckedImports(posixFile, source, module.externals, module.missingPeers),
       };
     });
   const reached = options.trace
