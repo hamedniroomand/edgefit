@@ -95,7 +95,7 @@ Mapping findings to packages needs sourcemaps. Without them, edgefit reads the `
 
 ## Deno: `jsr:` packages
 
-`jsr:` imports are not scanned yet and are reported as `unknown`.
+`jsr:` imports of Deno workspace members are followed. Other `jsr:` imports are not read, because edgefit does not read the Deno cache or the `vendor` directory. They are reported as `unknown`, with the package name.
 
 ## Vercel Edge is documented, not measured
 

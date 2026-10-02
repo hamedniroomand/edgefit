@@ -81,3 +81,12 @@ describe('deno target info', () => {
     ]);
   });
 });
+
+describe('deno workspace settings', () => {
+  it('names the workspace root as the source of an inherited import map', () => {
+    const target = createDenoTarget(fixture('deno-workspace/packages/core'));
+    expect(target.info.settings).toContain(
+      'import map from deno.json and ../../deno.json (workspace root)',
+    );
+  });
+});

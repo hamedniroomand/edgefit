@@ -12,7 +12,7 @@ function isPackageSpecifier(value: string): boolean {
   return packageSchemes.some(scheme => value.startsWith(scheme));
 }
 
-function isPathSpecifier(value: string): boolean {
+export function isPathSpecifier(value: string): boolean {
   return value.startsWith('./') || value.startsWith('../') || value.startsWith('/');
 }
 
@@ -47,4 +47,11 @@ export function applyImportMap(specifier: string, map: ImportMap): string | unde
 export function npmSpecifier(specifier: string): string | undefined {
   const match = /^npm:\/?((?:@[^/]+\/)?[^@/]+)(?:@[^/]*)?(\/.*)?$/u.exec(specifier);
   return match === null ? undefined : `${match[1]}${match[2] ?? ''}`;
+}
+
+/** `jsr:@scope/name@^1.2/sub` as the package `@scope/name` and the export key `./sub`. */
+export function jsrSpecifier(specifier: string): { name: string; key: string } | undefined {
+  const match = /^jsr:\/?(@[^/]+\/[^/@]+)(?:@[^/]*)?(\/.*)?$/u.exec(specifier);
+  const name = match?.[1];
+  return name === undefined ? undefined : { name, key: `.${match?.[2] ?? ''}` };
 }

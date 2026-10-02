@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { applyImportMap, npmSpecifier } from '@/targets/deno/import-map.ts';
+import { applyImportMap, jsrSpecifier, npmSpecifier } from '@/targets/deno/import-map.ts';
 
 const map = {
   directory: '/project',
@@ -52,5 +52,20 @@ describe('npm specifiers', () => {
   it('ignores other specifiers', () => {
     expect(npmSpecifier('chalk')).toBeUndefined();
     expect(npmSpecifier('jsr:@std/path')).toBeUndefined();
+  });
+});
+
+describe('jsrSpecifier', () => {
+  it('reads the package and the export key', () => {
+    expect(jsrSpecifier('jsr:@acme/core')).toEqual({ name: '@acme/core', key: '.' });
+    expect(jsrSpecifier('jsr:/@acme/core@^1.2/extra')).toEqual({
+      name: '@acme/core',
+      key: './extra',
+    });
+  });
+
+  it('ignores unscoped and other specifiers', () => {
+    expect(jsrSpecifier('jsr:core')).toBeUndefined();
+    expect(jsrSpecifier('npm:@acme/core')).toBeUndefined();
   });
 });

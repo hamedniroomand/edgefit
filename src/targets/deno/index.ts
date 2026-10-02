@@ -48,8 +48,14 @@ function describeImportMap(root: string, config: DenoConfig | undefined): string
   if (config === undefined) {
     return 'no import map (no deno.json found)';
   }
-  const file = path.relative(root, config.file);
-  return config.importMap === undefined ? `no import map in ${file}` : `import map from ${file}`;
+  if (config.importMapFiles.length === 0) {
+    return `no import map in ${path.relative(root, config.file)}`;
+  }
+  const sources = config.importMapFiles.map(file => {
+    const shown = path.relative(root, file);
+    return file === config.file ? shown : `${shown} (workspace root)`;
+  });
+  return `import map from ${sources.join(' and ')}`;
 }
 
 interface Variant {
@@ -125,7 +131,9 @@ export function createDenoTarget(root: string, options: DenoTargetOptions = {}):
     // Deno runs Node-API addons from npm packages. Deno Deploy and Netlify Edge do not allow them.
     loadsNativeAddons: key === 'deno',
     nodeEnv: netlify ? 'production' : undefined,
-    resolvePlugins: [denoSpecifiers(netlify ? netlify.importMap : config?.importMap)],
+    resolvePlugins: [
+      denoSpecifiers(netlify ? netlify.importMap : config?.importMap, config?.members),
+    ],
     entries: netlify?.entries ?? detectEntries(denoEntrySources(root, config?.file), true),
     globals,
     hasGlobal: name => index.globalNames().includes(name),

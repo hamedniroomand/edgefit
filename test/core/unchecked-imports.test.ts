@@ -14,7 +14,8 @@ describe('unchecked imports', () => {
       kind: 'dynamic',
       api: undefined,
       display: 'jsr:@std/path@^1/join',
-      reason: 'jsr: packages are not scanned yet',
+      reason:
+        'jsr:@std/path is not read, because edgefit does not read the Deno cache or the vendor directory',
       location: { file: 'src/main.ts', line: 2, column: 23 },
     });
   });
