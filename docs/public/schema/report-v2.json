@@ -37,8 +37,8 @@
       "required": ["file", "line", "column"],
       "properties": {
         "file": { "type": "string" },
-        "line": { "type": "integer" },
-        "column": { "type": "integer" }
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 }
       }
     },
     "target": {

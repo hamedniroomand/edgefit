@@ -43,7 +43,7 @@ Exit code `1` also happens when edgefit crashes. Then stdout is empty and stderr
 
 ## Read a finding
 
-Each finding has an `id`. The `id` is the same in every run for the same target, category, API and owner. Use it to follow one finding across runs.
+Each finding has an `id`. The `id` is the same in every run for the same target, category, API and owner. Use it to follow one finding across runs. The same `id` can be in `findings` and in `guarded` when some uses of the API have a guard and some do not.
 
 If a finding has a `suggestion`, it is a structured field. Its `kind` is `replace`, `setting` or `change`. For `replace`, `package` names the package to use. For `setting`, `setting` gives the key and the value. `source` links to the proof of the fix.
 
