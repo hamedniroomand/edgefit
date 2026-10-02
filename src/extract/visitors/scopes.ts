@@ -4,6 +4,7 @@ import { collectBlockNames, collectLexicalNames, patternNames } from '@/extract/
 import { createScope, declare } from '@/extract/scope.ts';
 
 import { visitStatements } from './guards.ts';
+import { visitParentClass } from './inheritance.ts';
 
 type FunctionNode = NodeOf<
   'FunctionDeclaration' | 'FunctionExpression' | 'ArrowFunctionExpression'
@@ -48,7 +49,9 @@ export const visitClass: Visitor<NodeOf<'ClassDeclaration' | 'ClassExpression'>>
   context,
 ) => {
   context.visitAll(node.decorators);
-  context.visit(node.superClass);
+  if (node.superClass !== null) {
+    visitParentClass(node.superClass, context);
+  }
   // Field initializers run when an instance is made, not where the class is written.
   context.collector.guards.deferred(() => {
     context.visit(node.body);

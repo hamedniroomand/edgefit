@@ -1,4 +1,5 @@
 import { builtinName } from '@/data/builtins.ts';
+import { memberPath } from '@/data/compat-index.ts';
 import { stringLiteral } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { interopArgument, isRequire, moduleSpecifier, resolveBinding } from '@/extract/bindings.ts';
@@ -8,6 +9,7 @@ import { isGlobal } from '@/extract/runtimes.ts';
 import { isTracked } from '@/extract/scope.ts';
 
 import { visitOptionalCallee } from './guards.ts';
+import { visitParentClass } from './inheritance.ts';
 
 // The call of the `Function` constructor with code in a string, which Vercel's Edge runtime
 // disables. Shown as `Function(string)`.
@@ -51,6 +53,27 @@ function visitRequire(node: NodeOf<'CallExpression'>, context: VisitContext): vo
   }
 }
 
+/** `util.inherits(Child, Parent)` makes `Parent` the parent class of `Child`. */
+function visitInherits(node: NodeOf<'CallExpression'>, context: VisitContext): boolean {
+  const callee = resolveBinding(node.callee, context);
+  const [child, parent, ...rest] = node.arguments;
+  if (
+    !isTracked(callee) ||
+    callee.ref.module !== 'util' ||
+    memberPath(callee.ref).join('.') !== 'inherits' ||
+    child === undefined ||
+    parent === undefined ||
+    parent.type === 'SpreadElement'
+  ) {
+    return false;
+  }
+  context.visit(node.callee);
+  context.visitAll([child]);
+  visitParentClass(parent, context);
+  context.visitAll(rest);
+  return true;
+}
+
 export const visitCall: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
   recordDynamicFunction(node, context);
   if (isRequire(node.callee, context.scope)) {
@@ -65,7 +88,7 @@ export const visitCall: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
     context.useRef(binding.ref, node.start, false);
     return;
   }
-  if (!visitOptionalCallee(node, context)) {
+  if (!visitInherits(node, context) && !visitOptionalCallee(node, context)) {
     context.visitChildren(node);
   }
 };

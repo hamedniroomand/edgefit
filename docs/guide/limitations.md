@@ -93,6 +93,10 @@ Mapping findings to packages needs sourcemaps. Without them, edgefit reads the `
 
 `import(name)` and `require(name)` are read when `name` is a `const` holding a plain string. A `let`, a value computed from other values, a function result or an object property is reported as `unknown`. So is any other access edgefit cannot follow, such as `obj[key]`, and `unknown` warnings never fail a check unless you make them errors.
 
+## Static members of a parent class
+
+A class that extends a Node.js class, or that is set up with `util.inherits`, counts as a use of that class and its instance members. The rest of the module is not reported as `unknown`. edgefit does not check a static member that you call through the subclass. Call it on the parent class, for example `EventEmitter.init()`, to have it checked.
+
 ## Deno: `jsr:` packages
 
 `jsr:` imports are not scanned yet and are reported as `unknown`.
