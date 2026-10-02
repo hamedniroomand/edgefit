@@ -22,15 +22,20 @@ function moduleName(node: Node): string {
   return node.type === 'Literal' ? String(node.value) : '';
 }
 
-function addImport(builder: ShapeBuilder, node: NodeOf<'ImportDeclaration'>): void {
-  if (node.importKind === 'type') {
+function addImport(
+  builder: ShapeBuilder,
+  node: NodeOf<'ImportDeclaration'>,
+  typeOnly: ReadonlySet<string>,
+): void {
+  const used = node.specifiers.filter(item => !typeOnly.has(item.local.name));
+  if (node.importKind === 'type' || (node.specifiers.length > 0 && used.length === 0)) {
     return;
   }
   const specifier = node.source.value;
   builder.importFrom(specifier);
   // The module itself is used wherever it is imported; only the names it takes can be unused.
   builder.bare(node.source);
-  for (const item of node.specifiers) {
+  for (const item of used) {
     if (item.type === 'ImportSpecifier' && item.importKind === 'type') {
       continue;
     }
@@ -118,9 +123,9 @@ function addExportAll(builder: ShapeBuilder, node: NodeOf<'ExportAllDeclaration'
   }
 }
 
-function addStatement(builder: ShapeBuilder, node: Node): void {
+function addStatement(builder: ShapeBuilder, node: Node, typeOnly: ReadonlySet<string>): void {
   if (node.type === 'ImportDeclaration') {
-    addImport(builder, node);
+    addImport(builder, node, typeOnly);
   } else if (node.type === 'ExportNamedDeclaration') {
     addExportNamed(builder, node);
   } else if (node.type === 'ExportDefaultDeclaration') {
@@ -143,13 +148,17 @@ function addStatement(builder: ShapeBuilder, node: Node): void {
 }
 
 /** Splits the top level of a module into the pieces that run on load and the pieces that wait to be used. */
-export function collectShape(body: readonly Node[], hasModuleSyntax: boolean): ModuleShape {
+export function collectShape(
+  body: readonly Node[],
+  hasModuleSyntax: boolean,
+  typeOnly: ReadonlySet<string> = new Set(),
+): ModuleShape {
   if (!hasModuleSyntax) {
     return collectCommonJsShape(body);
   }
   const builder = new ShapeBuilder();
   for (const statement of body) {
-    addStatement(builder, statement);
+    addStatement(builder, statement, typeOnly);
   }
   const { shape } = builder;
   shape.units.sort((left, right) => left.start - right.start);

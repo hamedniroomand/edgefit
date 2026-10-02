@@ -37,7 +37,7 @@ describe('usages when the platform stubs out a Node.js module it lacks', () => {
   });
 
   it('keeps counting the import where the platform does not stub modules out', () => {
-    expect(usagesOf("import fs from 'node:fs';")).toEqual(['api node:fs']);
+    expect(usagesOf("import fs from 'node:fs';", 'src/input.js')).toEqual(['api node:fs']);
     expect(usagesOf("import { watch } from 'node:fs';\nwatch('.');")).toEqual([
       'api node:fs',
       'api node:fs.watch',

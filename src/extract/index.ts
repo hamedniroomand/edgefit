@@ -5,6 +5,7 @@ import { collectShape } from '@/trace/shape.ts';
 import type { ModuleShape } from '@/trace/shape.ts';
 import type { Usage } from '@/types.ts';
 
+import { typeOnlyImports } from './type-only-imports.ts';
 import { UsageCollector } from './usage-collector.ts';
 import { Walker } from './walker.ts';
 
@@ -17,6 +18,8 @@ export interface ExtractOptions {
   shape?: boolean;
   /** The target's platform stubs out a Node.js module it lacks, so only reading from one fails. */
   lazyNodeImports?: boolean;
+  /** The bundler keeps imports that nothing uses as a value: `verbatimModuleSyntax` is on. */
+  keepUnusedImports?: boolean;
 }
 
 export interface ExtractedModule {
@@ -35,6 +38,10 @@ function languageFor(file: string): ParserOptions['lang'] {
     return 'ts';
   }
   return file.endsWith('.jsx') ? 'jsx' : 'js';
+}
+
+export function isTypeScript(file: string): boolean {
+  return /\.[cm]?tsx?$/u.test(file);
 }
 
 function sourceTypeFor(file: string): ParserOptions['sourceType'] {
@@ -77,13 +84,19 @@ export function extractModule(
     );
     return { usages: collector.usages, offsets: collector.offsets, shape: undefined };
   }
-  new Walker(collector, options.globals, options.nodeEnv).visit(result.program as Node);
+  const body = result.program.body as Node[];
+  // Only a TypeScript compiler drops an import because its names are not used as values.
+  const dropped =
+    options.keepUnusedImports === true || !isTypeScript(file)
+      ? new Set<string>()
+      : typeOnlyImports(body);
+  new Walker(collector, options.globals, options.nodeEnv, dropped).visit(result.program as Node);
   return {
     usages: collector.usages,
     offsets: collector.offsets,
     shape:
       options.shape === true
-        ? collectShape(result.program.body as Node[], result.module.hasModuleSyntax)
+        ? collectShape(body, result.module.hasModuleSyntax, dropped)
         : undefined,
   };
 }

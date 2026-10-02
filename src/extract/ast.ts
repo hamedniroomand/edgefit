@@ -31,6 +31,9 @@ const runtimeTsNodes = new Set([
   'TSModuleDeclaration',
   'TSModuleBlock',
   'TSImportEqualsDeclaration',
+  'TSEnumDeclaration',
+  'TSEnumBody',
+  'TSEnumMember',
 ]);
 
 const transparentNodes = new Set([

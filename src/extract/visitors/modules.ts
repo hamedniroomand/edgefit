@@ -14,18 +14,21 @@ function namedRef(module: string, name: Node): ApiRef {
 }
 
 export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context) => {
-  if (node.importKind === 'type') {
+  const used = node.specifiers.filter(
+    specifier => !context.typeOnlyImports.has(specifier.local.name),
+  );
+  if (node.importKind === 'type' || (node.specifiers.length > 0 && used.length === 0)) {
     return;
   }
   const module = builtinName(node.source.value);
   if (module === undefined) {
-    for (const specifier of node.specifiers) {
+    for (const specifier of used) {
       assign(context.scope, specifier.local.name, null);
     }
     return;
   }
   context.collector.api(moduleRef(module), node.source.start);
-  for (const specifier of node.specifiers) {
+  for (const specifier of used) {
     if (specifier.type !== 'ImportSpecifier') {
       assign(context.scope, specifier.local.name, { ref: moduleRef(module), recorded: false });
     } else if (specifier.importKind !== 'type') {

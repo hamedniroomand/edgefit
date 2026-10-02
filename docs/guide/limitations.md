@@ -46,6 +46,17 @@ What a CommonJS module asks of a module it `require`s is the members that are re
 
 A name counts as used when any used code mentions it. A property or a local variable of the same name also counts, which can only keep a finding, never hide one.
 
+## Imports used only as types
+
+In a TypeScript file, an import whose names are never used as values gives no finding. A bundler drops such an import, so `import { ServerResponse } from 'node:http'` that only appears in `as ServerResponse` uses no API. When some names of an import are used as values, edgefit reports only those names.
+
+The bundler keeps these imports when the `tsconfig.json` sets `verbatimModuleSyntax`, `preserveValueImports`, or `importsNotUsedAsValues` to `preserve` or `error`. edgefit then reports them. It has these limits:
+
+- It reads the nearest `tsconfig.json` of each file, and follows `extends` when the value is a relative path or a list of relative paths. A package name in `extends` is not followed.
+- It does not read the `tsconfig` option of a bundler.
+- A name counts as used when it is read anywhere in the file. A local variable of the same name also counts, which can only keep a finding, never hide one.
+- It reads no tsconfig for files in `node_modules`, so their imports that are used only as types are skipped.
+
 ## Existing is not the same as working
 
 The Node compatibility matrix records whether an API exists on each runtime. Curated overrides cover the APIs that are known to exist and still throw or do nothing, and a weekly probe checks them against the real runtimes. Still, an API that exists and works only in part can pass, and an API that throws only with certain arguments can pass too. The overrides are read by hand from the runtimes' sources, so they can be wrong or out of date until the probe or a report finds it.
