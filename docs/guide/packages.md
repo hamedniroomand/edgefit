@@ -16,9 +16,13 @@ npx edgefit package .            # your own package, as `npm publish` would ship
 
 A subpath passes when there are no findings, warns when there are only warnings, and fails when there is an error. A target's overall result is its worst subpath. Warnings are never shown as passes.
 
+The [package table](/packages/) also shows the result of the main entry (`.`). When it differs from the worst subpath, a row shows both: the main entry first, and the worst subpath as a smaller mark. The tooltip of the cell names the subpath that decides the worst result. The row detail lists the subpaths that are not a pass, with their finding counts. The status filter and the sort of the table use the worst result.
+
 ## What a pass means
 
 A static check found no API that the target lacks or stubs, in code reachable from the package's public entry points with every export used. It was checked against [pinned data](/guide/status), for the resolved version on the check date.
+
+In the table, the main entry mark is the result of the main entry only. The worst mark is the worst result of all subpaths.
 
 ## What a pass does not mean
 
@@ -34,6 +38,8 @@ The [limitations](/guide/limitations) apply to packages as they do to projects.
 ## Badges
 
 `edgefit package <name> --badge badge.svg` writes a static SVG such as `edgefit | workerd ✓ bun ✓ deno ⚠`: green for a pass, amber for warnings only, red for a failure, grey when the check could not run. Commit it, or regenerate it in CI.
+
+A badge always shows the worst result, not the main entry result, so a badge never hides a subpath that warns or fails. The Markdown snippet in the table uses this badge.
 
 Packages in the table have badges at `https://edgefit.kitdev.space/packages/badges/<name>.svg`, with `@scope/name` written as `scope__name`, and `<name>.<target>.svg` for one target. Each row of the table shows the Markdown to copy. The badge should link to the package's row, so the caveats are one click away:
 
