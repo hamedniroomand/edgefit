@@ -5,7 +5,7 @@ import { writeFileSync } from 'node:fs';
 
 import { netlifyMinimumDeno, readMatrix, readOverrides } from '../data.mjs';
 import { webMissingApis } from '../web.mjs';
-import { compareNetlify, compareVercel } from './compare.mjs';
+import { compareNetlify, compareVercel, decidedVercel } from './compare.mjs';
 import { vercelGlobals, witnessSpec } from './spec.mjs';
 
 /**
@@ -36,8 +36,13 @@ const comparers = {
   vercel() {
     const blocked = new Set(Object.keys(readOverrides('vercel-edge')));
     const accepted = new Set(vercelGlobals());
-    return (results, { names }) => ({
-      sections: compareVercel(results, { blocked, accepted, useNames: names }),
+    return (results, { names }, entry) => ({
+      sections: compareVercel(results, {
+        blocked,
+        accepted,
+        useNames: names,
+        decided: decidedVercel[entry],
+      }),
       lines: [],
     });
   },
@@ -92,7 +97,7 @@ for (const [entry, witness] of Object.entries(witnessUrls[platform])) {
   if (results.typesError) {
     lines.push(`The typeof scan failed, so no global is compared: ${results.typesError}`, '');
   }
-  const { sections, lines: disagreements } = compare(results, witness);
+  const { sections, lines: disagreements } = compare(results, witness, entry);
   for (const { title, items } of sections) {
     lines.push(`### ${title}`, ...items.map(item => `- \`${item}\``), '');
   }
