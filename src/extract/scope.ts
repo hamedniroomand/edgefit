@@ -101,3 +101,7 @@ export function isTracked(
 ): binding is { ref: ApiRef; recorded: boolean } {
   return typeof binding === 'object' && binding !== null;
 }
+
+export function isBound(binding: Binding | undefined): binding is Exclude<Binding, null> {
+  return binding !== undefined && binding !== null;
+}

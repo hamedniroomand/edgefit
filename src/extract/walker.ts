@@ -17,6 +17,7 @@ export class Walker implements VisitContext {
   public readonly globals: ReadonlySet<string>;
   public readonly nodeEnv: string | undefined;
   public readonly typeOnlyImports: ReadonlySet<string>;
+  public readonly assigned: ReadonlyMap<string, Node>;
   readonly #stack: Node[] = [];
   #scope: Scope = createScope();
   #boundInit: Node | undefined;
@@ -26,11 +27,13 @@ export class Walker implements VisitContext {
     globals: ReadonlySet<string>,
     nodeEnv: string | undefined,
     typeOnlyImports: ReadonlySet<string>,
+    assigned: ReadonlyMap<string, Node>,
   ) {
     this.collector = collector;
     this.globals = globals;
     this.nodeEnv = nodeEnv;
     this.typeOnlyImports = typeOnlyImports;
+    this.assigned = assigned;
   }
 
   public get scope(): Scope {

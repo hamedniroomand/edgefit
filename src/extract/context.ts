@@ -10,6 +10,8 @@ export interface VisitContext extends BindingContext {
   readonly collector: UsageCollector;
   /** Imported names that nothing reads as a value, so the bundler drops them. */
   readonly typeOnlyImports: ReadonlySet<string>;
+  /** The value of each name that is set once after its declaration, from `findAssigned`. */
+  readonly assigned: ReadonlyMap<string, Node>;
   visit: (node: Node | null | undefined) => void;
   visitAll: (nodes: readonly (Node | null)[]) => void;
   visitChildren: (node: Node) => void;

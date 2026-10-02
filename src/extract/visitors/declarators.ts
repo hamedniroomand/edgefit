@@ -5,7 +5,8 @@ import type { NodeOf } from '@/extract/ast.ts';
 import { resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { displayRef, isGlobalRoot, memberRef } from '@/extract/refs.ts';
-import { assign } from '@/extract/scope.ts';
+import { assign, isBound, lookup } from '@/extract/scope.ts';
+import type { Binding } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
 type DestructuredProperty = NodeOf<'ObjectPattern'>['properties'][number];
@@ -69,10 +70,16 @@ function bindDestructured(
   }
 }
 
+/** What `let c;` holds, when `c = value` is the one write to `c` in the file. */
+function assignedBinding(id: Node, context: VisitContext): Binding | undefined {
+  const value = id.type === 'Identifier' ? context.assigned.get(id.name) : undefined;
+  return value === undefined ? undefined : resolveBinding(value, context);
+}
+
 export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, context) => {
   const { id, init } = node;
-  const binding = init === null ? undefined : resolveBinding(init, context);
-  if (init === null || binding === undefined || binding === null) {
+  const binding = init === null ? assignedBinding(id, context) : resolveBinding(init, context);
+  if (!isBound(binding)) {
     context.visitPattern(id);
     context.visit(init);
     return;
@@ -83,7 +90,9 @@ export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, con
       id.name,
       binding === 'require' ? binding : { ref: binding.ref, recorded: false },
     );
-    context.visitBound(init);
+    if (init !== null) {
+      context.visitBound(init);
+    }
     return;
   }
   context.visit(init);
@@ -93,6 +102,32 @@ export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, con
     context.visitPattern(id);
   }
 };
+
+/**
+ * The one write to a name that `let c;` bound to a module, as in `let c; c = require('fs')`.
+ * It is followed unless its value is used by the code around it, as in `use((c = require('fs')))`.
+ * The declaration read the value in its own scope, so a name that this scope shadows unbinds `c`.
+ */
+export function bindAssigned(node: NodeOf<'AssignmentExpression'>, context: VisitContext): boolean {
+  const { left, right } = node;
+  if (
+    left.type !== 'Identifier' ||
+    node.operator !== '=' ||
+    context.assigned.get(left.name) !== right ||
+    !isBound(lookup(context.scope, left.name))
+  ) {
+    return false;
+  }
+  if (!isBound(resolveBinding(right, context))) {
+    assign(context.scope, left.name, null);
+    return false;
+  }
+  if (context.parent()?.type !== 'ExpressionStatement') {
+    return false;
+  }
+  context.visitBound(right);
+  return true;
+}
 
 /** Remembers `const name = 'text'`, so `import(name)` can be read like `import('text')`. */
 export const visitDeclaration: Visitor<NodeOf<'VariableDeclaration'>> = (node, context) => {

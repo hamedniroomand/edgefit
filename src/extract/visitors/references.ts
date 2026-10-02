@@ -5,6 +5,8 @@ import { globalRef, normalizeRef } from '@/extract/refs.ts';
 import { isTracked, lookup } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
+import { bindAssigned } from './declarators.ts';
+
 export const visitIdentifier: Visitor<NodeOf<'Identifier'>> = (node, context) => {
   const binding = lookup(context.scope, node.name);
   if (binding === null || binding === 'require') {
@@ -58,6 +60,9 @@ export const visitAssignment: Visitor<NodeOf<'AssignmentExpression'>> = (node, c
   // Writing to a plain name neither reads it nor changes what edgefit tracks.
   if (node.left.type === 'Identifier') {
     context.collector.guards.drop(node.left.name);
+    if (bindAssigned(node, context)) {
+      return;
+    }
   } else {
     context.visitPattern(node.left);
   }
