@@ -1,7 +1,10 @@
+import path from 'node:path';
+
 import { build } from 'esbuild';
 import type { Loader, Message, Metafile, Plugin } from 'esbuild';
 
 import { toResolveError } from './errors.ts';
+import { acceptMissingPeers, importKey, optionalPeers } from './optional-peers.ts';
 import { runtimeExternals } from './runtime-externals.ts';
 
 /** An import of a module in the graph, as esbuild resolved it. */
@@ -19,6 +22,8 @@ export interface GraphModule {
   links: ImportLink[];
   /** Imports left out of the graph, such as `node:fs` or `jsr:@std/path@^1`. */
   externals: string[];
+  /** The externals that are optional peer dependencies which are not installed. */
+  missingPeers: string[];
 }
 
 export interface ModuleGraph {
@@ -78,7 +83,7 @@ function isBuildFailure(error: unknown): error is { errors: Message[] } {
   );
 }
 
-async function bundleMetafile(options: ResolveOptions): Promise<Metafile> {
+async function bundleMetafile(options: ResolveOptions, accepted: Set<string>): Promise<Metafile> {
   const define: Record<string, string> = {};
   if (options.nodeEnv !== undefined) {
     define['process.env.NODE_ENV'] = JSON.stringify(options.nodeEnv);
@@ -100,17 +105,24 @@ async function bundleMetafile(options: ResolveOptions): Promise<Metafile> {
       loader: assetLoaders,
       define,
       logLevel: 'silent',
-      plugins: [...(options.plugins ?? []), runtimeExternals],
+      plugins: [...(options.plugins ?? []), runtimeExternals, optionalPeers(accepted)],
     });
     return result.metafile;
   } catch (error) {
-    throw isBuildFailure(error) ? toResolveError(error.errors) : error;
+    if (!isBuildFailure(error)) {
+      throw error;
+    }
+    if (acceptMissingPeers(options.root, error.errors, accepted)) {
+      return bundleMetafile(options, accepted);
+    }
+    throw toResolveError(error.errors);
   }
 }
 
 /** Resolves the module graph from an entry the way the target's bundler would. */
 export async function resolveGraph(options: ResolveOptions): Promise<ModuleGraph> {
-  const metafile = await bundleMetafile(options);
+  const accepted = new Set<string>();
+  const metafile = await bundleMetafile(options, accepted);
   const modules = new Map<string, GraphModule>();
   for (const [file, input] of Object.entries(metafile.inputs)) {
     const internal = input.imports.filter(item => item.external !== true);
@@ -121,7 +133,14 @@ export async function resolveGraph(options: ResolveOptions): Promise<ModuleGraph
       kind: item.kind,
     }));
     const externals = input.imports.filter(item => item.external === true).map(item => item.path);
-    modules.set(file, { imports, links, externals });
+    modules.set(file, {
+      imports,
+      links,
+      externals,
+      missingPeers: externals.filter(item =>
+        accepted.has(importKey(path.resolve(options.root, file), item)),
+      ),
+    });
   }
   const entries = Object.values(metafile.outputs).flatMap(output => output.entryPoint ?? []);
   return { entries: [...new Set(entries)], modules };

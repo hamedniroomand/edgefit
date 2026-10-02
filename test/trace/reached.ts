@@ -29,7 +29,12 @@ export function reached(
   const graph: ModuleGraph = { entries: [entry], modules: new Map<string, GraphModule>() };
   for (const [file, { code, imports = {} }] of Object.entries(files)) {
     const links = linksOf(imports);
-    graph.modules.set(file, { imports: links.map(link => link.path), links, externals: [] });
+    graph.modules.set(file, {
+      imports: links.map(link => link.path),
+      links,
+      externals: [],
+      missingPeers: [],
+    });
     modules.set(file, extractModule(file, code, { globals, shape: true, nodeEnv: 'production' }));
   }
   return Object.fromEntries(

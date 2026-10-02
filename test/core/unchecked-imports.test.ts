@@ -28,4 +28,18 @@ describe('unchecked imports', () => {
   it('ignores specifiers that are not jsr: packages', () => {
     expect(uncheckedImports('a.ts', '', ['npm:chalk', 'node:fs', 'jsr:unscoped'])).toEqual([]);
   });
+
+  it('reports a missing optional peer as an unknown usage', () => {
+    const [usage] = uncheckedImports(
+      'a.js',
+      "import 'react/jsx-runtime';\n",
+      [],
+      ['react/jsx-runtime'],
+    );
+    expect(usage?.display).toBe('react/jsx-runtime');
+    expect(usage?.kind).toBe('dynamic');
+    expect(usage?.kind === 'dynamic' && usage.reason).toContain(
+      'optional peer dependency react is not installed',
+    );
+  });
 });

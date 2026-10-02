@@ -9,7 +9,10 @@ import { fixture } from '~/helpers.ts';
 
 function graphOf(entry: string, edges: Record<string, string[]>): ModuleGraph {
   const modules = new Map(
-    Object.entries(edges).map(([file, imports]) => [file, { imports, links: [], externals: [] }]),
+    Object.entries(edges).map(([file, imports]) => [
+      file,
+      { imports, links: [], externals: [], missingPeers: [] },
+    ]),
   );
   return { entries: [entry], modules };
 }
