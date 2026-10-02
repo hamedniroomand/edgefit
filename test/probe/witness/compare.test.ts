@@ -1,7 +1,7 @@
 import type { Outcome } from '@scripts/probe/classify.mjs';
 import { matrixHas } from '@scripts/probe/compare.mjs';
 import { readMatrix, readOverrides } from '@scripts/probe/data.mjs';
-import { compareNetlify, compareVercel } from '@scripts/probe/witness/compare.mjs';
+import { compareNetlify, compareVercel, decidedVercel } from '@scripts/probe/witness/compare.mjs';
 import { witnessSpec } from '@scripts/probe/witness/spec.mjs';
 import { describe, expect, it } from 'vite-plus/test';
 
@@ -110,5 +110,34 @@ describe('compareVercel', () => {
     expect(compareVercel(results, { ...data, useNames: false })).toEqual([
       { title: 'On Vercel, not kept in the data', items: ['AsyncLocalStorage'] },
     ]);
+  });
+});
+
+describe('decided Vercel differences', () => {
+  const data = { blocked: new Set<string>(), accepted: new Set(['fetch']), useNames: true };
+  const results: VercelResults = {
+    names: ['fetch', 'Float16Array'],
+    types: { Float16Array: 'function', DisposableStack: 'function' },
+    outcomes: {},
+    checks: { wasmFromBytes: { allowed: true }, eval: { allowed: true } },
+  };
+
+  it('leaves out what the data decides for the entry, and keeps what is new', () => {
+    expect(compareVercel(results, { ...data, decided: decidedVercel.middleware })).toEqual([
+      { title: 'Dynamic code that the docs disable but Vercel allows', items: ['eval'] },
+    ]);
+  });
+
+  it('reports the same differences for an entry without decisions', () => {
+    expect(compareVercel(results, data).map(({ items }) => items)).toEqual([
+      ['DisposableStack', 'Float16Array'],
+      ['WebAssembly.compile', 'eval'],
+    ]);
+  });
+
+  it('gives each decision a reason', () => {
+    for (const reason of Object.values(decidedVercel.middleware ?? {})) {
+      expect(reason).toContain('#117');
+    }
   });
 });
