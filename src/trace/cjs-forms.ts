@@ -20,8 +20,19 @@ export const interopWrappers = new Set([
 ]);
 // Helpers that copy every export of a module onto this one.
 export const starHelpers = new Set(['_export_star', '__exportStar', '__reExport']);
+/** Whether the name is one that compiled code gives to a helper whose body handles modules. */
+export const isHelperName = (name: string): boolean =>
+  interopWrappers.has(name) || starHelpers.has(name);
 // Names that make a module read its own exports or run code from text, so nothing is known about it.
 export const opaqueNames = new Set(['module', 'exports', 'eval']);
+
+/** The helpers a module defines or imports at its top level. */
+export type Helpers = {
+  all: Set<string>;
+  getters: Set<string>;
+  /** `object.member` for a member of an imported helper module, and the helper that it is. */
+  members: Map<string, string>;
+};
 
 export type Call = NodeOf<'CallExpression'>;
 export type ObjectLiteral = NodeOf<'ObjectExpression'>;
@@ -70,7 +81,7 @@ export interface RequireUse {
  * `require('s')`, `require('s').member`, or either one inside a wrapper that passes the module
  * through, as `_interop_require_wildcard(require('s'))` does.
  */
-export function requiredBy(node: Node, wrappers: ReadonlySet<string>): RequireUse | undefined {
+export function requiredBy(node: Node, helpers: Helpers): RequireUse | undefined {
   let inner = strip(node);
   let member: string | undefined;
   if (
@@ -84,9 +95,7 @@ export function requiredBy(node: Node, wrappers: ReadonlySet<string>): RequireUs
   if (
     member === undefined &&
     inner.type === 'CallExpression' &&
-    inner.callee.type === 'Identifier' &&
-    interopWrappers.has(inner.callee.name) &&
-    wrappers.has(inner.callee.name) &&
+    interopWrappers.has(helperName(inner.callee, helpers) ?? '') &&
     inner.arguments.length > 0 &&
     inner.arguments[0] !== undefined
   ) {
@@ -94,6 +103,43 @@ export function requiredBy(node: Node, wrappers: ReadonlySet<string>): RequireUs
   }
   const found = requireCall(inner);
   return found === undefined ? undefined : { ...found, member };
+}
+
+/**
+ * The helper that a callee names: a top-level function, or a member of an imported helper module
+ * such as `_interop_require_default._` or `tslib_1.__importStar`.
+ */
+export function helperName(callee: Node, helpers: Helpers): string | undefined {
+  const inner = strip(callee);
+  if (inner.type === 'Identifier') {
+    return helpers.all.has(inner.name) ? inner.name : undefined;
+  }
+  return inner.type === 'MemberExpression' &&
+    !inner.computed &&
+    inner.object.type === 'Identifier' &&
+    inner.property.type === 'Identifier'
+    ? helpers.members.get(`${inner.object.name}.${inner.property.name}`)
+    : undefined;
+}
+
+/** The function that `(this && this.name) || function () {}`, as tsc emits its helpers, falls back to. */
+function fallbackFunction(node: Node, name: string): Node | undefined {
+  if (node.type !== 'LogicalExpression' || node.operator !== '||') {
+    return undefined;
+  }
+  const left = strip(node.left);
+  const right = strip(node.right);
+  const member = left.type === 'LogicalExpression' ? strip(left.right) : undefined;
+  const isFallback =
+    left.type === 'LogicalExpression' &&
+    left.operator === '&&' &&
+    strip(left.left).type === 'ThisExpression' &&
+    member?.type === 'MemberExpression' &&
+    !member.computed &&
+    strip(member.object).type === 'ThisExpression' &&
+    isName(member.property, name);
+  const isIife = right.type === 'CallExpression' && isFunction(strip(right.callee));
+  return isFallback && (isFunction(right) || isIife) ? right : undefined;
 }
 
 /** Whether a function copies each property of its second argument as a getter: `_export(target, all)`. */
@@ -116,13 +162,11 @@ export function definesGetters(node: Node): boolean {
   return found;
 }
 
-/** The names of the top-level functions, and which of them are helpers that define getters. */
-export function topLevelFunctions(body: readonly Node[]): {
-  all: Set<string>;
-  getters: Set<string>;
-} {
+/** The helpers at the top level: functions, and members of the `@swc/helpers` and `tslib` modules. */
+export function topLevelFunctions(body: readonly Node[]): Helpers {
   const all = new Set<string>();
   const getters = new Set<string>();
+  const members = new Map<string, string>();
   const add = (name: string, fn: Node): void => {
     all.add(name);
     if (definesGetters(fn)) {
@@ -135,13 +179,39 @@ export function topLevelFunctions(body: readonly Node[]): {
     } else if (statement.type === 'VariableDeclaration') {
       for (const declarator of statement.declarations) {
         const init = declarator.init === null ? undefined : strip(declarator.init);
-        if (declarator.id.type === 'Identifier' && init !== undefined && isFunction(init)) {
-          add(declarator.id.name, init);
+        if (declarator.id.type !== 'Identifier' || init === undefined) {
+          continue;
+        }
+        const { name } = declarator.id;
+        const fn = isFunction(init) ? init : fallbackFunction(init, name);
+        if (fn === undefined) {
+          addModuleHelpers(members, name, requireCall(init)?.specifier);
+        } else {
+          add(name, fn);
         }
       }
     }
   }
-  return { all, getters };
+  return { all, getters, members };
+}
+
+// The only helpers that tslib defines which pass a `require` through.
+const tslibHelpers = ['__importDefault', '__importStar', '__exportStar'];
+const swcHelperModule = /^@swc\/helpers\/_\/([^/]+)$/u;
+
+function addModuleHelpers(
+  members: Map<string, string>,
+  local: string,
+  specifier: string | undefined,
+): void {
+  const swc = specifier === undefined ? undefined : swcHelperModule.exec(specifier)?.[1];
+  if (swc !== undefined) {
+    members.set(`${local}._`, swc);
+  } else if (specifier === 'tslib') {
+    for (const name of tslibHelpers) {
+      members.set(`${local}.${name}`, name);
+    }
+  }
 }
 
 /** Every `require('specifier')` call in the module. */

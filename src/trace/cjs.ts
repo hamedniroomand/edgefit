@@ -10,7 +10,9 @@ import { ExportWriter } from './cjs-exports.ts';
 import {
   assignsExports,
   destructuredNames,
+  helperName,
   isExportsObject,
+  isHelperName,
   isName,
   opaqueNames,
   requireCall,
@@ -19,12 +21,11 @@ import {
   starHelpers,
   topLevelFunctions,
 } from './cjs-forms.ts';
-import type { Call, ObjectLiteral, RequireUse } from './cjs-forms.ts';
+import type { Call, Helpers, ObjectLiteral, RequireUse } from './cjs-forms.ts';
 
 class CommonJsReader {
   readonly #builder = new ShapeBuilder();
-  readonly #functions: { all: Set<string>; getters: Set<string> };
-  readonly #wrappers: Set<string>;
+  readonly #helpers: Helpers;
   /** The `require` calls whose use is understood. */
   readonly #read = new Set<Node>();
   readonly #writer: ExportWriter;
@@ -32,11 +33,10 @@ class CommonJsReader {
 
   public constructor(body: readonly Node[]) {
     this.#body = body;
-    this.#functions = topLevelFunctions(body);
-    this.#wrappers = this.#functions.all;
+    this.#helpers = topLevelFunctions(body);
     this.#writer = new ExportWriter({
       builder: this.#builder,
-      wrappers: this.#wrappers,
+      helpers: this.#helpers,
       load: (found: RequireUse): void => {
         this.#load(found);
       },
@@ -74,7 +74,12 @@ class CommonJsReader {
     }
     shape.traceable =
       this.#writer.settle() &&
-      !shape.units.some(unit => [...opaqueNames].some(name => rootNames(unit).has(name)));
+      !shape.units.some(
+        unit =>
+          // The body of a helper such as tsc's `__exportStar(m, exports)` names `exports` as a parameter.
+          !(unit.name !== undefined && isHelperName(unit.name)) &&
+          [...opaqueNames].some(name => rootNames(unit).has(name)),
+      );
   }
 
   /** A `require` whose use is understood, which also loads the module. */
@@ -106,7 +111,7 @@ class CommonJsReader {
 
   #declarator(node: NodeOf<'VariableDeclarator'>): void {
     const { id, init } = node;
-    const required = init === null ? undefined : requiredBy(init, this.#wrappers);
+    const required = init === null ? undefined : requiredBy(init, this.#helpers);
     if (required !== undefined && required.member === undefined && id.type === 'Identifier') {
       // `const x = require('s')`: what is read from `x` is what is asked of `s`.
       this.#load(required);
@@ -135,7 +140,10 @@ class CommonJsReader {
       this.#writer.readObject(id.name, strip(init) as ObjectLiteral);
       return;
     }
-    const lazy = id.type === 'Identifier' && init !== null && isFunction(strip(init));
+    const lazy =
+      id.type === 'Identifier' &&
+      init !== null &&
+      (isFunction(strip(init)) || this.#helpers.all.has(id.name));
     this.#builder.unit(node, lazy ? patternNames(id)[0] : undefined);
   }
 
@@ -184,14 +192,15 @@ class CommonJsReader {
     ) {
       return this.#writer.defineProperty(args as [Node, Node, Node]);
     }
-    if (callee.type !== 'Identifier' || args.length !== 2) {
+    if (args.length !== 2) {
       return false;
     }
     const [first, second] = args as [Node, Node];
-    if (this.#functions.getters.has(callee.name) && isExportsObject(first)) {
+    const helper = helperName(callee, this.#helpers);
+    if (helper !== undefined && this.#helpers.getters.has(helper) && isExportsObject(first)) {
       return this.#writer.getters(second);
     }
-    if (starHelpers.has(callee.name) && this.#functions.all.has(callee.name)) {
+    if (helper !== undefined && starHelpers.has(helper)) {
       const required = requireCall(first);
       if (required !== undefined && isExportsObject(second)) {
         this.#load({ ...required, member: undefined });
