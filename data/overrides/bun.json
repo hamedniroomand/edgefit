@@ -222,6 +222,16 @@
       "status": "supported",
       "note": "internal provider type constants, which differ with each runtime's resources",
       "source": "docs/runtime/nodejs-compat.mdx"
+    },
+    "*globals*.AbortSignal.any": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on Bun",
+      "source": "src/jsc/bindings/webcore/AbortSignal.idl"
+    },
+    "*globals*.ReadableStream.from": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on Bun",
+      "source": "src/jsc/bindings/webcore/streams/JSReadableStream.cpp"
     }
   }
 }

@@ -16,6 +16,11 @@ const dataDirectory = dataDirectoryWith({
     },
     apis: {
       'fs.promises.watch': { status: 'unsupported', note: 'throws', source: 'fs.ts' },
+      '*globals*.reportError': {
+        status: 'supported',
+        note: 'exists',
+        source: '../workerd/api/global-scope.c++',
+      },
       'fs/promises.watch': { status: 'unsupported', note: 'throws', source: 'fs.ts' },
     },
   },
@@ -29,8 +34,15 @@ describe('overrides provider', () => {
       ['dgram', ['isIP'], 'supported'],
       ['dgram', [], 'mocked'],
       ['fs', ['promises', 'watch'], 'unsupported'],
+      ['*globals*', ['reportError'], 'supported'],
       ['fs/promises', ['watch'], 'unsupported'],
     ]);
+  });
+
+  it('resolves a source path that leaves the override directory', () => {
+    expect(entries.find(entry => entry.module === '*globals*')?.source.url).toBe(
+      'https://github.com/cloudflare/workerd/tree/v1/src/workerd/api/global-scope.c++',
+    );
   });
 
   it('links each entry to the runtime source it was read from', () => {

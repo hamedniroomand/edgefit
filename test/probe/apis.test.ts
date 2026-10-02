@@ -17,3 +17,22 @@ describe('buildSpec', () => {
     expect(apis.some(entry => entry.lookup !== true)).toBe(true);
   });
 });
+
+describe('buildSpec drift', () => {
+  it('looks up the Web APIs the data marks missing, once each', () => {
+    const lookups = buildSpec('workerd', { drift: true }).apis.filter(
+      entry => entry.lookup === true,
+    );
+    const names = lookups.map(entry => entry.api);
+    expect(names.some(api => api.startsWith('*globals*.'))).toBe(true);
+    expect(new Set(names).size).toBe(names.length);
+  });
+
+  it('probes an overridden Web API as a call, not a lookup', () => {
+    const entry = buildSpec('bun', { drift: true }).apis.find(
+      ({ api }) => api === '*globals*.AbortSignal.any',
+    );
+    expect(entry).toBeDefined();
+    expect(entry?.lookup).toBeUndefined();
+  });
+});

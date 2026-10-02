@@ -213,6 +213,61 @@
       "status": "supported",
       "note": "the matrix recorded Node's stdio as sockets; Deno's are plain streams when not attached to a TTY",
       "source": "_process/streams.mjs"
+    },
+    "*globals*.GPUDeviceLostInfo": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on Deno",
+      "source": "../../webgpu/01_webgpu.js"
+    },
+    "*globals*.GPUInternalError": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on Deno",
+      "source": "../../webgpu/01_webgpu.js"
+    },
+    "*globals*.GPUOutOfMemoryError": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on Deno",
+      "source": "../../webgpu/01_webgpu.js"
+    },
+    "*globals*.GPUValidationError": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on Deno",
+      "source": "../../webgpu/01_webgpu.js"
+    },
+    "*globals*.Location": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on Deno",
+      "source": "../../web/12_location.js"
+    },
+    "*globals*.PerformanceObserver.supportedEntryTypes": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on Deno",
+      "source": "../../web/15_performance.js"
+    },
+    "process.uptime": {
+      "status": "supported",
+      "note": "the matrix recorded the named export of node:process, which lacks it; the global process and the default export have it. This also hides the error for a named import, because edgefit cannot tell the two apart",
+      "source": "process.ts"
+    },
+    "process.binding": {
+      "status": "supported",
+      "note": "the matrix recorded the named export of node:process, which lacks it; the global process and the default export have it. This also hides the error for a named import, because edgefit cannot tell the two apart",
+      "source": "process.ts"
+    },
+    "process.title": {
+      "status": "supported",
+      "note": "the matrix recorded the named export of node:process, which lacks it; the global process and the default export have it. This also hides the error for a named import, because edgefit cannot tell the two apart",
+      "source": "process.ts"
+    },
+    "*globals*.caches.keys": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on Deno",
+      "source": "../../cache/01_cache.js"
+    },
+    "*globals*.caches.match": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on Deno",
+      "source": "../../cache/01_cache.js"
     }
   }
 }

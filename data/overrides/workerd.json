@@ -565,6 +565,36 @@
       "status": "unsupported",
       "note": "the WASI constructor throws ERR_METHOD_NOT_IMPLEMENTED",
       "source": "wasi.ts"
+    },
+    "*globals*.ErrorEvent": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on workerd",
+      "source": "../workerd/api/global-scope.c++"
+    },
+    "*globals*.reportError": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on workerd",
+      "source": "../workerd/api/global-scope.c++"
+    },
+    "*globals*.PerformanceObserver.supportedEntryTypes": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on workerd",
+      "source": "../workerd/api/performance.c++"
+    },
+    "*globals*.ReadableStream.from": {
+      "status": "supported",
+      "note": "the Web API data lists it as missing, but it exists on workerd",
+      "source": "../workerd/api/streams/standard.c++"
+    },
+    "*globals*.URL.createObjectURL": {
+      "status": "unsupported",
+      "note": "exists, but throws: not implemented",
+      "source": "../workerd/api/url-standard.c++"
+    },
+    "*globals*.URL.revokeObjectURL": {
+      "status": "unsupported",
+      "note": "exists, but throws: not implemented",
+      "source": "../workerd/api/url-standard.c++"
     }
   }
 }
