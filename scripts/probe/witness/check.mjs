@@ -48,6 +48,7 @@ const compare = comparers[platform]();
 const isWitnessAnswer = results =>
   typeof results?.specHash === 'string' &&
   Array.isArray(results.names) &&
+  typeof results.types === 'object' &&
   typeof results.outcomes === 'object' &&
   typeof results.checks === 'object';
 

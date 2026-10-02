@@ -7,6 +7,8 @@ export type WitnessOptions = {
   spec: WitnessSpec;
   checks: Record<string, Check>;
   load?: (module: string) => unknown;
+  /** The `typeof` of each global, from code that names it. */
+  types?: () => Record<string, string>;
 };
 export type WitnessResults = {
   entry: string;
@@ -14,6 +16,7 @@ export type WitnessResults = {
   deno: string | null;
   runtime: Record<string, unknown>;
   names: string[];
+  types: Record<string, string>;
   outcomes: Record<string, Outcome>;
   checks: Record<string, CheckResult>;
 };

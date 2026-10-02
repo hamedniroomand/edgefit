@@ -19,19 +19,10 @@ export function vercelGlobals(allowlist = readData('allowlists/vercel-edge.json'
   ];
 }
 
-/**
- * Each global the data keeps, and the members of the five modules Vercel allows and of the globals
- * the data lists members for. The globals are looked up by name, because on an edge route the
- * own names of `globalThis` hide most of them.
- */
+/** The members of the five modules Vercel allows, and of the globals the data lists members for. */
 function vercelApis() {
-  const allowlist = readData('allowlists/vercel-edge.json');
-  const { modules, globalMembers } = allowlist;
+  const { modules, globalMembers } = readData('allowlists/vercel-edge.json');
   return [
-    // The lookup reads an undefined value as missing, so `undefined` would always read as missing.
-    ...vercelGlobals(allowlist)
-      .filter(name => name !== 'undefined')
-      .map(name => `*globals*.${name}`),
     ...Object.entries(modules).flatMap(([module, members]) => [
       module,
       ...members.map(member => `${module}.${member}`),
@@ -45,12 +36,26 @@ function vercelApis() {
 const builders = { netlify: netlifyApis, vercel: vercelApis };
 
 /**
+ * The globals a witness measures with `typeof`. On a Vercel edge route `globalThis` is a copy that
+ * lacks most globals, but a bare name resolves through the real scope, as it does in user code.
+ * `typeof undefined` says nothing.
+ */
+const globalsFor = {
+  netlify: () => [],
+  vercel: () => vercelGlobals().filter(name => name !== 'undefined'),
+};
+
+/**
  * The lookups a witness makes, with a hash the witness returns, so a reader can see that the
  * deployed witness has the same list as the repository. A witness only looks APIs up and never
  * calls them, because the endpoint is public.
  */
 export function witnessSpec(platform) {
   const apis = [...new Set(builders[platform]())].sort().map(api => ({ api, lookup: true }));
-  const hash = createHash('sha256').update(JSON.stringify(apis)).digest('hex').slice(0, 16);
-  return { hash, apis };
+  const globals = [...new Set(globalsFor[platform]())].sort();
+  const hash = createHash('sha256')
+    .update(JSON.stringify({ apis, globals }))
+    .digest('hex')
+    .slice(0, 16);
+  return { hash, apis, globals };
 }

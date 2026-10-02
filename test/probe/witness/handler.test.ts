@@ -10,6 +10,7 @@ const options: WitnessOptions = {
       { api: 'buffer.Buffer', lookup: true },
       { api: 'fs.readFile', lookup: true },
     ],
+    globals: [],
   },
   checks: { ok: (): number => 1 },
   load: (name: string): unknown => ({ buffer: { Buffer: 1 } })[name],
@@ -25,6 +26,7 @@ describe('observe', () => {
     expect(results).toMatchObject({
       entry: 'middleware',
       specHash: 'abc',
+      types: {},
       deno: null,
       outcomes: { 'buffer.Buffer': 'present', 'fs.readFile': 'missing' },
       checks: { ok: { allowed: true } },

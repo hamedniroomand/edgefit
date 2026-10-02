@@ -69,16 +69,18 @@ describe('compareVercel', () => {
   it('finds no disagreement when Vercel matches the allowlist', () => {
     const results: VercelResults = {
       names: ['fetch', 'Buffer', '__plumbing', 'addEventListener', 'gc'],
-      outcomes: { '*globals*.fetch': 'present', '*globals*.eval': 'missing' },
+      types: { fetch: 'function', eval: 'undefined' },
+      outcomes: { 'buffer.Buffer': 'present' },
       checks: { eval: { allowed: false }, newFunction: { allowed: false } },
     };
     expect(compareVercel(results, data)).toEqual([]);
   });
 
-  it('reports missing lookups, extra names and allowed dynamic code', () => {
+  it('reports missing globals and members, extra names and allowed dynamic code', () => {
     const results: VercelResults = {
       names: ['fetch', 'setImmediate'],
-      outcomes: { '*globals*.Buffer': 'missing', 'util.types': 'missing' },
+      types: { fetch: 'function', Buffer: 'undefined' },
+      outcomes: { 'util.types': 'missing' },
       checks: { eval: { allowed: true }, wasmInstantiateFromBytes: { allowed: true } },
     };
     expect(compareVercel(results, data)).toEqual([
@@ -92,7 +94,7 @@ describe('compareVercel', () => {
   });
 
   it('leaves out the names of an entry that hides them', () => {
-    const results: VercelResults = { names: ['caches'], outcomes: {}, checks: {} };
+    const results: VercelResults = { names: ['caches'], types: {}, outcomes: {}, checks: {} };
     expect(compareVercel(results, { blocked: data.blocked })).toEqual([]);
   });
 });

@@ -29,7 +29,11 @@ export const denoChecks = {
   // An absolute path, because Netlify sets no PATH to search. `NotCapable` is a block, and
   // `NotFound` is a system without the file.
   subprocess: () => new Deno.Command('/bin/true').output(),
-  fileWrite: () => Deno.writeTextFile('/tmp/edgefit-witness.txt', 'edgefit'),
+  // The `write` permission state does not show which paths Netlify allows, so three paths are
+  // tried. `NotCapable` is a block, and `PermissionDenied` is the file system.
+  fileWriteTmp: () => Deno.writeTextFile('/tmp/edgefit-witness.txt', 'edgefit'),
+  fileWriteCwd: () => Deno.writeTextFile(`${Deno.cwd()}/edgefit-witness.txt`, 'edgefit'),
+  fileWriteRoot: () => Deno.writeTextFile('/edgefit-witness.txt', 'edgefit'),
 };
 
 /**
