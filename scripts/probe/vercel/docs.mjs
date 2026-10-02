@@ -71,9 +71,12 @@ export function compareDocs(parsed, allowlist, overrides) {
   const dataGlobals = allowlist.globals.filter(name => name !== 'Buffer');
   const dataModules = Object.keys(allowlist.modules);
   // The data names a call of the Function constructor `Function.(string)`; the page says `new Function`.
-  const dataBlocked = [...Object.keys(overrides.apis), ...overrides.notModelled].map(name =>
-    name.replace(/^\*globals\*\./u, '').replace(/^Function\.\(string\)$/u, 'new Function'),
-  );
+  // The page forbids `require` in a sentence, not a table row, so `require.(dynamic)` is left out.
+  const dataBlocked = [...Object.keys(overrides.apis), ...overrides.notModelled]
+    .map(name =>
+      name.replace(/^\*globals\*\./u, '').replace(/^Function\.\(string\)$/u, 'new Function'),
+    )
+    .filter(name => name !== 'require.(dynamic)');
   const docsModules = Object.keys(parsed.modules);
   const changedDescriptions = docsModules.filter(
     name =>

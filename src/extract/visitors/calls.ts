@@ -15,6 +15,10 @@ import { visitParentClass } from './inheritance.ts';
 // disables. Shown as `Function(string)`.
 const dynamicFunction = { module: '*globals*', path: ['Function', '(string)'] };
 
+// A `require` whose module is chosen at runtime. No bundler can resolve it, and Vercel's Edge
+// runtime does not allow a `require` call that is left for runtime. Shown as `require(<expression>)`.
+const dynamicRequire = { module: '*globals*', path: ['require', '(dynamic)'] };
+
 /** `Function('return this')()` is the classic way to reach the global object, and code that uses it checks for `globalThis` first. */
 const isGlobalObjectIdiom = /^\s*return\s+this\s*;?\s*$/u;
 
@@ -42,7 +46,9 @@ function visitRequire(node: NodeOf<'CallExpression'>, context: VisitContext): vo
   }
   const specifier = moduleSpecifier(argument, context.scope);
   if (specifier === undefined) {
-    context.collector.dynamic(undefined, 'require(<expression>)', computedModuleReason, node.start);
+    // A `try` catches the error of a `require` that fails, so a caught one is only unknown.
+    const ref = context.collector.guards.isCaught() ? undefined : dynamicRequire;
+    context.collector.dynamic(ref, 'require(<expression>)', computedModuleReason, node.start);
     context.visit(argument);
     return;
   }

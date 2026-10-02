@@ -11,6 +11,7 @@ const target = stubTarget(
     'fs.cp': { status: 'mismatch' },
     'fs.glob': { status: 'uncovered' },
     'crypto.subtle': { status: 'unsupported', category: 'web' },
+    '*globals*.require.(dynamic)': { status: 'unsupported', note: 'is not allowed' },
   },
   ['os'],
 );
@@ -73,6 +74,19 @@ describe('classifying dynamic usages', () => {
 
   it('skips one whose starting API is already reported', () => {
     expect(classify(dynamic(watch), target)).toBeUndefined();
+  });
+
+  it('reports a call-shaped leaf as its own finding when the target blocks it', () => {
+    const usage = dynamic({ module: '*globals*', path: ['require', '(dynamic)'] });
+    expect(classify(usage, target)).toMatchObject({
+      category: 'unsupported',
+      detail: 'is not allowed',
+    });
+  });
+
+  it('keeps a call-shaped leaf the target allows as unknown', () => {
+    const usage = dynamic({ module: '*globals*', path: ['other', '(dynamic)'] });
+    expect(classify(usage, target)?.category).toBe('unknown');
   });
 
   it('uses a generic reason when none is given', () => {

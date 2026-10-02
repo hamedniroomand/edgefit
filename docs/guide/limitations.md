@@ -113,7 +113,7 @@ A class that extends a Node.js class, or that is set up with `util.inherits`, co
 
 ## Vercel Edge is documented, not measured
 
-Vercel publishes no compatibility dump for its Edge runtime, so the `vercel-edge` target is built from its documentation. Anything the documentation does not list is reported as missing, `require` calls are not checked, and the target is experimental. Vercel also recommends its Node.js runtime for functions. See [Vercel Edge](/targets/vercel-edge).
+Vercel publishes no compatibility dump for its Edge runtime, so the `vercel-edge` target is built from its documentation. Anything the documentation does not list is reported as missing, and the target is experimental. Vercel also recommends its Node.js runtime for functions. See [Vercel Edge](/targets/vercel-edge).
 
 ## Platform limits are not checked
 
