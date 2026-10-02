@@ -17,6 +17,8 @@ export interface CompatEntry {
   note?: string;
   /** Reported under this category instead of the one the status maps to, e.g. `web`. */
   category?: Category;
+  /** The API does not exist on the target, so a use that checks for it first is not a finding. */
+  absent?: true;
   source: CompatSource;
 }
 
