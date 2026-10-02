@@ -4,4 +4,4 @@ export type WitnessPlatform = 'netlify' | 'vercel';
 export type WitnessSpec = { hash: string; apis: ProbeEntry[] };
 
 export function witnessSpec(platform: WitnessPlatform): WitnessSpec;
-export function vercelGlobals(): string[];
+export function vercelGlobals(allowlist?: unknown): string[];

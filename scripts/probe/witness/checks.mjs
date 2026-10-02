@@ -21,14 +21,14 @@ const nodeModule = 'buffer';
 /** Deno APIs that Netlify may block. Each runs with fixed arguments, never with user input. */
 export const denoChecks = {
   // Computed as the probe computes its imports, so it fails when they fail.
-  nodeImport: () => import(`node:${nodeModule}`),
+  nodeImport: () => import(/* @vite-ignore */ `node:${nodeModule}`),
   runPermission: permission('run'),
   writePermission: permission('write'),
   envPermission: permission('env'),
-  // A separate check, so an `execPath` that throws does not read as a blocked subprocess.
   execPath: () => Deno.execPath(),
-  // An absolute path, because Netlify sets no PATH to search.
-  subprocess: () => new Deno.Command(Deno.execPath(), { args: ['--version'] }).output(),
+  // An absolute path, because Netlify sets no PATH to search. `NotCapable` is a block, and
+  // `NotFound` is a system without the file.
+  subprocess: () => new Deno.Command('/bin/true').output(),
   fileWrite: () => Deno.writeTextFile('/tmp/edgefit-witness.txt', 'edgefit'),
 };
 

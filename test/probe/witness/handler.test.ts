@@ -1,6 +1,6 @@
 import type { WitnessOptions } from '@scripts/probe/witness/handler.mjs';
 import { observe, respond } from '@scripts/probe/witness/handler.mjs';
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 const options: WitnessOptions = {
   entry: 'middleware',
@@ -14,6 +14,10 @@ const options: WitnessOptions = {
   checks: { ok: (): number => 1 },
   load: (name: string): unknown => ({ buffer: { Buffer: 1 } })[name],
 };
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe('observe', () => {
   it('reports the lookups, the checks and the global names', async () => {
@@ -33,7 +37,6 @@ describe('observe', () => {
     vi.stubGlobal('Deno', { version: { deno: '' } });
     vi.stubGlobal('navigator', { userAgent: 'Deno/2.4.3' });
     const results = await observe(options);
-    vi.unstubAllGlobals();
     expect(results.deno).toBe('2.4.3');
     expect(results.runtime).toMatchObject({ denoVersion: { deno: '' }, userAgent: 'Deno/2.4.3' });
   });

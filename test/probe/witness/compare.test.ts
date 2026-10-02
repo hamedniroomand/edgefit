@@ -31,8 +31,11 @@ describe('compareNetlify', () => {
       { deno: null, outcomes: asDeno(), checks: {} },
       netlifyData,
     );
-    expect(sections[0]?.items).toEqual([
-      'Netlify does not report its Deno version; the data records 2.4.2',
+    expect(sections).toEqual([
+      {
+        title: 'Netlify does not report its Deno version (read `runtime` in witness.json)',
+        items: ['The data keeps the bundler minimum, 2.4.2'],
+      },
     ]);
   });
 
@@ -83,7 +86,7 @@ describe('compareVercel', () => {
       { title: 'On Vercel, not kept in the data', items: ['setImmediate'] },
       {
         title: 'Dynamic code that the docs disable but Vercel allows',
-        items: ['WebAssembly.instantiate', 'eval'],
+        items: ['WebAssembly.instantiate from bytes', 'eval'],
       },
     ]);
   });

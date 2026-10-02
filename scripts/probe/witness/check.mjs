@@ -8,11 +8,15 @@ import { webMissingApis } from '../web.mjs';
 import { compareNetlify, compareVercel } from './compare.mjs';
 import { vercelGlobals, witnessSpec } from './spec.mjs';
 
+/**
+ * The deployed witnesses. `names` marks an entry whose own names on `globalThis` are its globals.
+ * On the Vercel edge route, `globalThis` hides most of them.
+ */
 export const witnessUrls = {
-  netlify: { 'edge-function': 'https://edgefit-witness.netlify.app/' },
+  netlify: { 'edge-function': { url: 'https://edgefit-witness.netlify.app/', names: true } },
   vercel: {
-    middleware: 'https://edgefit-witness.vercel.app/middleware',
-    'edge-function': 'https://edgefit-witness.vercel.app/api/witness',
+    middleware: { url: 'https://edgefit-witness.vercel.app/middleware', names: true },
+    'edge-function': { url: 'https://edgefit-witness.vercel.app/api/witness', names: false },
   },
 };
 
@@ -32,12 +36,8 @@ const comparers = {
   vercel() {
     const blocked = new Set(Object.keys(readOverrides('vercel-edge')));
     const accepted = new Set(vercelGlobals());
-    return (results, entry) => ({
-      // On the edge route `globalThis` hides its own names, so they say nothing about its globals.
-      sections: compareVercel(results, {
-        blocked,
-        accepted: entry === 'middleware' ? accepted : undefined,
-      }),
+    return (results, { names }) => ({
+      sections: compareVercel(results, { blocked, accepted: names ? accepted : undefined }),
       lines: [],
     });
   },
@@ -66,10 +66,10 @@ async function read(url) {
 const { hash } = witnessSpec(platform);
 const observed = {};
 const lines = [];
-for (const [entry, url] of Object.entries(witnessUrls[platform])) {
+for (const [entry, witness] of Object.entries(witnessUrls[platform])) {
   let results;
   try {
-    results = await read(url);
+    results = await read(witness.url);
   } catch (error) {
     console.error(`::warning::The ${platform} ${entry} witness did not answer: ${error.message}`);
     continue;
@@ -85,7 +85,7 @@ for (const [entry, url] of Object.entries(witnessUrls[platform])) {
       '',
     );
   }
-  const { sections, lines: disagreements } = compare(results, entry);
+  const { sections, lines: disagreements } = compare(results, witness);
   for (const { title, items } of sections) {
     lines.push(`### ${title}`, ...items.map(item => `- \`${item}\``), '');
   }
@@ -93,7 +93,7 @@ for (const [entry, url] of Object.entries(witnessUrls[platform])) {
   if (sections.length === 0 && disagreements.length === 0) {
     lines.push('No disagreements.', '');
   }
-  lines.push('| Check | Allowed | Value or error |', '| --- | --- | --- |');
+  lines.push('| Check | Ran | Value or error |', '| --- | --- | --- |');
   for (const [name, { allowed, value, error }] of Object.entries(results.checks)) {
     const detail = (value ?? error ?? '').replaceAll('|', '\\|');
     lines.push(`| \`${name}\` | ${allowed ? 'yes' : 'no'} | ${detail} |`);

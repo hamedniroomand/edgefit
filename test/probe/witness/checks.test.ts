@@ -6,7 +6,11 @@ import {
   runChecks,
   vercelChecks,
 } from '@scripts/probe/witness/checks.mjs';
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe('runChecks', () => {
   it('allows dynamic code under Node', async () => {
@@ -23,7 +27,6 @@ describe('runChecks', () => {
     expect(await runChecks(vercelChecks)).toEqual({
       requireBuffer: { allowed: true, value: 'object' },
     });
-    vi.unstubAllGlobals();
   });
 
   it('records the error of a check that throws', async () => {
