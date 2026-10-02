@@ -1,7 +1,8 @@
+import type { Message } from 'esbuild';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { resolveGraph, type ResolveOptions } from '@/resolve/graph.ts';
-import { moduleName } from '@/resolve/optional-peers.ts';
+import { acceptMissingPeers, moduleName } from '@/resolve/optional-peers.ts';
 import { fixture } from '~/helpers.ts';
 
 const options = (entry: string): ResolveOptions => ({
@@ -36,5 +37,27 @@ describe('optional peer dependencies', () => {
   it('names the module of a subpath', () => {
     expect(moduleName('react/jsx-runtime')).toBe('react');
     expect(moduleName('@scope/pkg/sub')).toBe('@scope/pkg');
+  });
+
+  it('ignores failures that are not an optional peer of an installed package', () => {
+    const at = (file: string): Message['location'] => ({ file }) as Message['location'];
+    const messages = [
+      { text: 'Other error', location: at('node_modules/with-peer/index.js') },
+      { text: 'Could not resolve "react"', location: null },
+      { text: 'Could not resolve "react"', location: at('/missing/node_modules/x/index.js') },
+      { text: 'Could not resolve "vue"', location: at('node_modules/with-peer/index.js') },
+    ] as Message[];
+    const accepted = new Set<string>();
+    expect(acceptMissingPeers(fixture('peer-app'), messages, accepted)).toBe(false);
+    expect(accepted.size).toBe(0);
+  });
+
+  it('reports a failure it has already accepted as not new', () => {
+    const messages = [
+      { text: 'Could not resolve "react"', location: { file: 'node_modules/with-peer/index.js' } },
+    ] as Message[];
+    const accepted = new Set<string>();
+    expect(acceptMissingPeers(fixture('peer-app'), messages, accepted)).toBe(true);
+    expect(acceptMissingPeers(fixture('peer-app'), messages, accepted)).toBe(false);
   });
 });
