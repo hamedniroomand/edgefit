@@ -1,7 +1,9 @@
 import type { NodeOf } from '@/extract/ast.ts';
-import type { Visitor } from '@/extract/context.ts';
-import { globalRef } from '@/extract/refs.ts';
-import { lookup } from '@/extract/scope.ts';
+import { resolveBinding } from '@/extract/bindings.ts';
+import type { VisitContext, Visitor } from '@/extract/context.ts';
+import { globalRef, normalizeRef } from '@/extract/refs.ts';
+import { isTracked, lookup } from '@/extract/scope.ts';
+import type { ApiRef } from '@/types.ts';
 
 export const visitIdentifier: Visitor<NodeOf<'Identifier'>> = (node, context) => {
   const binding = lookup(context.scope, node.name);
@@ -32,6 +34,26 @@ export const visitClassMember: Visitor<
   context.visitAll([node.computed ? node.key : null, node.value]);
 };
 
+/** The global that `node` sets only when it is missing: `globalThis.x ??= v`, or `=` inside `if (!globalThis.x)`. */
+function polyfilledGlobal(
+  node: NodeOf<'AssignmentExpression'>,
+  context: VisitContext,
+): ApiRef | undefined {
+  const binding =
+    node.left.type === 'MemberExpression' ? resolveBinding(node.left, context) : undefined;
+  if (!isTracked(binding)) {
+    return undefined;
+  }
+  const ref = normalizeRef(binding.ref);
+  if (ref.module !== '*globals*' || ref.path.length !== 1) {
+    return undefined;
+  }
+  const conditional = node.operator === '??=' || node.operator === '||=';
+  return conditional || (node.operator === '=' && context.collector.guards.absent(ref))
+    ? ref
+    : undefined;
+}
+
 export const visitAssignment: Visitor<NodeOf<'AssignmentExpression'>> = (node, context) => {
   // Writing to a plain name neither reads it nor changes what edgefit tracks.
   if (node.left.type === 'Identifier') {
@@ -39,7 +61,14 @@ export const visitAssignment: Visitor<NodeOf<'AssignmentExpression'>> = (node, c
   } else {
     context.visitPattern(node.left);
   }
-  context.visit(node.right);
+  const polyfill = polyfilledGlobal(node, context);
+  if (polyfill === undefined) {
+    context.visit(node.right);
+  } else {
+    context.collector.guards.within([{ kind: 'polyfill', ref: polyfill }], () => {
+      context.visit(node.right);
+    });
+  }
 };
 
 export const visitUpdate: Visitor<NodeOf<'UpdateExpression'>> = (node, context) => {

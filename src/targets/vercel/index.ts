@@ -42,7 +42,6 @@ export function createVercelEdgeTarget(root: string): Target {
   const docsDate = matrixSource.versions['vercel-edge'] ?? 'unknown';
   const { entries, label, notes } = findVercelSources(root);
   const output = readVercelOutput(root, outputDirectory);
-
   return {
     info: {
       key: 'vercel-edge',
@@ -83,6 +82,7 @@ export function createVercelEdgeTarget(root: string): Target {
     ),
     lazyNodeImports: true,
     globals,
+    hasGlobal: name => index.globalNames().includes(name),
     lookup: api => (isProcessImport(api) ? notAllowed : index.lookup(toVercelRef(api))),
     hasProblemsBelow: api => isProcessImport(api) || index.hasProblemsBelow(toVercelRef(api)),
   };

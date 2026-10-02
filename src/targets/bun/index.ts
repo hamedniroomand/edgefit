@@ -29,6 +29,7 @@ export function createBunTarget(root: string, options: BunOptions = {}): Target 
     nodeEnv: undefined,
     entries: detectEntries(bunEntrySources(root), true),
     globals,
+    hasGlobal: name => index.globalNames().includes(name),
     lookup: api => index.lookup(api),
     hasProblemsBelow: api => index.hasProblemsBelow(api),
   };

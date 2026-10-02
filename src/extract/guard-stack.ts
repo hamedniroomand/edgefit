@@ -26,7 +26,19 @@ export interface DeadGuard {
   kind: 'dead';
 }
 
-export type Guard = ApiGuard | RuntimeGuard | DeadGuard;
+/** The API is known to be missing inside the code a check protects. */
+export interface AbsentGuard {
+  kind: 'absent';
+  ref: ApiRef;
+}
+
+/** The code stores a value in a global that it only sets when the global is missing. */
+export interface PolyfillGuard {
+  kind: 'polyfill';
+  ref: ApiRef;
+}
+
+export type Guard = ApiGuard | RuntimeGuard | DeadGuard | AbsentGuard | PolyfillGuard;
 
 /** Whether `ref` is `guard.ref` or something below it. */
 function isCovered(guard: ApiGuard, ref: ApiRef): boolean {
@@ -118,6 +130,23 @@ export class GuardStack {
   /** Whether `ref` is only used where it exists, or where a `catch` stops the error of its absence. */
   public readonly covers = (ref: ApiRef): boolean =>
     this.#caught > 0 || this.#guards.some(guard => guard.kind === 'api' && isCovered(guard, ref));
+
+  /** Whether a check says `ref` is missing at this point. */
+  public readonly absent = (ref: ApiRef): boolean =>
+    this.#guards.some(
+      guard =>
+        guard.kind === 'absent' &&
+        guard.ref.module === ref.module &&
+        guard.ref.path.join('.') === ref.path.join('.'),
+    );
+
+  /**
+   * The global the code at this point stores a value in only when it is missing.
+   * ponytail: only the innermost store counts, so `a ??= (b ??= m)` is judged by `b` alone.
+   * Upgrade: keep every ref and guard when the target has any one of them.
+   */
+  public readonly polyfill = (): ApiRef | undefined =>
+    this.#guards.findLast(guard => guard.kind === 'polyfill')?.ref;
 
   /** Whether a bundler removes the code at this point. */
   public readonly dead = (): boolean => this.#guards.some(guard => guard.kind === 'dead');

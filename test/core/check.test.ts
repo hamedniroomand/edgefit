@@ -184,6 +184,14 @@ describe('check with guarded code', () => {
   });
 });
 
+describe('check with a module stored in a global', () => {
+  it('guards it when the target has the global and keeps it when none does', async () => {
+    const [report] = (await check({ root: fixture('polyfill-app') })).reports;
+    expect(report?.guarded.map(finding => finding.location.file)).toEqual(['src/index.js']);
+    expect(report?.findings.map(finding => finding.location.file)).toEqual(['src/unknown.js']);
+  });
+});
+
 describe('check with runtime branches and try blocks', () => {
   const describeAll = (findings: Finding[] | undefined): string[] =>
     (findings ?? []).map(finding => `${finding.api} ${finding.location.line}`);

@@ -55,6 +55,10 @@ function runtimeTags(usage: Usage): string {
     .join('');
 }
 
+function polyfillTag(usage: Usage): string {
+  return usage.polyfill === undefined ? '' : ` [polyfill ${usage.polyfill.path.join('.')}]`;
+}
+
 /** Extracts usages from a snippet as compact `kind display` strings. */
 export function usagesOf(
   source: string,
@@ -64,7 +68,7 @@ export function usagesOf(
 ): string[] {
   return extractUsages(file, source, { globals, nodeEnv: 'production', ...options }).map(
     usage =>
-      `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${runtimeTags(usage)}`,
+      `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${polyfillTag(usage)}${runtimeTags(usage)}`,
   );
 }
 
@@ -110,6 +114,7 @@ export function makeFinding(api: string, parts: Partial<Finding> = {}): Finding 
 export function stubTarget(
   results: Record<string, LookupResult> = {},
   problemsBelow: readonly string[] = [],
+  globals: readonly string[] = [],
 ): Target {
   const keyOf = (api: ApiRef): string => [api.module, ...api.path].join('.');
   return {
@@ -126,6 +131,7 @@ export function stubTarget(
     nodeEnv: undefined,
     entries: { exact: undefined, guess: undefined, searched: [], shared: true },
     globals: new Set(),
+    hasGlobal: name => globals.includes(name),
     lookup: api => results[keyOf(api)] ?? { status: 'supported' },
     hasProblemsBelow: api => problemsBelow.includes(keyOf(api)),
   };

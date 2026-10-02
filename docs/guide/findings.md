@@ -140,6 +140,18 @@ Usages in the `try` block are guarded, for the APIs the target lacks. Like a che
 - a function defined in the block, which may run after the block has ended, and a class body
 - an `import()` that nothing awaits, since its error does not reach the block. `await import(…)` does
 
+### Polyfills
+
+A module that code stores in a global only when the global is missing is not reached on a target that has the global, so it is guarded:
+
+```js
+import crypto from 'node:crypto';
+
+globalThis.crypto ??= crypto; // Guarded on Workers, which have `crypto`
+```
+
+The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. On a target that lacks the global, the store runs and stays a finding.
+
 ### Runtime checks
 
 Code that only runs on another runtime is never reached on this one, so everything it uses is guarded, an API that exists and throws included:

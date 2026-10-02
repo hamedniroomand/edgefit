@@ -259,3 +259,34 @@ describe('collecting findings behind a check for Netlify', () => {
     expect(files('workerd', 'findings')).toEqual(['not-netlify.js']);
   });
 });
+
+describe('a module stored in a global that is only set when it is missing', () => {
+  const crypto = { module: 'crypto', path: [] };
+  const polyfill = { module: '*globals*', path: ['crypto'] };
+  const usage = makeUsage(crypto, { kind: 'dynamic', polyfill });
+  const stored = [module('a.js', [usage])];
+
+  it('is guarded when the target has the global', () => {
+    const set = collectFindings(stored, {
+      ...options,
+      target: stubTarget({}, ['crypto'], ['crypto']),
+    });
+    expect(set.findings).toEqual([]);
+    expect(set.guarded.map(finding => finding.api)).toEqual(['node:crypto']);
+  });
+
+  it('is reported when no data names the global', () => {
+    const set = collectFindings(stored, { ...options, target: stubTarget({}, ['crypto']) });
+    expect(set.findings.map(finding => finding.api)).toEqual(['node:crypto']);
+    expect(set.guarded).toEqual([]);
+  });
+
+  it('is reported when the target lacks the global', () => {
+    const set = collectFindings(stored, {
+      ...options,
+      target: stubTarget({ '*globals*.crypto': { status: 'unsupported' } }, ['crypto'], ['crypto']),
+    });
+    expect(set.findings.map(finding => finding.api)).toEqual(['node:crypto']);
+    expect(set.guarded).toEqual([]);
+  });
+});

@@ -35,6 +35,8 @@ export interface Target {
   readonly lazyNodeImports?: boolean | undefined;
   /** Global names worth tracking because something at or below them is not fully supported. */
   readonly globals: ReadonlySet<string>;
+  /** Whether the target's data names this global, as opposed to a name nothing defines. */
+  hasGlobal: (name: string) => boolean;
   lookup: (api: ApiRef) => LookupResult;
   hasProblemsBelow: (api: ApiRef) => boolean;
 }

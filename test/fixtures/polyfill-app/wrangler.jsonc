@@ -1,0 +1,7 @@
+{
+  // A Worker that stores a Node.js module in a global the target already has.
+  "name": "fixture-polyfill-app",
+  "main": "src/index.js",
+  "compatibility_date": "2026-04-24",
+  "compatibility_flags": ["nodejs_compat"],
+}
