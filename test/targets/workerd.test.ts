@@ -181,6 +181,23 @@ describe('workerd target', () => {
   });
 });
 
+describe('workerd Web APIs', () => {
+  const target = createWorkerdTarget(fixture('worker'));
+
+  it('reports URL.createObjectURL as a stub that throws', () => {
+    expect(target.lookup({ module: '*globals*', path: ['URL', 'createObjectURL'] })).toEqual({
+      status: 'unsupported',
+      note: 'exists, but throws: not implemented',
+      source:
+        'https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/workerd/api/url-standard.c++',
+    });
+  });
+
+  it('supports a Web API that the data marks missing but workerd has', () => {
+    expect(target.lookup({ module: '*globals*', path: ['reportError'] }).status).toBe('supported');
+  });
+});
+
 describe('workerd target with a deploy redirect', () => {
   it('follows .wrangler/deploy/config.json to the generated config', () => {
     const target = createWorkerdTarget(fixture('nitro-redirect'));

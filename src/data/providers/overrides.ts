@@ -1,3 +1,5 @@
+import { URL } from 'node:url';
+
 import { readDataFile } from '@/data/data-directory.ts';
 import { findSource } from '@/data/manifest.ts';
 import type { TargetKey } from '@/types.ts';
@@ -47,7 +49,7 @@ export function overridesProvider(target: TargetKey): CompatProvider<CompatEntry
         path,
         status,
         ...(status === 'supported' ? {} : { note: entry.note }),
-        source: { provider: name, version, url: `${url}/${entry.source}` },
+        source: { provider: name, version, url: new URL(entry.source, `${url}/`).href },
       });
       const moduleEntries = Object.entries(file.modules).flatMap(([module, entry]) =>
         (entry.except ?? [])

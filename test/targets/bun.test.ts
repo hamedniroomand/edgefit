@@ -20,6 +20,12 @@ function projectWith(files: Record<string, string>): string {
 describe('bun lookups', () => {
   const target = createBunTarget(projectWith({}));
 
+  it('supports a Web API that the data marks missing but Bun has', () => {
+    expect(target.lookup({ module: '*globals*', path: ['AbortSignal', 'any'] }).status).toBe(
+      'supported',
+    );
+  });
+
   it('reports an API missing from Bun as unsupported', () => {
     expect(target.lookup({ module: 'util', path: ['transferableAbortSignal'] })).toEqual({
       status: 'unsupported',

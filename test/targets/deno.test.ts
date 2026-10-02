@@ -31,6 +31,13 @@ describe('deno lookups', () => {
     );
   });
 
+  it('supports members that the global process has but the named exports lack', () => {
+    for (const member of ['uptime', 'binding', 'title']) {
+      expect(target.lookup({ module: 'process', path: [member] }).status).toBe('supported');
+    }
+    expect(target.lookup({ module: '*globals*', path: ['Location'] }).status).toBe('supported');
+  });
+
   it('treats implemented modules the matrix does not cover as supported', () => {
     expect(target.lookup({ module: 'child_process', path: ['spawn'] }).status).toBe('supported');
     expect(target.lookup({ module: 'worker_threads', path: ['isInternalThread'] }).status).toBe(

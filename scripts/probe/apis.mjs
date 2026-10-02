@@ -1,5 +1,6 @@
 import { readMatrix, readOverrides } from './data.mjs';
 import { missingApis } from './drift.mjs';
+import { webMissingApis } from './web.mjs';
 
 /** Flattens a matrix tree into `module.member.path` names with their kind. */
 export function flattenMatrix(tree) {
@@ -54,11 +55,13 @@ export function buildSpec(
       names.add(api);
     }
   }
-  const lookups = drift ? missingApis(readMatrix(runtime), baseline, overrides) : [];
+  const lookups = drift
+    ? [...missingApis(readMatrix(runtime), baseline, overrides), ...webMissingApis(runtime)]
+    : [];
   return {
     apis: [
       ...[...names].sort().map(api => ({ api, kind: kinds.get(api) })),
-      ...lookups.filter(api => !names.has(api)).map(api => ({ api, lookup: true })),
+      ...[...new Set(lookups)].filter(api => !names.has(api)).map(api => ({ api, lookup: true })),
     ],
     mocked: mocked ? Object.keys(overrides).filter(api => overrides[api].status === 'mocked') : [],
   };

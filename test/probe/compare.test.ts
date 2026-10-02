@@ -52,6 +52,17 @@ describe('compareOutcomes against the matrix', () => {
     ).toEqual([]);
   });
 
+  it('names runtime-compat-data for a Web API the matrix does not describe', () => {
+    const webMissing = new Set(['*globals*.Cache']);
+    expect(compareOutcomes({ '*globals*.Cache': 'present' }, {}, {}, webMissing)).toEqual([
+      {
+        api: '*globals*.Cache',
+        message: 'runtime-compat-data says `missing`, probe says `present`',
+        dataSaysPresent: false,
+      },
+    ]);
+  });
+
   it('ignores a denied API that exists', () => {
     expect(
       compareOutcomes(
