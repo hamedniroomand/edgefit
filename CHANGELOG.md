@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.1
+
+### Patch Changes
+
+- [#93](https://github.com/hamedniroomand/edgefit/pull/93) [`7ae1c43`](https://github.com/hamedniroomand/edgefit/commit/7ae1c4326239dd879c217344334a68f3f465ca76) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - An optional peer dependency that is not installed no longer makes a package `?`. When an import fails and the importing package lists the module in `peerDependenciesMeta` as optional, edgefit leaves the module out and reports an `unknown` warning that names it. Other imports that fail still give `?`.
+
+- [#96](https://github.com/hamedniroomand/edgefit/pull/96) [`f374838`](https://github.com/hamedniroomand/edgefit/commit/f374838faa5aef415b760c1daedec3ab43a32639) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - A Node.js module that code stores in a global the target already has, such as `globalThis.crypto ??= crypto`, no longer gives an `unknown` warning. The store only runs when the global is missing, so edgefit lists it as guarded. The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. The warning stays on a target that lacks the global.
+
+- [#97](https://github.com/hamedniroomand/edgefit/pull/97) [`9b5801b`](https://github.com/hamedniroomand/edgefit/commit/9b5801b9f17b83ff9f15af363b15769665e2e40b) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - An import that is only used as a type no longer gives a finding. A bundler drops such an import from a TypeScript file, so `import { ServerResponse } from 'node:http'` that is only used in `as ServerResponse` uses no API. When an import has some names used as values, edgefit reports only those names. The check still keeps every import when the nearest `tsconfig.json` sets `verbatimModuleSyntax`, `preserveValueImports`, or `importsNotUsedAsValues` to `preserve` or `error`.
+
 ## 0.6.0
 
 ### Minor Changes
