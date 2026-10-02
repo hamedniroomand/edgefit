@@ -44,6 +44,7 @@ function visitRequire(node: NodeOf<'CallExpression'>, context: VisitContext): vo
     context.visit(argument);
     return;
   }
+  context.collector.native(specifier, argument.start);
   const module = builtinName(specifier);
   if (module !== undefined) {
     context.useRef(moduleRef(module), argument.start);
@@ -77,16 +78,17 @@ export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node,
     return;
   }
   const module = builtinName(specifier);
-  if (module !== undefined) {
-    // Only an awaited import can be caught by a `try`; a promise nothing awaits fails on its own.
-    const record = (): void => {
+  // Only an awaited import can be caught by a `try`; a promise nothing awaits fails on its own.
+  const record = (): void => {
+    context.collector.native(specifier, node.source.start);
+    if (module !== undefined) {
       context.useRef(moduleRef(module), node.source.start);
-    };
-    if (context.parent()?.type === 'AwaitExpression') {
-      record();
-    } else {
-      context.collector.guards.deferred(record);
     }
+  };
+  if (context.parent()?.type === 'AwaitExpression') {
+    record();
+  } else {
+    context.collector.guards.deferred(record);
   }
 };
 

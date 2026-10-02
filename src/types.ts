@@ -41,7 +41,7 @@ export interface PackageInfo {
 
 export interface Usage {
   /** `mocked` marks a polyfill the build injected in place of the API, found through sourcemaps. */
-  kind: 'api' | 'dynamic' | 'mocked';
+  kind: 'api' | 'dynamic' | 'mocked' | 'native';
   /** The API used. For dynamic usages this is the closest API edgefit could see, if any. */
   api: ApiRef | undefined;
   /** Human-readable name of what was used, e.g. `node:fs.watch` or `require(<expression>)`. */

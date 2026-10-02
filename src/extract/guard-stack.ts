@@ -127,9 +127,12 @@ export class GuardStack {
     }
   };
 
+  /** Whether a `catch` around this point stops an error from the code. */
+  public readonly isCaught = (): boolean => this.#caught > 0;
+
   /** Whether `ref` is only used where it exists, or where a `catch` stops the error of its absence. */
   public readonly covers = (ref: ApiRef): boolean =>
-    this.#caught > 0 || this.#guards.some(guard => guard.kind === 'api' && isCovered(guard, ref));
+    this.isCaught() || this.#guards.some(guard => guard.kind === 'api' && isCovered(guard, ref));
 
   /** Whether a check says `ref` is missing at this point. */
   public readonly absent = (ref: ApiRef): boolean =>

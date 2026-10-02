@@ -20,6 +20,7 @@ export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context)
   if (node.importKind === 'type' || (node.specifiers.length > 0 && used.length === 0)) {
     return;
   }
+  context.collector.native(node.source.value, node.source.start);
   const module = builtinName(node.source.value);
   if (module === undefined) {
     for (const specifier of used) {

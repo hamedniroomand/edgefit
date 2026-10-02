@@ -20,6 +20,8 @@ export interface ExtractOptions {
   lazyNodeImports?: boolean;
   /** The bundler keeps imports that nothing uses as a value: `verbatimModuleSyntax` is on. */
   keepUnusedImports?: boolean;
+  /** Specifiers of the file that resolve to a native addon, as written in the source. */
+  nativeSpecifiers?: ReadonlySet<string>;
 }
 
 export interface ExtractedModule {
@@ -72,7 +74,12 @@ export function extractModule(
   source: string,
   options: ExtractOptions,
 ): ExtractedModule {
-  const collector = new UsageCollector(file, source, options.lazyNodeImports === true);
+  const collector = new UsageCollector(
+    file,
+    source,
+    options.lazyNodeImports === true,
+    options.nativeSpecifiers,
+  );
   const result = parse(file, source);
   const [error] = result.errors;
   if (error !== undefined && result.program.body.length === 0) {

@@ -66,9 +66,10 @@ const assetExtensions = [
   '.ico',
   '.woff',
   '.woff2',
+  '.node',
 ];
 
-// Assets can be imported but hold no code to scan.
+// Assets can be imported but hold no code to scan. The import site of a `.node` addon is reported.
 const assetLoaders: Record<string, Loader> = Object.fromEntries(
   assetExtensions.map(extension => [extension, 'empty']),
 );

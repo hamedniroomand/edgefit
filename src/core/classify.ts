@@ -81,6 +81,16 @@ export function classify(usage: Usage, target: Target): Classification | undefin
         absent: false,
       };
     }
+    case 'native': {
+      return target.loadsNativeAddons === true
+        ? undefined
+        : {
+            category: 'unsupported',
+            detail: 'is a native addon, which this target cannot load',
+            source: undefined,
+            absent: true,
+          };
+    }
     default: {
       throw new Error(`Unknown usage kind: ${String(usage.kind)}`);
     }

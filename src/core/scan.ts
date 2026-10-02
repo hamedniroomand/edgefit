@@ -58,6 +58,11 @@ export function scanModules(
           keepUnusedImports:
             isProjectScript(file) && keepsUnusedImports(path.resolve(root, file), tsconfigs),
           nodeEnv: options.nodeEnv,
+          nativeSpecifiers: new Set(
+            module.links
+              .filter(link => link.path.endsWith('.node'))
+              .flatMap(link => link.original ?? []),
+          ),
         }),
         unchecked: uncheckedImports(posixFile, source, module.externals, module.missingPeers),
       };
