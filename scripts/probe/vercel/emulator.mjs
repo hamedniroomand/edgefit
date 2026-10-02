@@ -11,8 +11,13 @@ export const knownDivergences = {
 };
 
 // Names in the emulator that belong to its own plumbing or to service-worker events, not to code.
-const plumbing = new Set(['addEventListener', 'removeEventListener', 'FetchEvent']);
-const isPlumbing = name => name.startsWith('__') || plumbing.has(name);
+const plumbing = new Set([
+  'addEventListener',
+  'removeEventListener',
+  'dispatchEvent',
+  'FetchEvent',
+]);
+export const isPlumbing = name => name.startsWith('__') || plumbing.has(name);
 
 /**
  * Compares what the emulator reports (`names` on its global object, and whether dynamic code

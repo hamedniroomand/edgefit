@@ -49,7 +49,7 @@ export function compareNetlify({ hashes, range }, recorded) {
   }
   if (range !== recorded.bundler.denoRange) {
     sections.push({
-      title: `@netlify/edge-bundler now requires Deno ${range}, not ${recorded.bundler.denoRange} (update the netlify-edge version in source.json to ${minimumOf(range)})`,
+      title: `@netlify/edge-bundler now requires Deno ${range}, not ${recorded.bundler.denoRange} (update the netlify-edge version in source.json to ${minimumOf(range)}, unless the witness measured the version Netlify runs)`,
       items: [`${recorded.bundler.denoRange} -> ${range}`],
     });
   }

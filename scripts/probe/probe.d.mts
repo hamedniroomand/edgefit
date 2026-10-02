@@ -8,4 +8,7 @@ export interface ProbeEntry {
 }
 
 export function probeApi(entry: ProbeEntry, load?: (module: string) => unknown): Promise<Outcome>;
-export function probeApis(apis: ProbeEntry[]): Promise<Record<string, Outcome>>;
+export function probeApis(
+  apis: ProbeEntry[],
+  load?: (module: string) => unknown,
+): Promise<Record<string, Outcome>>;

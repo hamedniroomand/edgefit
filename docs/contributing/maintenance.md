@@ -11,6 +11,7 @@ edgefit is only as good as its picture of the runtimes, and the runtimes move ev
 | `data/source.json`                         | The versions, commit and date every file was made from. `edgefit targets` prints it      |
 | `scripts/probe`                            | Runs real runtimes and compares them with the data                                       |
 | `.github/workflows/probe.yml`              | The weekly run. Its last job keeps one issue up to date                                  |
+| `.github/workflows/witness.yml`            | Deploys the production witness to Netlify and Vercel, by hand                            |
 
 The matrix answers "does this API exist?". The overrides answer "what happens when it is called?". The probe checks both against the real thing, and never changes data by itself.
 
@@ -227,7 +228,7 @@ After a bump, a few tests fail because the data moved. That is the signal to loo
 `netlify-edge` reuses the Deno matrix, so the Deno probes cover its runtime. Its own inputs are the Deno range of `@netlify/edge-bundler` and three sections of Netlify's documentation, and a weekly job (`netlify-edge` in `probe.yml`) compares both with what `data/overrides/netlify-edge.json` records. When it reports a change:
 
 1. Read the changed page. If it now names a Deno version or blocks an API, add the entry to the override layer with the page as its source.
-2. If the Deno range changed, set the `netlify-edge` version in `source.json` to the range's lowest version, and update `bundler` in the override file.
+2. If the Deno range changed, update `bundler` in the override file. Set the `netlify-edge` version in `source.json` to the range's lowest version, unless the production witness measured the version Netlify runs. A measured version takes priority.
 3. Update the hashes in the override file.
 
 The `deno (netlify-min)` run of the probe looks up every API in the oldest Deno Netlify supports and lists where it differs from the data. The summary leaves out aliases (`x.default.y`, `sys` and the nested `path` names) and groups the rest by module, in three sections: present in the data but missing at runtime (possible false passes), missing as a named export only (`import stream from 'node:stream'` works, `import { promises }` fails), and unusable in the data (missing or a stub) but present at runtime. The full list, with every name as the probe wrote it, is folded away. It only informs the job summary. If Netlify starts documenting the version it runs, use that version in place of the minimum.
@@ -243,6 +244,18 @@ The `deno (netlify-min)` run of the probe looks up every API in the oldest Deno 
 5. For a global the emulator has that the data does not keep, decide from the documentation whether Vercel provides it, and add it to `emulatorGlobals` if so.
 
 A difference between the emulator and the documentation that is already understood goes in `knownDivergences` in `scripts/probe/vercel/emulator.mjs`, with the reason.
+
+## Production witness
+
+The `witness` jobs in `probe.yml` read the function that the **Witness** workflow deploys (see [Production witness](/contributing/data#production-witness)). They write only to the job summary. To act on them:
+
+1. If the summary says that the witness has an older list of APIs, run `gh workflow run witness.yml --ref main`.
+2. On Netlify, if the Deno version differs from the data, set the `netlify-edge` version in `source.json` to the version Netlify runs. Then run the probe and read the `deno (netlify-min)` summary at that version.
+3. For an API that is present in the data but missing in production, add an entry to the override layer of the target. Use the `witness.json` artifact of the run as the evidence in the pull request.
+4. On Vercel, a global that production has and the data does not keep goes in `emulatorGlobals` or `globals`. A kept name that production lacks is removed.
+5. The table of checks shows whether production blocks subprocesses, file writes and dynamic code. Record a blocked API in the override layer, with a link to the run.
+
+The witness tokens are secrets of the `witness` environment: `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` for Netlify, and `VERCEL_TOKEN`, `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` for Vercel. The URLs that the weekly run reads are in `scripts/probe/witness/check.mjs`.
 
 ## After merging
 

@@ -29,6 +29,9 @@ async function lookup(api, { exact, load }) {
     return lookupGlobal(path);
   }
   const namespace = await load(module);
+  if (namespace === undefined) {
+    throw new TypeError(`${module} is not a module`);
+  }
   if (path.length === 0) {
     return { owner: namespace, member: namespace };
   }
@@ -86,16 +89,17 @@ export async function probeApi({ api, kind, lookup: lookupOnly = false }, load =
 
 /**
  * Probes each API in turn, since a call may change state the next one reads. With `PROBE_TRACE`
- * set, each name is logged first, so the last line shows which call a hung probe was in.
+ * set, each name is logged first, so the last line shows which call a hung probe was in. `load`
+ * imports a `node:` module by name, for a bundler that cannot follow a computed import.
  */
-export async function probeApis(apis) {
+export async function probeApis(apis, load = loadNodeModule) {
   const trace = Boolean(globalThis.process?.env?.PROBE_TRACE);
   const outcomes = {};
   for (const entry of apis) {
     if (trace) {
       console.error(`probe ${entry.api}${entry.lookup ? ' (lookup)' : ''}`);
     }
-    outcomes[entry.api] = await probeApi(entry);
+    outcomes[entry.api] = await probeApi(entry, load);
   }
   return outcomes;
 }
