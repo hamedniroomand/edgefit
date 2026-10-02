@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.3
+
+### Patch Changes
+
+- [#102](https://github.com/hamedniroomand/edgefit/pull/102) [`2749b14`](https://github.com/hamedniroomand/edgefit/commit/2749b146f8297a286534a59238c169eb95fdf5fe) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Treat a class that extends a Node.js class, or `util.inherits` with one, as a use of that class. The rest of the module is no longer reported as `unknown`.
+
+- [#104](https://github.com/hamedniroomand/edgefit/pull/104) [`fb9542c`](https://github.com/hamedniroomand/edgefit/commit/fb9542c20e3577f14c37afab564d8b4654990bb9) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Follow a variable that is declared without a value and set once to a required module, such as `let c; c = require('node:crypto')`. Its members now count as uses of the module, and no `unknown` warning shows.
+
+- [#103](https://github.com/hamedniroomand/edgefit/pull/103) [`fdb804b`](https://github.com/hamedniroomand/edgefit/commit/fdb804b7d42d7510f7a88bb06feba28866858f55) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Do not report a computed access with a symbol key held in a `const`.
+
+- [#101](https://github.com/hamedniroomand/edgefit/pull/101) [`879bf74`](https://github.com/hamedniroomand/edgefit/commit/879bf741b1547c174f5f9d1acb41c4428a7dbcb0) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Stop reporting Web APIs and `process` members as missing on Bun, Deno and workerd when the runtime has them, such as `AbortSignal.any` on Bun. The probe now also looks up the Web APIs that the data marks missing.
+
 ## 0.6.2
 
 ### Patch Changes
