@@ -15,7 +15,10 @@ function importOffset(source: string, specifier: string, name: string): number {
   return [specifier, name].map(text => source.indexOf(text)).find(offset => offset >= 0) ?? 0;
 }
 
-/** `jsr:` packages, which the Deno target keeps out of the graph, as unknown usages. */
+/**
+ * `jsr:` packages, which the Deno target keeps out of the graph, and optional peer dependencies
+ * that are not installed, as unknown usages.
+ */
 export function uncheckedImports(
   file: string,
   source: string,

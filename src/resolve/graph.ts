@@ -109,13 +109,10 @@ async function bundleMetafile(options: ResolveOptions, accepted: Set<string>): P
     });
     return result.metafile;
   } catch (error) {
-    if (!isBuildFailure(error)) {
-      throw error;
-    }
-    if (acceptMissingPeers(options.root, error.errors, accepted)) {
+    if (isBuildFailure(error) && acceptMissingPeers(options.root, error.errors, accepted)) {
       return bundleMetafile(options, accepted);
     }
-    throw toResolveError(error.errors);
+    throw isBuildFailure(error) ? toResolveError(error.errors) : error;
   }
 }
 

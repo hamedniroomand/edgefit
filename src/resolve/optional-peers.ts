@@ -13,14 +13,21 @@ export function importKey(importer: string, specifier: string): string {
   return `${importer}\0${specifier}`;
 }
 
-/** The optional peer dependencies of the nearest package.json above a file. */
+/**
+ * The optional peer dependencies of the nearest named package.json above a file. A nested
+ * manifest such as `esm/package.json` holds only `type` and is skipped.
+ */
 function optionalPeersOf(file: string): ReadonlySet<string> {
   for (let directory = path.dirname(file); ; directory = path.dirname(directory)) {
     const manifest = path.join(directory, 'package.json');
-    if (existsSync(manifest)) {
-      const { peerDependenciesMeta } = JSON.parse(readFileSync(manifest, 'utf8')) as {
-        peerDependenciesMeta?: Record<string, { optional?: boolean } | undefined>;
-      };
+    const found = existsSync(manifest)
+      ? (JSON.parse(readFileSync(manifest, 'utf8')) as {
+          name?: unknown;
+          peerDependenciesMeta?: Record<string, { optional?: boolean } | undefined>;
+        })
+      : undefined;
+    if (typeof found?.name === 'string') {
+      const { peerDependenciesMeta } = found;
       return new Set(
         Object.entries(peerDependenciesMeta ?? {})
           .filter(([, meta]) => meta?.optional === true)
@@ -35,7 +42,7 @@ function optionalPeersOf(file: string): ReadonlySet<string> {
 
 /**
  * Adds the failed imports that name an optional peer dependency of the importing package to
- * `accepted`. The user brings the peer, so its version is not known. Returns true when it added one.
+ * `accepted`. The user brings the peer, so its version is not known. Returns true when it added a new one.
  */
 export function acceptMissingPeers(
   root: string,
@@ -53,8 +60,9 @@ export function acceptMissingPeers(
       importer.split(path.sep).includes('node_modules') &&
       optionalPeersOf(importer).has(moduleName(specifier))
     ) {
-      accepted.add(importKey(importer, specifier));
-      added = true;
+      const key = importKey(importer, specifier);
+      added ||= !accepted.has(key);
+      accepted.add(key);
     }
   }
   return added;

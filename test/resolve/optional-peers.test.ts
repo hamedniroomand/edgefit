@@ -20,6 +20,13 @@ describe('optional peer dependencies', () => {
     ]);
   });
 
+  it('reads the peers from the package manifest, not a nested one', async () => {
+    const graph = await resolveGraph(options('src/nested.ts'));
+    expect(graph.modules.get('node_modules/nested-peer/esm/index.js')?.missingPeers).toEqual([
+      'react',
+    ]);
+  });
+
   it('still fails for a peer that is not optional', async () => {
     await expect(resolveGraph(options('src/strict.ts'))).rejects.toThrow(
       'Could not resolve "react"',

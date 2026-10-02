@@ -60,6 +60,7 @@ edgefit could not determine what is used. Typical causes:
 - computed member access on a module that has unsupported members, such as `fs[method]`
 - a module the compatibility data does not cover
 - a `jsr:` import on Deno
+- an import of an optional peer dependency that is not installed. Edgefit does not install peers, so what the peer provides is not checked
 
 An `unknown` finding is only reported when the access could reach something unsupported. Computed access on a module that is fully supported on the target is not reported.
 
