@@ -51,7 +51,7 @@
   "dependencies": {
     "esbuild": "^0.28.2",
     "jsonc-parser": "^3.3.1",
-    "oxc-parser": "^0.151.0",
+    "oxc-parser": "^0.152.0",
     "smol-toml": "^1.9.0"
   },
   "devDependencies": {
@@ -60,11 +60,11 @@
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@types/node": "^22.20.4",
-    "@vitest/coverage-v8": "5.0.1",
+    "@vitest/coverage-v8": "5.0.3",
     "vite-plus": "catalog:"
   },
   "engines": {
     "node": ">=22.18.0"
   },
-  "packageManager": "pnpm@12.6.0"
+  "packageManager": "pnpm@12.8.1"
 }
