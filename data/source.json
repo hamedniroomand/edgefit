@@ -75,7 +75,7 @@
       "provider": "allowlist/vercel-edge",
       "url": "https://vercel.com/docs/functions/runtimes/edge",
       "license": "none",
-      "note": "API names and hashes read from Vercel's documentation, and member lists from next and @vercel/node (MIT); no text is copied.",
+      "note": "API names and hashes read from Vercel's documentation, and member lists from next and @vercel/node (MIT); no text is copied. AsyncLocalStorage in witnessGlobals comes from the production witness answer, read on 2026-10-03 after Witness run 37078244260.",
       "versions": {
         "vercel-edge": "2026-08-03",
         "next": "16.3.8",
@@ -86,7 +86,7 @@
       "provider": "overrides/vercel-edge",
       "url": "https://vercel.com/docs/functions/runtimes/edge",
       "license": "none",
-      "note": "API names and hashes read from Vercel's documentation; no text is copied.",
+      "note": "API names and hashes read from Vercel's documentation; no text is copied. Entries whose source is the production witness answer, read on 2026-10-03 after Witness run 37078244260, link it at a pinned commit.",
       "versions": {
         "vercel-edge": "2026-08-03"
       }

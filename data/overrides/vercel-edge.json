@@ -1,5 +1,5 @@
 {
-  "description": "Node built-ins the baseline dump does not cover and Vercel's Edge runtime lacks (the allowlist removes the rest), and JavaScript features it disables, applied by the vercel-edge target on top of the allowlist. eval and WebAssembly.compile are blocked. `new Function(string)` is blocked too and is listed as `Function.(string)`, the name edgefit gives a call of the Function constructor with code in an argument (`Function('return this')`, the global object idiom, is not counted). WebAssembly.instantiate is blocked only for buffer sources, so it is listed as `WebAssembly.instantiate.(bytes)`, a call whose first argument is not an imported module. A `require` whose module is computed at runtime is blocked too and is listed as `require.(dynamic)`. A static `require` is bundled, so it is not listed.",
+  "description": "Node built-ins the baseline dump does not cover and Vercel's Edge runtime lacks (the allowlist removes the rest), and JavaScript features it disables, applied by the vercel-edge target on top of the allowlist. eval and WebAssembly.compile are blocked. `new Function(string)` is blocked too and is listed as `Function.(string)`, the name edgefit gives a call of the Function constructor with code in an argument (`Function('return this')`, the global object idiom, is not counted). WebAssembly.instantiate is blocked only for buffer sources, so it is listed as `WebAssembly.instantiate.(bytes)`, a call whose first argument is not an imported module. A `require` whose module is computed at runtime is blocked too and is listed as `require.(dynamic)`. A static `require` is bundled, so it is not listed. The production witness, deployed as Vercel middleware and as an edge function, measured differences between the two. Middleware runs WebAssembly.compile and WebAssembly.instantiate from a buffer, which the entries keep blocked for edge functions. Edge functions lack DOMException, WeakRef and FinalizationRegistry, and middleware lacks async_hooks.AsyncResource. edgefit has one vercel-edge target for both, so an API that one of them lacks is an entry with \"absent\": true, and its note names the one that has it. These entries link the committed witness answer as their source.",
   "modules": {
     "child_process": {
       "status": "unsupported",
@@ -112,12 +112,12 @@
     },
     "*globals*.WebAssembly.compile": {
       "status": "unsupported",
-      "note": "is disabled in the Edge runtime: WebAssembly modules must come from an import, not a buffer",
+      "note": "is disabled in Vercel edge functions: WebAssembly modules must come from an import, not a buffer. Vercel middleware allows it.",
       "source": "#unsupported-apis"
     },
     "*globals*.WebAssembly.instantiate.(bytes)": {
       "status": "mismatch",
-      "note": "is disabled in the Edge runtime for a buffer source: import the .wasm file and pass the module",
+      "note": "is disabled in Vercel edge functions for a buffer source: import the .wasm file and pass the module. Vercel middleware allows it.",
       "source": "#unsupported-apis"
     },
     "*globals*.require.(dynamic)": {
@@ -129,6 +129,30 @@
       "status": "unsupported",
       "note": "is disabled in the Edge runtime: dynamic code execution is not allowed",
       "source": "#unsupported-apis"
+    },
+    "*globals*.DOMException": {
+      "status": "unsupported",
+      "note": "is missing in Vercel edge functions; Vercel middleware has it",
+      "source": "https://github.com/hamedniroomand/edgefit/blob/3ff2b27884b397a5067c80172d340b09916dd950/scripts/probe/witness/answers/vercel-2026-10-03.json",
+      "absent": true
+    },
+    "*globals*.WeakRef": {
+      "status": "unsupported",
+      "note": "is missing in Vercel edge functions; Vercel middleware has it",
+      "source": "https://github.com/hamedniroomand/edgefit/blob/3ff2b27884b397a5067c80172d340b09916dd950/scripts/probe/witness/answers/vercel-2026-10-03.json",
+      "absent": true
+    },
+    "*globals*.FinalizationRegistry": {
+      "status": "unsupported",
+      "note": "is missing in Vercel edge functions; Vercel middleware has it",
+      "source": "https://github.com/hamedniroomand/edgefit/blob/3ff2b27884b397a5067c80172d340b09916dd950/scripts/probe/witness/answers/vercel-2026-10-03.json",
+      "absent": true
+    },
+    "async_hooks.AsyncResource": {
+      "status": "unsupported",
+      "note": "is missing in Vercel middleware; Vercel edge functions have it",
+      "source": "https://github.com/hamedniroomand/edgefit/blob/3ff2b27884b397a5067c80172d340b09916dd950/scripts/probe/witness/answers/vercel-2026-10-03.json",
+      "absent": true
     }
   },
   "notModelled": []
