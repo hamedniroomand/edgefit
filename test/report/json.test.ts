@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
 
+import { findingId } from '@/report/finding-id.ts';
 import { jsonReportVersion, parseJsonReport } from '@/report/json.ts';
+import { makeFinding } from '~/helpers.ts';
 
 const valid = {
   version: jsonReportVersion,
@@ -38,5 +40,26 @@ describe('reading JSON reports', () => {
     expect(() => parseJsonReport(JSON.stringify({ ...valid, version: 99 }), 'head.json')).toThrow(
       'head.json has report version 99',
     );
+  });
+});
+
+describe('finding IDs in a report that is read back', () => {
+  const finding = makeFinding('node:fs.watch');
+  const read = (value: object): string | undefined => {
+    const [first] = parseJsonReport(JSON.stringify(value), 'base.json').targets[0]?.findings ?? [];
+    return (first as { id?: string } | undefined)?.id;
+  };
+
+  it('adds the ID to a finding from a report written before IDs existed', () => {
+    const old = { version: 1, targets: [{ key: 'workerd', entry: 'a.ts', findings: [finding] }] };
+    expect(read(old)).toBe(findingId(finding));
+  });
+
+  it('keeps the ID that the report has', () => {
+    const withId = {
+      ...valid,
+      targets: [{ ...valid.targets[0], findings: [{ ...finding, id: 'ef_0000000000' }] }],
+    };
+    expect(read(withId)).toBe('ef_0000000000');
   });
 });

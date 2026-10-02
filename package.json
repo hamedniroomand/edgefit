@@ -61,6 +61,7 @@
     "@commitlint/config-conventional": "^21.2.3",
     "@types/node": "^22.20.4",
     "@vitest/coverage-v8": "5.0.1",
+    "ajv": "^8.20.0",
     "vite-plus": "catalog:"
   },
   "engines": {
