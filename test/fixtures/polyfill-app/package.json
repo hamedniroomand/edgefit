@@ -1,0 +1,5 @@
+{
+  "name": "fixture-polyfill-app",
+  "private": true,
+  "type": "module"
+}

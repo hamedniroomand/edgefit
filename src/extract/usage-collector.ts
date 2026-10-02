@@ -70,8 +70,14 @@ export class UsageCollector {
       display,
       reason,
       location: this.location(offset),
+      ...this.#polyfill(),
       ...this.#runtimes(),
     });
+  }
+
+  #polyfill(): { polyfill?: ApiRef } {
+    const polyfill = this.guards.polyfill();
+    return polyfill === undefined ? {} : { polyfill };
   }
 
   #runtimes(): { runtimes?: RuntimeCondition[] } {

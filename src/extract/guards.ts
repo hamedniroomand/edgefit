@@ -41,6 +41,19 @@ function guardFor(node: Node, context: BindingContext, key?: string): Guard[] {
   return [{ kind: 'api', ref, root: local ? name : undefined, active: true }];
 }
 
+function absentGuard(node: Node, context: BindingContext, key?: string): Guard[] {
+  const binding = resolveBinding(node, context);
+  if (!isTracked(binding)) {
+    return [];
+  }
+  return [
+    {
+      kind: 'absent',
+      ref: normalizeRef(key === undefined ? binding.ref : memberRef(binding.ref, key)),
+    },
+  ];
+}
+
 function isNullish(node: Node): boolean {
   const inner = strip(node);
   return (
@@ -61,7 +74,8 @@ function runtimeGuard(runtime: Runtime | undefined, present: boolean): Guard[] {
 function presence(node: Node, present: boolean, context: BindingContext, key?: string): Guard[] {
   const runtime =
     key === undefined ? runtimeMarker(node, context) : memberRuntime(node, key, context);
-  return [...(present ? guardFor(node, context, key) : []), ...runtimeGuard(runtime, present)];
+  const api = present ? guardFor(node, context, key) : absentGuard(node, context, key);
+  return [...api, ...runtimeGuard(runtime, present)];
 }
 
 function typeofGuard(

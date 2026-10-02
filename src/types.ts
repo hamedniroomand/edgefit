@@ -53,6 +53,8 @@ export interface Usage {
   guarded?: true;
   /** Set when the code sits behind runtime checks, such as `typeof Deno !== 'undefined'`. All must hold. */
   runtimes?: RuntimeCondition[];
+  /** Set when the value is stored in this global only if the global is missing. */
+  polyfill?: ApiRef;
 }
 
 /** How to get rid of a finding: swap a package, change a setting, or change code or config. */

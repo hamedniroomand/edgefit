@@ -126,6 +126,7 @@ export function createDenoTarget(root: string, options: DenoTargetOptions = {}):
     resolvePlugins: [denoSpecifiers(netlify ? netlify.importMap : config?.importMap)],
     entries: netlify?.entries ?? detectEntries(denoEntrySources(root, config?.file), true),
     globals,
+    hasGlobal: name => index.globalNames().includes(name),
     lookup: api => index.lookup(api),
     hasProblemsBelow: api => index.hasProblemsBelow(api),
   };

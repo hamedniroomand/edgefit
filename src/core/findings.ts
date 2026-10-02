@@ -37,6 +37,17 @@ function isOtherRuntime(usage: Usage, target: Target): boolean {
   );
 }
 
+/** Whether a module is only stored in a global that the target already has, so the store never runs. */
+function isShadowedPolyfill(usage: Usage, target: Target): boolean {
+  const [name] = usage.polyfill?.path ?? [];
+  return (
+    usage.polyfill !== undefined &&
+    name !== undefined &&
+    target.hasGlobal(name) &&
+    target.lookup(usage.polyfill).status === 'supported'
+  );
+}
+
 export interface ModuleUsages {
   file: string;
   package: PackageInfo | undefined;
@@ -163,6 +174,7 @@ function toFinding(
   const guarded =
     (usage.guarded === true && classification.absent) ||
     isOtherRuntime(usage, options.target) ||
+    isShadowedPolyfill(usage, options.target) ||
     unreached !== undefined;
   const suggestion = guarded ? undefined : suggest(module, usage, classification, options);
   return {

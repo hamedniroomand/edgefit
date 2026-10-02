@@ -102,6 +102,7 @@ export function createWorkerdTarget(root: string, options: WorkerdOptions = {}):
       true,
     ),
     globals,
+    hasGlobal: name => index.globalNames().includes(name),
     lookup,
     hasProblemsBelow: api =>
       checkSettings(api, settings) !== undefined || index.hasProblemsBelow(api),
