@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.2
+
+### Patch Changes
+
+- [#100](https://github.com/hamedniroomand/edgefit/pull/100) [`34c3878`](https://github.com/hamedniroomand/edgefit/commit/34c3878ce2f6cd82fb85b76096322c14a21ffb58) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Report a native addon as a finding instead of stopping the check.
+
+- [#98](https://github.com/hamedniroomand/edgefit/pull/98) [`24a4791`](https://github.com/hamedniroomand/edgefit/commit/24a47911614451a1eaa6ba9dc86ed58898275752) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Stop reporting a constant value of a Node module as mocked on `workerd` when the unenv polyfill provides it, such as `EOL` from `node:os`. Functions and classes are still reported.
+
 ## 0.6.1
 
 ### Patch Changes
