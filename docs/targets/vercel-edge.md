@@ -56,9 +56,13 @@ Next.js middleware is the main use of this target. A middleware that only import
 
 Only the global `process.env` exists on this runtime. `process.env` is allowed as a whole (`Object.keys(process.env)`, `const { FOO } = process.env`), and the rest of `process` is not. An import of `node:process`, with `import process from 'node:process'` or `import { env } from 'node:process'`, is reported, because `node:process` is not one of the allowed modules.
 
+## `require`
+
+The documentation says calling `require` directly is not allowed and that packages must be ES modules. Vercel bundles the code, so a static `require('x')` is part of the bundle and is not reported. A `require` whose module is computed at runtime, such as `require(name)`, cannot be bundled. It is reported as an error here and stays an `unknown` warning on the other targets. A `require` inside `try` stays a warning, because the `catch` handles the error.
+
 ## What is not checked
 
-- **`require`.** The documentation says calling `require` directly is not allowed and that packages must be ES modules. edgefit follows CommonJS today, so this is not reported.
+- **A `require` that does not resolve, inside `try`.** esbuild keeps it as a call left for runtime and does not warn, so edgefit records nothing for it. Outside `try`, an unresolved `require` stops the check.
 - **`WebAssembly.instantiate` from bytes.** Only imported modules work on Vercel; edgefit cannot see where the bytes come from.
 - **Vercel's limits** on bundle size and execution time.
 

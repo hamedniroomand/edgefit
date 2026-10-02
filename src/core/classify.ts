@@ -1,3 +1,4 @@
+import { isSyntheticLeaf } from '@/data/builtins.ts';
 import type { LookupResult, Status } from '@/data/dump.ts';
 import type { Target } from '@/targets/index.ts';
 import type { Category, Suggestion, Usage } from '@/types.ts';
@@ -53,7 +54,12 @@ function classifyDynamic(usage: Usage, target: Target): Classification | undefin
   const reason = usage.reason ?? 'it cannot be analyzed statically';
   if (usage.api !== undefined) {
     const covered = target.lookup(usage.api).status !== 'supported';
-    if (covered || !target.hasProblemsBelow(usage.api)) {
+    // A leaf such as `(dynamic)` names this very usage, so no other finding covers it.
+    const own = isSyntheticLeaf(usage.api.path);
+    if (own && covered) {
+      return classifyApi(usage, target);
+    }
+    if (!own && (covered || !target.hasProblemsBelow(usage.api))) {
       return undefined;
     }
   }

@@ -17,11 +17,15 @@ export function builtinName(specifier: string): string | undefined {
   return unprefixed.has(specifier) ? specifier : undefined;
 }
 
+/** A leaf such as `(string)` or `(dynamic)`: it names a way of calling the API, not a member. */
+export function isSyntheticLeaf(path: readonly string[]): boolean {
+  return path.at(-1)?.startsWith('(') === true;
+}
+
 export function displayApi(module: string, path: readonly string[]): string {
   if (module === '*globals*') {
     // A call shown as `Function(string)`, not `Function.(string)`.
-    const last = path.at(-1) ?? '';
-    return last.startsWith('(') ? `${path.slice(0, -1).join('.')}${last}` : path.join('.');
+    return isSyntheticLeaf(path) ? `${path.slice(0, -1).join('.')}${path.at(-1)}` : path.join('.');
   }
   const members = path[0] === 'default' ? path.slice(1) : path;
   return [`node:${module}`, ...members].join('.');

@@ -55,7 +55,7 @@ export function createVercelEdgeTarget(root: string): Target {
         'Vercel recommends the Node.js runtime for functions. Routing Middleware still runs on the edge runtime by default.',
         'Export conditions follow the Next.js resolver; Edge Functions outside Next.js may resolve `module` differently.',
         'Importing a Node.js module Vercel lacks is not reported, only reading from it: Next.js replaces it with a stand-in that throws when it is used (globalThis.__import_unsupported, next 16.3.8, webpack build). Outside Next.js an import alone may fail.',
-        "Calling `require` directly is not allowed on Vercel's Edge runtime; edgefit does not check for it.",
+        "A `require` call left for runtime is not allowed on Vercel's Edge runtime. edgefit reports `require(<expression>)` as an error. A static `require` is bundled and is not reported.",
         ...notes,
       ],
     },
