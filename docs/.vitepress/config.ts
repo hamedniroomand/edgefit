@@ -1,7 +1,11 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { defineConfig } from 'vitepress';
 import type { DefaultTheme } from 'vitepress';
 
 import { icon } from './icons.ts';
+import { buildLlmsTxt } from './llms.ts';
 
 const repository = 'https://github.com/hamedniroomand/edgefit';
 const site = 'https://edgefit.kitdev.space';
@@ -24,6 +28,17 @@ export default defineConfig({
   // Roadmap specs live next to the site for maintainers and are not pages.
 
   sitemap: { hostname: site },
+
+  buildEnd(siteConfig) {
+    const pages = siteConfig.pages.map(page => ({
+      path: page,
+      source: readFileSync(path.join(siteConfig.srcDir, page), 'utf8'),
+    }));
+    writeFileSync(
+      path.join(siteConfig.outDir, 'llms.txt'),
+      buildLlmsTxt(pages, site, title, description),
+    );
+  },
 
   head: [
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
@@ -91,6 +106,7 @@ export default defineConfig({
             link('columns-3', 'Comparing targets', '/guide/compare'),
             link('layers', 'Framework build output', '/guide/built-output'),
             link('git-pull-request', 'Pull request checks', '/guide/ci'),
+            link('terminal', 'Use with a coding assistant', '/guide/assistants'),
           ],
         },
         {

@@ -8,6 +8,7 @@ export default defineConfig({
       '@/': fileURLToPath(new URL('src/', import.meta.url)),
       '~/': fileURLToPath(new URL('test/', import.meta.url)),
       '@pkg': fileURLToPath(new URL('package.json', import.meta.url)),
+      '@docs/': fileURLToPath(new URL('docs/', import.meta.url)),
       '@scripts/': fileURLToPath(new URL('scripts/', import.meta.url)),
     },
   },

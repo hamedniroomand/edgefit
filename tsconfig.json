@@ -17,6 +17,7 @@
     "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"],
+      "@docs/*": ["./docs/*"],
       "@pkg": ["./package.json"],
       "@scripts/*": ["./scripts/*"],
       "~/*": ["./test/*"]
