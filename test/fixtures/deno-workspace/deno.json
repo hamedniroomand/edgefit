@@ -1,0 +1,11 @@
+{
+  "workspace": ["./app", "./packages/*"],
+  "imports": {
+    "core": "jsr:@acme/core@^1.0.0",
+    "core/extra": "jsr:@acme/core@^1.0.0/extra",
+    "~/": "./shared/",
+    "shared": "./shared/mod.ts",
+    "mapped": "./shared/root.ts",
+    "@std/path": "jsr:@std/path@^1.0.0"
+  }
+}

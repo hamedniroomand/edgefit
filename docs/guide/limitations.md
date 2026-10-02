@@ -109,7 +109,7 @@ A class that extends a Node.js class, or that is set up with `util.inherits`, co
 
 ## Deno: `jsr:` packages
 
-`jsr:` imports are not scanned yet and are reported as `unknown`.
+`jsr:` imports of Deno workspace members are followed. Other `jsr:` imports are not read, because edgefit does not read the Deno cache or the `vendor` directory. They are reported as `unknown`, with the package name.
 
 ## Vercel Edge is documented, not measured
 

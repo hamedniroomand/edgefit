@@ -1,11 +1,7 @@
 import { UsageCollector } from '@/extract/usage-collector.ts';
 import { moduleName } from '@/resolve/optional-peers.ts';
+import { jsrSpecifier } from '@/targets/deno/import-map.ts';
 import type { Usage } from '@/types.ts';
-
-/** `jsr:@std/path@^1/join` as `@std/path`. JSR packages are always scoped. */
-function jsrPackageName(specifier: string): string | undefined {
-  return /^jsr:\/?(@[^/]+\/[^/@]+)/u.exec(specifier)?.[1];
-}
 
 /**
  * Where the file imports a package. The metafile has no import locations, and the specifier
@@ -27,10 +23,11 @@ export function uncheckedImports(
 ): Usage[] {
   const collector = new UsageCollector(file, source);
   for (const specifier of externals) {
-    const name = jsrPackageName(specifier);
+    const name = jsrSpecifier(specifier)?.name;
     if (name !== undefined) {
       const offset = importOffset(source, specifier, name);
-      collector.dynamic(undefined, specifier, 'jsr: packages are not scanned yet', offset);
+      const reason = `jsr:${name} is not read, because edgefit does not read the Deno cache or the vendor directory`;
+      collector.dynamic(undefined, specifier, reason, offset);
     }
   }
   for (const specifier of missingPeers) {

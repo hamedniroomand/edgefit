@@ -1,0 +1,5 @@
+{
+  "name": "@acme/app",
+  "exports": "./main.ts",
+  "imports": { "mapped": "./own.ts" }
+}

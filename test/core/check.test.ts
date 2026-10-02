@@ -94,7 +94,19 @@ describe('check on deno', () => {
       'unsupported node:v8.takeCoverage node_modules/multi-runtime/deno.js:1:10',
       'unknown jsr:@std/path@^1.0.0 src/main.ts:1:23',
     ]);
-    expect(result.reports[0]?.findings[3]?.detail).toContain('jsr: packages are not scanned yet');
+    expect(result.reports[0]?.findings[3]?.detail).toContain('jsr:@std/path is not read');
+  });
+
+  it('follows jsr: imports of workspace members and reads the root import map', async () => {
+    const result = await check({
+      root: fixture('deno-workspace/app'),
+      config: { targets: ['deno'], entry: 'main.ts' },
+    });
+    expect(summary(result.reports[0])).toEqual([
+      'unsupported node:v8.takeCoverage ../packages/core/extra.ts:1:10',
+      'unsupported node:util.isString ../packages/core/mod.ts:1:10',
+      'unknown jsr:@std/path@^1.0.0 main.ts:5:23',
+    ]);
   });
 
   it('checks deno-deploy with the same resolution', async () => {

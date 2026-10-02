@@ -1,0 +1,6 @@
+{
+  "name": "@acme/core",
+  "version": "1.0.0",
+  "exports": { ".": "./mod.ts", "./extra": "./extra.ts" },
+  "imports": { "#util": "./util.ts" }
+}
