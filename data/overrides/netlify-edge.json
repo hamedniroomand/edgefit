@@ -1,7 +1,959 @@
 {
-  "description": "APIs Netlify Edge Functions block on top of the Deno CLI, applied by the netlify-edge target. None are documented: Netlify says edge functions run in a Deno runtime that supports Node.js built-in modules, and its limits page lists size, memory and CPU time limits but no blocked APIs. The Deno version Netlify runs is not documented either; the version recorded is the minimum (^2.4.2) that @netlify/edge-bundler 16.1.1 requires. `docs` holds hashes of the Netlify docs sections this data rests on (the API page's runtime environment and supported web APIs, and the limits page), and `bundler` the release and Deno range it was read from; the weekly check compares both.",
-  "modules": {},
-  "apis": {},
+  "description": "APIs Netlify Edge Functions block or keep on top of the Deno CLI data, applied by the netlify-edge target. Netlify documents neither its Deno version nor blocked APIs, so the entries come from the production witness: the answer committed as the source file, which reports Deno 2.3.1 and agrees with a Deno 2.3.1 presence probe on every lookup except process.stdin. Netlify blocks subprocesses and file writes outside /tmp. The supported entries are APIs that Deno 2.3.1 has and later Deno releases removed. APIs added to Deno after 2.3.1 are covered by the version note, not by entries. `docs` holds hashes of the Netlify docs sections this data rests on (the API page's runtime environment and supported web APIs, and the limits page), and `bundler` the release and Deno range it was read from; the weekly check compares both.",
+  "modules": {
+    "child_process": {
+      "status": "unsupported",
+      "note": "Netlify does not grant run access: starting a subprocess throws NotCapable",
+      "source": "netlify-2026-10-03.json"
+    }
+  },
+  "apis": {
+    "fs.appendFile": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.appendFileSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.chmod": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.chmodSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.chown": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.chownSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.copyFile": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.copyFileSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.cp": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.cpSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.createWriteStream": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.F_OK": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.link": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.linkSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.lutimes": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.lutimesSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.mkdir": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.mkdirSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.mkdtemp": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.mkdtempSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.appendFile": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.chmod": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.chown": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.copyFile": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.cp": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.lchown": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.link": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.lutimes": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.mkdir": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.mkdtemp": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.rename": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.rm": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.rmdir": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.symlink": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.truncate": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.unlink": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.utimes": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.promises.writeFile": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.R_OK": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.rename": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.renameSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.rm": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.rmdir": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.rmdirSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.rmSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.symlink": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.symlinkSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.truncate": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.truncateSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.unlink": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.unlinkSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.utimes": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.utimesSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.W_OK": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.writeFile": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.writeFileSync": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs.X_OK": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.appendFile": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.chmod": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.chown": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.copyFile": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.cp": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.link": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.mkdir": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.mkdtemp": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.rename": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.rm": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.rmdir": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.symlink": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.truncate": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.unlink": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.utimes": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "fs/promises.writeFile": {
+      "status": "unsupported",
+      "note": "throws NotCapable for a path outside /tmp: Netlify grants write access to /tmp only",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_ACCEPTED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_ALREADY_REPORTED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_BAD_GATEWAY": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_BAD_REQUEST": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_BANDWIDTH_LIMIT_EXCEEDED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_CONFLICT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_CREATED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_FAILED_DEPENDENCY": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_FORBIDDEN": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_FOUND": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_GATEWAY_TIMEOUT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_GONE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_HTTP_VERSION_NOT_SUPPORTED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_IM_USED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_INSUFFICIENT_STORAGE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_INTERNAL_SERVER_ERROR": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_LENGTH_REQUIRED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_LOCKED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_LOOP_DETECTED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_MOVED_PERMANENTLY": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_MULTI_STATUS": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_MULTIPLE_CHOICES": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_NETWORK_AUTHENTICATION_REQUIRED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_NON_AUTHORITATIVE_INFORMATION": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_NOT_ACCEPTABLE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_NOT_EXTENDED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_NOT_FOUND": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_NOT_IMPLEMENTED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_PARTIAL_CONTENT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_PAYLOAD_TOO_LARGE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_PAYMENT_REQUIRED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_PERMANENT_REDIRECT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_PRECONDITION_FAILED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_PRECONDITION_REQUIRED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_PROCESSING": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_PROXY_AUTHENTICATION_REQUIRED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_RANGE_NOT_SATISFIABLE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_REQUEST_HEADER_FIELDS_TOO_LARGE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_REQUEST_TIMEOUT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_SEE_OTHER": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_SERVICE_UNAVAILABLE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_TEAPOT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_TEMPORARY_REDIRECT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_TOO_EARLY": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_TOO_MANY_REQUESTS": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_UNAUTHORIZED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_UNAVAILABLE_FOR_LEGAL_REASONS": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_UNPROCESSABLE_ENTITY": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_UPGRADE_REQUIRED": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_URI_TOO_LONG": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_USE_PROXY": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP_STATUS_VARIANT_ALSO_NEGOTIATES": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_ACL": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_BASELINE_CONTROL": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_BIND": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_CHECKIN": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_CHECKOUT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_COPY": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_LABEL": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_LINK": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_LOCK": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_MERGE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_MKACTIVITY": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_MKCALENDAR": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_MKCOL": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_MKREDIRECTREF": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_MKWORKSPACE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_MOVE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_OPTIONS": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_ORDERPATCH": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_PATCH": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_POST": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_PRI": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_PROPFIND": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_PROPPATCH": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_PUT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_REBIND": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_REPORT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_SEARCH": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_TRACE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_UNBIND": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_UNCHECKOUT": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_UNLINK": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_UNLOCK": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_UPDATE": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_UPDATEREDIRECTREF": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "http2.constants.HTTP2_METHOD_VERSION_CONTROL": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isBoolean": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isBuffer": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isDate": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isError": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isFunction": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isNull": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isNullOrUndefined": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isNumber": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isObject": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isPrimitive": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isRegExp": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isString": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isSymbol": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "sys.isUndefined": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isBoolean": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isBuffer": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isDate": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isError": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isFunction": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isNull": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isNullOrUndefined": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isNumber": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isObject": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isPrimitive": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isRegExp": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isString": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isSymbol": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    },
+    "util.isUndefined": {
+      "status": "supported",
+      "note": "exists in the Deno 2.3.1 build Netlify runs; later Deno releases removed it",
+      "source": "netlify-2026-10-03.json"
+    }
+  },
   "docs": {
     "runtimeEnvironment": "5ce92a1f7ea7e853",
     "supportedWebApis": "bb19b2a82580835f",

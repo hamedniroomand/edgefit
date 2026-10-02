@@ -52,7 +52,7 @@ describe('the status page', () => {
 });
 
 describe('the status page and the Edge platform targets', () => {
-  it('names the Deno floor Netlify Edge is recorded with', () => {
+  it('names the Deno version Netlify Edge is recorded with', () => {
     expect(status).toContain(source('overrides/netlify-edge').versions['netlify-edge']);
   });
 

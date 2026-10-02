@@ -11,18 +11,22 @@ import { webMissingApis } from './web.mjs';
 
 const [runtime, channel, resultsFile, probesDirectory] = process.argv.slice(2);
 const { version, outcomes, mocked } = JSON.parse(readFileSync(resultsFile, 'utf8'));
-const overrides = readOverrides(runtime);
+// The netlify-min run checks the Deno version netlify-edge records, so its layer applies too.
+const overrides =
+  channel === 'netlify-min'
+    ? { ...readOverrides(runtime), ...readOverrides('netlify-edge') }
+    : readOverrides(runtime);
 
 const section = (title, items) =>
   items.length > 0 ? [`### ${title}`, ...items.map(item => `- ${item}`), ''] : [];
 const code = api => `\`${api}\``;
 
 const heading = `## ${runtime} ${version} (${channel}, pinned ${pinnedVersion(runtime)})`;
-// Netlify runs Deno; this run shows what the Deno data gets wrong for the oldest Deno it supports.
+// Netlify runs Deno; this run shows what the Deno data gets wrong for the version Netlify runs.
 const intro =
   channel === 'netlify-min'
     ? [
-        `The oldest Deno Netlify's bundler supports is ${version}, and the data describes ${pinnedVersion(runtime)}. The APIs where they differ are grouped by module below, with the full list folded away. Netlify's production version is not documented, so this informs a review and changes no data.`,
+        `The netlify-edge data records Deno ${version}, the version the production witness measured on Netlify, and the Deno data describes ${pinnedVersion(runtime)}. The APIs where they differ are grouped by module below, with the full list folded away. APIs added to Deno after ${version} are reported as supported on netlify-edge, with a note; this run informs a review and changes no data.`,
         '',
       ]
     : [];

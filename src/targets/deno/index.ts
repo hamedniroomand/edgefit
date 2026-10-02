@@ -91,7 +91,7 @@ function describeSettings(
   config: DenoConfig | undefined,
 ): string {
   if (options.netlify !== undefined) {
-    return `Netlify Edge Functions on Deno ${version} or newer, ${options.netlify.settings}`;
+    return `Netlify Edge Functions on Deno ${version}, ${options.netlify.settings}`;
   }
   const runtime = options.deploy === true ? `Deno Deploy on Deno ${version}` : `Deno ${version}`;
   return `${runtime}, ${describeImportMap(root, config)}`;

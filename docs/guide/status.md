@@ -12,7 +12,7 @@ Every result comes from data that is pinned to these releases. `edgefit targets`
 | `bun`          | 1.4.2               |                                                                                                                                                          |
 | `deno`         | 2.9.7               |                                                                                                                                                          |
 | `deno-deploy`  | Deno 2.5.0 layer    | Deno Deploy runs an older Deno, so it has its own curated overrides                                                                                      |
-| `netlify-edge` | Deno 2.4.2 or newer | The oldest Deno `@netlify/edge-bundler` 16.1.1 accepts; Netlify does not document its own                                                                |
+| `netlify-edge` | Deno 2.3.1          | Measured on Netlify by the production witness, with a layer for blocked subprocesses and file writes outside `/tmp`                                      |
 | `vercel-edge`  | Docs of 2026-08-03  | Experimental: Vercel's documented allowlist, not a runtime dump. Members from `next` 16.3.8 and `@vercel/node` 17.0.0. Emulator `@edge-runtime/vm` 5.0.0 |
 
 | Data                      | Version                                                                |
