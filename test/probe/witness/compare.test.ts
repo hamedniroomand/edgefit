@@ -64,28 +64,35 @@ describe('compareNetlify', () => {
 });
 
 describe('compareVercel', () => {
-  const data = { blocked: new Set(['*globals*.eval']), accepted: new Set(['fetch', 'Buffer']) };
+  const blocked = new Set(['*globals*.eval']);
+  const accepted = new Set(['fetch', 'Buffer', 'eval']);
+  const data = { blocked, accepted, useNames: true };
 
   it('finds no disagreement when Vercel matches the allowlist', () => {
     const results: VercelResults = {
-      names: ['fetch', 'Buffer', '__plumbing', 'addEventListener', 'gc'],
-      types: { fetch: 'function', eval: 'undefined' },
+      names: ['fetch', 'Buffer', '__plumbing', 'addEventListener', 'gc', 'require'],
+      types: {
+        fetch: 'function',
+        eval: 'undefined',
+        Float16Array: 'undefined',
+        require: 'function',
+      },
       outcomes: { 'buffer.Buffer': 'present' },
       checks: { eval: { allowed: false }, newFunction: { allowed: false } },
     };
     expect(compareVercel(results, data)).toEqual([]);
   });
 
-  it('reports missing globals and members, extra names and allowed dynamic code', () => {
+  it('reports missing globals and members, extra globals and allowed dynamic code', () => {
     const results: VercelResults = {
       names: ['fetch', 'setImmediate'],
-      types: { fetch: 'function', Buffer: 'undefined' },
+      types: { fetch: 'function', Buffer: 'undefined', Float16Array: 'function' },
       outcomes: { 'util.types': 'missing' },
       checks: { eval: { allowed: true }, wasmInstantiateFromBytes: { allowed: true } },
     };
     expect(compareVercel(results, data)).toEqual([
       { title: 'Kept in the data, missing on Vercel', items: ['Buffer', 'util.types'] },
-      { title: 'On Vercel, not kept in the data', items: ['setImmediate'] },
+      { title: 'On Vercel, not kept in the data', items: ['Float16Array', 'setImmediate'] },
       {
         title: 'Dynamic code that the docs disable but Vercel allows',
         items: ['WebAssembly.instantiate from bytes', 'eval'],
@@ -93,8 +100,15 @@ describe('compareVercel', () => {
     ]);
   });
 
-  it('leaves out the names of an entry that hides them', () => {
-    const results: VercelResults = { names: ['caches'], types: {}, outcomes: {}, checks: {} };
-    expect(compareVercel(results, { blocked: data.blocked })).toEqual([]);
+  it('takes extras from typeof only, for an entry that hides its names', () => {
+    const results: VercelResults = {
+      names: ['caches'],
+      types: { AsyncLocalStorage: 'function' },
+      outcomes: {},
+      checks: {},
+    };
+    expect(compareVercel(results, { ...data, useNames: false })).toEqual([
+      { title: 'On Vercel, not kept in the data', items: ['AsyncLocalStorage'] },
+    ]);
   });
 });

@@ -56,30 +56,34 @@ const dynamicNames = {
 
 const withoutGlobalsPrefix = api => api.replace(/^\*globals\*\./u, '');
 
+// The middleware's own names include `require`, but it cannot load a module (the `requireBuffer`
+// check), so it is never a global to add.
+const unusable = new Set(['require']);
+
 /**
  * Compares one Vercel entry with the allowlist. `blocked` are the APIs the override layer already
- * blocks, so an absent `eval` is not news. `accepted` is every global the data keeps; without it,
- * the names on `globalThis` are not compared, for an entry whose own names hide its globals.
+ * blocks, so an absent `eval` is not news, and `accepted` is every global the data keeps. A
+ * `typeof` result for a name the data does not keep is a candidate. `useNames` also compares the
+ * own names of `globalThis`, for an entry where they are its globals.
  */
-export function compareVercel(results, { blocked, accepted }) {
+export function compareVercel(results, { blocked, accepted, useNames }) {
+  const extras = [
+    ...Object.keys(results.types).filter(name => results.types[name] !== 'undefined'),
+    ...(useNames ? results.names.filter(name => !isPlumbing(name)) : []),
+  ].filter(name => !accepted.has(name) && !unusable.has(name));
   return toSections([
     [
       'Kept in the data, missing on Vercel',
       [
         ...Object.keys(results.types)
-          .filter(name => results.types[name] === 'undefined')
+          .filter(name => results.types[name] === 'undefined' && accepted.has(name))
           .map(name => `*globals*.${name}`),
         ...withOutcome(results.outcomes, 'missing'),
       ]
         .filter(api => !blocked.has(api))
         .map(withoutGlobalsPrefix),
     ],
-    [
-      'On Vercel, not kept in the data',
-      accepted === undefined
-        ? []
-        : results.names.filter(name => !accepted.has(name) && !isPlumbing(name)),
-    ],
+    ['On Vercel, not kept in the data', [...new Set(extras)]],
     [
       'Dynamic code that the docs disable but Vercel allows',
       Object.keys(dynamicNames)

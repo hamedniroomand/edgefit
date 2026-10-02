@@ -37,7 +37,7 @@ const comparers = {
     const blocked = new Set(Object.keys(readOverrides('vercel-edge')));
     const accepted = new Set(vercelGlobals());
     return (results, { names }) => ({
-      sections: compareVercel(results, { blocked, accepted: names ? accepted : undefined }),
+      sections: compareVercel(results, { blocked, accepted, useNames: names }),
       lines: [],
     });
   },
