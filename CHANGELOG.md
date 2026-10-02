@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0
+
+### Minor Changes
+
+- [#111](https://github.com/hamedniroomand/edgefit/pull/111) [`1aabf8c`](https://github.com/hamedniroomand/edgefit/commit/1aabf8c3bda7b13c77ff17894dc2257496af2177) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - A CommonJS module that requires another module through a compiler helper now asks that module only for the members it reads. The helpers are the members of `@swc/helpers`, the `__importDefault`, `__importStar` and `__exportStar` that `tsc` defines, and the same helpers of `tslib`. Any other wrapper still asks for all of the module.
+
+- [#109](https://github.com/hamedniroomand/edgefit/pull/109) [`773c11a`](https://github.com/hamedniroomand/edgefit/commit/773c11a1f503620035e79e22d6bb7a2c1facde05) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Report `require(<expression>)` as an error on `vercel-edge`. Vercel bundles a static `require`, but a `require` whose module is computed at runtime cannot work there. It stays an `unknown` warning on the other targets, and inside `try`.
+
+- [#110](https://github.com/hamedniroomand/edgefit/pull/110) [`68a1189`](https://github.com/hamedniroomand/edgefit/commit/68a118921b1ae4be770b77c6b30d0343317b9782) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - The `vercel-edge` target now warns on `WebAssembly.instantiate` when its first argument is not an imported `.wasm` module, since Vercel's Edge runtime does not compile Wasm from bytes.
+
 ## 0.6.3
 
 ### Patch Changes
