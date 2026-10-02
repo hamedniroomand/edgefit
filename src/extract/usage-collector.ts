@@ -12,11 +12,19 @@ export class UsageCollector {
   public readonly guards = new GuardStack();
   /** Importing a Node.js module is not a use of it: only what is read from it is. */
   public readonly lazyNodeImports: boolean;
+  /** Specifiers that resolve to a native addon. */
+  readonly #nativeSpecifiers: ReadonlySet<string>;
   readonly #file: string;
   readonly #lineStarts: number[] = [0];
 
-  public constructor(file: string, source: string, lazyNodeImports = false) {
+  public constructor(
+    file: string,
+    source: string,
+    lazyNodeImports = false,
+    nativeSpecifiers: ReadonlySet<string> = new Set(),
+  ) {
     this.#file = file;
+    this.#nativeSpecifiers = nativeSpecifiers;
     this.lazyNodeImports = lazyNodeImports;
     for (let index = source.indexOf('\n'); index !== -1; index = source.indexOf('\n', index + 1)) {
       this.#lineStarts.push(index + 1);
@@ -54,6 +62,23 @@ export class UsageCollector {
       display: displayApi(api.module, api.path),
       location: this.location(offset),
       ...(guarded ? { guarded: true as const } : {}),
+      ...this.#runtimes(),
+    });
+  }
+
+  /** Records the import of a native addon, if `specifier` resolves to one. */
+  public native(specifier: string, offset: number): void {
+    if (this.guards.dead() || !this.#nativeSpecifiers.has(specifier)) {
+      return;
+    }
+    this.offsets.push(offset);
+    this.usages.push({
+      kind: 'native',
+      api: undefined,
+      display: `native addon ${specifier.split('/').at(-1)}`,
+      location: this.location(offset),
+      // A `try` that catches the error of a missing addon guards the import.
+      ...(this.guards.isCaught() ? { guarded: true as const } : {}),
       ...this.#runtimes(),
     });
   }

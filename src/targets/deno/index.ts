@@ -122,6 +122,8 @@ export function createDenoTarget(root: string, options: DenoTargetOptions = {}):
     },
     runtimes,
     resolvePlatform: 'node',
+    // Deno runs Node-API addons from npm packages. Deno Deploy and Netlify Edge do not allow them.
+    loadsNativeAddons: key === 'deno',
     nodeEnv: netlify ? 'production' : undefined,
     resolvePlugins: [denoSpecifiers(netlify ? netlify.importMap : config?.importMap)],
     entries: netlify?.entries ?? detectEntries(denoEntrySources(root, config?.file), true),

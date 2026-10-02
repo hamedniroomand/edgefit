@@ -36,6 +36,8 @@ When a package uses the same API in several places, the report shows the first o
 
 The clearest case. Either the module or member is not there, or it is there and throws, for example `ERR_METHOD_NOT_IMPLEMENTED`. Code that reaches it will fail.
 
+A reachable native addon (a `.node` file) is also `unsupported` on Workers, Vercel Edge, Netlify Edge and Deno Deploy. The finding shows the import chain to the addon. edgefit does not look inside the addon. Bun and Deno load native addons, so they give no finding. To ignore one, use an `ignore` rule with its `api`, which is `native addon <file>.node`.
+
 ### mocked
 
 The API exists and does not throw, but it does not do its job. On Workers, `dgram` sockets accept calls and never send anything. On Bun, `async_hooks.createHook` returns a hook that is never called. These are errors by default because they fail silently, which is worse than failing loudly.

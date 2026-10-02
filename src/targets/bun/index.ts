@@ -27,6 +27,7 @@ export function createBunTarget(root: string, options: BunOptions = {}): Target 
     runtimes: ['bun'],
     resolvePlatform: 'node',
     nodeEnv: undefined,
+    loadsNativeAddons: true,
     entries: detectEntries(bunEntrySources(root), true),
     globals,
     hasGlobal: name => index.globalNames().includes(name),

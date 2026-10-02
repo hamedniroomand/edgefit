@@ -33,6 +33,8 @@ export interface Target {
    * something from it is used, so importing one is harmless. Then a use is what fails, not the import.
    */
   readonly lazyNodeImports?: boolean | undefined;
+  /** Whether the target loads a native addon (a `.node` file). Left out, it does not. */
+  readonly loadsNativeAddons?: boolean | undefined;
   /** Global names worth tracking because something at or below them is not fully supported. */
   readonly globals: ReadonlySet<string>;
   /** Whether the target's data names this global, as opposed to a name nothing defines. */
