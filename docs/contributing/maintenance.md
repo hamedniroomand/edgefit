@@ -252,8 +252,8 @@ The `witness` jobs in `probe.yml` read the function that the **Witness** workflo
 1. If the summary says that the witness has an older list of APIs, run `gh workflow run witness.yml --ref main`.
 2. On Netlify, if the Deno version differs from the data, set the `netlify-edge` version in `source.json` to the version Netlify runs. Then run the probe and read the `deno (netlify-min)` summary at that version.
 3. For an API that is present in the data but missing in production, add an entry to the override layer of the target. Use the `witness.json` artifact of the run as the evidence in the pull request.
-4. On Vercel, a global that production has and the data does not keep goes in `emulatorGlobals` or `globals`. A kept name that production lacks is removed.
-5. The table of checks shows whether production blocks subprocesses, file writes and dynamic code. Record a blocked API in the override layer, with a link to the run.
+4. On Vercel, a global that production has and the data does not keep goes in `emulatorGlobals` or `globals`. A kept name that production lacks is removed. The two entries can differ, so check which entry reports it. An API that the override layer already blocks is not reported as missing.
+5. The table of checks shows whether production blocks subprocesses, file writes and dynamic code, and on Netlify the permission state of each. Record a blocked API in the override layer, with a link to the run.
 
 The witness tokens are secrets of the `witness` environment: `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` for Netlify, and `VERCEL_TOKEN`, `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` for Vercel. The URLs that the weekly run reads are in `scripts/probe/witness/check.mjs`.
 

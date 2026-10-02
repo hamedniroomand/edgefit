@@ -3,10 +3,10 @@
 // is evidence for a review, and the data never depends on it.
 import { writeFileSync } from 'node:fs';
 
-import { netlifyMinimumDeno, readData, readMatrix, readOverrides } from '../data.mjs';
+import { netlifyMinimumDeno, readMatrix, readOverrides } from '../data.mjs';
 import { webMissingApis } from '../web.mjs';
 import { compareNetlify, compareVercel } from './compare.mjs';
-import { witnessSpec } from './spec.mjs';
+import { vercelGlobals, witnessSpec } from './spec.mjs';
 
 export const witnessUrls = {
   netlify: { 'edge-function': 'https://edgefit-witness.netlify.app/' },
@@ -30,14 +30,16 @@ const comparers = {
     return results => compareNetlify(results, data);
   },
   vercel() {
-    const allowlist = readData('allowlists/vercel-edge.json');
-    const accepted = new Set([
-      ...allowlist.globals,
-      ...allowlist.languageGlobals,
-      ...allowlist.emulatorGlobals,
-      ...Object.keys(allowlist.globalMembers),
-    ]);
-    return results => ({ sections: compareVercel(results, accepted), lines: [] });
+    const blocked = new Set(Object.keys(readOverrides('vercel-edge')));
+    const accepted = new Set(vercelGlobals());
+    return (results, entry) => ({
+      // On the edge route `globalThis` hides its own names, so they say nothing about its globals.
+      sections: compareVercel(results, {
+        blocked,
+        accepted: entry === 'middleware' ? accepted : undefined,
+      }),
+      lines: [],
+    });
   },
 };
 const compare = comparers[platform]();
@@ -83,7 +85,7 @@ for (const [entry, url] of Object.entries(witnessUrls[platform])) {
       '',
     );
   }
-  const { sections, lines: disagreements } = compare(results);
+  const { sections, lines: disagreements } = compare(results, entry);
   for (const { title, items } of sections) {
     lines.push(`### ${title}`, ...items.map(item => `- \`${item}\``), '');
   }
@@ -91,11 +93,10 @@ for (const [entry, url] of Object.entries(witnessUrls[platform])) {
   if (sections.length === 0 && disagreements.length === 0) {
     lines.push('No disagreements.', '');
   }
-  lines.push('| Check | Allowed | Error |', '| --- | --- | --- |');
-  for (const [name, { allowed, error }] of Object.entries(results.checks)) {
-    lines.push(
-      `| \`${name}\` | ${allowed ? 'yes' : 'no'} | ${error?.replaceAll('|', '\\|') ?? ''} |`,
-    );
+  lines.push('| Check | Allowed | Value or error |', '| --- | --- | --- |');
+  for (const [name, { allowed, value, error }] of Object.entries(results.checks)) {
+    const detail = (value ?? error ?? '').replaceAll('|', '\\|');
+    lines.push(`| \`${name}\` | ${allowed ? 'yes' : 'no'} | ${detail} |`);
   }
   lines.push('');
 }

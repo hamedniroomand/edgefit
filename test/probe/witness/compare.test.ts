@@ -26,6 +26,16 @@ describe('compareNetlify', () => {
     });
   });
 
+  it('says when Netlify hides its version', () => {
+    const { sections } = compareNetlify(
+      { deno: null, outcomes: asDeno(), checks: {} },
+      netlifyData,
+    );
+    expect(sections[0]?.items).toEqual([
+      'Netlify does not report its Deno version; the data records 2.4.2',
+    ]);
+  });
+
   it('reports the version, and an API that Netlify lacks', () => {
     const outcomes = { ...asDeno(), 'fs.readFile': 'missing' as const };
     const { sections, lines } = compareNetlify(
@@ -51,30 +61,35 @@ describe('compareNetlify', () => {
 });
 
 describe('compareVercel', () => {
-  const accepted = new Set(['fetch', 'Buffer']);
+  const data = { blocked: new Set(['*globals*.eval']), accepted: new Set(['fetch', 'Buffer']) };
 
   it('finds no disagreement when Vercel matches the allowlist', () => {
     const results: VercelResults = {
-      names: ['fetch', 'Buffer', '__plumbing', 'addEventListener'],
-      outcomes: { 'buffer.Buffer': 'present' },
+      names: ['fetch', 'Buffer', '__plumbing', 'addEventListener', 'gc'],
+      outcomes: { '*globals*.fetch': 'present', '*globals*.eval': 'missing' },
       checks: { eval: { allowed: false }, newFunction: { allowed: false } },
     };
-    expect(compareVercel(results, accepted)).toEqual([]);
+    expect(compareVercel(results, data)).toEqual([]);
   });
 
-  it('reports missing names, extra names and allowed dynamic code', () => {
+  it('reports missing lookups, extra names and allowed dynamic code', () => {
     const results: VercelResults = {
       names: ['fetch', 'setImmediate'],
-      outcomes: { 'util.types': 'missing' },
-      checks: { eval: { allowed: true }, wasmFromBytes: { allowed: true } },
+      outcomes: { '*globals*.Buffer': 'missing', 'util.types': 'missing' },
+      checks: { eval: { allowed: true }, wasmInstantiateFromBytes: { allowed: true } },
     };
-    expect(compareVercel(results, accepted)).toEqual([
+    expect(compareVercel(results, data)).toEqual([
       { title: 'Kept in the data, missing on Vercel', items: ['Buffer', 'util.types'] },
       { title: 'On Vercel, not kept in the data', items: ['setImmediate'] },
       {
         title: 'Dynamic code that the docs disable but Vercel allows',
-        items: ['WebAssembly.compile', 'eval'],
+        items: ['WebAssembly.instantiate', 'eval'],
       },
     ]);
+  });
+
+  it('leaves out the names of an entry that hides them', () => {
+    const results: VercelResults = { names: ['caches'], outcomes: {}, checks: {} };
+    expect(compareVercel(results, { blocked: data.blocked })).toEqual([]);
   });
 });

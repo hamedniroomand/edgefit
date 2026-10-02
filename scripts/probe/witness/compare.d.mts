@@ -15,5 +15,5 @@ export function compareNetlify(
 ): { sections: DriftSection[]; lines: string[] };
 export function compareVercel(
   results: Pick<Observed, 'names' | 'outcomes' | 'checks'>,
-  accepted: Set<string>,
+  data: { blocked: ReadonlySet<string>; accepted?: ReadonlySet<string> },
 ): DriftSection[];

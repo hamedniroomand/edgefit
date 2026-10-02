@@ -9,10 +9,29 @@ import { readData } from '../data.mjs';
  */
 const netlifyApis = () => buildSpec('deno', { presence: true }).apis.map(({ api }) => api);
 
-/** The members of the five modules Vercel allows, and of the globals the data lists members for. */
+/** Every global name the vercel-edge allowlist keeps. */
+export function vercelGlobals() {
+  const allowlist = readData('allowlists/vercel-edge.json');
+  return [
+    ...allowlist.globals,
+    ...allowlist.languageGlobals,
+    ...allowlist.emulatorGlobals,
+    ...Object.keys(allowlist.globalMembers),
+  ];
+}
+
+/**
+ * Each global the data keeps, and the members of the five modules Vercel allows and of the globals
+ * the data lists members for. The globals are looked up by name, because on an edge route the
+ * own names of `globalThis` hide most of them.
+ */
 function vercelApis() {
   const { modules, globalMembers } = readData('allowlists/vercel-edge.json');
   return [
+    // The lookup reads an undefined value as missing, so `undefined` would always read as missing.
+    ...vercelGlobals()
+      .filter(name => name !== 'undefined')
+      .map(name => `*globals*.${name}`),
     ...Object.entries(modules).flatMap(([module, members]) => [
       module,
       ...members.map(member => `${module}.${member}`),

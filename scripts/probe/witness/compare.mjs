@@ -10,6 +10,11 @@ const toSections = pairs =>
     .filter(([, items]) => items.length > 0)
     .map(([title, items]) => ({ title, items: items.sort() }));
 
+const versionLine = (measured, recorded) =>
+  measured === null
+    ? `Netlify does not report its Deno version; the data records ${recorded}`
+    : `Netlify runs ${measured}, the data records ${recorded}`;
+
 /**
  * Compares the Netlify witness with the Deno data the netlify-edge target uses, as the
  * `deno (netlify-min)` probe does: `lines` are the summary lines of the disagreements, and
@@ -19,7 +24,7 @@ export function compareNetlify(results, { deno, overrides, matrix, webMissing })
   const sections = toSections([
     [
       'Deno version (update the netlify-edge version in data/source.json)',
-      results.deno === deno ? [] : [`Netlify runs ${results.deno}, the data records ${deno}`],
+      results.deno === deno ? [] : [versionLine(results.deno, deno)],
     ],
   ]);
   if (results.checks.nodeImport?.allowed === false) {
@@ -43,22 +48,29 @@ const dynamicNames = {
   eval: 'eval',
   newFunction: 'new Function',
   wasmFromBytes: 'WebAssembly.compile',
+  wasmInstantiateFromBytes: 'WebAssembly.instantiate',
 };
 
-/** Compares one Vercel entry with the allowlist. `accepted` is every global the data keeps. */
-export function compareVercel(results, accepted) {
-  const names = new Set(results.names);
+const withoutGlobalsPrefix = api => api.replace(/^\*globals\*\./u, '');
+
+/**
+ * Compares one Vercel entry with the allowlist. `blocked` are the APIs the override layer already
+ * blocks, so an absent `eval` is not news. `accepted` is every global the data keeps; without it,
+ * the names on `globalThis` are not compared, for an entry whose own names hide its globals.
+ */
+export function compareVercel(results, { blocked, accepted }) {
   return toSections([
     [
       'Kept in the data, missing on Vercel',
-      [
-        ...[...accepted].filter(name => !names.has(name)),
-        ...withOutcome(results.outcomes, 'missing'),
-      ],
+      withOutcome(results.outcomes, 'missing')
+        .filter(api => !blocked.has(api))
+        .map(withoutGlobalsPrefix),
     ],
     [
       'On Vercel, not kept in the data',
-      results.names.filter(name => !accepted.has(name) && !isPlumbing(name)),
+      accepted === undefined
+        ? []
+        : results.names.filter(name => !accepted.has(name) && !isPlumbing(name)),
     ],
     [
       'Dynamic code that the docs disable but Vercel allows',

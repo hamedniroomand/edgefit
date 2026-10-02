@@ -6,7 +6,15 @@ export const dynamicChecks = {
   eval: () => globalThis.eval('1'),
   newFunction: () => new Function('return 1')(),
   wasmFromBytes: () => WebAssembly.compile(emptyModule),
+  wasmInstantiateFromBytes: () => WebAssembly.instantiate(emptyModule),
 };
+
+/** Vercel's middleware has a `require` global. A call with a fixed name shows whether it works. */
+export const vercelChecks = {
+  requireBuffer: () => typeof globalThis.require('buffer'),
+};
+
+const permission = name => () => Deno.permissions.querySync({ name }).state;
 
 const nodeModule = 'buffer';
 
@@ -14,17 +22,26 @@ const nodeModule = 'buffer';
 export const denoChecks = {
   // Computed as the probe computes its imports, so it fails when they fail.
   nodeImport: () => import(`node:${nodeModule}`),
-  subprocess: () => new Deno.Command('true').output(),
+  runPermission: permission('run'),
+  writePermission: permission('write'),
+  envPermission: permission('env'),
+  // A separate check, so an `execPath` that throws does not read as a blocked subprocess.
+  execPath: () => Deno.execPath(),
+  // An absolute path, because Netlify sets no PATH to search.
+  subprocess: () => new Deno.Command(Deno.execPath(), { args: ['--version'] }).output(),
   fileWrite: () => Deno.writeTextFile('/tmp/edgefit-witness.txt', 'edgefit'),
 };
 
-/** Runs each check, and records whether it ran and the error it gave if it did not. */
+/**
+ * Runs each check, and records whether it ran, the text it returned, and the error it gave if it
+ * did not.
+ */
 export async function runChecks(checks) {
   const results = {};
   for (const [name, check] of Object.entries(checks)) {
     try {
-      await check();
-      results[name] = { allowed: true };
+      const value = await check();
+      results[name] = typeof value === 'string' ? { allowed: true, value } : { allowed: true };
     } catch (error) {
       results[name] = { allowed: false, error: `${error?.name}: ${error?.message}` };
     }

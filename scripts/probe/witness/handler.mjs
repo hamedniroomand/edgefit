@@ -19,12 +19,29 @@ function globalNames() {
   return [...names].sort();
 }
 
+const userAgentDeno = () => /\bDeno\/(\S+)/u.exec(globalThis.navigator?.userAgent ?? '')?.[1];
+
+/** Netlify hides `Deno.version.deno`, so the other places a runtime reports its version are kept. */
+const runtimeEvidence = () => ({
+  denoVersion: globalThis.Deno?.version ?? null,
+  denoBuild: globalThis.Deno?.build ?? null,
+  userAgent: globalThis.navigator?.userAgent ?? null,
+  processVersion: globalThis.process?.version ?? null,
+  processVersions: globalThis.process?.versions ?? null,
+});
+
 /** What a deployed witness reports about the runtime it runs in. */
 export async function observe({ entry, spec, checks, load }) {
   return {
     entry,
     specHash: spec.hash,
-    deno: globalThis.Deno?.version?.deno ?? null,
+    // An empty string is a hidden version, not a version.
+    deno:
+      globalThis.Deno?.version?.deno ||
+      globalThis.process?.versions?.deno ||
+      userAgentDeno() ||
+      null,
+    runtime: runtimeEvidence(),
     names: globalNames(),
     outcomes: await probeApis(spec.apis, load),
     checks: await runChecks(checks),
