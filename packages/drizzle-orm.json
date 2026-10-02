@@ -2,8 +2,8 @@
   "version": 1,
   "package": "drizzle-orm",
   "resolved": "0.45.3",
-  "checkedAt": "2026-10-01T12:52:26.790Z",
-  "edgefit": "0.5.1",
+  "checkedAt": "2026-10-02T09:16:41.035Z",
+  "edgefit": "0.6.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -28,17 +28,17 @@
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
         "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
-      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), NODE_ENV not fixed, so both branches of a check are followed",
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), entries from --entry or the config, NODE_ENV not fixed, so both branches of a check are followed",
       "notes": []
     },
     "deno": {
-      "settings": "Deno 2.9.7, no import map (no deno.json found), NODE_ENV not fixed, so both branches of a check are followed",
+      "settings": "Deno 2.9.7, no import map (no deno.json found), entries from --entry or the config, NODE_ENV not fixed, so both branches of a check are followed",
       "notes": []
     }
   },
@@ -573,22 +573,19 @@
       "specifier": "drizzle-orm/better-sqlite3/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/better-sqlite3/driver.js:1:20: Could not resolve \"better-sqlite3\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/better-sqlite3/driver.js:1:20: Could not resolve \"better-sqlite3\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/better-sqlite3/driver.js:1:20: Could not resolve \"better-sqlite3\""
+          "warnings": 1
         }
       }
     },
@@ -597,22 +594,19 @@
       "specifier": "drizzle-orm/better-sqlite3",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/better-sqlite3/driver.js:1:20: Could not resolve \"better-sqlite3\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/better-sqlite3/driver.js:1:20: Could not resolve \"better-sqlite3\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/better-sqlite3/driver.js:1:20: Could not resolve \"better-sqlite3\""
+          "warnings": 1
         }
       }
     },
@@ -1023,19 +1017,19 @@
           "status": "error",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:1:43: Could not resolve \"expo-sqlite\"\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
         },
         "bun": {
           "status": "error",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:1:43: Could not resolve \"expo-sqlite\"\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
         },
         "deno": {
           "status": "error",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:1:43: Could not resolve \"expo-sqlite\"\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
         }
       }
     },
@@ -1071,19 +1065,19 @@
           "status": "error",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:1:43: Could not resolve \"expo-sqlite\"\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
         },
         "bun": {
           "status": "error",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:1:43: Could not resolve \"expo-sqlite\"\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
         },
         "deno": {
           "status": "error",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:1:43: Could not resolve \"expo-sqlite\"\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
         }
       }
     },
@@ -1113,22 +1107,19 @@
       "specifier": "drizzle-orm/gel/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/gel/driver.js:1:30: Could not resolve \"gel\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/gel/driver.js:1:30: Could not resolve \"gel\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/gel/driver.js:1:30: Could not resolve \"gel\""
+          "warnings": 1
         }
       }
     },
@@ -1137,22 +1128,19 @@
       "specifier": "drizzle-orm/gel",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/gel/driver.js:1:30: Could not resolve \"gel\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/gel/driver.js:1:30: Could not resolve \"gel\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/gel/driver.js:1:30: Could not resolve \"gel\""
+          "warnings": 1
         }
       }
     },
@@ -2148,22 +2136,19 @@
       "specifier": "drizzle-orm/mysql2/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/mysql2/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/mysql2/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/mysql2/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         }
       }
     },
@@ -2172,22 +2157,19 @@
       "specifier": "drizzle-orm/mysql2",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/mysql2/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/mysql2/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/mysql2/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         }
       }
     },
@@ -2259,22 +2241,19 @@
       "specifier": "drizzle-orm/libsql/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/driver.js:1:30: Could not resolve \"@libsql/client\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/driver.js:1:30: Could not resolve \"@libsql/client\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/driver.js:1:30: Could not resolve \"@libsql/client\""
+          "warnings": 1
         }
       }
     },
@@ -2283,22 +2262,19 @@
       "specifier": "drizzle-orm/libsql",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/driver.js:1:30: Could not resolve \"@libsql/client\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/driver.js:1:30: Could not resolve \"@libsql/client\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/driver.js:1:30: Could not resolve \"@libsql/client\""
+          "warnings": 1
         }
       }
     },
@@ -2412,22 +2388,19 @@
       "specifier": "drizzle-orm/neon-http/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-http/driver.js:1:29: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-http/driver.js:1:29: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-http/driver.js:1:29: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         }
       }
     },
@@ -2436,22 +2409,19 @@
       "specifier": "drizzle-orm/neon-http",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-http/driver.js:1:29: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-http/driver.js:1:29: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-http/driver.js:1:29: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         }
       }
     },
@@ -2502,22 +2472,19 @@
       "specifier": "drizzle-orm/neon-serverless/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/driver.js:1:34: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/driver.js:1:34: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/driver.js:1:34: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         }
       }
     },
@@ -2526,22 +2493,19 @@
       "specifier": "drizzle-orm/neon-serverless",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/driver.js:1:34: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/driver.js:1:34: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/driver.js:1:34: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         }
       }
     },
@@ -2571,22 +2535,19 @@
       "specifier": "drizzle-orm/neon-serverless/session",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         }
       }
     },
@@ -2595,22 +2556,19 @@
       "specifier": "drizzle-orm/netlify-db/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:1:35: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:2:29: Could not resolve \"@netlify/db\"\nnode_modules/drizzle-orm/netlify-db/session.js:1:28: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\n...and 1 more"
+          "warnings": 3
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:1:35: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:2:29: Could not resolve \"@netlify/db\"\nnode_modules/drizzle-orm/netlify-db/session.js:1:28: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\n...and 1 more"
+          "warnings": 3
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:1:35: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:2:29: Could not resolve \"@netlify/db\"\nnode_modules/drizzle-orm/netlify-db/session.js:1:28: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\n...and 1 more"
+          "warnings": 3
         }
       }
     },
@@ -2619,22 +2577,19 @@
       "specifier": "drizzle-orm/netlify-db",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:1:35: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:2:29: Could not resolve \"@netlify/db\"\nnode_modules/drizzle-orm/netlify-db/session.js:1:28: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\n...and 1 more"
+          "warnings": 3
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:1:35: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:2:29: Could not resolve \"@netlify/db\"\nnode_modules/drizzle-orm/netlify-db/session.js:1:28: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\n...and 1 more"
+          "warnings": 3
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:1:35: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/driver.js:2:29: Could not resolve \"@netlify/db\"\nnode_modules/drizzle-orm/netlify-db/session.js:1:28: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\n...and 1 more"
+          "warnings": 3
         }
       }
     },
@@ -2643,22 +2598,19 @@
       "specifier": "drizzle-orm/netlify-db/migrator",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         }
       }
     },
@@ -2667,22 +2619,19 @@
       "specifier": "drizzle-orm/netlify-db/session",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/session.js:1:28: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/session.js:1:28: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/neon-serverless/session.js:4:8: Could not resolve \"@neondatabase/serverless\"\nnode_modules/drizzle-orm/netlify-db/session.js:1:28: Could not resolve \"@neondatabase/serverless\""
+          "warnings": 1
         }
       }
     },
@@ -2691,22 +2640,19 @@
       "specifier": "drizzle-orm/node-postgres/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         }
       }
     },
@@ -2715,22 +2661,19 @@
       "specifier": "drizzle-orm/node-postgres",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/driver.js:1:16: Could not resolve \"pg\"\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         }
       }
     },
@@ -2760,22 +2703,19 @@
       "specifier": "drizzle-orm/node-postgres/session",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/node-postgres/session.js:1:16: Could not resolve \"pg\""
+          "warnings": 1
         }
       }
     },
@@ -3396,22 +3336,19 @@
       "specifier": "drizzle-orm/pglite/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/pglite/driver.js:1:24: Could not resolve \"@electric-sql/pglite\"\nnode_modules/drizzle-orm/pglite/session.js:7:23: Could not resolve \"@electric-sql/pglite\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/pglite/driver.js:1:24: Could not resolve \"@electric-sql/pglite\"\nnode_modules/drizzle-orm/pglite/session.js:7:23: Could not resolve \"@electric-sql/pglite\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/pglite/driver.js:1:24: Could not resolve \"@electric-sql/pglite\"\nnode_modules/drizzle-orm/pglite/session.js:7:23: Could not resolve \"@electric-sql/pglite\""
+          "warnings": 1
         }
       }
     },
@@ -3420,22 +3357,19 @@
       "specifier": "drizzle-orm/pglite",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/pglite/driver.js:1:24: Could not resolve \"@electric-sql/pglite\"\nnode_modules/drizzle-orm/pglite/session.js:7:23: Could not resolve \"@electric-sql/pglite\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/pglite/driver.js:1:24: Could not resolve \"@electric-sql/pglite\"\nnode_modules/drizzle-orm/pglite/session.js:7:23: Could not resolve \"@electric-sql/pglite\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/pglite/driver.js:1:24: Could not resolve \"@electric-sql/pglite\"\nnode_modules/drizzle-orm/pglite/session.js:7:23: Could not resolve \"@electric-sql/pglite\""
+          "warnings": 1
         }
       }
     },
@@ -3465,22 +3399,19 @@
       "specifier": "drizzle-orm/pglite/session",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/pglite/session.js:7:23: Could not resolve \"@electric-sql/pglite\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/pglite/session.js:7:23: Could not resolve \"@electric-sql/pglite\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/pglite/session.js:7:23: Could not resolve \"@electric-sql/pglite\""
+          "warnings": 1
         }
       }
     },
@@ -3489,22 +3420,19 @@
       "specifier": "drizzle-orm/planetscale-serverless/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/planetscale-serverless/driver.js:1:24: Could not resolve \"@planetscale/database\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/planetscale-serverless/driver.js:1:24: Could not resolve \"@planetscale/database\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/planetscale-serverless/driver.js:1:24: Could not resolve \"@planetscale/database\""
+          "warnings": 1
         }
       }
     },
@@ -3513,22 +3441,19 @@
       "specifier": "drizzle-orm/planetscale-serverless",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/planetscale-serverless/driver.js:1:24: Could not resolve \"@planetscale/database\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/planetscale-serverless/driver.js:1:24: Could not resolve \"@planetscale/database\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/planetscale-serverless/driver.js:1:24: Could not resolve \"@planetscale/database\""
+          "warnings": 1
         }
       }
     },
@@ -3579,22 +3504,19 @@
       "specifier": "drizzle-orm/postgres-js/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/postgres-js/driver.js:1:22: Could not resolve \"postgres\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/postgres-js/driver.js:1:22: Could not resolve \"postgres\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/postgres-js/driver.js:1:22: Could not resolve \"postgres\""
+          "warnings": 1
         }
       }
     },
@@ -3603,22 +3525,19 @@
       "specifier": "drizzle-orm/postgres-js",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/postgres-js/driver.js:1:22: Could not resolve \"postgres\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/postgres-js/driver.js:1:22: Could not resolve \"postgres\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/postgres-js/driver.js:1:22: Could not resolve \"postgres\""
+          "warnings": 1
         }
       }
     },
@@ -3711,22 +3630,19 @@
       "specifier": "drizzle-orm/singlestore/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/singlestore/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/singlestore/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/singlestore/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         }
       }
     },
@@ -3735,22 +3651,19 @@
       "specifier": "drizzle-orm/singlestore",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/singlestore/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/singlestore/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/singlestore/driver.js:1:28: Could not resolve \"mysql2\""
+          "warnings": 1
         }
       }
     },
@@ -4830,22 +4743,19 @@
       "specifier": "drizzle-orm/tidb-serverless/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/tidb-serverless/driver.js:1:25: Could not resolve \"@tidbcloud/serverless\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/tidb-serverless/driver.js:1:25: Could not resolve \"@tidbcloud/serverless\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/tidb-serverless/driver.js:1:25: Could not resolve \"@tidbcloud/serverless\""
+          "warnings": 1
         }
       }
     },
@@ -4854,22 +4764,19 @@
       "specifier": "drizzle-orm/tidb-serverless",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/tidb-serverless/driver.js:1:25: Could not resolve \"@tidbcloud/serverless\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/tidb-serverless/driver.js:1:25: Could not resolve \"@tidbcloud/serverless\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/tidb-serverless/driver.js:1:25: Could not resolve \"@tidbcloud/serverless\""
+          "warnings": 1
         }
       }
     },
@@ -4920,22 +4827,19 @@
       "specifier": "drizzle-orm/vercel-postgres/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/vercel-postgres/driver.js:1:21: Could not resolve \"@vercel/postgres\"\nnode_modules/drizzle-orm/vercel-postgres/session.js:4:8: Could not resolve \"@vercel/postgres\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/vercel-postgres/driver.js:1:21: Could not resolve \"@vercel/postgres\"\nnode_modules/drizzle-orm/vercel-postgres/session.js:4:8: Could not resolve \"@vercel/postgres\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/vercel-postgres/driver.js:1:21: Could not resolve \"@vercel/postgres\"\nnode_modules/drizzle-orm/vercel-postgres/session.js:4:8: Could not resolve \"@vercel/postgres\""
+          "warnings": 1
         }
       }
     },
@@ -4944,22 +4848,19 @@
       "specifier": "drizzle-orm/vercel-postgres",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/vercel-postgres/driver.js:1:21: Could not resolve \"@vercel/postgres\"\nnode_modules/drizzle-orm/vercel-postgres/session.js:4:8: Could not resolve \"@vercel/postgres\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/vercel-postgres/driver.js:1:21: Could not resolve \"@vercel/postgres\"\nnode_modules/drizzle-orm/vercel-postgres/session.js:4:8: Could not resolve \"@vercel/postgres\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/vercel-postgres/driver.js:1:21: Could not resolve \"@vercel/postgres\"\nnode_modules/drizzle-orm/vercel-postgres/session.js:4:8: Could not resolve \"@vercel/postgres\""
+          "warnings": 1
         }
       }
     },
@@ -4989,22 +4890,19 @@
       "specifier": "drizzle-orm/vercel-postgres/session",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/vercel-postgres/session.js:4:8: Could not resolve \"@vercel/postgres\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/vercel-postgres/session.js:4:8: Could not resolve \"@vercel/postgres\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/vercel-postgres/session.js:4:8: Could not resolve \"@vercel/postgres\""
+          "warnings": 1
         }
       }
     },
@@ -5097,22 +4995,19 @@
       "specifier": "drizzle-orm/aws-data-api/common",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         }
       }
     },
@@ -5121,22 +5016,19 @@
       "specifier": "drizzle-orm/aws-data-api/pg/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/driver.js:1:31: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/session.js:6:8: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/driver.js:1:31: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/session.js:6:8: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/driver.js:1:31: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/session.js:6:8: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         }
       }
     },
@@ -5145,22 +5037,19 @@
       "specifier": "drizzle-orm/aws-data-api/pg",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/driver.js:1:31: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/session.js:6:8: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/driver.js:1:31: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/session.js:6:8: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/driver.js:1:31: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/session.js:6:8: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         }
       }
     },
@@ -5190,22 +5079,19 @@
       "specifier": "drizzle-orm/aws-data-api/pg/session",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/session.js:6:8: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/session.js:6:8: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/aws-data-api/common/index.js:1:26: Could not resolve \"@aws-sdk/client-rds-data\"\nnode_modules/drizzle-orm/aws-data-api/pg/session.js:6:8: Could not resolve \"@aws-sdk/client-rds-data\""
+          "warnings": 1
         }
       }
     },
@@ -5277,22 +5163,19 @@
       "specifier": "drizzle-orm/cache/upstash/cache",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/cache/upstash/cache.js:1:23: Could not resolve \"@upstash/redis\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/cache/upstash/cache.js:1:23: Could not resolve \"@upstash/redis\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/cache/upstash/cache.js:1:23: Could not resolve \"@upstash/redis\""
+          "warnings": 1
         }
       }
     },
@@ -5301,22 +5184,19 @@
       "specifier": "drizzle-orm/cache/upstash",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/cache/upstash/cache.js:1:23: Could not resolve \"@upstash/redis\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/cache/upstash/cache.js:1:23: Could not resolve \"@upstash/redis\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/cache/upstash/cache.js:1:23: Could not resolve \"@upstash/redis\""
+          "warnings": 1
         }
       }
     },
@@ -6858,22 +6738,19 @@
       "specifier": "drizzle-orm/libsql/http",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/http/index.js:1:30: Could not resolve \"@libsql/client/http\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/http/index.js:1:30: Could not resolve \"@libsql/client/http\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/http/index.js:1:30: Could not resolve \"@libsql/client/http\""
+          "warnings": 1
         }
       }
     },
@@ -6882,22 +6759,19 @@
       "specifier": "drizzle-orm/libsql/node",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/node/index.js:1:30: Could not resolve \"@libsql/client/node\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/node/index.js:1:30: Could not resolve \"@libsql/client/node\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/node/index.js:1:30: Could not resolve \"@libsql/client/node\""
+          "warnings": 1
         }
       }
     },
@@ -6906,22 +6780,19 @@
       "specifier": "drizzle-orm/libsql/sqlite3",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/sqlite3/index.js:1:30: Could not resolve \"@libsql/client/sqlite3\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/sqlite3/index.js:1:30: Could not resolve \"@libsql/client/sqlite3\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/sqlite3/index.js:1:30: Could not resolve \"@libsql/client/sqlite3\""
+          "warnings": 1
         }
       }
     },
@@ -6930,22 +6801,19 @@
       "specifier": "drizzle-orm/libsql/wasm",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/wasm/index.js:1:30: Could not resolve \"@libsql/client-wasm\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/wasm/index.js:1:30: Could not resolve \"@libsql/client-wasm\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/wasm/index.js:1:30: Could not resolve \"@libsql/client-wasm\""
+          "warnings": 1
         }
       }
     },
@@ -6954,22 +6822,19 @@
       "specifier": "drizzle-orm/libsql/web",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/web/index.js:1:30: Could not resolve \"@libsql/client/web\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/web/index.js:1:30: Could not resolve \"@libsql/client/web\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/web/index.js:1:30: Could not resolve \"@libsql/client/web\""
+          "warnings": 1
         }
       }
     },
@@ -6978,22 +6843,19 @@
       "specifier": "drizzle-orm/libsql/ws",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/ws/index.js:1:30: Could not resolve \"@libsql/client/ws\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/ws/index.js:1:30: Could not resolve \"@libsql/client/ws\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/libsql/ws/index.js:1:30: Could not resolve \"@libsql/client/ws\""
+          "warnings": 1
         }
       }
     },
@@ -7947,22 +7809,19 @@
       "specifier": "drizzle-orm/prisma/mysql/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/mysql/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/mysql/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/mysql/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         }
       }
     },
@@ -7971,22 +7830,19 @@
       "specifier": "drizzle-orm/prisma/mysql",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/mysql/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/mysql/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/mysql/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         }
       }
     },
@@ -8016,22 +7872,19 @@
       "specifier": "drizzle-orm/prisma/pg/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/pg/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/pg/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/pg/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         }
       }
     },
@@ -8040,22 +7893,19 @@
       "specifier": "drizzle-orm/prisma/pg",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/pg/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/pg/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/pg/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         }
       }
     },
@@ -8085,22 +7935,19 @@
       "specifier": "drizzle-orm/prisma/sqlite/driver",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/sqlite/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/sqlite/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/sqlite/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         }
       }
     },
@@ -8109,22 +7956,19 @@
       "specifier": "drizzle-orm/prisma/sqlite",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/sqlite/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "bun": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/sqlite/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         },
         "deno": {
-          "status": "error",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/prisma/sqlite/driver.js:1:24: Could not resolve \"@prisma/client\""
+          "warnings": 1
         }
       }
     },

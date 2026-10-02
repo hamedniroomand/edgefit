@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-01T12:53:18.853Z",
-  "edgefit": "0.5.1",
+  "generatedAt": "2026-10-02T09:17:33.825Z",
+  "edgefit": "0.6.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -25,11 +25,16 @@
       "file": "hono",
       "resolved": "4.13.12",
       "summary": {
-        "workerd": "warn",
-        "bun": "warn",
-        "deno": "warn"
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
       },
-      "subpaths": 75
+      "subpaths": 75,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "itty-router",
@@ -40,7 +45,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 19
+      "subpaths": 19,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "elysia",
@@ -51,7 +61,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 30
+      "subpaths": 30,
+      "main": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "h3",
@@ -59,10 +79,20 @@
       "resolved": "2.0.1-rc.32",
       "summary": {
         "workerd": "fail",
-        "bun": "error",
-        "deno": "error"
+        "bun": "warn",
+        "deno": "warn"
       },
-      "subpaths": 12
+      "subpaths": 12,
+      "main": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "workerd": "./node",
+        "bun": ".",
+        "deno": "./node"
+      }
     },
     {
       "name": "zod",
@@ -73,7 +103,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 10
+      "subpaths": 10,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "valibot",
@@ -84,7 +119,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "jose",
@@ -95,7 +135,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 9
+      "subpaths": 9,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "oauth4webapi",
@@ -106,7 +151,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "bcryptjs",
@@ -117,7 +167,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "pg",
@@ -128,7 +183,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "postgres",
@@ -139,18 +199,28 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "@neondatabase/serverless",
       "file": "neondatabase__serverless",
-      "resolved": "1.1.0",
+      "resolved": "1.2.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "drizzle-orm",
@@ -161,7 +231,17 @@
         "bun": "error",
         "deno": "error"
       },
-      "subpaths": 447
+      "subpaths": 447,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "workerd": "./expo-sqlite",
+        "bun": "./expo-sqlite",
+        "deno": "./expo-sqlite"
+      }
     },
     {
       "name": "@prisma/client",
@@ -172,7 +252,17 @@
         "bun": "error",
         "deno": "error"
       },
-      "subpaths": 9
+      "subpaths": 9,
+      "main": {
+        "workerd": "error",
+        "bun": "error",
+        "deno": "error"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "mysql2",
@@ -183,7 +273,17 @@
         "bun": "warn",
         "deno": "fail"
       },
-      "subpaths": 3
+      "subpaths": 3,
+      "main": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "fail"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "ioredis",
@@ -194,7 +294,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "@upstash/redis",
@@ -205,7 +310,15 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 8
+      "subpaths": 8,
+      "main": {
+        "workerd": "warn",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "workerd": "."
+      }
     },
     {
       "name": "stripe",
@@ -216,18 +329,33 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "openai",
       "file": "openai",
-      "resolved": "7.25.0",
+      "resolved": "7.27.0",
       "summary": {
         "workerd": "warn",
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 38
+      "subpaths": 38,
+      "main": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "@anthropic-ai/sdk",
@@ -238,18 +366,36 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 33
+      "subpaths": 33,
+      "main": {
+        "workerd": "pass",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "@aws-sdk/client-s3",
       "file": "aws-sdk__client-s3",
-      "resolved": "3.1144.0",
+      "resolved": "3.1145.0",
       "summary": {
         "workerd": "pass",
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "lodash",
@@ -260,7 +406,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "lodash-es",
@@ -271,7 +422,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "date-fns",
@@ -282,7 +438,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 740
+      "subpaths": 740,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "dayjs",
@@ -293,7 +454,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "nanoid",
@@ -304,7 +470,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 2
+      "subpaths": 2,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "uuid",
@@ -315,7 +486,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "axios",
@@ -326,7 +502,16 @@
         "bun": "pass",
         "deno": "warn"
       },
-      "subpaths": 13
+      "subpaths": 13,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": "./lib/adapters/http.js",
+        "deno": "."
+      }
     },
     {
       "name": "node-fetch",
@@ -337,7 +522,15 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "warn",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "workerd": "."
+      }
     },
     {
       "name": "ws",
@@ -348,7 +541,15 @@
         "bun": "pass",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "deno": "."
+      }
     },
     {
       "name": "sharp",
@@ -360,6 +561,16 @@
         "deno": "warn"
       },
       "subpaths": 1,
+      "main": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      },
       "notes": "Native addon."
     },
     {
@@ -372,6 +583,11 @@
         "deno": "pass"
       },
       "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
       "notes": "Native addon; bcryptjs is the pure-JS alternative."
     },
     {
@@ -384,6 +600,14 @@
         "deno": "pass"
       },
       "subpaths": 2,
+      "main": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "workerd": "."
+      },
       "notes": "Watches the file system."
     },
     {
@@ -395,7 +619,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "fastify",
@@ -406,7 +640,16 @@
         "bun": "pass",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "deno": "."
+      }
     },
     {
       "name": "koa",
@@ -417,7 +660,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "cors",
@@ -428,7 +681,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "jsonwebtoken",
@@ -439,7 +697,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "cookie",
@@ -450,7 +713,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "jsdom",
@@ -461,7 +729,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "cheerio",
@@ -472,7 +750,16 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 3
+      "subpaths": 3,
+      "main": {
+        "workerd": "pass",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "marked",
@@ -483,7 +770,17 @@
         "bun": "warn",
         "deno": "fail"
       },
-      "subpaths": 2
+      "subpaths": 2,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "workerd": "./bin/marked",
+        "bun": "./bin/marked",
+        "deno": "./bin/marked"
+      }
     },
     {
       "name": "yaml",
@@ -494,18 +791,33 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 2
+      "subpaths": 2,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "zustand",
       "file": "zustand",
       "resolved": "5.0.15",
       "summary": {
-        "workerd": "error",
-        "bun": "error",
-        "deno": "error"
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "ky",
@@ -516,7 +828,15 @@
         "bun": "warn",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "warn",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "bun": "."
+      }
     },
     {
       "name": "got",
@@ -527,7 +847,15 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "workerd": "."
+      }
     },
     {
       "name": "undici",
@@ -538,7 +866,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "graphql",
@@ -549,7 +887,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 7
+      "subpaths": 7,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "graphql-yoga",
@@ -560,7 +903,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "@trpc/server",
@@ -571,7 +919,17 @@
         "bun": "error",
         "deno": "error"
       },
-      "subpaths": 15
+      "subpaths": 15,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "workerd": "./adapters/next-app-dir",
+        "bun": "./adapters/next-app-dir",
+        "deno": "./adapters/next-app-dir"
+      }
     },
     {
       "name": "@supabase/supabase-js",
@@ -580,9 +938,19 @@
       "summary": {
         "workerd": "fail",
         "bun": "fail",
-        "deno": "error"
+        "deno": "warn"
       },
-      "subpaths": 3
+      "subpaths": 3,
+      "main": {
+        "workerd": "fail",
+        "bun": "fail",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "firebase",
@@ -593,7 +961,12 @@
         "bun": "warn",
         "deno": "fail"
       },
-      "subpaths": 32
+      "subpaths": 32,
+      "decidedBy": {
+        "workerd": "./ai",
+        "bun": "./analytics",
+        "deno": "./firestore"
+      }
     },
     {
       "name": "@sentry/node",
@@ -604,7 +977,17 @@
         "bun": "fail",
         "deno": "fail"
       },
-      "subpaths": 6
+      "subpaths": 6,
+      "main": {
+        "workerd": "fail",
+        "bun": "fail",
+        "deno": "fail"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "mongodb",
@@ -615,7 +998,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "mongoose",
@@ -626,7 +1019,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "fail",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "better-sqlite3",
@@ -638,6 +1041,16 @@
         "deno": "error"
       },
       "subpaths": 9,
+      "main": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": "./linux-x64",
+        "bun": "./linux-x64",
+        "deno": "./linux-x64"
+      },
       "notes": "Native addon."
     },
     {
@@ -650,6 +1063,11 @@
         "deno": "pass"
       },
       "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
       "notes": "Native addon."
     },
     {
@@ -661,7 +1079,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "kysely",
@@ -672,7 +1100,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 7
+      "subpaths": 7,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "workerd": "./migration",
+        "bun": "./migration",
+        "deno": "./migration"
+      }
     },
     {
       "name": "@libsql/client",
@@ -683,7 +1121,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 6
+      "subpaths": 6,
+      "main": {
+        "workerd": "pass",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": "./node",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "@planetscale/database",
@@ -694,18 +1142,32 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "resend",
       "file": "resend",
-      "resolved": "6.31.0",
+      "resolved": "6.32.0",
       "summary": {
         "workerd": "warn",
         "bun": "warn",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "pass"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": "."
+      }
     },
     {
       "name": "nodemailer",
@@ -716,7 +1178,16 @@
         "bun": "pass",
         "deno": "warn"
       },
-      "subpaths": 21
+      "subpaths": 21,
+      "main": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "deno": "."
+      }
     },
     {
       "name": "pino",
@@ -727,7 +1198,15 @@
         "bun": "pass",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "deno": "."
+      }
     },
     {
       "name": "winston",
@@ -738,7 +1217,15 @@
         "bun": "pass",
         "deno": "fail"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "fail"
+      },
+      "decidedBy": {
+        "deno": "."
+      }
     },
     {
       "name": "ajv",
@@ -749,7 +1236,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "@sinclair/typebox",
@@ -760,7 +1252,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 8
+      "subpaths": 8,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "superstruct",
@@ -771,7 +1268,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "ohash",
@@ -782,7 +1284,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 3
+      "subpaths": 3,
+      "main": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "ofetch",
@@ -793,7 +1305,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 2
+      "subpaths": 2,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "@octokit/rest",
@@ -804,7 +1321,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "tweetnacl",
@@ -815,7 +1337,17 @@
         "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "main": {
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
+      },
+      "decidedBy": {
+        "workerd": ".",
+        "bun": ".",
+        "deno": "."
+      }
     },
     {
       "name": "@noble/hashes",
@@ -826,7 +1358,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 17
+      "subpaths": 17,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     },
     {
       "name": "@noble/curves",
@@ -837,7 +1374,12 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 23
+      "subpaths": 23,
+      "main": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      }
     }
   ]
 }
