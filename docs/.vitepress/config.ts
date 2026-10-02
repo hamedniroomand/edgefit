@@ -1,11 +1,8 @@
-import { readFileSync, writeFileSync } from 'node:fs';
-import path from 'node:path';
-
 import { defineConfig } from 'vitepress';
 import type { DefaultTheme } from 'vitepress';
+import llmstxt from 'vitepress-plugin-llms';
 
 import { icon } from './icons.ts';
-import { buildLlmsTxt } from './llms.ts';
 
 const repository = 'https://github.com/hamedniroomand/edgefit';
 const site = 'https://edgefit.kitdev.space';
@@ -29,15 +26,8 @@ export default defineConfig({
 
   sitemap: { hostname: site },
 
-  buildEnd(siteConfig) {
-    const pages = siteConfig.pages.map(page => ({
-      path: page,
-      source: readFileSync(path.join(siteConfig.srcDir, page), 'utf8'),
-    }));
-    writeFileSync(
-      path.join(siteConfig.outDir, 'llms.txt'),
-      buildLlmsTxt(pages, site, title, description),
-    );
+  vite: {
+    plugins: [llmstxt({ domain: site })],
   },
 
   head: [
