@@ -9,6 +9,8 @@
     file: string;
     resolved: string | null;
     summary: Record<string, Status>;
+    main?: Record<string, Status>;
+    decidedBy?: Record<string, string>;
     subpaths: number;
     error?: string;
     notes?: string;
@@ -89,6 +91,30 @@
     }
   }
 
+  function mainDiffers(row: Row, key: string): boolean {
+    return row.main?.[key] !== undefined && row.main[key] !== row.summary[key];
+  }
+
+  function cellTitle(row: Row, key: string): string {
+    const main = row.main?.[key];
+    const decider = row.decidedBy?.[key];
+    const overall = row.summary[key];
+    const parts = [`${key}: ${overall ? words[overall] : ''}`];
+    if (decider !== undefined) {
+      parts.push(`decided by ${decider}`);
+    }
+    if (main !== undefined && mainDiffers(row, key)) {
+      parts.push(`main entry ${words[main]}`);
+    }
+    return parts.join(', ');
+  }
+
+  const failing = computed(() =>
+    (details.value[open.value]?.entries ?? []).filter(entry =>
+      Object.values(entry.results).some(result => result.status !== 'pass'),
+    ),
+  );
+
   function markdown(row: Row): string {
     const link = `${site}/packages/#${row.file}`;
     return `[![edgefit](${site}/packages/badges/${row.file}.svg)](${link})`;
@@ -130,6 +156,11 @@
           >{{ runtime }} {{ version }};
         </span>
         <a :href="withBase('/guide/packages')">What a pass means</a>
+      </p>
+      <p class="ef-packages-legend">
+        A target with two marks shows the main entry first and the worst subpath second, smaller. A
+        target with one mark has the same result for both. The status filter and the sort use the
+        worst result.
       </p>
       <div class="ef-packages-controls">
         <input
@@ -213,17 +244,33 @@
                 v-for="key in row.error === undefined ? results.targets : []"
                 v-else
                 :key="key"
-                :title="`${key}: ${row.summary[key] ? words[row.summary[key]] : ''}`"
-                :class="`ef-status-${row.summary[key]}`"
+                :title="cellTitle(row, key)"
               >
-                {{ row.summary[key] ? symbols[row.summary[key]] : '' }}
+                <template v-if="row.summary[key]">
+                  <span
+                    v-if="mainDiffers(row, key)"
+                    :class="`ef-status-${row.main[key]}`"
+                    >{{ symbols[row.main[key]] }}</span
+                  >
+                  <span
+                    :class="[
+                      `ef-status-${row.summary[key]}`,
+                      { 'ef-worst': mainDiffers(row, key) },
+                    ]"
+                    >{{ symbols[row.summary[key]] }}</span
+                  >
+                </template>
               </td>
             </tr>
             <tr v-if="open === row.file">
               <td :colspan="results.targets.length + 2">
                 <p v-if="row.error !== undefined">{{ row.error }}</p>
                 <p v-if="row.notes">{{ row.notes }}</p>
-                <table v-if="details[row.file]">
+                <p v-if="details[row.file]">
+                  {{ details[row.file]?.entries.length }} subpaths checked, {{ failing.length }} not
+                  a pass.
+                </p>
+                <table v-if="failing.length > 0">
                   <thead>
                     <tr>
                       <th>Subpath</th>
@@ -237,7 +284,7 @@
                   </thead>
                   <tbody>
                     <tr
-                      v-for="entry in details[row.file]?.entries"
+                      v-for="entry in failing"
                       :key="entry.subpath"
                     >
                       <td>
@@ -298,6 +345,9 @@
   }
   .ef-packages-row {
     cursor: pointer;
+  }
+  .ef-worst {
+    font-size: 0.75em;
   }
   .ef-status-pass {
     color: var(--vp-c-green-1);

@@ -63,6 +63,29 @@ function keepPrevious(name, file, error) {
   stale.push(`- \`${name}\`: ${error} (kept the result for ${before.resolved})`);
   return true;
 }
+
+function entryColumns(entries, summary) {
+  const main = entries.find(entry => entry.subpath === '.');
+  const decidedBy = {};
+  for (const [target, status] of Object.entries(summary)) {
+    // The first subpath with the worst status decides it.
+    const decider = entries.find(entry => entry.results[target]?.status === status);
+    if (status !== 'pass' && decider !== undefined) {
+      decidedBy[target] = decider.subpath;
+    }
+  }
+  return {
+    ...(main === undefined
+      ? {}
+      : {
+          main: Object.fromEntries(
+            Object.entries(main.results).map(([target, result]) => [target, result.status]),
+          ),
+        }),
+    ...(Object.keys(decidedBy).length === 0 ? {} : { decidedBy }),
+  };
+}
+
 let sample;
 for (const { name } of readList()) {
   const file = fileNameOf(name);
@@ -94,6 +117,7 @@ for (const { name } of readList()) {
     resolved: result.resolved,
     summary: result.summary,
     subpaths: result.entries.length,
+    ...(result.error === undefined ? entryColumns(result.entries, result.summary) : {}),
     ...(result.error === undefined ? {} : { error: result.error }),
     ...(result.notes === undefined ? {} : { notes: result.notes }),
   });
