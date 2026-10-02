@@ -44,6 +44,8 @@ Everything in a module counts when it cannot be told which parts are used:
 
 What a CommonJS module asks of a module it `require`s is the members that are read from the result (`const dep = require('dep')` with `dep.name`, `const { name } = require('dep')`, `require('dep').name`, also through `_interop_require_default` and `_interop_require_wildcard`). The result used in any other way asks for all of it.
 
+A variable that is declared without a value and set once to a `require()` result, such as `let c; c = require('node:crypto')`, is followed like a `const`. Another declaration of the name (a parameter, a function or a second `var`), any other write to it in the file, or an export of it stops this.
+
 A name counts as used when any used code mentions it. A property or a local variable of the same name also counts, which can only keep a finding, never hide one.
 
 ## Imports used only as types

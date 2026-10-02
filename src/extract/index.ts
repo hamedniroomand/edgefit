@@ -5,6 +5,7 @@ import { collectShape } from '@/trace/shape.ts';
 import type { ModuleShape } from '@/trace/shape.ts';
 import type { Usage } from '@/types.ts';
 
+import { findAssigned } from './assigned.ts';
 import { typeOnlyImports } from './type-only-imports.ts';
 import { UsageCollector } from './usage-collector.ts';
 import { Walker } from './walker.ts';
@@ -97,7 +98,9 @@ export function extractModule(
     options.keepUnusedImports === true || !isTypeScript(file)
       ? new Set<string>()
       : typeOnlyImports(body);
-  new Walker(collector, options.globals, options.nodeEnv, dropped).visit(result.program as Node);
+  new Walker(collector, options.globals, options.nodeEnv, dropped, findAssigned(body)).visit(
+    result.program as Node,
+  );
   return {
     usages: collector.usages,
     offsets: collector.offsets,
