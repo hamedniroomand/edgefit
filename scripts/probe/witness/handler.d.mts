@@ -12,6 +12,7 @@ export type WitnessResults = {
   entry: string;
   specHash: string;
   deno: string | null;
+  runtime: Record<string, unknown>;
   names: string[];
   outcomes: Record<string, Outcome>;
   checks: Record<string, CheckResult>;

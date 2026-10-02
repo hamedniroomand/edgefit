@@ -6,11 +6,16 @@ import * as buffer from 'node:buffer';
 import * as events from 'node:events';
 import * as util from 'node:util';
 
-import { dynamicChecks } from './checks.mjs';
+import { dynamicChecks, vercelChecks } from './checks.mjs';
 import { respond } from './handler.mjs';
 import spec from './spec-data.mjs';
 
 const modules = { assert, async_hooks, buffer, events, util };
 
 export const handle = entry =>
-  respond({ entry, spec, checks: dynamicChecks, load: name => modules[name] });
+  respond({
+    entry,
+    spec,
+    checks: { ...dynamicChecks, ...vercelChecks },
+    load: name => modules[name],
+  });

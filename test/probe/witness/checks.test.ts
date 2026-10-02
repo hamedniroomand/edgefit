@@ -1,5 +1,16 @@
-import { denoChecks, dynamicChecks, runChecks } from '@scripts/probe/witness/checks.mjs';
-import { describe, expect, it } from 'vite-plus/test';
+import { createRequire } from 'node:module';
+
+import {
+  denoChecks,
+  dynamicChecks,
+  runChecks,
+  vercelChecks,
+} from '@scripts/probe/witness/checks.mjs';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe('runChecks', () => {
   it('allows dynamic code under Node', async () => {
@@ -7,11 +18,20 @@ describe('runChecks', () => {
       eval: { allowed: true },
       newFunction: { allowed: true },
       wasmFromBytes: { allowed: true },
+      wasmInstantiateFromBytes: { allowed: true },
+    });
+  });
+
+  it('records the text a check returns', async () => {
+    vi.stubGlobal('require', createRequire(import.meta.url));
+    expect(await runChecks(vercelChecks)).toEqual({
+      requireBuffer: { allowed: true, value: 'object' },
     });
   });
 
   it('records the error of a check that throws', async () => {
     const results = await runChecks(denoChecks);
+    expect(results.runPermission?.allowed).toBe(false);
     expect(results.subprocess).toEqual({
       allowed: false,
       error: 'ReferenceError: Deno is not defined',

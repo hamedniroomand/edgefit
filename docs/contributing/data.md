@@ -108,10 +108,12 @@ Netlify and Vercel publish no runtime to install, so a small function deployed o
 
 The witness only looks APIs up. It never calls them, because the endpoint is public. It reports:
 
-- the Deno version (Netlify)
-- the names on the global object
-- a lookup of each API in its list: every module and member in the Node baseline on Netlify, and the members of the allowed modules on Vercel
-- whether `eval`, `new Function` and `WebAssembly.compile` from bytes run, and on Netlify whether `Deno.Command` and a file write run
+- the Deno version (Netlify), and each place the runtime reports a version as evidence. Netlify hides `Deno.version.deno`, so the version can be missing.
+- the names on the global object. On a Vercel edge route, `globalThis` hides most of its own names, so only the middleware names are compared.
+- a lookup of each API in its list: every module and member in the Node baseline on Netlify, and on Vercel each global the data keeps and the members of the allowed modules
+- whether `eval`, `new Function`, `WebAssembly.compile` and `WebAssembly.instantiate` from bytes run
+- on Vercel, whether the `require` global loads a module
+- on Netlify, the `run`, `write` and `env` permissions, `Deno.execPath()`, and whether a subprocess and a file write run
 
 The weekly Probe run reads the witness with no secret, in the `witness` jobs, and compares the answer with the data in the job summary. Each answer has a hash of the list of APIs that the witness was built with. When the hash does not match the repository, the summary says to redeploy. The witness is not part of the drift issue. A witness that does not answer gives a warning, so you can remove the witness and the results do not change.
 

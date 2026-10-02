@@ -15,6 +15,8 @@ const plumbing = new Set([
   'addEventListener',
   'removeEventListener',
   'dispatchEvent',
+  // A V8 flag can expose it; no code that edgefit checks reads it.
+  'gc',
   'FetchEvent',
 ]);
 export const isPlumbing = name => name.startsWith('__') || plumbing.has(name);

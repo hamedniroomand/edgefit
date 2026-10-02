@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 import { readData } from '../data.mjs';
 import { readPackageFiles } from '../tarball.mjs';
+import { vercelGlobals } from '../witness/spec.mjs';
 import { compareDocs, parseEdgeDocs } from './docs.mjs';
 import { compareEmulator } from './emulator.mjs';
 import {
@@ -46,11 +47,7 @@ if (parsed.lastUpdated === undefined || Object.keys(parsed.modules).length === 0
   throw new Error(`${docsUrl} no longer has the tables edgefit reads; update vercel/docs.mjs`);
 }
 
-const accepted = new Set([
-  ...allowlist.globals,
-  ...allowlist.languageGlobals,
-  ...allowlist.emulatorGlobals,
-]);
+const accepted = new Set(vercelGlobals(allowlist));
 const docsSections = compareDocs(parsed, allowlist, overrides).map(section => ({
   ...section,
   title: `Vercel docs: ${section.title}`,
