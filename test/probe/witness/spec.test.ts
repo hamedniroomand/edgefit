@@ -17,6 +17,7 @@ describe('witnessSpec', () => {
     expect(names).toContain('*globals*.process.env');
     expect(witnessSpec('vercel').globals).toContain('fetch');
     expect(witnessSpec('vercel').globals).not.toContain('undefined');
+    expect(witnessSpec('vercel').globals).toContain('AsyncLocalStorage');
     expect(witnessSpec('netlify').globals).toEqual([]);
     expect(names).not.toContain('fs');
   });

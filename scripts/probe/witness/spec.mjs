@@ -35,13 +35,29 @@ function vercelApis({ modules, globalMembers }) {
 const builders = { netlify: netlifyApis, vercel: vercelApis };
 
 /**
+ * Globals the data does not keep, which the Vercel middleware's own names showed in Witness run
+ * 37075288327. The edge function hides its own names, so only `typeof` can show them there. A
+ * candidate is a question for a review, not data.
+ */
+export const vercelCandidates = [
+  'AsyncLocalStorage',
+  'Float16Array',
+  'DisposableStack',
+  'AsyncDisposableStack',
+  'SuppressedError',
+];
+
+/**
  * The globals a witness measures with `typeof`. On a Vercel edge route `globalThis` is a copy that
  * lacks most globals, but a bare name resolves through the real scope, as it does in user code.
  * `typeof undefined` says nothing.
  */
 const globalsFor = {
   netlify: () => [],
-  vercel: allowlist => vercelGlobals(allowlist).filter(name => name !== 'undefined'),
+  vercel: allowlist => [
+    ...vercelGlobals(allowlist).filter(name => name !== 'undefined'),
+    ...vercelCandidates,
+  ],
 };
 
 /**

@@ -111,7 +111,7 @@ The witness only looks APIs up. It never calls them, because the endpoint is pub
 - the Deno version (Netlify), and each place the runtime reports a version as evidence. Netlify hides `Deno.version.deno`, so the version can be missing.
 - the names on the global object. On a Vercel edge route, `globalThis` hides most of its own names, so only the middleware names are compared.
 - a lookup of each API in its list: every module and member in the Node baseline on Netlify, and the members of the allowed modules on Vercel
-- on Vercel, `typeof` of each global the data keeps. The build writes this as static code, because on an edge route `globalThis` is a copy that lacks most globals, while a bare name resolves through the real scope, as in user code.
+- on Vercel, `typeof` of each global the data keeps. The build writes this as static code, because on an edge route `globalThis` is a copy that lacks most globals, while a bare name resolves through the real scope, as in user code. It also measures a few candidate globals that the data does not keep (`vercelCandidates` in `scripts/probe/witness/spec.mjs`). A defined candidate is reported as a global to review. The middleware's own names include `require`, which is left out, because it cannot load a module.
 - whether `eval`, `new Function`, `WebAssembly.compile` and `WebAssembly.instantiate` from bytes run
 - on Vercel, whether the `require` global loads a module
 - on Netlify, the `run`, `write` and `env` permissions, `Deno.execPath()`, whether a subprocess runs, and whether a file write runs in `/tmp`, in the working directory and in `/`
