@@ -118,6 +118,8 @@ The witness only looks APIs up. It never calls them, because the endpoint is pub
 
 The weekly Probe run reads the witness with no secret, in the `witness` jobs, and compares the answer with the data in the job summary. Each answer has a hash of the list of APIs that the witness was built with. When the hash does not match the repository, the summary says to redeploy. The witness is not part of the drift issue. A witness that does not answer gives a warning, so you can remove the witness and the results do not change.
 
+A data entry that rests on the witness needs a source that does not expire, and run logs and artifacts do. Commit the reviewed answer under `scripts/probe/witness/answers`, named for the platform and the date, and link it from the entry: the layer's `url` in `source.json` points at the answers folder at a pinned commit, and each entry's `source` is the file name. The folder is outside `data`, so it does not ship in the package. An `unsupported` override with `"absent": true` says that the API does not exist on the target, as when the matrix lacks it, so a use that checks for the API first is not reported.
+
 The code is in `scripts/probe/witness`.
 
 ## Bumping a data source

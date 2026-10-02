@@ -60,3 +60,22 @@ describe('compatibility data lookups', () => {
     expect(data.hasProblemsBelow({ module: 'fs', path: ['readFile'] })).toBe(false);
   });
 });
+
+describe('absent overrides', () => {
+  it('reports an override that says absent as absent', () => {
+    const source = { provider: 'overrides/workerd', version: '1' };
+    const withAbsent = new CompatIndex(matrixProvider('workerd').load(dataDirectory), [
+      {
+        target: 'workerd',
+        module: 'fs',
+        path: ['glob'],
+        status: 'unsupported',
+        absent: true,
+        source,
+      },
+      { target: 'workerd', module: 'fs', path: ['watch'], status: 'unsupported', source },
+    ]);
+    expect(withAbsent.lookup({ module: 'fs', path: ['glob'] }).absent).toBe(true);
+    expect(withAbsent.lookup({ module: 'fs', path: ['watch'] }).absent).toBeUndefined();
+  });
+});

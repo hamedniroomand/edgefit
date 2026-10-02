@@ -16,6 +16,11 @@ interface OverrideEntry {
   except?: string[];
   /** The stub checks its arguments before it throws, which the runtime probe knows about. */
   validatesFirst?: boolean;
+  /**
+   * The API does not exist on the target, as when the matrix lacks it, not a stub that throws.
+   * Only with status `unsupported`: a mocked or mismatched API exists.
+   */
+  absent?: true;
 }
 
 interface OverridesFile {
@@ -27,7 +32,8 @@ interface OverridesFile {
 
 /**
  * Curated results from `data/overrides/<target>.json` for APIs that exist but throw or
- * no-op when called. Tree sources such as the matrix only record whether an API exists.
+ * no-op when called, or that a platform build lacks although the matrix has them (`absent`).
+ * Tree sources such as the matrix only record whether an API exists.
  */
 export function overridesProvider(target: TargetKey): CompatProvider<CompatEntry[]> {
   const name = `overrides/${target}`;
@@ -49,6 +55,7 @@ export function overridesProvider(target: TargetKey): CompatProvider<CompatEntry
         path,
         status,
         ...(status === 'supported' ? {} : { note: entry.note }),
+        ...(status === 'unsupported' && entry.absent === true ? { absent: true as const } : {}),
         source: { provider: name, version, url: new URL(entry.source, `${url}/`).href },
       });
       const moduleEntries = Object.entries(file.modules).flatMap(([module, entry]) =>

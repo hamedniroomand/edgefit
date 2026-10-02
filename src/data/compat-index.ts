@@ -20,7 +20,7 @@ function toResult(entry: CompatEntry): LookupResult {
     source: entry.source.url,
     category: entry.category,
     // A Web API the data lists as missing is missing, not stubbed.
-    ...(entry.category === 'web' ? { absent: true as const } : {}),
+    ...(entry.absent === true || entry.category === 'web' ? { absent: true as const } : {}),
   };
 }
 
