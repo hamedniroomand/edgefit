@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { extractModule } from '@/extract/index.ts';
+import { extractModule, isTypeScript } from '@/extract/index.ts';
 import type { ModuleGraph } from '@/resolve/graph.ts';
 import { PackageResolver } from '@/resolve/packages.ts';
+import { keepsUnusedImports } from '@/resolve/tsconfig.ts';
 import { reachedUsages } from '@/trace/reach.ts';
 
 import { ImportChains } from './chains.ts';
@@ -12,6 +13,11 @@ import { uncheckedImports } from './unchecked-imports.ts';
 
 // esbuild's metafile also lists JSON and asset inputs, which hold no code.
 const scriptFile = /\.[cm]?[jt]sx?$/u;
+
+// A package ships its own build settings, so the project's `tsconfig.json` does not apply to it.
+function isProjectScript(file: string): boolean {
+  return isTypeScript(file) && !file.includes('node_modules');
+}
 
 export function toPosix(file: string): string {
   return file.split(path.sep).join('/');
@@ -36,6 +42,7 @@ export function scanModules(
   options: ScanOptions,
 ): ModuleUsages[] {
   const packages = new PackageResolver(root);
+  const tsconfigs = new Map<string, boolean>();
   const chains = new ImportChains(graph, packages);
   const scripts = [...graph.modules]
     .filter(([file]) => scriptFile.test(file))
@@ -48,6 +55,8 @@ export function scanModules(
           globals,
           shape: options.trace,
           lazyNodeImports: options.lazyNodeImports,
+          keepUnusedImports:
+            isProjectScript(file) && keepsUnusedImports(path.resolve(root, file), tsconfigs),
           nodeEnv: options.nodeEnv,
         }),
         unchecked: uncheckedImports(posixFile, source, module.externals, module.missingPeers),

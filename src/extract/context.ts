@@ -8,6 +8,8 @@ import type { UsageCollector } from './usage-collector.ts';
 
 export interface VisitContext extends BindingContext {
   readonly collector: UsageCollector;
+  /** Imported names that nothing reads as a value, so the bundler drops them. */
+  readonly typeOnlyImports: ReadonlySet<string>;
   visit: (node: Node | null | undefined) => void;
   visitAll: (nodes: readonly (Node | null)[]) => void;
   visitChildren: (node: Node) => void;

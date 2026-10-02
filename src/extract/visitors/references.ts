@@ -81,6 +81,15 @@ export const visitLabeled: Visitor<NodeOf<'LabeledStatement'>> = (node, context)
   context.visit(node.body);
 };
 
+/** An enum's own names are not references: only what its members are set to is read. */
+export const visitEnum: Visitor<NodeOf<'TSEnumDeclaration'>> = (node, context) => {
+  context.visit(node.body);
+};
+
+export const visitEnumMember: Visitor<NodeOf<'TSEnumMember'>> = (node, context) => {
+  context.visit(node.initializer);
+};
+
 export const skip: Visitor = () => {
   // Labels and `import.meta` hold no references.
 };

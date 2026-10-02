@@ -4,7 +4,9 @@ import { usagesOf } from '~/helpers.ts';
 
 describe('extracting ES module imports', () => {
   it('records named imports with and without the node: prefix', () => {
-    expect(usagesOf("import { watch } from 'node:fs';\nimport { join } from 'path';")).toEqual([
+    const source =
+      "import { watch } from 'node:fs';\nimport { join } from 'path';\nwatch(join('.'));";
+    expect(usagesOf(source)).toEqual([
       'api node:fs',
       'api node:fs.watch',
       'api node:path',
@@ -47,7 +49,9 @@ describe('extracting ES module imports', () => {
       'api node:vm.runInThisContext',
     ]);
   });
+});
 
+describe('extracting dynamic imports', () => {
   it('reports dynamic imports with computed specifiers', () => {
     expect(usagesOf('await import(name);')).toEqual(['dynamic import(<expression>)']);
   });
