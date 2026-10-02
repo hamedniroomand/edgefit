@@ -29,6 +29,26 @@ describe('compareOutcomes', () => {
     expect(compareOutcomes({ 'a.x': 'missing', 'a.y': 'unsupported' }, overrides, {})).toEqual([]);
   });
 
+  it('applies an override to the default mirror of its API', () => {
+    const overrides = { 'fs.F_OK': override('supported') };
+    const matrix = { fs: { F_OK: 'missing', default: { F_OK: 'missing' } } };
+    expect(compareOutcomes({ 'fs.default.F_OK': 'present' }, overrides, matrix)).toEqual([]);
+  });
+
+  it('accepts a stub that a lookup found, but not an absent one', () => {
+    const overrides = {
+      'a.x': override('unsupported'),
+      'a.y': { ...override('unsupported'), absent: true as const },
+    };
+    expect(compareOutcomes({ 'a.x': 'present', 'a.y': 'present' }, overrides, {})).toEqual([
+      {
+        api: 'a.y',
+        message: 'override says `unsupported`, probe says `present`',
+        dataSaysPresent: false,
+      },
+    ]);
+  });
+
   it('lists a mocked override that the probe found missing', () => {
     expect(compareOutcomes({ 'a.x': 'missing' }, { 'a.x': override('mocked') }, {})).toHaveLength(
       1,

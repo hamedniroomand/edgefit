@@ -17,6 +17,10 @@ export function matrixHas(tree, api) {
 function overrideDisagreement(override, outcome) {
   const stub = override.status === 'unsupported';
   const probedAsStub = MISSING_OR_UNSUPPORTED.has(outcome);
+  // A lookup finds a stub as `present`, so it agrees with a stub unless the override says absent.
+  if (stub && outcome === 'present' && override.absent !== true) {
+    return undefined;
+  }
   // A mismatch is a partial implementation, so a call with no arguments cannot confirm or refute it.
   if (override.status === 'mismatch') {
     return undefined;
@@ -48,7 +52,8 @@ export function compareOutcomes(outcomes, overrides, matrix, webMissing = new Se
     if (isDenied(api) && outcome !== 'missing') {
       continue;
     }
-    const override = overrides[api];
+    // edgefit reads a default import of a built-in as the module itself, and so does the probe.
+    const override = overrides[api] ?? overrides[api.replace('.default.', '.')];
     const found = override
       ? overrideDisagreement(override, outcome)
       : matrixDisagreement(matrix, api, outcome, webMissing);
