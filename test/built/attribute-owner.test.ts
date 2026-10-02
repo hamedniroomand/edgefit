@@ -35,28 +35,24 @@ function project(): string {
 }
 
 describe('who owns code in build output', () => {
-  it('owns the file of the project, and leaves code with no file there to the build output', async () => {
+  it('owns the file of the project, and merges code with no file there into one build output finding', async () => {
     const root = project();
     const result = await check({ root, built: 'out/index.js', config: { targets: ['workerd'] } });
-    const owners = Object.fromEntries(
-      (result.reports[0]?.findings ?? []).map(finding => [
-        finding.location.file,
-        finding.buildOutput === true ? 'build output' : (finding.package?.name ?? 'your code'),
-      ]),
-    );
-    expect(owners).toEqual({
-      'src/app.ts': 'your code',
-      'gone/x.ts': 'build output',
-      '.svelte-kit/output/server.js': 'build output',
-      'out/index.js': 'build output',
-    });
+    const owners = (result.reports[0]?.findings ?? []).map(finding => [
+      finding.buildOutput === true ? 'build output' : (finding.package?.name ?? 'your code'),
+      [finding.location, ...finding.otherLocations].map(location => location.file).toSorted(),
+    ]);
+    expect(owners).toEqual([
+      ['build output', ['.svelte-kit/output/server.js', 'gone/x.ts', 'out/index.js']],
+      ['your code', ['src/app.ts']],
+    ]);
   });
 
   it('shows build output as the owner in the text report', async () => {
     const root = project();
     const result = await check({ root, built: 'out/index.js', config: { targets: ['workerd'] } });
     const text = formatText(result, { color: false });
-    expect(text).toMatch(/build output {2}gone\/x\.ts:/u);
+    expect(text).toMatch(/build output {2}out\/index\.js:\d+:\d+ {2}\(\+2 more\)/u);
     expect(text).toMatch(/your code {2}src\/app\.ts:/u);
   });
 });

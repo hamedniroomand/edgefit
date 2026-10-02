@@ -203,13 +203,16 @@ function toFinding(
 /**
  * Identifies a finding by its API and owner: the package name, or the file for the project's own
  * code. Versions and line numbers are left out, so a patch release keeps the same identity.
+ * Build output has no file of the project, and its chunk names change with every build.
  */
 export function findingKey(finding: Finding): string {
-  const owner = finding.package?.name ?? finding.location.file;
+  const owner =
+    finding.package?.name ??
+    (finding.buildOutput === true ? 'build output' : finding.location.file);
   return `${finding.target}\0${finding.category}\0${finding.api}\0${owner}`;
 }
 
-/** Merges findings for the same API within one package (or one file of the project's own code). */
+/** Merges findings for the same API within one owner: a package, a file of the project's own code, or build output. */
 function group(findings: readonly Finding[]): Finding[] {
   const groups = new Map<string, Finding>();
   for (const finding of findings) {
