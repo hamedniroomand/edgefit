@@ -233,3 +233,36 @@ describe('usages behind process.env.NEXT_RUNTIME', () => {
     expect(watchUsages(`${fs}if (process.env.OTHER === 'edge') fs.watch('.');`)).toEqual(only());
   });
 });
+
+describe('usages behind a negative check on process.versions', () => {
+  it('knows another runtime from == null and === undefined', () => {
+    expect(usagesOf(`${fs}if (process.versions?.deno == null) fs.watch('.');`)).toEqual(
+      watch('not deno'),
+    );
+    expect(usagesOf(`${fs}if (process.versions.bun === undefined) fs.watch('.');`)).toEqual(
+      watch('not bun'),
+    );
+    expect(usagesOf(`${fs}if (process.versions.deno != null) fs.watch('.');`)).toEqual(
+      watch('deno'),
+    );
+  });
+
+  it('adds up the checks of an && chain', () => {
+    const chain = 'process.versions?.deno == null && process.versions?.bun == null && Date.now()';
+    expect(usagesOf(`${fs}if (${chain}) fs.watch('.');`)).toEqual(watch('not deno', 'not bun'));
+  });
+
+  it('keeps a check on Node from protecting anything', () => {
+    expect(usagesOf(`${fs}if (process.versions.node) fs.watch('.');`)).toEqual(watch());
+  });
+
+  it('knows the runtime when a helper holds the check', () => {
+    const helper =
+      "const isNode = () => process.versions?.deno == null && process.title !== 'workerd';";
+    expect(usagesOf(`${fs}${helper}\nif (isNode()) fs.watch('.');`)).toEqual([
+      'api node:fs',
+      'api node:process.title [not deno]',
+      'api node:fs.watch [not deno]',
+    ]);
+  });
+});
