@@ -12,13 +12,19 @@ Netlify Edge Functions run in a [Deno](https://docs.netlify.com/build/edge-funct
 
 - **Node API data** is the compatibility matrix's Deno dump, the same one the [`deno` target](/targets/deno) uses.
 - **Web API data** comes from the `netlify` column of runtime-compat-data instead of its `deno` column. The two differ on a few features, such as `Storage`.
-- **Curated overrides:** none yet. Netlify's documentation says edge functions support Node.js built-in modules and lists no blocked ones. Its [limits page](https://docs.netlify.com/build/edge-functions/limits) covers bundle size, memory and CPU time, which edgefit does not check.
+- **Curated overrides** come from edgefit's [production witness](/contributing/data#production-witness), a function deployed on Netlify, because Netlify's documentation lists no blocked Node.js modules. The witness answer is committed in the repository, and each entry links it.
+  - `child_process` is an error: Netlify does not grant run access, so starting a subprocess throws `NotCapable`.
+  - The `fs` write APIs (`writeFile`, `mkdir`, `rm`, `rename` and the others, also in `fs/promises`) are errors: Netlify grants write access to `/tmp` only, and a write anywhere else throws `NotCapable`. A write to `/tmp` works, but edgefit cannot see the path, so it reports the call. Dismiss the finding if your code writes to `/tmp`. A write through a file descriptor, `fs.open` with a write flag and then `fs.write`, is not reported, because edgefit cannot see the flag.
+  - About 120 APIs that Deno 2.3.1 has and later Deno releases removed, such as `util.isString`, are supported.
+- Netlify's [limits page](https://docs.netlify.com/build/edge-functions/limits) covers bundle size, memory and CPU time, which edgefit does not check.
 
 ## The Deno version
 
-Netlify does not document which Deno it runs. The data records the oldest one `@netlify/edge-bundler` accepts (`^2.4.2` in bundler 16.1.1), so the report says Deno `2.4.2` or newer, and notes that it is older than the data. APIs added to Deno since then are reported as supported.
+Netlify does not document which Deno it runs, and it hides `Deno.version.deno`. The production witness reads the version from `navigator.userAgent` and `process.versions.deno`: Netlify runs Deno `2.3.1`. On every Node API lookup, Netlify agrees with a Deno 2.3.1 probe, except the members of `process.stdin`, which is a socket there. So Netlify removes no Node APIs of its own.
 
-If Netlify runs a newer Deno than that, results are unaffected. If it runs 2.4.2, some APIs the data marks as present are missing there. The weekly probe lists them in the job summary (the `netlify-min` run), but they are not applied to your report, because that would report errors that may not exist.
+The report says Deno `2.3.1` and notes that it is older than the data. APIs added to Deno after 2.3.1, such as `fs.glob` or `sqlite.StatementSync`, are reported as supported, although Netlify does not have them.
+
+Deno 2.3.1 is older than the `^2.4.2` that `@netlify/edge-bundler` 16.1.1 requires on your machine. So `netlify dev` and local tests can run a newer Deno than production. An API that works locally can be missing when you deploy.
 
 ## Entry detection
 

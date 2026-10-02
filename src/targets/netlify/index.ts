@@ -57,7 +57,7 @@ export function createNetlifyEdgeTarget(root: string, netlify: NetlifyOptions = 
       entries,
       notes: [
         'Packages are resolved with the `node` condition: @netlify/edge-bundler 16.1.1 bundles npm dependencies with esbuild for the node platform and passes no conditions (dist/node/npm_dependencies.js). It also picks `module`, `browser` then `main` fields and defines `process.env.NODE_ENV` as production, which edgefit does not apply.',
-        "Netlify's docs name no blocked Node.js APIs. The Deno version is the minimum @netlify/edge-bundler requires, not the one Netlify runs.",
+        "Netlify's docs name no Deno version and no blocked Node.js APIs. The version and the blocked APIs (subprocesses, and file writes outside /tmp) come from edgefit's production witness on Netlify.",
         ...map.notes,
         ...notes,
       ],

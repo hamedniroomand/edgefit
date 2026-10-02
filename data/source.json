@@ -64,11 +64,12 @@
     },
     {
       "provider": "overrides/netlify-edge",
-      "url": "https://www.npmjs.com/package/@netlify/edge-bundler/v/16.1.1",
+      "url": "https://github.com/hamedniroomand/edgefit/blob/e904f680c6c1ebb0c6c2912b44253fd8c4cc0306/scripts/probe/witness/answers",
       "license": "MIT",
       "versions": {
-        "netlify-edge": "2.4.2"
-      }
+        "netlify-edge": "2.3.1"
+      },
+      "note": "The answer of the production witness, read on 2026-10-03 after Witness run 37075288327. Netlify hides Deno.version.deno; navigator.userAgent and process.versions.deno report 2.3.1."
     },
     {
       "provider": "allowlist/vercel-edge",

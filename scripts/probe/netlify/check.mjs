@@ -36,7 +36,7 @@ if (range === undefined) {
 
 const sections = compareNetlify({ hashes: hashPages(pages), range }, recorded);
 const lines = [
-  `## netlify-edge · @netlify/edge-bundler ${latest.version} (data ${recorded.bundler.version}) · Deno ${range} (data ${source.versions['netlify-edge']}+)`,
+  `## netlify-edge · @netlify/edge-bundler ${latest.version} (data ${recorded.bundler.version}) · Deno ${range} (data ${source.versions['netlify-edge']})`,
   '',
 ];
 for (const { title, items } of sections) {

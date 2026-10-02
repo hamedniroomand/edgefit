@@ -40,8 +40,8 @@ jobs:
         runtime: [bun, deno, workerd]
         channel: [pinned, latest]
         include:
-          # The oldest Deno Netlify's bundler supports, to show what the Deno data would get wrong
-          # if Netlify ran it. It only informs the job summary; it never opens an issue.
+          # The Deno that the netlify-edge data records, to show what the Deno data gets wrong for
+          # it. It only informs the job summary; it never opens an issue.
           - runtime: deno
             channel: netlify-min
     steps:

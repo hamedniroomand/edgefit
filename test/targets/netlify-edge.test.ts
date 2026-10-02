@@ -19,7 +19,7 @@ describe('netlify-edge target', () => {
     expect(info.conditions).toEqual(['node']);
     expect(info.data).toContain('deno 2.9.7');
     expect(info.settings).toBe(
-      'Netlify Edge Functions on Deno 2.4.2 or newer, edge functions from netlify.toml, import map import_map.json',
+      'Netlify Edge Functions on Deno 2.3.1, edge functions from netlify.toml, import map import_map.json',
     );
   });
 
@@ -29,9 +29,9 @@ describe('netlify-edge target', () => {
     expect(info.settings).not.toContain('deno.jsonc');
   });
 
-  it('notes that Deno 2.4.2 is older than the data', () => {
+  it('notes that Deno 2.3.1 is older than the data', () => {
     const { info } = createNetlifyEdgeTarget(fixture('netlify-app'));
-    expect(info.notes.join('\n')).toContain('Deno 2.4.2 is older than the data (2.9.7)');
+    expect(info.notes.join('\n')).toContain('Deno 2.3.1 is older than the data (2.9.7)');
   });
 
   it('is Deno and Netlify at once for runtime checks', () => {
@@ -46,9 +46,17 @@ describe('netlify-edge target', () => {
     );
   });
 
-  it('answers Node lookups like Deno', () => {
+  it('applies what the production witness measured on top of the Deno data', () => {
     const target = createNetlifyEdgeTarget(fixture('netlify-app'));
-    expect(target.lookup({ module: 'util', path: ['isString'] }).status).toBe('unsupported');
+    const statusOf = (module: string, ...path: string[]): string =>
+      target.lookup({ module, path }).status;
+    // Deno 2.3.1 has it; the Deno release the matrix describes removed it.
+    expect(statusOf('util', 'isString')).toBe('supported');
+    // The netlify-edge module entry wins over the Deno layer's `child_process: supported`.
+    expect(statusOf('child_process', 'spawn')).toBe('unsupported');
+    expect(statusOf('fs', 'writeFile')).toBe('unsupported');
+    expect(statusOf('fs', 'promises', 'writeFile')).toBe('unsupported');
+    expect(statusOf('fs', 'readFile')).toBe('supported');
   });
 });
 

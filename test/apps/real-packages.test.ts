@@ -73,17 +73,21 @@ describe.skipIf(!installed)('a known-bad app', () => {
 });
 
 /**
- * The same app on the Edge platforms. Netlify runs Deno, which has everything chokidar and
- * cross-spawn reach. Vercel allows five modules, so every other one is an error: the watcher's
+ * The same app on the Edge platforms. Netlify runs Deno, which has everything chokidar reaches,
+ * but blocks subprocesses, so cross-spawn's child_process is an error. Vercel allows five modules, so every other one is an error: the watcher's
  * fs, path, os, process and stream, and the spawner's child_process, which the matrix does not
  * cover and the override layer has to catch. `events`, which chokidar also imports, is allowed.
  */
 describe.skipIf(!installed)('a known-bad app on the Edge platforms', () => {
   const root = sampleApp('known-bad');
 
-  it('finds nothing to report on netlify-edge', async () => {
+  it('reports only the subprocess on netlify-edge', async () => {
     const config = { targets: ['netlify-edge' as const], entry: 'src/index.js' };
-    expect((await check({ root, config })).reports[0]?.findings).toEqual([]);
+    const [report] = (await check({ root, config })).reports;
+    expect(report?.findings.map(finding => finding.api).sort()).toEqual([
+      'node:child_process.spawn',
+      'node:child_process.spawnSync',
+    ]);
   });
 
   it('reports every module Vercel does not allow, including child_process', async () => {
@@ -110,7 +114,8 @@ describe.skipIf(!installed)('a known-bad app on the Edge platforms', () => {
     const io = captureIo(root);
     await run(['compare', 'workerd', 'netlify-edge', 'vercel-edge', '--entry', 'src/index.js', '--no-color'], io);
     expect(io.output()).toContain('API                           workerd  netlify-edge  vercel-edge');
-    expect(io.output()).toContain('node:child_process.spawn      ✗        ✓             ✗');
+    expect(io.output()).toContain('node:child_process.spawn      ✗        ✗             ✗');
+    expect(io.output()).toContain('node:fs.watch                 ✗        ✓             –');
   });
 });
 

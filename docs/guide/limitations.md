@@ -85,7 +85,7 @@ Without a wrangler config, edgefit uses the compatibility date and flags of its 
 
 Deno Deploy runs an older Deno than the newest release. Its results are the Deno data plus a curated layer, and that layer is the least tested part of the data.
 
-Netlify Edge Functions run Deno, but Netlify does not document which version or which Node APIs it blocks. The `netlify-edge` target uses the Deno data, records the oldest Deno Netlify's bundler accepts as a floor, and has no curated layer. If Netlify runs an older Deno than the data, an API added since is reported as supported.
+Netlify Edge Functions run Deno 2.3.1, which edgefit measured on Netlify, because Netlify does not document its version or the Node APIs it blocks. The `netlify-edge` target uses the Deno data with a layer from those measurements. An API added to Deno after 2.3.1 is reported as supported. A file write is reported even when the path is under `/tmp`, where Netlify allows it.
 
 ## Your runtime's own APIs are not checked
 

@@ -20,8 +20,9 @@ const factories: Record<TargetKey, TargetFactory> = {
 
 export const targetKeys = Object.keys(factories) as TargetKey[];
 
-// deno-deploy and netlify-edge are left out while their override layers are empty: their columns
-// would repeat deno's. vercel-edge is experimental: its data is Vercel's documentation, not a dump.
+// deno-deploy is left out while its override layer is empty: its column would repeat deno's.
+// netlify-edge has a layer now, but adding its column changes the compare table and is its own
+// change. vercel-edge is experimental: its data is Vercel's documentation, not a dump.
 export const compareTargetKeys = targetKeys.filter(
   key => key !== 'deno-deploy' && key !== 'netlify-edge' && key !== 'vercel-edge',
 );
