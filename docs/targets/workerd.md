@@ -28,7 +28,7 @@ Without a wrangler config, edgefit uses the settings the compatibility data was 
 
 Workers turns on native Node modules one by one, gated by compatibility flags that become defaults at a given date when `nodejs_compat` is on. For example, `fs` is native from `2025-09-15` with `enable_nodejs_fs_module`, and `child_process` from `2026-03-17`.
 
-A module that is not native at your date and flags is reported as `mocked`, because wrangler bundles an unenv polyfill in its place. Moving your compatibility date forward often clears a group of findings at once.
+A module that is not native at your date and flags is reported as `mocked`, because wrangler bundles an unenv polyfill in its place. A constant value that the polyfill provides, such as `EOL` from `node:os`, is not reported. Moving your compatibility date forward often clears a group of findings at once.
 
 ## What the data covers
 
