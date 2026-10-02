@@ -202,7 +202,7 @@
     "Crypto",
     "EdgeRuntime"
   ],
-  "witnessGlobals": [],
+  "witnessGlobals": ["AsyncLocalStorage"],
   "docs": {
     "moduleDescriptions": {
       "async_hooks": "4d8c462925334356",
@@ -217,7 +217,7 @@
     "version": "5.0.0"
   },
   "members": {
-    "description": "Which modules are allowed comes from the docs page. Which members of each exist comes from two pieces of Vercel's own code that list them identically: NativeModuleMap in next's edge sandbox and in @vercel/node's dev server. Both are local stand-ins for production, so the witness in #8 is what would confirm it.",
+    "description": "Which modules are allowed comes from the docs page. Which members of each exist comes from two pieces of Vercel's own code that list them identically: NativeModuleMap in next's edge sandbox and in @vercel/node's dev server. The production witness confirmed the lists in both Vercel middleware and edge functions, except async_hooks.AsyncResource, which middleware lacks (an override).",
     "sources": [
       {
         "package": "next",
@@ -230,5 +230,11 @@
         "file": "dist/dev-server.mjs"
       }
     ]
+  },
+  "witness": {
+    "description": "witnessGlobals, and the overrides that link this answer, come from the production witness, deployed as Vercel middleware and as an edge function. The edge function hides the own names of globalThis, so each global is measured with typeof.",
+    "answer": "scripts/probe/witness/answers/vercel-2026-10-03.json",
+    "commit": "3ff2b27884b397a5067c80172d340b09916dd950",
+    "run": 37078244260
   }
 }

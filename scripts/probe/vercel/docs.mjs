@@ -73,7 +73,11 @@ export function compareDocs(parsed, allowlist, overrides) {
   // The data names a call of the Function constructor `Function.(string)`; the page says `new Function`.
   // It names `WebAssembly.instantiate` with bytes `WebAssembly.instantiate.(bytes)`; the page says `WebAssembly.instantiate`.
   // The page forbids `require` in a sentence, not a table row, so `require.(dynamic)` is left out.
-  const dataBlocked = [...Object.keys(overrides.apis), ...overrides.notModelled]
+  // An entry that rests on the production witness links the answer, not the page, so it is left out.
+  const fromDocs = Object.keys(overrides.apis).filter(name =>
+    overrides.apis[name].source.startsWith('#'),
+  );
+  const dataBlocked = [...fromDocs, ...overrides.notModelled]
     .map(name =>
       name
         .replace(/^\*globals\*\./u, '')

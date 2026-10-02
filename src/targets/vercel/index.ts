@@ -50,8 +50,8 @@ export function createVercelEdgeTarget(root: string): Target {
       data: description,
       settings: `Vercel Edge runtime as documented on ${docsDate}`,
       notes: [
-        `Based on Vercel's Edge runtime documentation (${docsDate}) and runtime-compat-data, not on a run in production. ` +
-          'Anything the documentation does not list is reported as missing.',
+        `Based on Vercel's Edge runtime documentation (${docsDate}) and runtime-compat-data, corrected by edgefit's production witness where middleware and edge functions differ. ` +
+          'Anything the documentation does not list is reported as missing. An API that only one of the two has is reported as missing, and its note names the one that has it.',
         'Vercel recommends the Node.js runtime for functions. Routing Middleware still runs on the edge runtime by default.',
         'Export conditions follow the Next.js resolver; Edge Functions outside Next.js may resolve `module` differently.',
         'Importing a Node.js module Vercel lacks is not reported, only reading from it: Next.js replaces it with a stand-in that throws when it is used (globalThis.__import_unsupported, next 16.3.8, webpack build). Outside Next.js an import alone may fail.',

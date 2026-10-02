@@ -37,6 +37,24 @@
       "target": "vercel-edge",
       "reason": "Runs only when routeModule.isDev is true. isDev is set from __NEXT_DEV_SERVER, which only next dev sets, so a deployed build never runs it.",
       "source": "https://github.com/vercel/next.js/blob/v16.3.8/packages/next/src/build/templates/app-route.ts#L117"
+    },
+    {
+      "package": "next",
+      "versions": { "min": "16.3.8", "max": "16.3.8" },
+      "file": "dist/esm/server/lib/clone-response.js",
+      "apis": ["WeakRef"],
+      "target": "vercel-edge",
+      "reason": "Runs only inside `if (registry)`, and `registry` is set only when `globalThis.FinalizationRegistry` exists. Vercel edge functions have no FinalizationRegistry, so the branch never runs there.",
+      "source": "https://github.com/vercel/next.js/blob/v16.3.8/packages/next/src/server/lib/clone-response.ts#L5"
+    },
+    {
+      "package": "next",
+      "versions": { "min": "16.3.8", "max": "16.3.8" },
+      "file": "dist/server/lib/clone-response.js",
+      "apis": ["WeakRef"],
+      "target": "vercel-edge",
+      "reason": "Runs only inside `if (registry)`, and `registry` is set only when `globalThis.FinalizationRegistry` exists. Vercel edge functions have no FinalizationRegistry, so the branch never runs there.",
+      "source": "https://github.com/vercel/next.js/blob/v16.3.8/packages/next/src/server/lib/clone-response.ts#L5"
     }
   ]
 }

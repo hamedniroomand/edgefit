@@ -33,8 +33,7 @@ describe('vercel-edge module members', () => {
     expect(status('util', 'format')).toBe('supported');
     expect(status('util', 'promisify')).toBe('supported');
     expect(status('util', 'types')).toBe('supported');
-    expect(status('async_hooks', 'AsyncResource')).toBe('supported');
-    expect(status('async_hooks', 'default', 'AsyncResource')).toBe('supported');
+    expect(status('async_hooks', 'AsyncLocalStorage')).toBe('supported');
   });
 
   it('reports what exists in Node but not on Vercel, instead of passing it', () => {
@@ -140,10 +139,10 @@ describe('vercel-edge target info', () => {
     expect(created.runtimes).toEqual(['vercel-edge']);
   });
 
-  it('names the docs date and says the data is not from production', () => {
+  it('names the docs date and says where the witness corrects it', () => {
     expect(target.info.data).toContain('allowlist/vercel-edge (vercel-edge 2026-08-03)');
     expect(target.info.settings).toBe('Vercel Edge runtime as documented on 2026-08-03');
-    expect(target.info.notes.join('\n')).toContain('not on a run in production');
+    expect(target.info.notes.join('\n')).toContain("corrected by edgefit's production witness");
     expect(target.info.notes.join('\n')).toContain('recommends the Node.js runtime');
   });
 
@@ -155,7 +154,7 @@ describe('vercel-edge target info', () => {
 
 describe('vercel-edge globals the docs table omits', () => {
   it('keeps the ECMAScript builtins of V8', () => {
-    for (const name of ['Uint16Array', 'WeakRef', 'globalThis', 'AggregateError', 'Iterator']) {
+    for (const name of ['Uint16Array', 'WeakMap', 'globalThis', 'AggregateError', 'Iterator']) {
       expect(status('*globals*', name)).toBe('supported');
     }
   });
@@ -170,6 +169,29 @@ describe('vercel-edge globals the docs table omits', () => {
     for (const name of ['setImmediate', 'clearImmediate', 'global']) {
       expect(status('*globals*', name)).toBe('unsupported');
     }
+  });
+});
+
+describe('vercel-edge APIs that only one kind of entry has', () => {
+  // The production witness measured them; edgefit has one target for middleware and edge functions.
+  const lookup = (module: string, ...apiPath: string[]): ReturnType<typeof target.lookup> =>
+    target.lookup({ module, path: apiPath });
+
+  it('reports the globals edge functions lack as absent, naming middleware', () => {
+    for (const name of ['DOMException', 'WeakRef', 'FinalizationRegistry']) {
+      const result = lookup('*globals*', name);
+      expect(result).toMatchObject({ status: 'unsupported', absent: true });
+      expect(result.note).toContain('Vercel middleware has it');
+    }
+  });
+
+  it('reports AsyncResource as absent, naming edge functions', () => {
+    expect(lookup('async_hooks', 'AsyncResource')).toMatchObject({
+      status: 'unsupported',
+      absent: true,
+    });
+    expect(lookup('async_hooks', 'default', 'AsyncResource').status).toBe('unsupported');
+    expect(lookup('async_hooks', 'AsyncResource').note).toContain('Vercel edge functions have it');
   });
 });
 
@@ -188,12 +210,14 @@ describe('vercel-edge data provenance', () => {
     }
   });
 
-  it('cites a docs anchor for every curated override', () => {
+  it('cites a docs anchor or the witness answer at a commit for every curated override', () => {
     const { apis } = read('overrides/vercel-edge.json') as {
       apis: Record<string, { source: string }>;
     };
+    const answer =
+      /^https:\/\/github\.com\/hamedniroomand\/edgefit\/blob\/[0-9a-f]{40}\/scripts\/probe\/witness\/answers\/vercel-[\d-]+\.json$/u;
     for (const entry of Object.values(apis)) {
-      expect(entry.source).toMatch(/^#[a-z-]+$/u);
+      expect(/^#[a-z-]+$/u.test(entry.source) || answer.test(entry.source)).toBe(true);
     }
   });
 });

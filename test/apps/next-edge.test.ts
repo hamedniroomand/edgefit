@@ -47,15 +47,20 @@ describe.skipIf(!built)('next.js on vercel-edge, from the build output', () => {
     expect((await report())?.guarded.every(finding => finding.package?.name === 'next')).toBe(true);
   });
 
-  it('keeps the four guarded findings, each with a reason and a source', async () => {
+  // Edge functions lack FinalizationRegistry and WeakRef. Next checks for FinalizationRegistry itself,
+  // and calls WeakRef only inside that check, which data/unreached.json records.
+  it('keeps the guarded findings, each unreached one with a reason and a source', async () => {
     const { guarded } = (await report()) ?? { guarded: [] };
     expect(guarded.map(finding => finding.api).toSorted()).toEqual([
+      'FinalizationRegistry',
+      'WeakRef',
       'clearImmediate',
       'node:process.hrtime.bigint',
       'node:process.nextTick',
       'setImmediate',
     ]);
-    for (const finding of guarded) {
+    const unreached = guarded.filter(finding => finding.api !== 'FinalizationRegistry');
+    for (const finding of unreached) {
       expect(finding.unreached?.reason).not.toBe('');
       expect(finding.unreached?.source).toMatch(/^https:\/\/github\.com\/vercel\/next\.js\//u);
     }

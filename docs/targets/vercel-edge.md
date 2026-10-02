@@ -14,8 +14,8 @@ Vercel recommends the Node.js runtime for functions and calls standalone Edge Fu
 
 Vercel's Edge runtime is its own V8 runtime, not workerd, Deno or Node, and Vercel publishes no compatibility dump for it. So this target is built from Vercel's [Edge Runtime documentation](https://vercel.com/docs/functions/runtimes/edge) as of 2026-08-03:
 
-- **Node modules.** Only five are allowed, with or without the `node:` prefix: `events`, `buffer`, `assert`, `async_hooks` and `util`. The documentation says which modules; it does not say which members of each exist. Those come from two pieces of Vercel's own code that list them identically: `NativeModuleMap` in Next.js's edge sandbox (`next@16.3.8`) and in `@vercel/node`'s dev server (`17.0.0`). Every member they do not list is reported as missing, so `buffer.Blob`, `events.getEventListeners`, `assert.partialDeepStrictEqual`, `util.inspect` and `async_hooks.createHook` are errors, and `util.format`, `util.inherits` and `async_hooks.AsyncResource`, which the documentation does not mention, are not. Every other built-in, such as `fs`, `path` or `crypto`, is reported as missing.
-- **Globals.** `Buffer`, `process.env` and the Web APIs the documentation lists. The ECMAScript builtins of V8 (`Uint16Array`, `WeakRef`, `globalThis` and the rest) are kept, and so are a few web globals the documentation's table omits but Vercel's own emulator provides (`queueMicrotask`, `performance`, `WebSocket` and others). Node-only globals such as `setImmediate` and `global` are reported as missing.
+- **Node modules.** Only five are allowed, with or without the `node:` prefix: `events`, `buffer`, `assert`, `async_hooks` and `util`. The documentation says which modules; it does not say which members of each exist. Those come from two pieces of Vercel's own code that list them identically: `NativeModuleMap` in Next.js's edge sandbox (`next@16.3.8`) and in `@vercel/node`'s dev server (`17.0.0`). Every member they do not list is reported as missing, so `buffer.Blob`, `events.getEventListeners`, `assert.partialDeepStrictEqual`, `util.inspect` and `async_hooks.createHook` are errors, and `util.format` and `util.inherits`, which the documentation does not mention, are not. Every other built-in, such as `fs`, `path` or `crypto`, is reported as missing.
+- **Globals.** `Buffer`, `process.env` and the Web APIs the documentation lists. The ECMAScript builtins of V8 (`Uint16Array`, `WeakMap`, `globalThis` and the rest) are kept, and so are a few web globals the documentation's table omits but Vercel's own emulator provides (`queueMicrotask`, `performance`, `WebSocket` and others). Node-only globals such as `setImmediate` and `global` are reported as missing.
 - **Disabled features.** `eval`, `WebAssembly.compile` and `Function(string)` are reported as unsupported. `WebAssembly.instantiate` is reported as a warning (`mismatch`) when its first argument is not a module from `import mod from './x.wasm'` (or `'./x.wasm?module'`), for example bytes from `fetch` or `readFile`. A parameter is reported too, because edgefit cannot see what the caller passes. `Function(string)` is a call of the `Function` constructor with an argument, `new Function('a', 'return a')` for example. `Function('return this')`, the classic way to reach the global object, is not counted, since code that uses it checks for `globalThis` first.
 - **Other Web APIs** come from the `edge-light` column of runtime-compat-data, as warnings at the `web` level.
 
@@ -60,6 +60,16 @@ Only the global `process.env` exists on this runtime. `process.env` is allowed a
 
 The documentation says calling `require` directly is not allowed and that packages must be ES modules. Vercel bundles the code, so a static `require('x')` is part of the bundle and is not reported. A `require` whose module is computed at runtime, such as `require(name)`, cannot be bundled. It is reported as an error here and stays an `unknown` warning on the other targets. A `require` inside `try` stays a warning, because the `catch` handles the error.
 
+## Middleware and edge functions
+
+edgefit's [production witness](/contributing/data#production-witness) runs on Vercel as middleware and as an edge function, and the two are not the same. edgefit has one `vercel-edge` target for both, so an API that one of them lacks is reported as missing, and the note names the one that has it.
+
+- Edge functions have no `DOMException`, `WeakRef` or `FinalizationRegistry`. Middleware has them. A middleware that uses them gets a finding to dismiss. Next.js checks for `FinalizationRegistry` itself, so its own use of `WeakRef` is reported as guarded.
+- Middleware has no `async_hooks.AsyncResource`. Edge functions have it.
+- Middleware runs `WebAssembly.compile` and `WebAssembly.instantiate` with bytes. Edge functions do not, as the documentation says, so both are still reported.
+- Middleware has `Float16Array`, `DisposableStack`, `AsyncDisposableStack` and `SuppressedError`. Edge functions do not, so a use of them is reported.
+- Both have `AsyncLocalStorage` as a global.
+
 ## What is not checked
 
 - **A `require` that does not resolve, inside `try`.** esbuild keeps it as a call left for runtime and does not warn, so edgefit records nothing for it. Outside `try`, an unresolved `require` stops the check.
@@ -67,12 +77,12 @@ The documentation says calling `require` directly is not allowed and that packag
 
 Two limits of those member lists:
 
-- Both files are local stand-ins for production (Next's own edge sandbox, and Vercel's dev server), so they are not a measurement of the platform. The documentation's "fully supported" for `events` is wider than the sandbox's member list, and the list wins here, which can only cause false errors.
-- Turbopack's edge build also keeps `assert/strict` and `util/types` as separate modules, but neither sandbox lists them, so they are reported as missing. The production witness ([#8](https://github.com/hamedniroomand/edgefit-2/issues/8)) would settle it.
+- Both files are local stand-ins for production (Next's own edge sandbox, and Vercel's dev server). The production witness confirmed their lists in middleware and in edge functions, except `async_hooks.AsyncResource`, which middleware lacks. The documentation's "fully supported" for `events` is wider than the sandbox's member list, and the list wins here, which can only cause false errors.
+- Turbopack's edge build also keeps `assert/strict` and `util/types` as separate modules, but neither sandbox lists them, so they are reported as missing. The [production witness](/contributing/data#production-witness) has not looked them up yet: it imports only the five allowed modules.
 
 ## How trustworthy this is
 
-The results describe what Vercel's documentation says, not what was observed in production. The report notes this.
+The results describe what Vercel's documentation says, corrected where the production witness measured something else. The report notes this.
 
 A weekly job checks the data two ways, and adds a section to the data drift issue when either finds something:
 
