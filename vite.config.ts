@@ -101,6 +101,7 @@ export default defineConfig({
     cache: true,
   },
   test: {
+    isolate: false,
     projects: [
       {
         extends: true,

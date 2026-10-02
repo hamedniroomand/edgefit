@@ -102,6 +102,21 @@ Nothing is committed automatically. Probe results are evidence for reviewers. ed
 
 The probe code is in `scripts/probe`.
 
+### Production witness
+
+Netlify and Vercel publish no runtime to install, so a small function deployed on each platform reports what production has. The **Witness** workflow (`.github/workflows/witness.yml`) deploys it to a Netlify site as an edge function, and to a Vercel project as middleware and as an edge route. Run the workflow by hand when the witness code or its list of APIs changes. Only this workflow needs the platform tokens.
+
+The witness only looks APIs up. It never calls them, because the endpoint is public. It reports:
+
+- the Deno version (Netlify)
+- the names on the global object
+- a lookup of each API in its list: every module and member in the Node baseline on Netlify, and the members of the allowed modules on Vercel
+- whether `eval`, `new Function` and `WebAssembly.compile` from bytes run, and on Netlify whether `Deno.Command` and a file write run
+
+The weekly Probe run reads the witness with no secret, in the `witness` jobs, and compares the answer with the data in the job summary. Each answer has a hash of the list of APIs that the witness was built with. When the hash does not match the repository, the summary says to redeploy. The witness is not part of the drift issue. A witness that does not answer gives a warning, so you can remove the witness and the results do not change.
+
+The code is in `scripts/probe/witness`.
+
 ## Bumping a data source
 
 The matrix provider's repository may lag behind the runtimes. Check its newest commit first: if it has newer dumps, vendor those. If it does not, regenerate the runtime dumps with its own scripts, at the commit `source.json` names:

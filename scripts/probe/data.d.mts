@@ -7,3 +7,4 @@ export interface OverrideEntry {
 }
 
 export function readOverrides(runtime: string): Record<string, OverrideEntry>;
+export function readMatrix(file: string): Record<string, unknown>;

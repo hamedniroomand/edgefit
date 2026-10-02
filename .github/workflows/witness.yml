@@ -1,0 +1,57 @@
+name: Witness
+
+# Deploys the witness that the weekly Probe run reads. Run it by hand when the witness code or the
+# list of APIs changes: the probe summary says so when the deployed list is older.
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Which witness to deploy
+        type: choice
+        options: [both, netlify, vercel]
+        default: both
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: deploy (${{ matrix.platform }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # The tokens are secrets of this environment only, so no other workflow can read them.
+    environment: witness
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ inputs.platform == 'both' && fromJSON('["netlify", "vercel"]') || fromJSON(format('["{0}"]', inputs.platform)) }}
+    env:
+      STAGE: ${{ github.workspace }}/../witness
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - name: Stage the project
+        run: node scripts/probe/witness/build.mjs ${{ matrix.platform }} "$STAGE"
+
+      - if: matrix.platform == 'netlify'
+        name: Deploy to Netlify
+        working-directory: ${{ env.STAGE }}
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: npx --yes netlify-cli@27.10.2 deploy --prod --dir public --site "$NETLIFY_SITE_ID"
+
+      - if: matrix.platform == 'vercel'
+        name: Deploy to Vercel
+        working-directory: ${{ env.STAGE }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TELEMETRY_DISABLED: '1'
+        run: npx --yes vercel@62.1.0 deploy --prod --yes --token "$VERCEL_TOKEN"
