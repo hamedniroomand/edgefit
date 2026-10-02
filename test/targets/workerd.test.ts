@@ -122,6 +122,33 @@ describe('workerd module gates', () => {
   });
 });
 
+describe('workerd constants that unenv provides', () => {
+  const early = settings('2025-04-01');
+  const status = (module: string, path: string[]): string | undefined =>
+    checkSettings({ module, path }, early)?.status;
+
+  it('does not report a constant value of the polyfill', () => {
+    expect(checkSettings({ module: 'os', path: ['EOL'] }, early)).toBeUndefined();
+    expect(checkSettings({ module: 'os', path: ['constants'] }, early)).toBeUndefined();
+  });
+
+  it('still reports functions, classes and objects of stubs', () => {
+    expect(status('os', ['cpus'])).toBe('mocked');
+    expect(status('os', ['setPriority'])).toBe('mocked');
+    expect(status('fs', ['readFile'])).toBe('mocked');
+    expect(status('fs', ['existsSync'])).toBe('mocked');
+    expect(status('fs', ['promises'])).toBe('mocked');
+    expect(status('http', ['Server'])).toBe('mocked');
+    expect(status('child_process', ['ChildProcess'])).toBe('mocked');
+  });
+
+  it('still reports what is not known: a module, a member, a nested member', () => {
+    expect(status('os', ['unknown'])).toBe('mocked');
+    expect(status('os', [])).toBe('mocked');
+    expect(status('os', ['constants', 'signals'])).toBe('mocked');
+  });
+});
+
 describe('what a missing nodejs_compat flag leaves undefined', () => {
   it('marks the result as absent, so a check for the API protects the code', () => {
     const bare = settings('2026-05-20', []);

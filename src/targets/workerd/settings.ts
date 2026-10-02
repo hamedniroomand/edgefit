@@ -1,4 +1,5 @@
 import type { LookupResult } from '@/data/dump.ts';
+import { isUnenvConstant } from '@/data/unenv.ts';
 import type { ApiRef } from '@/types.ts';
 
 import {
@@ -125,7 +126,7 @@ export function checkSettings(api: ApiRef, settings: WorkerdSettings): LookupRes
       : withoutFlag('needs the nodejs_compat compatibility flag, which is not set', settings);
   }
   const gate = gatesFor(api).find(candidate => !isGateOpen(candidate, settings));
-  if (gate === undefined) {
+  if (gate === undefined || isUnenvConstant(api)) {
     return undefined;
   }
   // Without native support, wrangler's nodejs_compat build substitutes unenv polyfills.

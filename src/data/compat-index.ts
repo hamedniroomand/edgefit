@@ -9,7 +9,7 @@ function entryKey(module: string, path: readonly string[]): string {
 }
 
 /** A default import of a built-in is the module itself, so `fs.default.watch` is `fs.watch`. */
-function memberPath(api: ApiRef): string[] {
+export function memberPath(api: ApiRef): string[] {
   return api.module !== '*globals*' && api.path[0] === 'default' ? api.path.slice(1) : api.path;
 }
 

@@ -22,6 +22,15 @@
       }
     },
     {
+      "provider": "unenv",
+      "url": "https://github.com/unjs/unenv/tree/v2.0.0-rc.24/src/runtime/node",
+      "license": "MIT",
+      "note": "The exports of unenv's Node polyfills that are constant values, read with scripts/unenv/generate.mjs from the release wrangler pins.",
+      "versions": {
+        "unenv": "2.0.0-rc.24"
+      }
+    },
+    {
       "provider": "overrides/workerd",
       "url": "https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node",
       "license": "MIT",
