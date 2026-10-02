@@ -12,6 +12,7 @@ const allowlist = data('allowlists/vercel-edge.json') as {
   globals: string[];
   languageGlobals: string[];
   emulatorGlobals: string[];
+  witnessGlobals: string[];
   modules: Record<string, unknown>;
   docs: { moduleDescriptions: Record<string, string> };
 };
@@ -124,6 +125,7 @@ describe('compareEmulator', () => {
     ...allowlist.globals,
     ...allowlist.languageGlobals,
     ...allowlist.emulatorGlobals,
+    ...allowlist.witnessGlobals,
   ]);
   const documented = allowlist.globals.filter(name => name !== 'Buffer');
   const observed = { names: [...documented, 'eval'], evalThrows: true, functionThrows: true };
