@@ -25,11 +25,13 @@ export interface Scope {
   checks: Map<string, Check>;
   /** `const` names bound to a plain string, which can stand in for a literal specifier. */
   strings: Map<string, string>;
+  /** `const` names bound to a symbol, which can never name an API. */
+  symbols: Set<string>;
   parent: Scope | undefined;
 }
 
 export function createScope(parent?: Scope): Scope {
-  return { names: new Map(), checks: new Map(), strings: new Map(), parent };
+  return { names: new Map(), checks: new Map(), strings: new Map(), symbols: new Set(), parent };
 }
 
 /** The string a `const` holds, unless a nearer declaration of the name shadows it. */
@@ -42,6 +44,14 @@ export function lookupString(scope: Scope | undefined, name: string): string | u
     return value;
   }
   return scope.names.has(name) ? undefined : lookupString(scope.parent, name);
+}
+
+/** True when the name is a `const` symbol, unless a nearer declaration of the name shadows it. */
+export function lookupSymbol(scope: Scope | undefined, name: string): boolean {
+  if (scope === undefined) {
+    return false;
+  }
+  return scope.symbols.has(name) || (!scope.names.has(name) && lookupSymbol(scope.parent, name));
 }
 
 /** The check a name holds, unless a nearer declaration of the name shadows it. */

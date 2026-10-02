@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { staticKey, staticString } from '@/extract/ast.ts';
+import { isSymbolKey, staticKey, staticString } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
@@ -101,6 +101,8 @@ export const visitDeclaration: Visitor<NodeOf<'VariableDeclaration'>> = (node, c
       const value = id.type === 'Identifier' ? staticString(init) : undefined;
       if (id.type === 'Identifier' && value !== undefined) {
         context.scope.strings.set(id.name, value);
+      } else if (id.type === 'Identifier' && init !== null && isSymbolKey(init)) {
+        context.scope.symbols.add(id.name);
       }
     }
   }

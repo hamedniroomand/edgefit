@@ -91,7 +91,7 @@ Mapping findings to packages needs sourcemaps. Without them, edgefit reads the `
 
 ## Constant module names only
 
-`import(name)` and `require(name)` are read when `name` is a `const` holding a plain string. A `let`, a value computed from other values, a function result or an object property is reported as `unknown`. So is any other access edgefit cannot follow, such as `obj[key]`, and `unknown` warnings never fail a check unless you make them errors.
+`import(name)` and `require(name)` are read when `name` is a `const` holding a plain string. A `let`, a value computed from other values, a function result or an object property is reported as `unknown`. So is any other access edgefit cannot follow, such as `obj[key]`. A key that is a symbol, or a `const` that holds one, is not reported, because a symbol cannot name an API. `unknown` warnings never fail a check unless you make them errors.
 
 ## Static members of a parent class
 
