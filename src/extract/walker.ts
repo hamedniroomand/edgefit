@@ -97,7 +97,7 @@ export class Walker implements VisitContext {
   };
 
   public readonly useRef = (ref: ApiRef, offset: number, recordBare = true): void => {
-    const chain = followChain(this.#stack, ref, offset);
+    const chain = followChain(this.#stack, ref, offset, this.#scope);
     if (chain.kind === 'computed') {
       if (!isGlobalRoot(chain.ref)) {
         this.collector.api(chain.ref, chain.offset);

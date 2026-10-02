@@ -94,6 +94,49 @@ describe('keys that cannot name an API', () => {
   });
 });
 
+describe('a symbol held in a constant', () => {
+  it('does not report a computed access with a symbol key', () => {
+    expect(usagesOf("const key = Symbol.for('app');\nglobalThis[key] ??= 1;")).toEqual([]);
+    expect(usagesOf('const key = Symbol();\nglobalThis[key] ??= 1;')).toEqual([]);
+  });
+
+  it('still reports a key that may not be a symbol', () => {
+    const reported = ['dynamic globalThis[<expression>]'];
+    expect(usagesOf('function get(key) {\n  return globalThis[key];\n}')).toEqual(reported);
+    expect(usagesOf("let key = Symbol();\nkey = 'x';\nglobalThis[key];")).toEqual(reported);
+    expect(
+      usagesOf('const key = Symbol();\nfunction get(key) {\n  return globalThis[key];\n}'),
+    ).toEqual(reported);
+  });
+
+  it('reads a string-literal key as before', () => {
+    expect(usagesOf("globalThis['Buffer'].from('a');")).toEqual(
+      usagesOf("globalThis.Buffer.from('a');"),
+    );
+  });
+
+  it('does not report the registry pattern from the issue', () => {
+    const source = [
+      "const key = Symbol.for('app.registry');",
+      'const g = globalThis as Record<symbol, unknown>;',
+      'const registry = (g[key] ??= new WeakMap());',
+      'export default {',
+      '  fetch() {',
+      '    return new Response(String(!!registry));',
+      '  },',
+      '};',
+    ].join('\n');
+    expect(usagesOf(source, 'registry.ts')).not.toContain('dynamic globalThis[<expression>]');
+  });
+
+  it('still reports a string made from a symbol', () => {
+    const reported = ['dynamic globalThis[<expression>]'];
+    expect(usagesOf('globalThis[Symbol.keyFor(s)];')).toEqual(reported);
+    expect(usagesOf("const k = Symbol('a').description;\nglobalThis[k];")).toEqual(reported);
+    expect(usagesOf("globalThis[Symbol.for('a').toString()];")).toEqual(reported);
+  });
+});
+
 describe('checking for a computed member', () => {
   it('does not report typeof on a computed key as a use', () => {
     expect(usagesOf("if (typeof globalThis[name] > 'u') throw new Error(name);")).toEqual([]);

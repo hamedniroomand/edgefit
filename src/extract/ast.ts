@@ -91,16 +91,23 @@ export function staticKey(node: Node, computed: boolean): string | undefined {
   return staticString(node);
 }
 
+function isSymbolGlobal(node: Node): boolean {
+  return node.type === 'Identifier' && node.name === 'Symbol';
+}
+
 /** `Symbol.iterator`, `Symbol('x')` and `Symbol.for('x')`: a key that can never name an API. */
 export function isSymbolKey(node: Node): boolean {
   const inner = unwrap(node) ?? node;
   if (inner.type === 'CallExpression') {
-    return isSymbolKey(inner.callee);
+    const callee = unwrap(inner.callee) ?? inner.callee;
+    return (
+      isSymbolGlobal(callee) ||
+      (callee.type === 'MemberExpression' &&
+        isSymbolGlobal(callee.object) &&
+        staticKey(callee.property, callee.computed) === 'for')
+    );
   }
-  if (inner.type === 'MemberExpression') {
-    return isSymbolKey(inner.object);
-  }
-  return inner.type === 'Identifier' && inner.name === 'Symbol';
+  return inner.type === 'MemberExpression' && isSymbolGlobal(inner.object);
 }
 
 /** The operand of a wrapper that passes its value through unchanged, such as `(x)`, `x!` or `await x`. */
