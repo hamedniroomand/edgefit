@@ -43,6 +43,15 @@ describe('observe', () => {
     expect(results.runtime).toMatchObject({ denoVersion: { deno: '' }, userAgent: 'Deno/2.4.3' });
   });
 
+  it('keeps the answer when a typeof throws', async () => {
+    const types = (): never => {
+      throw new TypeError('getter');
+    };
+    const results = await observe({ ...options, types });
+    expect(results).toMatchObject({ types: {}, typesError: 'TypeError: getter' });
+    expect(results.outcomes['buffer.Buffer']).toBe('present');
+  });
+
   it('answers with JSON that is never cached', async () => {
     const response = await respond(options);
     expect(response.headers.get('cache-control')).toBe('no-store');

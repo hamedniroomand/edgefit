@@ -20,8 +20,7 @@ export function vercelGlobals(allowlist = readData('allowlists/vercel-edge.json'
 }
 
 /** The members of the five modules Vercel allows, and of the globals the data lists members for. */
-function vercelApis() {
-  const { modules, globalMembers } = readData('allowlists/vercel-edge.json');
+function vercelApis({ modules, globalMembers }) {
   return [
     ...Object.entries(modules).flatMap(([module, members]) => [
       module,
@@ -42,7 +41,7 @@ const builders = { netlify: netlifyApis, vercel: vercelApis };
  */
 const globalsFor = {
   netlify: () => [],
-  vercel: () => vercelGlobals().filter(name => name !== 'undefined'),
+  vercel: allowlist => vercelGlobals(allowlist).filter(name => name !== 'undefined'),
 };
 
 /**
@@ -51,8 +50,11 @@ const globalsFor = {
  * calls them, because the endpoint is public.
  */
 export function witnessSpec(platform) {
-  const apis = [...new Set(builders[platform]())].sort().map(api => ({ api, lookup: true }));
-  const globals = [...new Set(globalsFor[platform]())].sort();
+  const allowlist = readData('allowlists/vercel-edge.json');
+  const apis = [...new Set(builders[platform](allowlist))]
+    .sort()
+    .map(api => ({ api, lookup: true }));
+  const globals = [...new Set(globalsFor[platform](allowlist))].sort();
   const hash = createHash('sha256')
     .update(JSON.stringify({ apis, globals }))
     .digest('hex')

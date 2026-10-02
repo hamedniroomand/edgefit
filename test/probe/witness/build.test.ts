@@ -28,6 +28,7 @@ describe('build', () => {
     const directory = staged('netlify');
     expect(readFileSync(path.join(directory, 'netlify.toml'), 'utf8')).toContain('path = "/"');
     expect(existsSync(path.join(directory, 'netlify/edge-functions/witness.mjs'))).toBe(true);
+    expect(existsSync(path.join(directory, 'lib/witness/globals-data.mjs'))).toBe(false);
     const handler = (await load(path.join(directory, 'lib/witness/netlify.mjs')))
       .default as () => Promise<Response>;
     const results = (await (await handler()).json()) as { specHash: string; checks: object };
@@ -59,6 +60,10 @@ describe('build', () => {
 describe('typeofModule', () => {
   it('names each global in code', () => {
     expect(typeofModule(['fetch'])).toContain('"fetch": typeof fetch,');
+  });
+
+  it('refuses a reserved word', () => {
+    expect(() => typeofModule(['import'])).toThrow('import is not an identifier');
   });
 
   it('refuses a name that is not an identifier', () => {

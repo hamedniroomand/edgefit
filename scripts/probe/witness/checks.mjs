@@ -32,7 +32,8 @@ export const denoChecks = {
   // The `write` permission state does not show which paths Netlify allows, so three paths are
   // tried. `NotCapable` is a block, and `PermissionDenied` is the file system.
   fileWriteTmp: () => Deno.writeTextFile('/tmp/edgefit-witness.txt', 'edgefit'),
-  fileWriteCwd: () => Deno.writeTextFile(`${Deno.cwd()}/edgefit-witness.txt`, 'edgefit'),
+  // A relative path, because `Deno.cwd()` needs the `read` permission.
+  fileWriteCwd: () => Deno.writeTextFile('edgefit-witness.txt', 'edgefit'),
   fileWriteRoot: () => Deno.writeTextFile('/edgefit-witness.txt', 'edgefit'),
 };
 

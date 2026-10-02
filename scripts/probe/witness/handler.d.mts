@@ -17,6 +17,7 @@ export type WitnessResults = {
   runtime: Record<string, unknown>;
   names: string[];
   types: Record<string, string>;
+  typesError?: string;
   outcomes: Record<string, Outcome>;
   checks: Record<string, CheckResult>;
 };
