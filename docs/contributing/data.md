@@ -64,6 +64,7 @@ Vercel Edge has no matrix dump, so `allowlists/vercel-edge.json` lists what its 
 - `modules` maps each allowed module to the members that exist on it (or to `true` for all of them). The documentation says which modules; the members come from `members.sources`, two pieces of the vendor's own code that list them.
 - `globals` are the names in the documentation's tables, and `Buffer`.
 - `languageGlobals` are the ECMAScript builtins of a fresh V8 context, and `emulatorGlobals` are web globals the vendor's emulator has and the tables omit.
+- `witnessGlobals` are globals the [production witness](#production-witness) measured in every entry of the platform, and the tables omit.
 - `docs.moduleDescriptions` are hashes of the documentation's description of each module, so the weekly check notices a changed sentence. `emulator` pins the emulator release.
 
 A list that falls behind the platform reports an API as missing that exists, never the reverse, so a mistake here shows to users as a false error. Keep the `source.json` date in step with the page you read.
@@ -118,7 +119,7 @@ The witness only looks APIs up. It never calls them, because the endpoint is pub
 
 The weekly Probe run reads the witness with no secret, in the `witness` jobs, and compares the answer with the data in the job summary. Each answer has a hash of the list of APIs that the witness was built with. When the hash does not match the repository, the summary says to redeploy. The witness is not part of the drift issue. A witness that does not answer gives a warning, so you can remove the witness and the results do not change.
 
-A data entry that rests on the witness needs a source that does not expire, and run logs and artifacts do. Commit the reviewed answer under `scripts/probe/witness/answers`, named for the platform and the date, and link it from the entry: the layer's `url` in `source.json` points at the answers folder at a pinned commit, and each entry's `source` is the file name. The folder is outside `data`, so it does not ship in the package. An `unsupported` override with `"absent": true` says that the API does not exist on the target, as when the matrix lacks it, so a use that checks for the API first is not reported.
+A data entry that rests on the witness needs a source that does not expire, and run logs and artifacts do. Commit the reviewed answer under `scripts/probe/witness/answers`, named for the platform and the date, and link it from the entry: the layer's `url` in `source.json` points at the answers folder at a pinned commit, and each entry's `source` is the file name. When a layer's `url` is another page, such as the platform's docs, an entry that rests on the witness gives the full link to the answer at a pinned commit as its `source`. An absolute `source` replaces the layer's `url`. The folder is outside `data`, so it does not ship in the package. An `unsupported` override with `"absent": true` says that the API does not exist on the target, as when the matrix lacks it, so a use that checks for the API first is not reported.
 
 The code is in `scripts/probe/witness`.
 

@@ -15,6 +15,7 @@ export function vercelGlobals(allowlist = readData('allowlists/vercel-edge.json'
     ...allowlist.globals,
     ...allowlist.languageGlobals,
     ...allowlist.emulatorGlobals,
+    ...allowlist.witnessGlobals,
     ...Object.keys(allowlist.globalMembers),
   ];
 }

@@ -15,6 +15,8 @@ interface AllowlistFile {
   languageGlobals: string[];
   /** Web globals the platform's own emulator has and its docs omit. */
   emulatorGlobals: string[];
+  /** Globals the production witness measured in every entry of the platform and the docs omit. */
+  witnessGlobals: string[];
   /** Globals that exist with only these members. */
   globalMembers: Record<string, string[]>;
 }
@@ -44,6 +46,31 @@ function pickMembers(node: DumpNode | undefined, members: readonly string[]): Du
   return { ...keep(node), ...(inner === undefined ? {} : { default: keep(inner) }) };
 }
 
+/** The global object: each global the lists name, and the listed members of the others. */
+function globalsOf(allowed: AllowlistFile, baseGlobals: DumpNode | undefined): DumpNode {
+  const globals: Record<string, DumpNode> = {
+    '*self*': child(baseGlobals, '*self*') ?? 'object',
+  };
+  for (const global of [
+    ...allowed.globals,
+    ...allowed.languageGlobals,
+    ...allowed.emulatorGlobals,
+    ...allowed.witnessGlobals,
+  ]) {
+    const node = child(baseGlobals, global);
+    if (node !== undefined) {
+      globals[global] = node;
+    }
+  }
+  for (const [global, members] of Object.entries(allowed.globalMembers)) {
+    const node = child(baseGlobals, global);
+    if (node !== undefined) {
+      globals[global] = pickMembers(node, members);
+    }
+  }
+  return globals;
+}
+
 /**
  * A runtime with no dump of its own, described by what its docs allow: the Node baseline with
  * everything not listed removed. A module or global the list omits then reads as missing, so a
@@ -65,27 +92,7 @@ export function allowlistProvider(target: TargetKey): CompatProvider<CompatTree>
           runtime[module] = allow === true ? node : pickMembers(node, allow);
         }
       }
-      const baseGlobals = baseline[globalsKey];
-      const globals: Record<string, DumpNode> = {
-        '*self*': child(baseGlobals, '*self*') ?? 'object',
-      };
-      for (const global of [
-        ...allowed.globals,
-        ...allowed.languageGlobals,
-        ...allowed.emulatorGlobals,
-      ]) {
-        const node = child(baseGlobals, global);
-        if (node !== undefined) {
-          globals[global] = node;
-        }
-      }
-      for (const [global, members] of Object.entries(allowed.globalMembers)) {
-        const node = child(baseGlobals, global);
-        if (node !== undefined) {
-          globals[global] = pickMembers(node, members);
-        }
-      }
-      runtime[globalsKey] = globals;
+      runtime[globalsKey] = globalsOf(allowed, baseline[globalsKey]);
 
       return {
         baseline,
