@@ -1,5 +1,5 @@
 {
-  "description": "Node built-ins the baseline dump does not cover and Vercel's Edge runtime lacks (the allowlist removes the rest), and JavaScript features it disables, applied by the vercel-edge target on top of the allowlist. eval and WebAssembly.compile are blocked. `new Function(string)` is blocked too and is listed as `Function.(string)`, the name edgefit gives a call of the Function constructor with code in an argument (`Function('return this')`, the global object idiom, is not counted). WebAssembly.instantiate is blocked only for buffer sources, so it is not listed either. A `require` whose module is computed at runtime is blocked too and is listed as `require.(dynamic)`. A static `require` is bundled, so it is not listed.",
+  "description": "Node built-ins the baseline dump does not cover and Vercel's Edge runtime lacks (the allowlist removes the rest), and JavaScript features it disables, applied by the vercel-edge target on top of the allowlist. eval and WebAssembly.compile are blocked. `new Function(string)` is blocked too and is listed as `Function.(string)`, the name edgefit gives a call of the Function constructor with code in an argument (`Function('return this')`, the global object idiom, is not counted). WebAssembly.instantiate is blocked only for buffer sources, so it is listed as `WebAssembly.instantiate.(bytes)`, a call whose first argument is not an imported module. A `require` whose module is computed at runtime is blocked too and is listed as `require.(dynamic)`. A static `require` is bundled, so it is not listed.",
   "modules": {
     "child_process": {
       "status": "unsupported",
@@ -115,6 +115,11 @@
       "note": "is disabled in the Edge runtime: WebAssembly modules must come from an import, not a buffer",
       "source": "#unsupported-apis"
     },
+    "*globals*.WebAssembly.instantiate.(bytes)": {
+      "status": "mismatch",
+      "note": "is disabled in the Edge runtime for a buffer source: import the .wasm file and pass the module",
+      "source": "#unsupported-apis"
+    },
     "*globals*.require.(dynamic)": {
       "status": "unsupported",
       "note": "is not allowed in the Edge runtime: a require call left for runtime does not work, use import",
@@ -126,5 +131,5 @@
       "source": "#unsupported-apis"
     }
   },
-  "notModelled": ["WebAssembly.instantiate"]
+  "notModelled": []
 }

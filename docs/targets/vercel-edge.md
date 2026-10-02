@@ -16,7 +16,7 @@ Vercel's Edge runtime is its own V8 runtime, not workerd, Deno or Node, and Verc
 
 - **Node modules.** Only five are allowed, with or without the `node:` prefix: `events`, `buffer`, `assert`, `async_hooks` and `util`. The documentation says which modules; it does not say which members of each exist. Those come from two pieces of Vercel's own code that list them identically: `NativeModuleMap` in Next.js's edge sandbox (`next@16.3.8`) and in `@vercel/node`'s dev server (`17.0.0`). Every member they do not list is reported as missing, so `buffer.Blob`, `events.getEventListeners`, `assert.partialDeepStrictEqual`, `util.inspect` and `async_hooks.createHook` are errors, and `util.format`, `util.inherits` and `async_hooks.AsyncResource`, which the documentation does not mention, are not. Every other built-in, such as `fs`, `path` or `crypto`, is reported as missing.
 - **Globals.** `Buffer`, `process.env` and the Web APIs the documentation lists. The ECMAScript builtins of V8 (`Uint16Array`, `WeakRef`, `globalThis` and the rest) are kept, and so are a few web globals the documentation's table omits but Vercel's own emulator provides (`queueMicrotask`, `performance`, `WebSocket` and others). Node-only globals such as `setImmediate` and `global` are reported as missing.
-- **Disabled features.** `eval`, `WebAssembly.compile` and `Function(string)` are reported as unsupported. `Function(string)` is a call of the `Function` constructor with an argument, `new Function('a', 'return a')` for example. `Function('return this')`, the classic way to reach the global object, is not counted, since code that uses it checks for `globalThis` first.
+- **Disabled features.** `eval`, `WebAssembly.compile` and `Function(string)` are reported as unsupported. `WebAssembly.instantiate` is reported as a warning (`mismatch`) when its first argument is not a module from `import mod from './x.wasm'` (or `'./x.wasm?module'`), for example bytes from `fetch` or `readFile`. A parameter is reported too, because edgefit cannot see what the caller passes. `Function(string)` is a call of the `Function` constructor with an argument, `new Function('a', 'return a')` for example. `Function('return this')`, the classic way to reach the global object, is not counted, since code that uses it checks for `globalThis` first.
 - **Other Web APIs** come from the `edge-light` column of runtime-compat-data, as warnings at the `web` level.
 
 Anything the documentation does not list is reported as missing, so if Vercel adds something before the data catches up you see a false error, not a false pass.
@@ -63,7 +63,6 @@ The documentation says calling `require` directly is not allowed and that packag
 ## What is not checked
 
 - **A `require` that does not resolve, inside `try`.** esbuild keeps it as a call left for runtime and does not warn, so edgefit records nothing for it. Outside `try`, an unresolved `require` stops the check.
-- **`WebAssembly.instantiate` from bytes.** Only imported modules work on Vercel; edgefit cannot see where the bytes come from.
 - **Vercel's limits** on bundle size and execution time.
 
 Two limits of those member lists:

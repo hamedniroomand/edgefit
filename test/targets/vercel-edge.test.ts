@@ -120,6 +120,7 @@ describe('vercel-edge globals', () => {
     expect(status('*globals*', 'WebAssembly', 'compile')).toBe('unsupported');
     expect(status('*globals*', 'Function', '(string)')).toBe('unsupported');
     expect(status('*globals*', 'WebAssembly', 'instantiate')).toBe('supported');
+    expect(status('*globals*', 'WebAssembly', 'instantiate', '(bytes)')).toBe('mismatch');
   });
 
   it('keeps the documented Web APIs', () => {

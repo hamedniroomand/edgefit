@@ -27,11 +27,20 @@ export interface Scope {
   strings: Map<string, string>;
   /** `const` names bound to a symbol, which can never name an API. */
   symbols: Set<string>;
+  /** Names bound to a WebAssembly module by `import mod from './x.wasm'`. */
+  wasmImports: Set<string>;
   parent: Scope | undefined;
 }
 
 export function createScope(parent?: Scope): Scope {
-  return { names: new Map(), checks: new Map(), strings: new Map(), symbols: new Set(), parent };
+  return {
+    names: new Map(),
+    checks: new Map(),
+    strings: new Map(),
+    symbols: new Set(),
+    wasmImports: new Set(),
+    parent,
+  };
 }
 
 /** The string a `const` holds, unless a nearer declaration of the name shadows it. */
@@ -44,6 +53,16 @@ export function lookupString(scope: Scope | undefined, name: string): string | u
     return value;
   }
   return scope.names.has(name) ? undefined : lookupString(scope.parent, name);
+}
+
+/** Whether the name is an imported WebAssembly module, unless a nearer declaration shadows it. */
+export function isWasmImport(scope: Scope | undefined, name: string): boolean {
+  if (scope === undefined) {
+    return false;
+  }
+  return (
+    scope.wasmImports.has(name) || (!scope.names.has(name) && isWasmImport(scope.parent, name))
+  );
 }
 
 /** True when the name is a `const` symbol, unless a nearer declaration of the name shadows it. */
