@@ -13,12 +13,12 @@ import {
   isVoidChain,
   requiredBy,
 } from './cjs-forms.ts';
-import type { ObjectLiteral, RequireUse } from './cjs-forms.ts';
+import type { Helpers, ObjectLiteral, RequireUse } from './cjs-forms.ts';
 
 /** What the reader of a module gives the reader of its exports. */
 export interface ExportContext {
   builder: ShapeBuilder;
-  wrappers: ReadonlySet<string>;
+  helpers: Helpers;
   /** Notes that a `require` is understood, and that its module is loaded. */
   load: (found: RequireUse) => void;
 }
@@ -168,7 +168,7 @@ export class ExportWriter {
       return true;
     }
     this.#writes += 1;
-    const required = requiredBy(value, this.#context.wrappers);
+    const required = requiredBy(value, this.#context.helpers);
     if (required !== undefined) {
       this.#context.load(required);
       this.#context.builder.export(name, {
@@ -202,7 +202,7 @@ export class ExportWriter {
       this.#assigned = { name: value.name };
       return true;
     }
-    const required = requiredBy(value, this.#context.wrappers);
+    const required = requiredBy(value, this.#context.helpers);
     if (required !== undefined && required.member === undefined) {
       this.#assigned = {};
       this.#context.load(required);
@@ -224,7 +224,7 @@ export class ExportWriter {
       if (name === undefined) {
         return false;
       }
-      const required = requiredBy(value, this.#context.wrappers);
+      const required = requiredBy(value, this.#context.helpers);
       if (required !== undefined) {
         this.#context.load(required);
         this.#context.builder.export(name, {

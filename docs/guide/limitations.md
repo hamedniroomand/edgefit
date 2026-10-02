@@ -42,7 +42,15 @@ Everything in a module counts when it cannot be told which parts are used:
 - it is CommonJS and its exports cannot be read by name. These are read: `exports.name = …`, `module.exports = { … }`, `module.exports = require('…')`, `Object.defineProperty(exports, 'name', …)`, and the getter helpers that TypeScript and SWC emit (`_export(exports, { … })`, `_export_star`). A computed export name, `module.exports` set to something else, code that reads `exports` or `module` in any other way, or a mix of `module.exports =` and `exports.name =` writes counts as a whole
 - it is build output. Build output has been through a bundler's own tree shaking, so [`--built`](/guide/built-output) checks it in full
 
-What a CommonJS module asks of a module it `require`s is the members that are read from the result (`const dep = require('dep')` with `dep.name`, `const { name } = require('dep')`, `require('dep').name`, also through `_interop_require_default` and `_interop_require_wildcard`). The result used in any other way asks for all of it.
+What a CommonJS module asks of a module it `require`s is the members that are read from the result (`const dep = require('dep')` with `dep.name`, `const { name } = require('dep')`, `require('dep').name`). The result used in any other way asks for all of it.
+
+A `require` can be wrapped in a helper that compiled code adds. These helpers pass the module through:
+
+- `_interop_require_default` and `_interop_require_wildcard`, as functions or as `@swc/helpers` members (`_interop_require_default._(require('dep'))`)
+- `_export_star`, `__exportStar` and `__reExport`
+- `__importDefault`, `__importStar` and `__exportStar`, as `tsc` defines them or as members of `tslib`
+
+Any other wrapper asks for all of the module.
 
 A variable that is declared without a value and set once to a `require()` result, such as `let c; c = require('node:crypto')`, is followed like a `const`. Another declaration of the name (a parameter, a function or a second `var`), any other write to it in the file, or an export of it stops this.
 
