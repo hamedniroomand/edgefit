@@ -8,6 +8,9 @@ import { displayRef, isGlobalRoot, moduleRef } from '@/extract/refs.ts';
 import { assign, isTracked, lookup } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
+// What Vercel's Edge runtime accepts as a WebAssembly module: a `.wasm` file, with or without `?module`.
+const wasmSource = /\.wasm(?:\?module)?$/u;
+
 function namedRef(module: string, name: Node): ApiRef {
   const key = staticKey(name, false) ?? 'default';
   return key === 'default' ? moduleRef(module) : { module, path: [key] };
@@ -23,8 +26,12 @@ export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context)
   context.collector.native(node.source.value, node.source.start);
   const module = builtinName(node.source.value);
   if (module === undefined) {
+    const isWasm = wasmSource.test(node.source.value);
     for (const specifier of used) {
       assign(context.scope, specifier.local.name, null);
+      if (isWasm && specifier.type !== 'ImportSpecifier') {
+        context.scope.wasmImports.add(specifier.local.name);
+      }
     }
     return;
   }

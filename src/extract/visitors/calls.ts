@@ -1,12 +1,12 @@
 import { builtinName } from '@/data/builtins.ts';
 import { memberPath } from '@/data/compat-index.ts';
-import { stringLiteral } from '@/extract/ast.ts';
+import { staticKey, stringLiteral, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { interopArgument, isRequire, moduleSpecifier, resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { moduleRef } from '@/extract/refs.ts';
 import { isGlobal } from '@/extract/runtimes.ts';
-import { isTracked } from '@/extract/scope.ts';
+import { isTracked, isWasmImport } from '@/extract/scope.ts';
 
 import { visitOptionalCallee } from './guards.ts';
 import { visitParentClass } from './inheritance.ts';
@@ -34,6 +34,28 @@ function recordDynamicFunction(
   const text = node.arguments.length === 1 && only !== undefined ? stringLiteral(only) : undefined;
   if (text === undefined || !isGlobalObjectIdiom.test(text)) {
     context.useRef(dynamicFunction, node.start);
+  }
+}
+
+// The call of `WebAssembly.instantiate` with a source other than an imported module, which Vercel's
+// Edge runtime disables. Shown as `WebAssembly.instantiate(bytes)`.
+const wasmBytes = { module: '*globals*', path: ['WebAssembly', 'instantiate', '(bytes)'] };
+
+/** Only an imported module can be instantiated; a parameter may hold one, which edgefit cannot see. */
+function recordWasmBytes(node: NodeOf<'CallExpression'>, context: VisitContext): void {
+  const callee = strip(node.callee);
+  const [source] = node.arguments;
+  if (
+    source === undefined ||
+    callee.type !== 'MemberExpression' ||
+    staticKey(callee.property, callee.computed) !== 'instantiate' ||
+    !isGlobal(callee.object, 'WebAssembly', context)
+  ) {
+    return;
+  }
+  const inner = strip(source);
+  if (inner.type !== 'Identifier' || !isWasmImport(context.scope, inner.name)) {
+    context.useRef(wasmBytes, node.start);
   }
 }
 
@@ -82,6 +104,7 @@ function visitInherits(node: NodeOf<'CallExpression'>, context: VisitContext): b
 
 export const visitCall: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
   recordDynamicFunction(node, context);
+  recordWasmBytes(node, context);
   if (isRequire(node.callee, context.scope)) {
     visitRequire(node, context);
     return;
