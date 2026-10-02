@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.0
+
+### Minor Changes
+
+- [#106](https://github.com/hamedniroomand/edgefit/pull/106) [`6414a3a`](https://github.com/hamedniroomand/edgefit/commit/6414a3a75c53aaeeed90fb4fadd7ae30b5fa0829) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Check a Deno workspace member. The member inherits the `imports` of the workspace root, and `jsr:` imports of workspace members are followed. The warning for another `jsr:` package names the package.
+
+- [#120](https://github.com/hamedniroomand/edgefit/pull/120) [`7863694`](https://github.com/hamedniroomand/edgefit/commit/786369407ca866fa6b0f75043add8459f09d3a6c) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - The `netlify-edge` target now uses what edgefit measured on Netlify. Netlify runs Deno 2.3.1, so the report names that version. `child_process` and the `fs` write APIs are now errors, because Netlify blocks subprocesses and grants write access to `/tmp` only. APIs that Deno 2.3.1 has and later Deno releases removed, such as `util.isString`, are no longer reported.
+
+- [#123](https://github.com/hamedniroomand/edgefit/pull/123) [`09dd24e`](https://github.com/hamedniroomand/edgefit/commit/09dd24e6f718d820ab5fb6b3db3763a2b488d20f) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - The `vercel-edge` target now uses what edgefit measured on Vercel, as middleware and as an edge function. `DOMException`, `WeakRef` and `FinalizationRegistry` are reported as missing, because edge functions lack them, and `async_hooks.AsyncResource` is reported as missing, because middleware lacks it. Each note names the one that has the API. Next.js's own use of `WeakRef` is reported as guarded, because Next.js checks for `FinalizationRegistry` first.
+
 ## 0.7.0
 
 ### Minor Changes
