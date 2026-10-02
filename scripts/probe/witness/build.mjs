@@ -41,10 +41,30 @@ export default () => handle('edge-function');
 
 const libraries = ['probe.mjs', 'classify.mjs', 'witness/checks.mjs', 'witness/handler.mjs'];
 
+const identifier = /^[A-Za-z_$][\w$]*$/u;
+// A reserved word passes the pattern but is a syntax error after `typeof`.
+const reserved = new Set(
+  'await break case catch class const continue debugger default delete do else enum export extends false finally for function if implements import in instanceof interface let new null package private protected public return static super switch this throw true try typeof var void while with yield'.split(
+    ' ',
+  ),
+);
+
+/** Static `typeof` code for each global, so the witness needs no `eval`, which Vercel blocks. */
+export function typeofModule(globals) {
+  const invalid = globals.find(name => !identifier.test(name) || reserved.has(name));
+  if (invalid !== undefined) {
+    throw new Error(`${invalid} is not an identifier, so it cannot go in the witness code`);
+  }
+  const lines = globals.map(name => `  ${JSON.stringify(name)}: typeof ${name},`);
+  return `export default () => ({\n${lines.join('\n')}\n});\n`;
+}
+
 export function build(platform, directory) {
+  const spec = witnessSpec(platform);
   const files = {
     ...projects[platform],
-    'lib/witness/spec-data.mjs': `export default ${JSON.stringify(witnessSpec(platform))};\n`,
+    'lib/witness/spec-data.mjs': `export default ${JSON.stringify(spec)};\n`,
+    ...(spec.globals.length > 0 && { 'lib/witness/globals-data.mjs': typeofModule(spec.globals) }),
   };
   for (const [file, text] of Object.entries(files)) {
     mkdirSync(path.dirname(path.join(directory, file)), { recursive: true });

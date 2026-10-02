@@ -10,6 +10,7 @@ const options: WitnessOptions = {
       { api: 'buffer.Buffer', lookup: true },
       { api: 'fs.readFile', lookup: true },
     ],
+    globals: [],
   },
   checks: { ok: (): number => 1 },
   load: (name: string): unknown => ({ buffer: { Buffer: 1 } })[name],
@@ -25,6 +26,7 @@ describe('observe', () => {
     expect(results).toMatchObject({
       entry: 'middleware',
       specHash: 'abc',
+      types: {},
       deno: null,
       outcomes: { 'buffer.Buffer': 'present', 'fs.readFile': 'missing' },
       checks: { ok: { allowed: true } },
@@ -39,6 +41,15 @@ describe('observe', () => {
     const results = await observe(options);
     expect(results.deno).toBe('2.4.3');
     expect(results.runtime).toMatchObject({ denoVersion: { deno: '' }, userAgent: 'Deno/2.4.3' });
+  });
+
+  it('keeps the answer when a typeof throws', async () => {
+    const types = (): never => {
+      throw new TypeError('getter');
+    };
+    const results = await observe({ ...options, types });
+    expect(results).toMatchObject({ types: {}, typesError: 'TypeError: getter' });
+    expect(results.outcomes['buffer.Buffer']).toBe('present');
   });
 
   it('answers with JSON that is never cached', async () => {

@@ -44,12 +44,16 @@ const comparers = {
 };
 const compare = comparers[platform]();
 
-// A protection page or an old deploy can answer 200 with other JSON.
+const isObject = value => value !== null && typeof value === 'object';
+
+// A protection page or an old deploy can answer 200 with other JSON. A witness from before `types`
+// still answers, so the summary can say that it is out of date.
 const isWitnessAnswer = results =>
   typeof results?.specHash === 'string' &&
   Array.isArray(results.names) &&
-  typeof results.outcomes === 'object' &&
-  typeof results.checks === 'object';
+  (results.types === undefined || isObject(results.types)) &&
+  isObject(results.outcomes) &&
+  isObject(results.checks);
 
 async function read(url) {
   const response = await fetch(url, { signal: AbortSignal.timeout(30_000) });
@@ -60,7 +64,7 @@ async function read(url) {
   if (!isWitnessAnswer(results)) {
     throw new Error(`${url} did not answer with witness results`);
   }
-  return results;
+  return { ...results, types: results.types ?? {} };
 }
 
 const { hash } = witnessSpec(platform);
@@ -84,6 +88,9 @@ for (const [entry, witness] of Object.entries(witnessUrls[platform])) {
       'The witness has an older list of APIs than the repository. Run the Witness workflow to redeploy it.',
       '',
     );
+  }
+  if (results.typesError) {
+    lines.push(`The typeof scan failed, so no global is compared: ${results.typesError}`, '');
   }
   const { sections, lines: disagreements } = compare(results, witness);
   for (const { title, items } of sections) {

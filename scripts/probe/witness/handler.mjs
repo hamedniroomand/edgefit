@@ -30,8 +30,17 @@ const runtimeEvidence = () => ({
   processVersions: globalThis.process?.versions ?? null,
 });
 
+/** A global whose getter throws must not take the whole answer with it. */
+function measureTypes(types) {
+  try {
+    return { types: types?.() ?? {} };
+  } catch (error) {
+    return { types: {}, typesError: `${error?.name}: ${error?.message}` };
+  }
+}
+
 /** What a deployed witness reports about the runtime it runs in. */
-export async function observe({ entry, spec, checks, load }) {
+export async function observe({ entry, spec, checks, load, types }) {
   return {
     entry,
     specHash: spec.hash,
@@ -43,6 +52,7 @@ export async function observe({ entry, spec, checks, load }) {
       null,
     runtime: runtimeEvidence(),
     names: globalNames(),
+    ...measureTypes(types),
     outcomes: await probeApis(spec.apis, load),
     checks: await runChecks(checks),
   };

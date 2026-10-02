@@ -15,8 +15,9 @@ describe('witnessSpec', () => {
     const names = witnessSpec('vercel').apis.map(({ api }) => api);
     expect(names).toContain('buffer.Buffer');
     expect(names).toContain('*globals*.process.env');
-    expect(names).toContain('*globals*.fetch');
-    expect(names).not.toContain('*globals*.undefined');
+    expect(witnessSpec('vercel').globals).toContain('fetch');
+    expect(witnessSpec('vercel').globals).not.toContain('undefined');
+    expect(witnessSpec('netlify').globals).toEqual([]);
     expect(names).not.toContain('fs');
   });
 

@@ -7,6 +7,7 @@ import * as events from 'node:events';
 import * as util from 'node:util';
 
 import { dynamicChecks, vercelChecks } from './checks.mjs';
+import typeofGlobals from './globals-data.mjs';
 import { respond } from './handler.mjs';
 import spec from './spec-data.mjs';
 
@@ -18,4 +19,5 @@ export const handle = entry =>
     spec,
     checks: { ...dynamicChecks, ...vercelChecks },
     load: name => modules[name],
+    types: typeofGlobals,
   });

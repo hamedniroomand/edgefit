@@ -65,7 +65,12 @@ export function compareVercel(results, { blocked, accepted }) {
   return toSections([
     [
       'Kept in the data, missing on Vercel',
-      withOutcome(results.outcomes, 'missing')
+      [
+        ...Object.keys(results.types)
+          .filter(name => results.types[name] === 'undefined')
+          .map(name => `*globals*.${name}`),
+        ...withOutcome(results.outcomes, 'missing'),
+      ]
         .filter(api => !blocked.has(api))
         .map(withoutGlobalsPrefix),
     ],
