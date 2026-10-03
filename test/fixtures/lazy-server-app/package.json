@@ -1,0 +1,5 @@
+{
+  "name": "lazy-server-app",
+  "private": true,
+  "dependencies": { "mini-sql": "1.0.0" }
+}

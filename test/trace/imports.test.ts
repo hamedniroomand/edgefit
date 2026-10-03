@@ -43,9 +43,9 @@ describe('imports that are not a static import of names', () => {
     ).toEqual(['node:fs.watch']);
   });
 
-  it('keeps everything in a CommonJS module that is not read by name, and what it requires', () => {
+  it('keeps the function that a CommonJS module sets as its exports once anything is asked of it, and what it requires', () => {
     const found = reached({
-      'index.js': entry("import { upper } from './lib.js';", { './lib.js': 'lib.js' }),
+      'index.js': entry("import { upper } from './lib.js';\nupper();", { './lib.js': 'lib.js' }),
       'lib.js': {
         code: `const fs = require('node:fs');\nfunction watchDir(dir) {\n  return fs.watch(dir);\n}\nmodule.exports = watchDir;`,
         imports: { 'require-call:./more.js': 'more.js' },

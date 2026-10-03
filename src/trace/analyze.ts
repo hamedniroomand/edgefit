@@ -107,6 +107,9 @@ export function analyze(shape: ModuleShape, asked: Demand): Analysis {
   for (const name of demand === 'all' ? shape.exports.keys() : demand) {
     analyzer.route(shape.exports.get(name));
   }
+  if (shape.moduleExports !== undefined && (demand === 'all' || demand.size > 0)) {
+    analyzer.route(shape.moduleExports);
+  }
   for (const star of shape.stars) {
     merge(analyzer.asks, star, demand);
   }
