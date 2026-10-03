@@ -3,12 +3,12 @@ import type { Node } from 'oxc-parser';
 import { builtinName } from '@/data/builtins.ts';
 import { isSymbolKey, staticKey, staticString, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
-import { resolveBinding } from '@/extract/bindings.ts';
+import { fileMembers, resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { displayRef, isGlobalRoot, memberRef, moduleRef } from '@/extract/refs.ts';
 import { assign, isBound, lookup, lookupStringObject } from '@/extract/scope.ts';
 import type { Binding } from '@/extract/scope.ts';
-import { destructuredLoad } from '@/trace/dynamic-imports.ts';
+import { destructuredLoad, requireOf } from '@/trace/dynamic-imports.ts';
 import type { ApiRef } from '@/types.ts';
 
 type DestructuredProperty = NodeOf<'ObjectPattern'>['properties'][number];
@@ -100,8 +100,39 @@ function bindLoadedNames(node: NodeOf<'VariableDeclarator'>, context: VisitConte
   }
 }
 
+/** The file that `init` loads by its literal specifier, with `require()` or `import()`, as written. */
+function loadedSpecifier(init: Node | null): string | undefined {
+  const inner = init === null ? undefined : strip(init);
+  if (inner === undefined) {
+    return undefined;
+  }
+  return inner.type === 'ImportExpression'
+    ? staticString(inner.source)
+    : requireOf(inner)?.specifier;
+}
+
+/**
+ * `const files = require('./file')` binds `files` to the whole file, when the graph knows what the
+ * file exports as Node.js modules, so that `files.crypto.randomBytes` is a use of `crypto`.
+ */
+function bindFileNamespace(node: NodeOf<'VariableDeclarator'>, context: VisitContext): boolean {
+  const { id, init } = node;
+  const specifier = loadedSpecifier(init);
+  const members =
+    specifier === undefined ? undefined : fileMembers(context.collector.importedModules, specifier);
+  if (id.type !== 'Identifier' || members === undefined) {
+    return false;
+  }
+  context.visit(init);
+  assign(context.scope, id.name, { ref: moduleRef('*file*'), recorded: false, members });
+  return true;
+}
+
 export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, context) => {
   const { id, init } = node;
+  if (bindFileNamespace(node, context)) {
+    return;
+  }
   bindLoadedNames(node, context);
   const initial =
     init === null ? undefined : (wrapperBinding(init, context) ?? resolveBinding(init, context));

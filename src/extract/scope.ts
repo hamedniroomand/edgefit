@@ -5,8 +5,13 @@ import type { ApiRef } from '@/types.ts';
 /**
  * What a name refers to: a runtime API, a `require` made by `module.createRequire`,
  * or `null` for any other declaration, which shadows globals and outer bindings.
+ * A name that holds a whole file of the project has `members`: what each name the file exports
+ * stands for, when that is a Node.js module. Its `ref` is not an API.
  */
-export type Binding = { ref: ApiRef; recorded: boolean } | 'require' | null;
+export type Binding =
+  | { ref: ApiRef; recorded: boolean; members?: ReadonlyMap<string, ApiRef> }
+  | 'require'
+  | null;
 
 /** A name that stands for a check, so testing it is the same as testing what it holds. */
 export interface Check {
@@ -150,7 +155,7 @@ export function declare(scope: Scope, names: readonly string[]): void {
 
 export function isTracked(
   binding: Binding | undefined,
-): binding is { ref: ApiRef; recorded: boolean } {
+): binding is { ref: ApiRef; recorded: boolean; members?: ReadonlyMap<string, ApiRef> } {
   return typeof binding === 'object' && binding !== null;
 }
 

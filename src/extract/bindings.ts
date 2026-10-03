@@ -27,6 +27,21 @@ function tracked(ref: ApiRef): Binding {
   return { ref, recorded: false };
 }
 
+/** What the names that a file exports stand for in the importer, by the specifier that loads it, from the seeds of `followAliases`. */
+export function fileMembers(
+  imported: ReadonlyMap<string, ApiRef>,
+  specifier: string,
+): Map<string, ApiRef> | undefined {
+  const prefix = `${specifier}\0`;
+  const members = new Map<string, ApiRef>();
+  for (const [key, ref] of imported) {
+    if (key.startsWith(prefix)) {
+      members.set(key.slice(prefix.length), ref);
+    }
+  }
+  return members.size > 0 ? members : undefined;
+}
+
 /** The module name an `import()` or `require()` argument spells out, directly or through a `const`. */
 export function moduleSpecifier(node: Node | null | undefined, scope: Scope): string | undefined {
   if (node?.type === 'Identifier') {
@@ -159,6 +174,10 @@ export function resolveBinding(node: Node, context: BindingContext): Binding | u
   if (node.type === 'MemberExpression') {
     const object = resolveBinding(node.object, context);
     const key = staticKey(node.property, node.computed);
+    if (isTracked(object) && object.members !== undefined) {
+      const member = key === undefined ? undefined : object.members.get(key);
+      return member === undefined ? undefined : tracked(member);
+    }
     return isTracked(object) && key !== undefined ? tracked(memberRef(object.ref, key)) : undefined;
   }
   if (node.type === 'CallExpression') {

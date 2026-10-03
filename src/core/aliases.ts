@@ -47,9 +47,10 @@ function openedFiles(
   for (const [file, { shape }] of modules) {
     const specifiers = [
       ...(shape?.stars ?? []),
-      ...[...(shape?.imports.values() ?? [])]
-        .filter(item => item.imported === '*')
-        .map(item => item.specifier),
+      // A `require` of a whole file that is only read by member asks for those members, see `loadsOf`.
+      ...[...(shape?.imports ?? [])]
+        .filter(([local, item]) => item.imported === '*' && shape?.bindings.has(local) !== true)
+        .map(([, item]) => item.specifier),
       ...[...(shape?.exports.values() ?? [])].flatMap(item =>
         'specifier' in item ? item.specifier : [],
       ),

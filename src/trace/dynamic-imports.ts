@@ -34,7 +34,7 @@ export type LoadKind = 'import' | 'require';
  * (`__importStar(require('x'))`), or `Promise.resolve().then(() => …)` around those, which `tsc`
  * writes for `import()` in CommonJS.
  */
-function requireOf(node: Node): { specifier: string; node: Node } | undefined {
+export function requireOf(node: Node): { specifier: string; node: Node } | undefined {
   const call = strip(node);
   if (call.type !== 'CallExpression') {
     return undefined;
@@ -65,11 +65,11 @@ function loadOf(node: Node, kind: LoadKind): { specifier: string; node: Node } |
   return specifier === undefined ? undefined : { specifier, node: call };
 }
 
-/** The load that a declarator holds when it destructures plain names from it: `const { a } = await import('literal')` or `= require('literal')`. */
-export function destructuredLoad(
+/** The load that a declarator holds: `const x = await import('literal')` or `= require('literal')`. */
+function loadOfDeclarator(
   declarator: Node,
   kind: LoadKind,
-): { specifier: string; node: Node; names: Map<string, string> } | undefined {
+): { specifier: string; node: Node } | undefined {
   if (declarator.type !== 'VariableDeclarator' || declarator.init === null) {
     return undefined;
   }
@@ -87,8 +87,79 @@ export function destructuredLoad(
   if (kind === 'import' && !awaited) {
     return undefined;
   }
-  const load = loadOf(init.type === 'AwaitExpression' ? init.argument : init, kind);
-  const names = destructuredImports(declarator.id);
+  return loadOf(init.type === 'AwaitExpression' ? init.argument : init, kind);
+}
+
+/** The load that a declarator holds when it destructures plain names from it: `const { a } = await import('literal')` or `= require('literal')`. */
+export function destructuredLoad(
+  declarator: Node,
+  kind: LoadKind,
+): { specifier: string; node: Node; names: Map<string, string> } | undefined {
+  const load = loadOfDeclarator(declarator, kind);
+  const names =
+    declarator.type === 'VariableDeclarator' ? destructuredImports(declarator.id) : undefined;
+  return load === undefined || names === undefined ? undefined : { ...load, names };
+}
+
+/** Whether `node` is a name of a member or of a property, which no variable holds. */
+function isPropertyName(node: Node, parent: Node | undefined): boolean {
+  return (
+    (parent?.type === 'MemberExpression' && parent.property === node && !parent.computed) ||
+    (parent?.type === 'Property' && parent.key === node && !parent.computed && !parent.shorthand)
+  );
+}
+
+/**
+ * The members that a file reads from a name by `name.member`, when that is every use of the name:
+ * no other use, no write to a member, and no key that is not a plain string. The name is
+ * matched in the whole file, so another name that is spelled the same only adds members.
+ */
+function memberReads(body: readonly Node[], declaration: Node): Set<string> | undefined {
+  const name = declaration.type === 'Identifier' ? declaration.name : undefined;
+  const reads = new Set<string>();
+  const visit = (node: Node, ancestors: readonly Node[]): boolean => {
+    const parent = ancestors.at(-1);
+    if (node.type === 'Identifier' && node.name === name) {
+      if (node === declaration || isPropertyName(node, parent)) {
+        return true;
+      }
+      const key =
+        parent?.type === 'MemberExpression' && parent.object === node
+          ? staticKey(parent.property, parent.computed)
+          : undefined;
+      const written = ancestors.at(-2);
+      const isWrite =
+        (written?.type === 'AssignmentExpression' && written.left === parent) ||
+        (written?.type === 'UpdateExpression' && written.argument === parent) ||
+        (written?.type === 'UnaryExpression' && written.operator === 'delete');
+      if (key === undefined || isWrite) {
+        return false;
+      }
+      reads.add(key);
+      return true;
+    }
+    return childNodes(node).every(child => visit(child, [...ancestors, node]));
+  };
+  return name !== undefined && body.every(node => visit(node, [])) ? reads : undefined;
+}
+
+/**
+ * The load that a declarator holds when the name it gives is only read by member: `const x =
+ * require('literal')`, with `x.a` and `x.b` as every use of `x`.
+ */
+function namespaceLoad(
+  declarator: Node,
+  kind: LoadKind,
+  body: readonly Node[],
+): { specifier: string; node: Node; names: Set<string> } | undefined {
+  const load = loadOfDeclarator(declarator, kind);
+  const id = declarator.type === 'VariableDeclarator' ? declarator.id : undefined;
+  // A helper around the call may read what the module exports, so only the call itself counts.
+  const direct =
+    declarator.type === 'VariableDeclarator' &&
+    declarator.init !== null &&
+    strip(declarator.init) === load?.node;
+  const names = id?.type === 'Identifier' && direct ? memberReads(body, id) : undefined;
   return load === undefined || names === undefined ? undefined : { ...load, names };
 }
 
@@ -103,7 +174,8 @@ export function loadsOf(body: readonly Node[], kind: LoadKind): DynamicImports {
   const loads: { specifier: string; node: Node }[] = [];
   const pending = [...body];
   for (let node = pending.pop(); node !== undefined; node = pending.pop()) {
-    const found = destructuredLoad(node, kind);
+    const destructured = destructuredLoad(node, kind);
+    const found = destructured ?? namespaceLoad(node, kind, body);
     if (found !== undefined) {
       understood.add(found.node);
       const current = asked.get(found.specifier);

@@ -1,4 +1,5 @@
 import type { NodeOf } from '@/extract/ast.ts';
+import { staticKey, strip } from '@/extract/ast.ts';
 import { resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { globalRef, normalizeRef } from '@/extract/refs.ts';
@@ -20,7 +21,26 @@ export const visitIdentifier: Visitor<NodeOf<'Identifier'>> = (node, context) =>
   }
 };
 
+/** `file.name` where `file` holds a whole file of the project: the use of what the file exports under `name`. */
+function visitFileMember(node: NodeOf<'MemberExpression'>, context: VisitContext): boolean {
+  const object = strip(node.object);
+  const binding = object.type === 'Identifier' ? lookup(context.scope, object.name) : undefined;
+  if (!isTracked(binding) || binding.members === undefined) {
+    return false;
+  }
+  const key = staticKey(node.property, node.computed);
+  const ref = key === undefined ? undefined : binding.members.get(key);
+  // A name that is not a Node.js module is an export of the project, which has its own findings.
+  if (ref !== undefined) {
+    context.useRef(ref, object.start);
+  }
+  return true;
+}
+
 export const visitMember: Visitor<NodeOf<'MemberExpression'>> = (node, context) => {
+  if (visitFileMember(node, context)) {
+    return;
+  }
   context.visit(node.object);
   context.visit(node.computed ? node.property : null);
 };
