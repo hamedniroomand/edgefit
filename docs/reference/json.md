@@ -137,7 +137,7 @@ edgefit check --format json
 }
 ```
 
-`status` is `pass`, `warn` (warnings only), `fail` (an error), `error` (the entry could not be checked, with a `message`) or `unchecked` (the entry needs a module that the package does not declare, with a `message`). `summary` is the status of the main entry for each target, or of the worst entry for a package without a checked main entry. `worst` names the worst entry of a target, and is only there when it is worse than `summary`. `resolved` is the installed version, never the requested range. `summary` is each target's worst status.
+`status` is `pass`, `warn` (warnings only), `fail` (an error), `error` (the entry could not be checked, with a `message`) or `unchecked` (the entry needs a module that the package does not declare, with a `message`). `summary` is the status of the main entry for each target, or of the worst entry for a package without a checked main entry. `worst` names the worst entry of a target, and is only there when it is worse than `summary`. `resolved` is the installed version, never the requested range.
 
 The table's `results.json` lists one row per package with `name`, `file`, `resolved`, `summary`, `worst`, `subpaths`, and `error` when the package could not be installed or checked.
 
