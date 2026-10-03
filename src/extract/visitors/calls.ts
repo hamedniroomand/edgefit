@@ -109,6 +109,11 @@ export const visitCall: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
     visitRequire(node, context);
     return;
   }
+  const wrapped = context.wrappers.calls.get(node);
+  if (wrapped !== undefined) {
+    recordImport(wrapped, node.arguments[0]?.start ?? node.start, context);
+    return;
+  }
   const argument = interopArgument(node);
   const binding = argument === undefined ? undefined : resolveBinding(argument, context);
   if (argument !== undefined && isTracked(binding)) {
@@ -122,19 +127,14 @@ export const visitCall: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
   }
 };
 
-export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node, context) => {
-  const specifier = moduleSpecifier(node.source, context.scope);
-  if (specifier === undefined) {
-    context.collector.dynamic(undefined, 'import(<expression>)', computedModuleReason, node.start);
-    context.visitChildren(node);
-    return;
-  }
+/** Records the load of `specifier`, as `import()` of it does. */
+function recordImport(specifier: string, offset: number, context: VisitContext): void {
   const module = builtinName(specifier);
   // Only an awaited import can be caught by a `try`; a promise nothing awaits fails on its own.
   const record = (): void => {
-    context.collector.native(specifier, node.source.start);
+    context.collector.native(specifier, offset);
     if (module !== undefined) {
-      context.useRef(moduleRef(module), node.source.start);
+      context.useRef(moduleRef(module), offset);
     }
   };
   if (context.parent()?.type === 'AwaitExpression') {
@@ -142,6 +142,19 @@ export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node,
   } else {
     context.collector.guards.deferred(record);
   }
+}
+
+export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node, context) => {
+  if (context.wrappers.imports.has(node)) {
+    return;
+  }
+  const specifier = moduleSpecifier(node.source, context.scope);
+  if (specifier === undefined) {
+    context.collector.dynamic(undefined, 'import(<expression>)', computedModuleReason, node.start);
+    context.visitChildren(node);
+    return;
+  }
+  recordImport(specifier, node.source.start, context);
 };
 
 export const visitNew: Visitor<NodeOf<'NewExpression'>> = (node, context) => {

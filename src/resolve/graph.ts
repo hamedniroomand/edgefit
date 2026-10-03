@@ -4,6 +4,7 @@ import { build } from 'esbuild';
 import type { Loader, Message, Metafile, Plugin } from 'esbuild';
 
 import { toResolveError } from './errors.ts';
+import { importWrappers } from './import-wrappers.ts';
 import { acceptMissingPeers, importKey, optionalPeers } from './optional-peers.ts';
 import { runtimeExternals } from './runtime-externals.ts';
 
@@ -106,7 +107,12 @@ async function bundleMetafile(options: ResolveOptions, accepted: Set<string>): P
       loader: assetLoaders,
       define,
       logLevel: 'silent',
-      plugins: [...(options.plugins ?? []), runtimeExternals, optionalPeers(accepted)],
+      plugins: [
+        ...(options.plugins ?? []),
+        runtimeExternals,
+        importWrappers,
+        optionalPeers(accepted),
+      ],
     });
     return result.metafile;
   } catch (error) {
