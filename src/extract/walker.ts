@@ -9,6 +9,7 @@ import {
   displayRef,
   escapes,
   isFeatureCheck,
+  isAwaitedCall,
   isGlobalRoot,
   isOnlyTested,
   isMemberWrite,
@@ -121,6 +122,9 @@ export class Walker implements VisitContext {
     this.#boundInit !== node &&
     escapes(node, parent, this.#outer(node));
 
+  readonly #awaited = (node: Node, parent: Node | undefined): boolean =>
+    parent !== undefined && isAwaitedCall(node, parent, this.#outer(node));
+
   public readonly useRef = (ref: ApiRef, offset: number, recordBare = true): void => {
     const chain = followChain(this.#stack, ref, offset, this.#scope);
     if (chain.kind === 'computed') {
@@ -158,7 +162,7 @@ export class Walker implements VisitContext {
       return;
     }
     if (recordBare || chain.extended) {
-      this.collector.api(chain.ref, chain.offset);
+      this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
     }
     if (parent !== undefined && this.#escapes(chain.ref, node, parent)) {
       this.collector.dynamic(

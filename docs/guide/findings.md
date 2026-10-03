@@ -135,7 +135,7 @@ try {
 }
 ```
 
-Usages in the `try` block are guarded, for the APIs the target lacks. Like a check, it does not protect an API that exists and throws. These are not guarded:
+Usages in the `try` block are guarded, for the APIs the target lacks and for the APIs that exist and throw, because the `catch` takes the error of both. A check does not do the second. A promise that nothing awaits is not guarded, because a rejection does not reach the `catch`. The data does not say which API gives a promise, so edgefit reads the name: a path with `promises` in it. These are not guarded:
 
 - a `try` with no `catch`, or a `catch` that throws again, even only on some errors
 - the `catch` and `finally` blocks themselves
