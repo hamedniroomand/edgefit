@@ -35,7 +35,7 @@ describe.skipIf(!installed)('without nodejs_compat', () => {
       'Buffer.from drizzle-orm',
       'Buffer.isBuffer drizzle-orm',
     ]);
-    expect(report?.guarded.map(finding => finding.api)).toEqual(['Buffer.from', 'Buffer.isBuffer']);
+    expect(report?.guarded.map(finding => finding.api)).toEqual(['Buffer.isBuffer', 'Buffer.from']);
   });
 });
 

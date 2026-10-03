@@ -215,18 +215,17 @@ describe('check with runtime branches and try blocks', () => {
       'node:fs.unwatchFile 29',
       'FileReader 37',
     ]);
-    expect(report?.guarded[0]?.otherLocations.map(location => location.line)).toEqual([18]);
+    // `node:fs.watch` at line 43 exists and throws inside a try block that catches it.
+    expect(report?.guarded[0]?.otherLocations.map(location => location.line)).toEqual([18, 43]);
   });
 
-  it('keeps code that can run on Workers, and what a try block does not stop', async () => {
+  it('keeps code that can run on Workers, and a catch that throws again', async () => {
     const [report] = (await check({ root: fixture('branch-app') })).reports;
     expect(describeAll(report?.findings)).toEqual([
       // The last branch of the chain, and `navigator.userAgent === 'Cloudflare-Workers'`.
       'node:fs.watchFile 20',
       // `isDeno() || isBun()` does not say which of the two this is.
       'node:fs.unwatchFile 26',
-      // Exists and throws, so catching the error does not make it fine.
-      'node:fs.watch 43',
       // A catch that throws again.
       'FileReader 47',
     ]);

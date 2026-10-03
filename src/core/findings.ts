@@ -173,6 +173,8 @@ function toFinding(
   const target: TargetKey = options.target.info.key;
   const unreached = unreachedFor(module, usage, options);
   const guarded =
+    // A `catch` that does not throw again takes the throw of an API that exists and fails.
+    (usage.caught === true && classification.category === 'unsupported') ||
     (usage.guarded === true &&
       (classification.absent || (usage.kind === 'api' && classification.category === 'unknown'))) ||
     isOtherRuntime(usage, options.target) ||

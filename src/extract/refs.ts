@@ -211,3 +211,25 @@ export function isOnlyTested(member: Node, parent: Node, ref: ApiRef): boolean {
     isFeatureCheck(member, parent) || (isGlobalRoot(ref) && isComparisonOperand(member, parent))
   );
 }
+
+/** Whether `node` is called and the result is awaited: `await a.b()`. `outer` holds the ancestors above `parent`. */
+export function isAwaitedCall(node: Node, parent: Node, outer: readonly Node[]): boolean {
+  // `await` also passes its value on, so it is the one wrapper that ends the search.
+  const next = outer.find(
+    ancestor => ancestor.type === 'AwaitExpression' || unwrap(ancestor) === undefined,
+  );
+  return (
+    parent.type === 'CallExpression' && parent.callee === node && next?.type === 'AwaitExpression'
+  );
+}
+
+/**
+ * Whether the API gives a promise, so an error of it is a rejection. The data does not say it, so
+ * this reads the name: a `promises` module or path, or `crypto.subtle`.
+ * ponytail: a function that returns a promise outside a `promises` path counts as sync. Add a field to the data to cover it.
+ */
+export function isPromiseApi(ref: ApiRef): boolean {
+  return (
+    ref.module.endsWith('/promises') || ref.path.includes('promises') || ref.path.includes('subtle')
+  );
+}

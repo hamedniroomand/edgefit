@@ -14,15 +14,15 @@ npx edgefit package .            # your own package, as `npm publish` would ship
 2. Each public entry point, one for every subpath in `exports` (or `main` without one), gets an entry file that imports it as a namespace. Every export counts as used, which is the worst case for "I import this entry point".
 3. The usual [check](/guide/findings) runs on each entry for each target.
 
-A subpath passes when there are no findings, warns when there are only warnings, and fails when there is an error. A target's overall result is its worst subpath. Warnings are never shown as passes.
+A subpath passes when there are no findings, warns when there are only warnings, and fails when there is an error. The result of a target is the result of its main entry. Warnings are never shown as passes.
 
-The [package table](/packages/) also shows the result of the main entry (`.`). When it differs from the worst subpath, a row shows both: the main entry first, and the worst subpath as a smaller mark. The tooltip of the cell names the subpath that decides the worst result. The row detail lists the subpaths that are not a pass, with their finding counts. A subpath that needs a module which the package does not declare, such as a React Native subpath that imports `react`, is listed as not checked (`–`), with the module it needs. edgefit did not install that module, and a project that uses the subpath has to bring it. A not checked subpath is left out of the result of the row. When every subpath is not checked, the row shows `?`. The same lines show in the output of `edgefit package`. The status filter and the sort of the table use the worst result.
+The result of a target is the result of the main entry (`.`), because that is what an import of the package gets. When a subpath is worse, `edgefit package` names it on a `worst subpath` line, and the [package table](/packages/) shows it as a second, smaller mark, and names it in the tooltip of the cell. The row detail lists the subpaths that are not a pass, with their finding counts. The status filter and the sort of the table use the result of the main entry. A package without a main entry, or whose main entry could not be checked, takes the worst subpath.
 
 ## What a pass means
 
 A static check found no API that the target lacks or stubs, in code reachable from the package's public entry points with every export used. It was checked against [pinned data](/guide/status), for the resolved version on the check date.
 
-In the table, the main entry mark is the result of the main entry only. The worst mark is the worst result of all subpaths.
+In the table, the main entry mark is the result of the main entry only. The second mark is the worst subpath, when it is worse than the main entry.
 
 ## What a pass does not mean
 
@@ -39,7 +39,7 @@ The [limitations](/guide/limitations) apply to packages as they do to projects.
 
 `edgefit package <name> --badge badge.svg` writes a static SVG such as `edgefit | workerd ✓ bun ✓ deno ⚠`: green for a pass, amber for warnings only, red for a failure, grey when the check could not run. Commit it, or regenerate it in CI.
 
-A badge always shows the worst result, not the main entry result, so a badge never hides a subpath that warns or fails. The Markdown snippet in the table uses this badge.
+A badge shows the result of the main entry, the same as the row of the table. The row detail lists a subpath that is worse. The Markdown snippet in the table uses this badge.
 
 Packages in the table have badges at `https://edgefit.kitdev.space/packages/badges/<name>.svg`, with `@scope/name` written as `scope__name`, and `<name>.<target>.svg` for one target. Each row of the table shows the Markdown to copy. The badge should link to the package's row, so the caveats are one click away:
 

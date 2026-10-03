@@ -1,10 +1,11 @@
 import type { Node } from 'oxc-parser';
 
-import { isSymbolKey, staticKey, staticString } from '@/extract/ast.ts';
+import { builtinName } from '@/data/builtins.ts';
+import { isSymbolKey, staticKey, staticString, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
-import { displayRef, isGlobalRoot, memberRef } from '@/extract/refs.ts';
+import { displayRef, isGlobalRoot, memberRef, moduleRef } from '@/extract/refs.ts';
 import { assign, isBound, lookup } from '@/extract/scope.ts';
 import type { Binding } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
@@ -73,12 +74,22 @@ function bindDestructured(
 /** What `let c;` holds, when `c = value` is the one write to `c` in the file. */
 function assignedBinding(id: Node, context: VisitContext): Binding | undefined {
   const value = id.type === 'Identifier' ? context.assigned.get(id.name) : undefined;
-  return value === undefined ? undefined : resolveBinding(value, context);
+  return value === undefined
+    ? undefined
+    : (wrapperBinding(value, context) ?? resolveBinding(value, context));
+}
+
+/** What `const m = load()` holds when `load` only returns a `require()` of a Node.js module. */
+function wrapperBinding(init: Node, context: VisitContext): Binding | undefined {
+  const loaded = context.wrappers.requireCalls.get(strip(init));
+  const module = loaded === undefined ? undefined : builtinName(loaded.specifier);
+  return module === undefined ? undefined : { ref: moduleRef(module), recorded: false };
 }
 
 export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, context) => {
   const { id, init } = node;
-  const initial = init === null ? undefined : resolveBinding(init, context);
+  const initial =
+    init === null ? undefined : (wrapperBinding(init, context) ?? resolveBinding(init, context));
   const binding = isBound(initial) ? initial : assignedBinding(id, context);
   if (!isBound(binding)) {
     context.visitPattern(id);
@@ -123,7 +134,7 @@ export function bindAssigned(node: NodeOf<'AssignmentExpression'>, context: Visi
   ) {
     return false;
   }
-  if (!isBound(resolveBinding(right, context))) {
+  if (!isBound(wrapperBinding(right, context) ?? resolveBinding(right, context))) {
     assign(context.scope, left.name, null);
     return false;
   }

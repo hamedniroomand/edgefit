@@ -4,6 +4,8 @@ export interface OverrideEntry {
   source: string;
   /** The stub checks its arguments before it throws, so an argument error is not a sign it works. */
   validatesFirst?: boolean;
+  /** The API is missing on the target and the code works without it. Only with status `supported`. */
+  missingHarmless?: true;
   /** The API does not exist on the target. Only with status `unsupported`. */
   absent?: true;
 }

@@ -179,6 +179,12 @@
       "note": "does nothing; source maps are always enabled",
       "source": "process.ts"
     },
+    "fs.F_OK": {
+      "status": "supported",
+      "note": "missing on Deno, but an undefined mode of fs.access is F_OK, so `fs.access(path, fs.F_OK, cb)` works the same. R_OK, W_OK and X_OK stay missing, because an undefined mode checks only that the file exists",
+      "source": "internal/fs/utils.mjs",
+      "missingHarmless": true
+    },
     "process.sourceMapsEnabled": {
       "status": "supported",
       "note": "always true, since source maps are always enabled",

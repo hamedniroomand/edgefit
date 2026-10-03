@@ -3,12 +3,13 @@ import type { Node } from 'oxc-parser';
 import type { ApiRef } from '@/types.ts';
 
 import { childNodes, isTypeOnly } from './ast.ts';
-import { followChain, isCheckedOperand } from './chain.ts';
+import { followChain, isCheckedOperand, isTestedChain } from './chain.ts';
 import type { VisitContext } from './context.ts';
 import {
   displayRef,
   escapes,
   isFeatureCheck,
+  isAwaitedCall,
   normalizeRef,
   isGlobalRoot,
   isOnlyTested,
@@ -23,8 +24,11 @@ import { visitorFor } from './visitors/index.ts';
 import { visitPattern } from './visitors/patterns.ts';
 
 /** A read that only tests for the API, so it is not a use. */
-function isCheck(node: Node, parent: Node | undefined): boolean {
-  return (parent !== undefined && isFeatureCheck(node, parent)) || isOptionalRead(node, parent);
+function isCheck(node: Node, parent: Node | undefined, outer: readonly Node[]): boolean {
+  return (
+    (parent !== undefined && (isFeatureCheck(node, parent) || isTestedChain(parent, outer))) ||
+    isOptionalRead(node, parent)
+  );
 }
 
 export class Walker implements VisitContext {
@@ -139,6 +143,9 @@ export class Walker implements VisitContext {
     return true;
   };
 
+  readonly #awaited = (node: Node, parent: Node | undefined): boolean =>
+    parent !== undefined && isAwaitedCall(node, parent, this.#outer(node));
+
   public readonly useRef = (ref: ApiRef, offset: number, recordBare = true): void => {
     const chain = followChain(this.#stack, ref, offset, this.#scope);
     if (chain.kind === 'computed') {
@@ -160,7 +167,7 @@ export class Walker implements VisitContext {
       return;
     }
     const { node, parent } = chain;
-    if (isGlobalRoot(chain.ref) || isCheck(node, parent)) {
+    if (isGlobalRoot(chain.ref) || isCheck(node, parent, this.#outer(node))) {
       return;
     }
     if (parent !== undefined && this.#recordChecked(chain.ref, chain.offset, node, parent)) {
@@ -175,7 +182,7 @@ export class Walker implements VisitContext {
       return;
     }
     if (recordBare || chain.extended) {
-      this.collector.api(chain.ref, chain.offset);
+      this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
     }
     if (parent !== undefined && this.#escapes(chain.ref, node, parent)) {
       this.collector.dynamic(

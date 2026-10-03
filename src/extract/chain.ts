@@ -84,6 +84,41 @@ export function followChain(
   return { kind: 'static', ...current, node, parent };
 }
 
+const testStatements = new Set([
+  'IfStatement',
+  'WhileStatement',
+  'DoWhileStatement',
+  'ForStatement',
+]);
+
+/**
+ * Whether `node` is an operand of an `&&` or `||` chain whose value only decides truthiness: the
+ * test of an `if`, a loop or `?:`, or the operand of `!`. `if (a && x.y && b)` tests for `x.y`.
+ * `outer` holds the ancestors above `parent`, nearest first.
+ */
+export function isTestedChain(parent: Node, outer: readonly Node[]): boolean {
+  const joins = (item: Node): boolean =>
+    item.type === 'LogicalExpression' && (item.operator === '&&' || item.operator === '||');
+  if (!joins(parent)) {
+    return false;
+  }
+  let value: Node = parent;
+  for (const ancestor of outer) {
+    if (joins(ancestor) || (ancestor.type !== 'AwaitExpression' && unwrap(ancestor) === value)) {
+      value = ancestor;
+    } else if (ancestor.type === 'UnaryExpression') {
+      return ancestor.operator === '!';
+    } else {
+      return (
+        (testStatements.has(ancestor.type) || ancestor.type === 'ConditionalExpression') &&
+        'test' in ancestor &&
+        ancestor.test === value
+      );
+    }
+  }
+  return false;
+}
+
 const logicalChecks = new Set(['||', '??']);
 
 /** Whether the value of `node` is an API, or the last one of a chain of `||` and `??` that holds an API. */

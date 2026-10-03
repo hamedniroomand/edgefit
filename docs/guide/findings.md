@@ -117,6 +117,7 @@ These checks are understood:
 
 - `if (x.y)`, `typeof x.y === 'function'`, `x.y !== undefined` and `'y' in x`, for the code they protect
 - `x.y && x.y()`, `!x.y || x.y()` and `x.y ? x.y() : fallback`
+- `x.y` in any place of an `&&` or `||` chain that is the test of an `if`, a loop or `?:`, or the operand of `!`, such as `if (a && x.y && b)`
 - `x.y?.()`, and `if (x.y?.z)` or `if (x.y?.z?.())`, which also protect `x.y`
 - a guard clause such as `if (!x.y) throw …` or `return`, for the rest of the block
 
@@ -137,7 +138,7 @@ try {
 }
 ```
 
-Usages in the `try` block are guarded, for the APIs the target lacks. Like a check, it does not protect an API that exists and throws. These are not guarded:
+Usages in the `try` block are guarded, for the APIs the target lacks and for the APIs that exist and throw, because the `catch` takes the error of both. A check does not do the second. A promise that nothing awaits is not guarded, because a rejection does not reach the `catch`. The data does not say which API gives a promise, so edgefit reads the name: a path with `promises` in it. These are not guarded:
 
 - a `try` with no `catch`, or a `catch` that throws again, even only on some errors
 - the `catch` and `finally` blocks themselves
