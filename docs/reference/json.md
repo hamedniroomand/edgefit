@@ -38,6 +38,7 @@ edgefit check --format json
       "modules": 5,
       "ignored": 0,
       "guarded": [],
+      "suppliedLoads": [],
       "findings": [
         {
           "id": "ef_3fa09c21b7",
@@ -70,6 +71,8 @@ edgefit check --format json
 `entries` lists every entry the target was checked from, relative to the root, sorted. A target that has no entry of its own and uses another target's lists those.
 
 `guarded` has the same shape as `findings` and holds usages that do not fail the check because the code guards them: it only runs when the API exists, catches the error of its absence, or only runs on another runtime (see [guarded usages](/guide/findings#guarded-usages)). They are not counted in `summary` and never fail a check.
+
+`suppliedLoads` lists each `require()` or `import()` of a name that the user of the code gives, as `{ "package": "express", "place": "view.js:81" }`. `package` is left out for the code of the project. These are not findings. See [modules that the user names](/guide/packages#modules-that-the-user-names).
 
 ### Finding
 

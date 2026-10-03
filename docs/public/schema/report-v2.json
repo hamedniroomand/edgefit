@@ -67,7 +67,15 @@
         "modules": { "type": "integer", "minimum": 0 },
         "ignored": { "type": "integer", "minimum": 0 },
         "findings": { "type": "array", "items": { "$ref": "#/definitions/finding" } },
-        "guarded": { "type": "array", "items": { "$ref": "#/definitions/finding" } }
+        "guarded": { "type": "array", "items": { "$ref": "#/definitions/finding" } },
+        "suppliedLoads": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["place"],
+            "properties": { "package": { "type": "string" }, "place": { "type": "string" } }
+          }
+        }
       }
     },
     "finding": {

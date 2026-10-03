@@ -8,6 +8,8 @@ import { extractScripts } from './scripts.ts';
 import type { ScanOptions } from './scripts.ts';
 
 export { toPosix } from './scripts.ts';
+export { leaveOutSupplied } from './supplied.ts';
+export type { SuppliedLoad } from './supplied.ts';
 export type { ScanOptions } from './scripts.ts';
 
 /** Extracts runtime API usages from every script in the graph, with its package and import chain. */

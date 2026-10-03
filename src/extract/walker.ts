@@ -41,6 +41,7 @@ export class Walker implements VisitContext {
   public readonly assigned: ReadonlyMap<string, Node>;
   public readonly wrappers: VisitContext['wrappers'];
   public readonly functions: VisitContext['functions'];
+  public readonly supplied: VisitContext['supplied'];
   readonly #stack: Node[] = [];
   #scope: Scope = createScope();
   #boundInit: Node | undefined;
@@ -53,6 +54,7 @@ export class Walker implements VisitContext {
     assigned: ReadonlyMap<string, Node>,
     wrappers: VisitContext['wrappers'],
     functions: VisitContext['functions'],
+    supplied: VisitContext['supplied'],
   ) {
     this.collector = collector;
     this.globals = globals;
@@ -61,6 +63,7 @@ export class Walker implements VisitContext {
     this.assigned = assigned;
     this.wrappers = wrappers;
     this.functions = functions;
+    this.supplied = supplied;
   }
 
   public get scope(): Scope {
