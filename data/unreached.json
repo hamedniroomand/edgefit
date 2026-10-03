@@ -76,7 +76,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.2" },
+      "versions": { "min": "4.0.2", "max": "4.0.4" },
       "file": "dist/esm/decode-strings.js",
       "apis": ["FileReader"],
       "target": "workerd",
@@ -85,7 +85,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.2" },
+      "versions": { "min": "4.0.2", "max": "4.0.4" },
       "file": "dist/esm/decode-strings.js",
       "apis": ["FileReader"],
       "target": "bun",
@@ -94,7 +94,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.2" },
+      "versions": { "min": "4.0.2", "max": "4.0.4" },
       "file": "dist/cjs/decode-strings.js",
       "apis": ["FileReader"],
       "target": "workerd",
@@ -103,7 +103,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.2" },
+      "versions": { "min": "4.0.2", "max": "4.0.4" },
       "file": "dist/cjs/decode-strings.js",
       "apis": ["FileReader"],
       "target": "bun",
