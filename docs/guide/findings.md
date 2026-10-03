@@ -121,6 +121,8 @@ These checks are understood:
 - `x.y?.()`, and `if (x.y?.z)` or `if (x.y?.z?.())`, which also protect `x.y`
 - a guard clause such as `if (!x.y) throw …` or `return`, for the rest of the block
 
+A read that is an operand of `||` or `??` is a check too, as in `const f = util.getCallSites ?? util.getCallSite`. A member that the target lacks gives no finding, because it gives `undefined` and the operator moves on. A member that exists and throws is still a finding, because the value goes on. The right operand counts when the left one is an API too. A value that is called in place, such as `(x.y || z)()`, is a use.
+
 A check only covers the API it names, and anything below it. `if (fs.watchFile)` does not guard `fs.watch`.
 
 ### Try blocks

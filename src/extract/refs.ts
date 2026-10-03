@@ -138,7 +138,7 @@ function isNullishOperand(node: Node): boolean {
 /**
  * Tests for an API rather than uses it: `typeof x.y`, `'y' in x`, `!x.y`, `x.y === undefined`,
  * and `x.y` as the condition of an `if` or `?:` or the left side of `&&`. The left side of `||`
- * and `??` is the value that gets used, so it stays a use.
+ * and `??` is a check too, see `isTested`.
  */
 export function isFeatureCheck(node: Node, parent: Node): boolean {
   if (parent.type === 'UnaryExpression') {

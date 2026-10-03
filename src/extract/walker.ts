@@ -3,13 +3,14 @@ import type { Node } from 'oxc-parser';
 import type { ApiRef } from '@/types.ts';
 
 import { childNodes, isTypeOnly } from './ast.ts';
-import { followChain, isTestedChain } from './chain.ts';
+import { followChain, isCheckedOperand, isTestedChain } from './chain.ts';
 import type { VisitContext } from './context.ts';
 import {
   displayRef,
   escapes,
   isFeatureCheck,
   isAwaitedCall,
+  normalizeRef,
   isGlobalRoot,
   isOnlyTested,
   isMemberWrite,
@@ -21,6 +22,14 @@ import type { Scope } from './scope.ts';
 import type { UsageCollector } from './usage-collector.ts';
 import { visitorFor } from './visitors/index.ts';
 import { visitPattern } from './visitors/patterns.ts';
+
+/** A read that only tests for the API, so it is not a use. */
+function isCheck(node: Node, parent: Node | undefined, outer: readonly Node[]): boolean {
+  return (
+    (parent !== undefined && (isFeatureCheck(node, parent) || isTestedChain(parent, outer))) ||
+    isOptionalRead(node, parent)
+  );
+}
 
 export class Walker implements VisitContext {
   public readonly collector: UsageCollector;
@@ -122,6 +131,18 @@ export class Walker implements VisitContext {
     this.#boundInit !== node &&
     escapes(node, parent, this.#outer(node));
 
+  /** The read of an operand of `||` or `??` checks for the API, and the value goes on: absence is handled, a throw is not. */
+  readonly #recordChecked = (ref: ApiRef, offset: number, node: Node, parent: Node): boolean => {
+    if (!isCheckedOperand(node, parent, this.#outer(node), this)) {
+      return false;
+    }
+    const guard = { kind: 'api', ref: normalizeRef(ref), root: undefined, active: true } as const;
+    this.collector.guards.within([guard], () => {
+      this.collector.api(ref, offset);
+    });
+    return true;
+  };
+
   readonly #awaited = (node: Node, parent: Node | undefined): boolean =>
     parent !== undefined && isAwaitedCall(node, parent, this.#outer(node));
 
@@ -146,12 +167,10 @@ export class Walker implements VisitContext {
       return;
     }
     const { node, parent } = chain;
-    if (
-      isGlobalRoot(chain.ref) ||
-      (parent !== undefined &&
-        (isFeatureCheck(node, parent) || isTestedChain(parent, this.#outer(node)))) ||
-      isOptionalRead(node, parent)
-    ) {
+    if (isGlobalRoot(chain.ref) || isCheck(node, parent, this.#outer(node))) {
+      return;
+    }
+    if (parent !== undefined && this.#recordChecked(chain.ref, chain.offset, node, parent)) {
       return;
     }
     if (parent !== undefined && isMemberWrite(node, parent)) {
