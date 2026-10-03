@@ -12,6 +12,7 @@ import {
   isAwaitedCall,
   normalizeRef,
   isGlobalRoot,
+  memberRef,
   isOnlyTested,
   isMemberWrite,
   isOptionalRead,
@@ -131,6 +132,29 @@ export class Walker implements VisitContext {
     this.#boundInit !== node &&
     escapes(node, parent, this.#outer(node));
 
+  /** A computed access: the object is a use, and the key is each string it may be, or unknown. */
+  readonly #recordComputed = (
+    chain: Extract<ReturnType<typeof followChain>, { kind: 'computed' }>,
+  ): void => {
+    if (!isGlobalRoot(chain.ref)) {
+      this.collector.api(chain.ref, chain.offset);
+    }
+    const tested =
+      chain.memberParent !== undefined && isOnlyTested(chain.member, chain.memberParent, chain.ref);
+    if (chain.keys !== undefined) {
+      for (const key of tested ? [] : chain.keys) {
+        this.collector.api(memberRef(chain.ref, key), chain.propertyOffset);
+      }
+    } else if (!tested) {
+      this.collector.dynamic(
+        chain.ref,
+        `${displayRef(chain.ref)}[<expression>]`,
+        'accessed with a computed property',
+        chain.propertyOffset,
+      );
+    }
+  };
+
   /** The read of an operand of `||` or `??` checks for the API, and the value goes on: absence is handled, a throw is not. */
   readonly #recordChecked = (ref: ApiRef, offset: number, node: Node, parent: Node): boolean => {
     if (!isCheckedOperand(node, parent, this.#outer(node), this)) {
@@ -149,21 +173,7 @@ export class Walker implements VisitContext {
   public readonly useRef = (ref: ApiRef, offset: number, recordBare = true): void => {
     const chain = followChain(this.#stack, ref, offset, this.#scope);
     if (chain.kind === 'computed') {
-      if (!isGlobalRoot(chain.ref)) {
-        this.collector.api(chain.ref, chain.offset);
-      }
-      // A test for a member, or a global that is only compared, has nothing to follow.
-      if (
-        chain.memberParent === undefined ||
-        !isOnlyTested(chain.member, chain.memberParent, chain.ref)
-      ) {
-        this.collector.dynamic(
-          chain.ref,
-          `${displayRef(chain.ref)}[<expression>]`,
-          'accessed with a computed property',
-          chain.propertyOffset,
-        );
-      }
+      this.#recordComputed(chain);
       return;
     }
     const { node, parent } = chain;
