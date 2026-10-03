@@ -1,5 +1,6 @@
 import type { ExtractedModule } from '@/extract/index.ts';
 import type { ModuleGraph } from '@/resolve/graph.ts';
+import type { Demand } from '@/trace/analyze.ts';
 import { exportDemands } from '@/trace/reach.ts';
 import type { ApiRef } from '@/types.ts';
 
@@ -31,9 +32,13 @@ function openedFiles(
 ): Set<string> {
   const opened = new Set<string>();
   // Only an `import` statement binds the names, so a file that is required is read in a way not followed.
-  for (const { links } of graph.modules.values()) {
-    for (const link of links.filter(item => item.kind !== 'import-statement')) {
-      opened.add(link.path);
+  for (const [file, module] of graph.modules) {
+    const dynamic = modules.get(file)?.shape?.dynamicImports;
+    for (const link of module.links.filter(item => item.kind !== 'import-statement')) {
+      // An `import()` that only destructures names is followed, like an import of those names.
+      if (!(link.kind === 'dynamic-import' && dynamic?.get(link.original ?? '') instanceof Set)) {
+        opened.add(link.path);
+      }
     }
   }
   for (const [file, { shape }] of modules) {
@@ -84,7 +89,48 @@ export function followAliases(
       }
     }
   }
+  seedDynamicImports(graph, modules, demands, opened, { seeds, followed });
   return { seeds, followed };
+}
+
+/** The same for the names that a file destructures from `await import('./file')`. */
+function seedDynamicImports(
+  graph: ModuleGraph,
+  modules: ReadonlyMap<string, ExtractedModule>,
+  demands: ReadonlyMap<string, Demand>,
+  opened: ReadonlySet<string>,
+  found: FollowedAliases,
+): void {
+  for (const [file, { shape }] of modules) {
+    for (const [specifier, names] of shape?.dynamicImports ?? []) {
+      const target = graph.modules
+        .get(file)
+        ?.links.find(link => link.kind === 'dynamic-import' && link.original === specifier)?.path;
+      if (!(names instanceof Set) || target === undefined) {
+        continue;
+      }
+      for (const name of names) {
+        const alias = modules.get(target)?.aliases.get(name);
+        if (alias === undefined) {
+          continue;
+        }
+        found.seeds.set(
+          file,
+          (found.seeds.get(file) ?? new Map<string, ApiRef>()).set(
+            `${specifier}\0${name}`,
+            alias.ref,
+          ),
+        );
+        const asked = demands.get(target);
+        if (asked !== undefined && asked !== 'all' && !opened.has(target)) {
+          found.followed.set(
+            target,
+            (found.followed.get(target) ?? new Set<number>()).add(alias.offset),
+          );
+        }
+      }
+    }
+  }
 }
 
 /** Drops the `unknown` of the exports that are followed, from the module that writes them. */

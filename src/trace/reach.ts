@@ -50,7 +50,14 @@ function seedDemands(graph: ModuleGraph, shapes: ReadonlyMap<string, ModuleShape
         shape?.traceable === true &&
         isStatic(link.kind) &&
         shape.specifiers.has(link.original ?? '');
-      if (!named) {
+      // A file loaded with `import()` that only gets destructured by name is asked for those names.
+      const asked =
+        link.kind === 'dynamic-import' && shape?.traceable === true
+          ? shape.dynamicImports.get(link.original ?? '')
+          : undefined;
+      if (asked instanceof Set) {
+        demands.raise(link.path, asked);
+      } else if (!named) {
         demands.raise(link.path, 'all');
       }
     }

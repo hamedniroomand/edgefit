@@ -3,6 +3,8 @@ import type { Node } from 'oxc-parser';
 import { childNodes, isTypeOnly } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 
+import type { DynamicImports } from './dynamic-imports.ts';
+
 /**
  * A top-level piece of a module. Code that runs when the module loads has no `name`. A function
  * or class that does nothing until it is used has one, and only counts once something uses it.
@@ -44,6 +46,8 @@ export interface ModuleShape {
   exports: Map<string, ExportSource>;
   /** The modules `export * from` re-exports. */
   stars: string[];
+  /** What the module asks of each file it loads with `import('literal')`. */
+  dynamicImports: DynamicImports;
 }
 
 export function mentionsIn(node: Node, names = new Set<string>()): Set<string> {
@@ -104,6 +108,7 @@ export class ShapeBuilder {
     specifiers: new Set(),
     exports: new Map(),
     stars: [],
+    dynamicImports: new Map(),
   };
 
   public unit(node: Node, name?: string, mentions?: Set<string>): void {

@@ -7,6 +7,7 @@ import { patternNames } from '@/extract/declarations.ts';
 import { ShapeBuilder, isLazyClass, rootNames } from './builder.ts';
 import type { ModuleShape } from './builder.ts';
 import { collectCommonJsShape } from './cjs.ts';
+import { dynamicImportsOf } from './dynamic-imports.ts';
 
 export type { ExportSource, ModuleShape, Unit } from './builder.ts';
 
@@ -154,13 +155,14 @@ export function collectShape(
   typeOnly: ReadonlySet<string> = new Set(),
 ): ModuleShape {
   if (!hasModuleSyntax) {
-    return collectCommonJsShape(body);
+    return { ...collectCommonJsShape(body), dynamicImports: dynamicImportsOf(body) };
   }
   const builder = new ShapeBuilder();
   for (const statement of body) {
     addStatement(builder, statement, typeOnly);
   }
   const { shape } = builder;
+  shape.dynamicImports = dynamicImportsOf(body);
   shape.units.sort((left, right) => left.start - right.start);
   shape.traceable =
     shape.traceable &&
