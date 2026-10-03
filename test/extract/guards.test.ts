@@ -100,7 +100,7 @@ describe('usages the check does not protect', () => {
     );
     expect(usagesOf(`${fs}fs.watch || fs.watch('.');`)).toEqual([
       'api node:fs',
-      'api node:fs.watch',
+      'api node:fs.watch [guarded]',
       'api node:fs.watch',
     ]);
   });
@@ -127,9 +127,10 @@ describe('usages the check does not protect', () => {
 });
 
 describe('uses that only look like checks', () => {
-  it('keeps the left side of || and ?? as a use of the API', () => {
-    expect(usagesOf(`${fs}const watch = fs.watch || polyfill;`)).toEqual(plainWatch);
-    expect(usagesOf(`${fs}const watch = fs.watch ?? polyfill;`)).toEqual(plainWatch);
+  it('keeps an operand of || and ?? as a use when the value is called in place', () => {
+    expect(usagesOf(`${fs}(fs.watch || polyfill)('.');`)).toEqual(plainWatch);
+    expect(usagesOf(`${fs}(fs.watch ?? polyfill)('.');`)).toEqual(plainWatch);
+    expect(usagesOf(`${fs}(fs.watch || other || polyfill)('.');`)).toEqual(plainWatch);
   });
 
   it('keeps a comparison with a value as a use', () => {

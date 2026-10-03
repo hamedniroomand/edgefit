@@ -12,7 +12,7 @@ const timeoutMs = 10 * 60 * 1000;
 mkdirSync(out, { recursive: true });
 
 const failed = (name, message) => ({
-  version: 1,
+  version: 2,
   package: name,
   resolved: null,
   checkedAt: new Date().toISOString(),
