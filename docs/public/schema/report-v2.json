@@ -110,6 +110,7 @@
         "chain": { "type": "array", "items": { "type": "string" } },
         "source": { "type": "string" },
         "suggestion": { "$ref": "#/definitions/suggestion" },
+        "exports": { "type": "array", "items": { "type": "string" } },
         "guarded": { "const": true },
         "unreached": {
           "type": "object",

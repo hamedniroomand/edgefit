@@ -55,6 +55,8 @@ export interface Usage {
   supplied?: true;
   /** Set when a `try` with a `catch` that does not throw again stops the error of this use, and no check guards it. */
   caught?: true;
+  /** The exports of the checked package that reach this usage, when only some of them do. Set with `byExport`. */
+  exports?: string[];
   /** Set when the code only runs if the API exists, for example inside `if (x.y)`. */
   guarded?: true;
   /** Set when the code sits behind runtime checks, such as `typeof Deno !== 'undefined'`. All must hold. */
@@ -100,6 +102,8 @@ export interface Finding {
   source?: string;
   /** What to do about it, when edgefit knows. Never set on guarded findings. */
   suggestion?: Suggestion;
+  /** The exports of the checked package that reach this finding, when only some of them do. Set with `byExport`. */
+  exports?: string[];
   /** Set when the code only runs if the API exists, or on another runtime. Guarded findings never fail a check. */
   guarded?: true;
   /** Set on a guarded finding that edgefit's data says is not reached on the target, with why. */

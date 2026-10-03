@@ -64,9 +64,12 @@ function keepPrevious(name, file, error) {
   return true;
 }
 
-/** The worst entry of each target, where it is worse than the result of the target. */
-function worstColumns(worst) {
-  return worst === undefined || Object.keys(worst).length === 0 ? {} : { worst };
+/** The worst entry of each target, where it is worse than the result of the target, and the worst export. */
+function worstColumns({ worst, worstExport }) {
+  return {
+    ...(worst === undefined || Object.keys(worst).length === 0 ? {} : { worst }),
+    ...(worstExport === undefined || Object.keys(worstExport).length === 0 ? {} : { worstExport }),
+  };
 }
 
 let sample;
@@ -101,7 +104,7 @@ for (const { name } of readList()) {
     summary: result.summary,
     subpaths: result.entries.length,
     ...(result.error === undefined && result.main !== undefined ? { main: result.main } : {}),
-    ...(result.error === undefined ? worstColumns(result.worst) : {}),
+    ...(result.error === undefined ? worstColumns(result) : {}),
     ...(result.error === undefined ? {} : { error: result.error }),
     ...(result.notes === undefined ? {} : { notes: result.notes }),
   });

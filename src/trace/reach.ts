@@ -41,18 +41,28 @@ function loadsFor(
   return { 'dynamic-import': shape?.dynamicImports, 'require-call': shape?.requires }[kind];
 }
 
+/** What the file `entry` asks of the module that it imports, in place of what its own code asks. */
+export type EntryAsk = { entry: string; names: Set<string> };
+
 /**
  * Asks for every export of the modules that something may reach in any way: the entry, and
  * anything imported other than by a static import whose specifier was read from a module that
  * can be traced.
  */
-function seedDemands(graph: ModuleGraph, shapes: ReadonlyMap<string, ModuleShape>): Demands {
+function seedDemands(
+  graph: ModuleGraph,
+  shapes: ReadonlyMap<string, ModuleShape>,
+  ask?: EntryAsk,
+): Demands {
   const demands = new Demands();
   for (const entry of graph.entries) {
     demands.raise(entry, 'all');
   }
   for (const [file, module] of graph.modules) {
     const shape = shapes.get(file);
+    if (file === ask?.entry) {
+      continue;
+    }
     for (const link of module.links) {
       const named =
         shape?.traceable === true &&
@@ -81,8 +91,9 @@ function seedDemands(graph: ModuleGraph, shapes: ReadonlyMap<string, ModuleShape
 export function traceReach(
   graph: ModuleGraph,
   shapes: ReadonlyMap<string, ModuleShape>,
+  ask?: EntryAsk,
 ): { traced: Map<string, Set<Unit>>; demands: ReadonlyMap<string, Demand> } {
-  const demands = seedDemands(graph, shapes);
+  const demands = seedDemands(graph, shapes, ask);
   const traced = new Map<string, Set<Unit>>();
   const queue = [...graph.modules.keys()];
   for (let file = queue.pop(); file !== undefined; file = queue.pop()) {
@@ -93,7 +104,8 @@ export function traceReach(
     const { live, asks } = analyze(shape, demands.get(file));
     traced.set(file, live);
     for (const link of graph.modules.get(file)?.links ?? []) {
-      const names = isStatic(link.kind) ? asks.get(link.original ?? '') : undefined;
+      const asked = file === ask?.entry ? ask.names : asks.get(link.original ?? '');
+      const names = isStatic(link.kind) ? asked : undefined;
       if (names !== undefined && demands.raise(link.path, names)) {
         queue.push(link.path);
       }
@@ -142,8 +154,9 @@ export function exportDemands(
 export function reachedUsages(
   graph: ModuleGraph,
   modules: ReadonlyMap<string, ExtractedModule>,
+  ask?: EntryAsk,
 ): Map<string, Usage[]> {
-  const { traced } = traceReach(graph, shapesOf(modules));
+  const { traced } = traceReach(graph, shapesOf(modules), ask);
   return new Map(
     [...modules].map(([file, module]) => {
       const live = traced.get(file);

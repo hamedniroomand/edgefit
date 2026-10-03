@@ -26,6 +26,8 @@ export interface ScanOptions {
   nodeEnv: string | undefined;
   /** Do not report an optional peer dependency that is not installed. The caller lists it instead. */
   leaveOutMissingPeers?: boolean;
+  /** Name the exports of the entry's package that reach a usage, when only some of them do. */
+  byExport?: boolean;
 }
 
 // esbuild's metafile also lists JSON and asset inputs, which hold no code.

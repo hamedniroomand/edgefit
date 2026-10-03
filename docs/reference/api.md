@@ -23,12 +23,13 @@ Scans a project and returns one report per target.
 function check(options?: CheckOptions): Promise<CheckResult>;
 ```
 
-| Option             | Type            | Description                                                          |
-| ------------------ | --------------- | -------------------------------------------------------------------- |
-| `root`             | `string`        | Project root. Default: `process.cwd()`                               |
-| `config`           | `EdgefitConfig` | The same shape as the config file. It is not loaded for you          |
-| `built`            | `string`        | Scan build output: its entry file or directory, relative to the root |
-| `includeSupported` | `boolean`       | Also list the reached APIs each target supports, in `supported`      |
+| Option             | Type            | Description                                                                                       |
+| ------------------ | --------------- | ------------------------------------------------------------------------------------------------- |
+| `root`             | `string`        | Project root. Default: `process.cwd()`                                                            |
+| `config`           | `EdgefitConfig` | The same shape as the config file. It is not loaded for you                                       |
+| `built`            | `string`        | Scan build output: its entry file or directory, relative to the root                              |
+| `includeSupported` | `boolean`       | Also list the reached APIs each target supports, in `supported`                                   |
+| `byExport`         | `boolean`       | For a check of one package entry: set `Finding.exports` on a finding that only some exports reach |
 
 ```ts
 interface CheckResult {

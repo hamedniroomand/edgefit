@@ -11,6 +11,7 @@
     summary: Record<string, Status>;
     main?: string;
     worst?: Record<string, { subpath: string; status: Status }>;
+    worstExport?: Record<string, { subpath: string; name: string; status: Status }>;
     subpaths: number;
     error?: string;
     notes?: string;
@@ -29,7 +30,14 @@
       subpath: string;
       results: Record<
         string,
-        { status: Status; errors: number; warnings: number; message?: string; notes?: string[] }
+        {
+          status: Status;
+          errors: number;
+          warnings: number;
+          message?: string;
+          notes?: string[];
+          exports?: { name: string; findings: { api: string; category: string }[] }[];
+        }
       >;
     }[];
   }
@@ -108,6 +116,12 @@
     if (worst !== undefined) {
       parts.push(`worst subpath ${worst.subpath} ${words[worst.status]}`);
     }
+    const worstExport = row.worstExport?.[key];
+    if (worstExport !== undefined) {
+      parts.push(
+        `worst export ${worstExport.name} of ${worstExport.subpath} ${words[worstExport.status]}`,
+      );
+    }
     return parts.join(', ');
   }
 
@@ -123,6 +137,18 @@
     }
     return [...bySubpaths].map(([note, subpaths]) => `${note}: ${[...subpaths].join(', ')}`);
   });
+
+  // The findings that only some exports reach, one line for each export of a subpath on a target.
+  const exportLines = computed(() =>
+    (details.value[open.value]?.entries ?? []).flatMap(entry =>
+      Object.entries(entry.results).flatMap(([key, result]) =>
+        (result.exports ?? []).map(
+          item =>
+            `${entry.subpath} on ${key}, only through ${item.name}: ${item.findings.map(finding => `${finding.category} ${finding.api}`).join(', ')}`,
+        ),
+      ),
+    ),
+  );
 
   const failing = computed(() =>
     (details.value[open.value]?.entries ?? []).filter(entry =>
@@ -174,7 +200,8 @@
       </p>
       <p class="ef-packages-legend">
         The first mark is the result of the main entry, which is what an import of the package gets.
-        A second, smaller mark is the worst subpath, when it is worse. The status filter and the
+        A second, smaller mark is the worst subpath, when it is worse. A third is the worst export,
+        when an export has findings that the first mark does not count. The status filter and the
         sort use the first mark. A package without a main entry shows its worst subpath, unless its
         row names the subpath that stands for it.
       </p>
@@ -271,6 +298,11 @@
                     :class="[`ef-status-${row.worst[key].status}`, 'ef-worst']"
                     >{{ symbols[row.worst[key].status] }}</span
                   >
+                  <span
+                    v-if="row.worstExport?.[key]"
+                    :class="[`ef-status-${row.worstExport[key].status}`, 'ef-worst']"
+                    >{{ symbols[row.worstExport[key].status] }}</span
+                  >
                 </template>
               </td>
             </tr>
@@ -324,6 +356,12 @@
                     </tr>
                   </tbody>
                 </table>
+                <p
+                  v-for="line in exportLines"
+                  :key="line"
+                >
+                  {{ line }}
+                </p>
                 <p
                   v-for="note in notes"
                   :key="note"

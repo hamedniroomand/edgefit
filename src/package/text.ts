@@ -80,6 +80,30 @@ function worstLines(result: PackageResult, paint: Paint): string[] {
   });
 }
 
+function worstExportLines(result: PackageResult, paint: Paint): string[] {
+  return result.targets.flatMap(key => {
+    const found = result.worstExport?.[key];
+    return found === undefined
+      ? []
+      : [
+          `  worst export on ${key}: ${found.name} of ${found.subpath} ${paint(statusColors[found.status], statusSymbols[found.status])}`,
+        ];
+  });
+}
+
+/** The findings that only some exports reach, one line for each export of an entry on a target. */
+function exportLines(result: PackageResult, paint: Paint): string[] {
+  const lines = result.entries.flatMap(entry =>
+    result.targets.flatMap(key =>
+      (entry.results[key]?.exports ?? []).map(
+        item =>
+          `  ${entry.subpath} on ${key}, only through ${item.name}: ${item.findings.map(finding => `${finding.category} ${finding.api}`).join(', ')}`,
+      ),
+    ),
+  );
+  return lines.length === 0 ? [] : ['', ...lines.map(line => paint('dim', line))];
+}
+
 function problemLines(result: PackageResult, paint: Paint): string[] {
   const problems = result.entries.flatMap(entry =>
     result.targets.flatMap(key => {
@@ -123,7 +147,7 @@ function footerLines(result: PackageResult, paint: Paint): string[] {
   lines.push(
     paint(
       'dim',
-      `  A pass means a static check found no API the target lacks in code reachable from the entry, with every export used. The package was not run. Details: ${packagesGuideUrl}`,
+      `  A pass means a static check found no API the target lacks in the code that the entry runs when it loads, or that every export reaches. A finding that only some exports reach is listed under them. The package was not run. Details: ${packagesGuideUrl}`,
     ),
   );
   return lines;
@@ -139,8 +163,10 @@ export function formatPackageText(result: PackageResult, options: { color: boole
     ...gridLines(result, paint),
     ...mainLines(result),
     ...worstLines(result, paint),
+    ...worstExportLines(result, paint),
     ...noteLines(result).map(line => paint('dim', line)),
     ...problemLines(result, paint),
+    ...exportLines(result, paint),
     ...footerLines(result, paint),
   ];
   return `${lines.join('\n')}\n`;

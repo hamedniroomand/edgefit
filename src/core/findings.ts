@@ -202,6 +202,7 @@ function toFinding(
     ...(unreached === undefined
       ? {}
       : { unreached: { reason: unreached.reason, source: unreached.source } }),
+    ...(usage.exports === undefined ? {} : { exports: usage.exports }),
     ...(module.buildOutput === true ? { buildOutput: true as const } : {}),
   };
 }
@@ -218,6 +219,15 @@ export function findingKey(finding: Finding): string {
   return `${finding.target}\0${finding.category}\0${finding.api}\0${owner}`;
 }
 
+/** A finding that one export reaches and another reaches in some other way counts for every export. */
+function mergeExports(existing: Finding, other: Finding): void {
+  if (existing.exports === undefined || other.exports === undefined) {
+    delete existing.exports;
+  } else {
+    existing.exports = [...new Set([...existing.exports, ...other.exports])].toSorted();
+  }
+}
+
 /** Merges findings for the same API within one owner: a package, a file of the project's own code, or build output. */
 function group(findings: readonly Finding[]): Finding[] {
   const groups = new Map<string, Finding>();
@@ -228,6 +238,7 @@ function group(findings: readonly Finding[]): Finding[] {
       groups.set(key, { ...finding, otherLocations: [] });
     } else {
       existing.otherLocations.push(finding.location);
+      mergeExports(existing, finding);
     }
   }
   return [...groups.values()];
