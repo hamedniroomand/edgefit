@@ -42,7 +42,9 @@ describe('checkPackage', () => {
     expect(result.entries.map(entry => entry.subpath)).toEqual(['.', './node']);
     expect(result.entries[0]?.results.workerd?.status).toBe('pass');
     expect(result.entries[1]?.results.workerd?.status).not.toBe('pass');
-    expect(result.summary.workerd).not.toBe('pass');
+    // The main entry decides the result, and the worst subpath is named next to it.
+    expect(result.summary.workerd).toBe('pass');
+    expect(result.worst?.workerd?.subpath).toBe('./node');
     expect(result.summary.bun).toBeDefined();
   });
 
