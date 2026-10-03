@@ -96,6 +96,41 @@ const files = (code: string): Record<string, Source> => ({
   'dep.js': dep,
 });
 
+describe('an export that is an object literal', () => {
+  it('drops the methods of an object literal export that nothing uses, and keeps what runs when the module loads', () => {
+    const lib = cjs(
+      "exports.used = function () {\n  return fs.watch('.');\n};\nexports.dead = {\n  run: function () {\n    return fs.watchFile('.');\n  },\n  stat: fs.stat,\n};",
+    );
+    const found = reached({ 'index.js': useUsed(), 'lib.js': lib })['lib.js'] ?? [];
+    expect([...new Set(found)].sort()).toEqual(['node:fs.stat', 'node:fs.watch']);
+  });
+
+  it.each([
+    ['a call', "data: fs.watchFile('.')"],
+    ['a static class field', "k: class { static x = fs.watchFile('.'); }"],
+    ['a new expression', "s: new (require('node:net').Server)()"],
+  ])('counts %s in an object literal export when the module loads', (_name, member) => {
+    const lib = cjs(
+      `exports.used = function () {\n  return fs.watch('.');\n};\nexports.dead = { ${member} };`,
+    );
+    expect(reached({ 'index.js': useUsed(), 'lib.js': lib })['lib.js']).toHaveLength(2);
+  });
+
+  it('reads an object literal export that has a spread, and still drops its dead method', () => {
+    const lib = cjs(
+      "const other = {};\nexports.used = function () {\n  return fs.watch('.');\n};\nexports.dead = {\n  ...other,\n  run() {\n    return fs.watchFile('.');\n  },\n};",
+    );
+    expect(reached({ 'index.js': useUsed(), 'lib.js': lib })['lib.js']).toEqual(['node:fs.watch']);
+  });
+
+  it('keeps the members of an export that is an object literal once it is used', () => {
+    const lib = cjs(
+      "exports.used = {\n  run: function () {\n    return fs.watch('.');\n  },\n};\nexports.dead = function () {\n  return fs.watchFile('.');\n};",
+    );
+    expect(reached({ 'index.js': useUsed(), 'lib.js': lib })['lib.js']).toEqual(['node:fs.watch']);
+  });
+});
+
 describe('what a CommonJS module asks of the modules it requires', () => {
   it('asks for the member that is read from a required module', () => {
     const result = reached(

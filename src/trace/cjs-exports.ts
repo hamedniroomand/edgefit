@@ -177,11 +177,33 @@ export class ExportWriter {
       });
       return true;
     }
+    if (value.type === 'ObjectExpression') {
+      this.#exportObject(name, value);
+      return true;
+    }
     if (isFunction(value) || (value.type === 'ClassExpression' && isLazyClass(value))) {
       this.#export(name, value, value);
       return true;
     }
     return false;
+  }
+
+  /** Only a function or a lazy class in the object waits for the export to be used. The rest runs when the module loads. */
+  #exportObject(name: string, object: ObjectLiteral): void {
+    const { builder } = this.#context;
+    for (const property of object.properties) {
+      const value =
+        property.type === 'Property' && !property.computed ? strip(property.value) : undefined;
+      if (
+        value !== undefined &&
+        (isFunction(value) || (value.type === 'ClassExpression' && isLazyClass(value)))
+      ) {
+        builder.unit(property, exportKey(name), mentionsIn(value));
+      } else {
+        builder.unit(property);
+      }
+    }
+    builder.export(name, { local: exportKey(name) });
   }
 
   /** `module.exports = value`. */
