@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress';
 import type { DefaultTheme } from 'vitepress';
+import llmstxt from 'vitepress-plugin-llms';
 
 import { icon } from './icons.ts';
 
@@ -24,6 +25,10 @@ export default defineConfig({
   // Roadmap specs live next to the site for maintainers and are not pages.
 
   sitemap: { hostname: site },
+
+  vite: {
+    plugins: [llmstxt({ domain: site })],
+  },
 
   head: [
     ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
@@ -91,6 +96,7 @@ export default defineConfig({
             link('columns-3', 'Comparing targets', '/guide/compare'),
             link('layers', 'Framework build output', '/guide/built-output'),
             link('git-pull-request', 'Pull request checks', '/guide/ci'),
+            link('terminal', 'Use with a coding assistant', '/guide/assistants'),
           ],
         },
         {

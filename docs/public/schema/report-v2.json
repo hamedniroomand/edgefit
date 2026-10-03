@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://edgefit.kitdev.space/schema/report-v2.json",
+  "title": "edgefit check report",
+  "description": "The output of `edgefit check --format json`, version 2.",
+  "type": "object",
+  "required": ["version", "summary", "skipped", "targets"],
+  "properties": {
+    "version": { "const": 2 },
+    "summary": {
+      "type": "object",
+      "required": ["errors", "warnings"],
+      "properties": {
+        "errors": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "searched"],
+        "properties": {
+          "key": { "$ref": "#/definitions/targetKey" },
+          "searched": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "targets": { "type": "array", "items": { "$ref": "#/definitions/target" } }
+  },
+  "definitions": {
+    "targetKey": {
+      "enum": ["workerd", "bun", "deno", "deno-deploy", "netlify-edge", "vercel-edge"]
+    },
+    "location": {
+      "type": "object",
+      "required": ["file", "line", "column"],
+      "properties": {
+        "file": { "type": "string" },
+        "line": { "type": "integer", "minimum": 1 },
+        "column": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "key",
+        "platform",
+        "conditions",
+        "data",
+        "settings",
+        "notes",
+        "entries",
+        "modules",
+        "ignored",
+        "findings",
+        "guarded"
+      ],
+      "properties": {
+        "key": { "$ref": "#/definitions/targetKey" },
+        "platform": { "type": "string" },
+        "conditions": { "type": "array", "items": { "type": "string" } },
+        "data": { "type": "string" },
+        "settings": { "type": "string" },
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "entries": { "type": "array", "items": { "type": "string" } },
+        "modules": { "type": "integer", "minimum": 0 },
+        "ignored": { "type": "integer", "minimum": 0 },
+        "findings": { "type": "array", "items": { "$ref": "#/definitions/finding" } },
+        "guarded": { "type": "array", "items": { "$ref": "#/definitions/finding" } }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": [
+        "id",
+        "category",
+        "level",
+        "api",
+        "target",
+        "message",
+        "detail",
+        "location",
+        "otherLocations",
+        "chain"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^ef_[0-9a-f]{10}$" },
+        "category": { "enum": ["unsupported", "mocked", "mismatch", "web", "unknown"] },
+        "level": { "enum": ["error", "warning"] },
+        "api": { "type": "string" },
+        "target": { "$ref": "#/definitions/targetKey" },
+        "message": { "type": "string" },
+        "detail": { "type": "string" },
+        "package": {
+          "type": "object",
+          "required": ["name"],
+          "properties": { "name": { "type": "string" }, "version": { "type": "string" } }
+        },
+        "location": { "$ref": "#/definitions/location" },
+        "otherLocations": { "type": "array", "items": { "$ref": "#/definitions/location" } },
+        "chain": { "type": "array", "items": { "type": "string" } },
+        "source": { "type": "string" },
+        "suggestion": { "$ref": "#/definitions/suggestion" },
+        "guarded": { "const": true },
+        "unreached": {
+          "type": "object",
+          "required": ["reason", "source"],
+          "properties": { "reason": { "type": "string" }, "source": { "type": "string" } }
+        },
+        "buildOutput": { "const": true }
+      }
+    },
+    "suggestion": {
+      "type": "object",
+      "required": ["kind", "text", "target", "source"],
+      "properties": {
+        "kind": { "enum": ["replace", "setting", "change"] },
+        "text": { "type": "string" },
+        "package": { "type": "string" },
+        "setting": {
+          "type": "object",
+          "required": ["name", "value"],
+          "properties": {
+            "name": { "type": "string" },
+            "value": { "type": "string" },
+            "remove": { "const": true }
+          }
+        },
+        "target": { "$ref": "#/definitions/targetKey" },
+        "source": { "type": "string" }
+      }
+    }
+  }
+}

@@ -48,7 +48,7 @@ interface TargetReport {
 }
 ```
 
-`Finding` has the same fields as in the [JSON report](/reference/json#finding).
+`Finding` has the same fields as in the [JSON report](/reference/json#finding), except `id`. Only the JSON report has `id`.
 
 ## checkPackage(spec, options?)
 

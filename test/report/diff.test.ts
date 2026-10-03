@@ -76,6 +76,23 @@ describe('diff reports', () => {
   });
 });
 
+describe('build output in a diff', () => {
+  it('ignores a new chunk name', () => {
+    const chunk = (file: string): Finding =>
+      finding('node:fs.watch', undefined, {
+        buildOutput: true,
+        location: { file, line: 3, column: 1 },
+      });
+    const diff = diffReports(
+      report(chunk('.output/server/chunks/nitro-a1b2c3.mjs')),
+      report(chunk('.output/server/chunks/nitro-d4e5f6.mjs')),
+    );
+    expect(diff.added).toEqual([]);
+    expect(diff.fixed).toEqual([]);
+    expect(diff.unchanged).toHaveLength(1);
+  });
+});
+
 describe('diff fail-on', () => {
   it('fails according to fail-on', () => {
     const warning = finding('require(<expression>)', undefined, { level: 'warning' });

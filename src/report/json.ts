@@ -1,6 +1,7 @@
 import { countLevels } from '@/core/check.ts';
 import type { CheckResult, SkippedTarget } from '@/core/check.ts';
 import { EdgefitError } from '@/errors.ts';
+import { findingId } from '@/report/finding-id.ts';
 import type { Finding, TargetKey } from '@/types.ts';
 
 /** Bumped on any breaking change to the JSON shape. */
@@ -17,6 +18,11 @@ export interface JsonReport {
   skipped: SkippedTarget[];
 }
 
+/** Keeps the `id` of a finding that has one. A report written before IDs existed has none. */
+function withId(finding: Finding): Finding & { id: string } {
+  return { id: findingId(finding), ...finding };
+}
+
 export function formatJson(result: CheckResult): string {
   const report = {
     version: jsonReportVersion,
@@ -27,8 +33,8 @@ export function formatJson(result: CheckResult): string {
       entries: targetReport.entries,
       modules: targetReport.modules,
       ignored: targetReport.ignored,
-      findings: targetReport.findings,
-      guarded: targetReport.guarded,
+      findings: targetReport.findings.map(withId),
+      guarded: targetReport.guarded.map(withId),
     })),
   };
   return `${JSON.stringify(report, null, 2)}\n`;
@@ -78,7 +84,7 @@ export function parseJsonReport(text: string, source: string): JsonReport {
     targets: value.targets.map(target => ({
       key: target.key,
       entries: entriesOf(target),
-      findings: target.findings,
+      findings: target.findings.map(withId),
     })),
   };
 }
