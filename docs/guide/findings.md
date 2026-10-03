@@ -38,6 +38,8 @@ The clearest case. Either the module or member is not there, or it is there and 
 
 A reachable native addon (a `.node` file) is also `unsupported` on Workers, Vercel Edge, Netlify Edge and Deno Deploy. The finding shows the import chain to the addon. edgefit does not look inside the addon. Bun and Deno load native addons, so they give no finding. To ignore one, use an `ignore` rule with its `api`, which is `native addon <file>.node`.
 
+A package that loads its addon through a loader (`node-gyp-build`, `bindings`, `node-pre-gyp`, or a platform package that ships a `.node` file) gets the same finding, with the api `native addon <package>`. edgefit reads the manifest of each package to find these: `gypfile`, `binary`, an install script that runs `node-gyp`, `prebuild-install`, `node-pre-gyp`, `node-gyp-build` or `cargo-cp-artifact`, or a dependency on a known loader. The computed `require` in such a loader is not reported as `unknown`.
+
 ### mocked
 
 The API exists and does not throw, but it does not do its job. On Workers, `dgram` sockets accept calls and never send anything. On Bun, `async_hooks.createHook` returns a hook that is never called. These are errors by default because they fail silently, which is worse than failing loudly.

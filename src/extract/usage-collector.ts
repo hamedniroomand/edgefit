@@ -17,7 +17,7 @@ export class UsageCollector {
   /** Imported local names that another module of the graph exports as a Node.js module. */
   public readonly importedModules: ReadonlyMap<string, ApiRef>;
   /** Specifiers that resolve to a native addon. */
-  readonly #nativeSpecifiers: ReadonlySet<string>;
+  readonly #nativeSpecifiers: ReadonlyMap<string, string>;
   readonly #file: string;
   readonly #lineStarts: number[] = [0];
 
@@ -25,7 +25,7 @@ export class UsageCollector {
     file: string,
     source: string,
     lazyNodeImports = false,
-    nativeSpecifiers: ReadonlySet<string> = new Set(),
+    nativeSpecifiers: ReadonlyMap<string, string> = new Map(),
     importedModules: ReadonlyMap<string, ApiRef> = new Map(),
   ) {
     this.importedModules = importedModules;
@@ -77,14 +77,15 @@ export class UsageCollector {
 
   /** Records the import of a native addon, if `specifier` resolves to one. */
   public native(specifier: string, offset: number): void {
-    if (this.guards.dead() || !this.#nativeSpecifiers.has(specifier)) {
+    const name = this.#nativeSpecifiers.get(specifier);
+    if (this.guards.dead() || name === undefined) {
       return;
     }
     this.offsets.push(offset);
     this.usages.push({
       kind: 'native',
       api: undefined,
-      display: `native addon ${specifier.split('/').at(-1)}`,
+      display: `native addon ${name}`,
       location: this.location(offset),
       // A `try` that catches the error of a missing addon guards the import.
       ...(this.guards.isCaught() ? { guarded: true as const } : {}),

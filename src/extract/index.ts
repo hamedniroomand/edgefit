@@ -22,8 +22,8 @@ export interface ExtractOptions {
   lazyNodeImports?: boolean;
   /** The bundler keeps imports that nothing uses as a value: `verbatimModuleSyntax` is on. */
   keepUnusedImports?: boolean;
-  /** Specifiers of the file that resolve to a native addon, as written in the source. */
-  nativeSpecifiers?: ReadonlySet<string>;
+  /** Specifiers of the file that resolve to a native addon, as written in the source, with the name to show. */
+  nativeSpecifiers?: ReadonlyMap<string, string>;
   /** Imported local names that another module of the graph exports as a Node.js module. */
   importedModules?: ReadonlyMap<string, ApiRef>;
 }
