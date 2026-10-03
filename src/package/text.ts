@@ -10,6 +10,7 @@ export const statusSymbols: Record<PackageStatus, string> = {
   warn: '⚠',
   fail: '✗',
   error: '?',
+  unchecked: '–',
 };
 
 const statusColors: Record<PackageStatus, 'green' | 'yellow' | 'red' | 'gray'> = {
@@ -17,6 +18,7 @@ const statusColors: Record<PackageStatus, 'green' | 'yellow' | 'red' | 'gray'> =
   warn: 'yellow',
   fail: 'red',
   error: 'gray',
+  unchecked: 'gray',
 };
 
 function cell(status: PackageStatus | undefined, width: number, paint: Paint): string {
@@ -59,10 +61,13 @@ function problemLines(result: PackageResult, paint: Paint): string[] {
       }
       const plural = (count: number, word: string): string =>
         `${count} ${word}${count === 1 ? '' : 's'}`;
+      const detailByStatus: Partial<Record<PackageStatus, string>> = {
+        error: `could not be checked: ${found.message ?? 'unknown error'}`,
+        unchecked: `not checked: ${found.message ?? 'unknown reason'}`,
+      };
       const detail =
-        found.status === 'error'
-          ? `could not be checked: ${found.message ?? 'unknown error'}`
-          : `${plural(found.errors, 'error')}, ${plural(found.warnings, 'warning')}`;
+        detailByStatus[found.status] ??
+        `${plural(found.errors, 'error')}, ${plural(found.warnings, 'warning')}`;
       return [`  ${entry.subpath} on ${key}: ${detail}`];
     }),
   );

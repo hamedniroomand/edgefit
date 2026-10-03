@@ -31,4 +31,22 @@ describe('formatPackageText', () => {
     expect(text).toContain('. on workerd: 1 error, 2 warnings');
     expect(text).toContain('. on bun: could not be checked: boom');
   });
+
+  it('lists an unchecked entry with the reason', () => {
+    const unchecked: PackageResult = {
+      ...result,
+      entries: [
+        {
+          subpath: './native',
+          specifier: '@s/p/native',
+          results: {
+            workerd: { status: 'unchecked', errors: 0, warnings: 0, message: 'needs "react"' },
+          },
+        },
+      ],
+    };
+    expect(formatPackageText(unchecked, { color: false })).toContain(
+      './native on workerd: not checked: needs "react"',
+    );
+  });
 });
