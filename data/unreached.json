@@ -109,6 +109,42 @@
       "target": "bun",
       "reason": "Runs only when `blob.arrayBuffer` is missing. Bun has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
       "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.2/packages/bun-types/globals.d.ts#L1527"
+    },
+    {
+      "package": "@supabase/auth-js",
+      "versions": { "min": "2.117.2", "max": "2.117.2" },
+      "file": "dist/module/lib/locks.js",
+      "apis": ["navigator.locks.request"],
+      "target": "workerd",
+      "reason": "Runs only when a project passes `navigatorLock` as the deprecated `lock` option. The client coordinates session refreshes without a lock by default and does not use `navigator.locks`.",
+      "source": "https://github.com/supabase/supabase-js/blob/v2.117.2/packages/core/auth-js/src/GoTrueClient.ts#L465"
+    },
+    {
+      "package": "@supabase/auth-js",
+      "versions": { "min": "2.117.2", "max": "2.117.2" },
+      "file": "dist/module/lib/locks.js",
+      "apis": ["navigator.locks.request"],
+      "target": "bun",
+      "reason": "Runs only when a project passes `navigatorLock` as the deprecated `lock` option. The client coordinates session refreshes without a lock by default and does not use `navigator.locks`.",
+      "source": "https://github.com/supabase/supabase-js/blob/v2.117.2/packages/core/auth-js/src/GoTrueClient.ts#L465"
+    },
+    {
+      "package": "@supabase/realtime-js",
+      "versions": { "min": "2.117.2", "max": "2.117.2" },
+      "file": "dist/module/RealtimeClient.js",
+      "apis": ["Worker", "URL.createObjectURL"],
+      "target": "workerd",
+      "reason": "Runs only with the `worker` option, which defaults to false. It starts the heartbeat in a Web Worker.",
+      "source": "https://github.com/supabase/supabase-js/blob/v2.117.2/packages/core/realtime-js/src/RealtimeClient.ts#L813"
+    },
+    {
+      "package": "@supabase/realtime-js",
+      "versions": { "min": "2.117.2", "max": "2.117.2" },
+      "file": "dist/module/RealtimeClient.js",
+      "apis": ["Worker", "URL.createObjectURL"],
+      "target": "bun",
+      "reason": "Runs only with the `worker` option, which defaults to false. It starts the heartbeat in a Web Worker.",
+      "source": "https://github.com/supabase/supabase-js/blob/v2.117.2/packages/core/realtime-js/src/RealtimeClient.ts#L813"
     }
   ]
 }
