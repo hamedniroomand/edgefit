@@ -48,6 +48,10 @@ function addImport(
     }
     builder.unit(item, item.local.name, new Set());
     builder.shape.imports.set(item.local.name, { specifier, imported });
+    if (item.type === 'ImportNamespaceSpecifier') {
+      // Only the members that are read from `import * as ns` are asked of the module.
+      builder.shape.bindings.add(item.local.name);
+    }
   }
 }
 

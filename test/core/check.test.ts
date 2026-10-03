@@ -246,12 +246,11 @@ describe('check with unused exports', () => {
     expect(apis).not.toContain('node:fs.unwatchFile dir-tools');
   });
 
-  it('keeps what an imported export reaches, and all of a module imported as a namespace', async () => {
+  it('keeps what an imported export reaches, and what is read from a module imported as a namespace', async () => {
     const [report] = (await check({ root: fixture('reach-app') })).reports;
     expect(describeAll(report?.findings)).toEqual([
       'node:fs.watchFile dir-tools',
       'node:child_process.spawn whole-lib',
-      'node:child_process.spawnSync whole-lib',
     ]);
   });
 });

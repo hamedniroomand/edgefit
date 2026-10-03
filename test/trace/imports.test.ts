@@ -9,10 +9,16 @@ const importedBy = (code: string, specifier: string): Record<string, string[]> =
   });
 
 describe('imports that may reach any export', () => {
-  it('keeps everything for a namespace import', () => {
+  it('keeps everything for a namespace that is passed on', () => {
+    expect(importedBy("import * as lib from './lib.js';\nuse(lib);", './lib.js')['lib.js']).toEqual(
+      ['node:fs.watch'],
+    );
+  });
+
+  it('asks only for the members that are read from a namespace import', () => {
     expect(
       importedBy("import * as lib from './lib.js';\nlib.upper('a');", './lib.js')['lib.js'],
-    ).toEqual(['node:fs.watch']);
+    ).toEqual([]);
   });
 });
 
