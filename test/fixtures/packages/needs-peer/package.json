@@ -1,0 +1,8 @@
+{
+  "name": "edgefit-fixture-needs-peer",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./index.js",
+  "peerDependencies": { "edgefit-peer-missing": "1" },
+  "peerDependenciesMeta": { "edgefit-peer-missing": { "optional": true } }
+}

@@ -6,7 +6,7 @@ import type { Loader, Message, Metafile, Plugin } from 'esbuild';
 
 import { toResolveError } from './errors.ts';
 import { importWrappers } from './import-wrappers.ts';
-import { acceptMissingPeers, importKey, optionalPeers } from './optional-peers.ts';
+import { acceptMissingPeers, importKey, moduleName, optionalPeers } from './optional-peers.ts';
 import { runtimeExternals } from './runtime-externals.ts';
 import { tsconfigRawFor } from './tsconfig.ts';
 
@@ -124,6 +124,12 @@ async function bundleMetafile(options: ResolveOptions, accepted: Set<string>): P
     }
     throw isBuildFailure(error) ? toResolveError(error.errors) : error;
   }
+}
+
+/** The optional peer dependencies that are not installed, and that the code in the graph imports. */
+export function missingPeersOf(graph: ModuleGraph): string[] {
+  const names = [...graph.modules.values()].flatMap(module => module.missingPeers.map(moduleName));
+  return [...new Set(names)].toSorted();
 }
 
 /** Resolves the module graph from an entry the way the target's bundler would. */

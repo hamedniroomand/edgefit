@@ -3,7 +3,7 @@ import process from 'node:process';
 
 import { attributeOutput } from '@/built/attribute.ts';
 import { builtEntries, isBuildOutput } from '@/built/entry.ts';
-import { resolveGraph } from '@/resolve/graph.ts';
+import { missingPeersOf, resolveGraph } from '@/resolve/graph.ts';
 import { createTarget } from '@/targets/index.ts';
 import type { Target, TargetInfo } from '@/targets/index.ts';
 import type { EdgefitConfig, Finding, TargetKey } from '@/types.ts';
@@ -31,6 +31,8 @@ export interface CheckOptions {
   built?: string;
   /** Also list the reached APIs each target supports, as `TargetReport.supported`. */
   includeSupported?: boolean;
+  /** List an optional peer dependency that is not installed as `TargetReport.missingPeers`, not as a finding. */
+  missingPeersAsNotes?: boolean;
 }
 
 export interface TargetReport {
@@ -43,6 +45,8 @@ export interface TargetReport {
   ignored: number;
   /** Empty unless `includeSupported` is set. */
   supported: SupportedApi[];
+  /** The optional peer dependencies that are not installed, and that the code reaches. Only with `missingPeersAsNotes`. */
+  missingPeers?: string[];
 }
 
 /** A target left out of the run because it has no entry. */
@@ -87,11 +91,11 @@ async function checkTarget(
     trace: !isBuilt,
     lazyNodeImports: target.lazyNodeImports,
     nodeEnv,
+    leaveOutMissingPeers: options.missingPeersAsNotes,
   });
   const { modules, notes } = isBuilt
     ? attributeOutput(scanned, root)
     : { modules: scanned, notes: [] };
-
   const { findings, guarded, ignored } = collectFindings(modules, {
     target,
     levels: { ...defaultLevels, ...config.levels },
@@ -112,6 +116,7 @@ async function checkTarget(
     guarded,
     ignored,
     supported: options.includeSupported === true ? collectSupported(modules, target) : [],
+    ...(options.missingPeersAsNotes === true ? { missingPeers: missingPeersOf(graph) } : {}),
   };
 }
 

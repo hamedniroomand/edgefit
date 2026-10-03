@@ -29,7 +29,7 @@
       subpath: string;
       results: Record<
         string,
-        { status: Status; errors: number; warnings: number; message?: string }
+        { status: Status; errors: number; warnings: number; message?: string; notes?: string[] }
       >;
     }[];
   }
@@ -115,6 +115,19 @@
     }
     return parts.join(', ');
   }
+
+  // What the check did not cover, with the subpaths that have it.
+  const notes = computed(() => {
+    const bySubpaths = new Map<string, Set<string>>();
+    for (const entry of details.value[open.value]?.entries ?? []) {
+      for (const result of Object.values(entry.results)) {
+        for (const note of result.notes ?? []) {
+          bySubpaths.set(note, (bySubpaths.get(note) ?? new Set<string>()).add(entry.subpath));
+        }
+      }
+    }
+    return [...bySubpaths].map(([note, subpaths]) => `${note}: ${[...subpaths].join(', ')}`);
+  });
 
   const failing = computed(() =>
     (details.value[open.value]?.entries ?? []).filter(entry =>
@@ -319,6 +332,12 @@
                     </tr>
                   </tbody>
                 </table>
+                <p
+                  v-for="note in notes"
+                  :key="note"
+                >
+                  {{ note }}
+                </p>
                 <p v-if="row.error === undefined">
                   Badge:
                   <code>{{ markdown(row) }}</code>
