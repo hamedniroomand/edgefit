@@ -7,7 +7,7 @@ import type { TargetKey } from '@/types.ts';
 
 import { checkEntry, inSequence } from './check-entry.ts';
 import { packageEntries } from './entry.ts';
-import { packageResultVersion, worstStatus } from './result.ts';
+import { packageResultVersion, summaryOf } from './result.ts';
 import type { PackageResult } from './result.ts';
 import { parsePackageSpec } from './spec.ts';
 import type { PackageSpec } from './spec.ts';
@@ -62,7 +62,7 @@ export async function checkPackage(
     });
     const summary: PackageResult['summary'] = {};
     for (const key of targets) {
-      summary[key] = worstStatus(rows.flatMap(row => row.results[key]?.status ?? []));
+      summary[key] = summaryOf(rows.flatMap(row => row.results[key]?.status ?? []));
     }
     return {
       version: packageResultVersion,

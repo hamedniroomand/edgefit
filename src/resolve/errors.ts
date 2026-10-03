@@ -3,9 +3,13 @@ import type { Message } from 'esbuild';
 import { EdgefitError } from '@/errors.ts';
 
 export class ResolveError extends EdgefitError {
-  public constructor(message: string, hint?: string) {
+  /** The esbuild messages that failed the build. */
+  public readonly messages: readonly Message[];
+
+  public constructor(message: string, hint?: string, messages: readonly Message[] = []) {
     super(message, hint);
     this.name = 'ResolveError';
+    this.messages = messages;
   }
 }
 
@@ -40,5 +44,6 @@ export function toResolveError(messages: readonly Message[]): ResolveError {
   return new ResolveError(
     `Could not resolve the module graph:\n${shown.join('\n')}`,
     hintFor(messages),
+    messages,
   );
 }

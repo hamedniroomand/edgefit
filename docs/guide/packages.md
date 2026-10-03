@@ -16,7 +16,7 @@ npx edgefit package .            # your own package, as `npm publish` would ship
 
 A subpath passes when there are no findings, warns when there are only warnings, and fails when there is an error. A target's overall result is its worst subpath. Warnings are never shown as passes.
 
-The [package table](/packages/) also shows the result of the main entry (`.`). When it differs from the worst subpath, a row shows both: the main entry first, and the worst subpath as a smaller mark. The tooltip of the cell names the subpath that decides the worst result. The row detail lists the subpaths that are not a pass, with their finding counts. The status filter and the sort of the table use the worst result.
+The [package table](/packages/) also shows the result of the main entry (`.`). When it differs from the worst subpath, a row shows both: the main entry first, and the worst subpath as a smaller mark. The tooltip of the cell names the subpath that decides the worst result. The row detail lists the subpaths that are not a pass, with their finding counts. A subpath that needs a module which the package does not declare, such as a React Native subpath that imports `react`, is listed as not checked (`–`), with the module it needs. edgefit did not install that module, and a project that uses the subpath has to bring it. A not checked subpath is left out of the result of the row. When every subpath is not checked, the row shows `?`. The same lines show in the output of `edgefit package`. The status filter and the sort of the table use the worst result.
 
 ## What a pass means
 
