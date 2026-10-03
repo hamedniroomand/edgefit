@@ -3,9 +3,11 @@ import type { Node } from 'oxc-parser';
 import { builtinName } from '@/data/builtins.ts';
 import { staticKey } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
+import { fileMembers } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { displayRef, isGlobalRoot, moduleRef } from '@/extract/refs.ts';
 import { assign, isTracked, lookup } from '@/extract/scope.ts';
+import type { Binding } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
 // What Vercel's Edge runtime accepts as a WebAssembly module: a `.wasm` file, with or without `?module`.
@@ -29,11 +31,15 @@ export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context)
     const isWasm = wasmSource.test(node.source.value);
     for (const specifier of used) {
       const alias = context.collector.importedModules.get(specifier.local.name);
-      assign(
-        context.scope,
-        specifier.local.name,
-        alias === undefined ? null : { ref: alias, recorded: false },
-      );
+      const members =
+        specifier.type === 'ImportNamespaceSpecifier'
+          ? fileMembers(context.collector.importedModules, node.source.value)
+          : undefined;
+      let binding: Binding = alias === undefined ? null : { ref: alias, recorded: false };
+      if (members !== undefined) {
+        binding = { ref: moduleRef('*file*'), recorded: false, members };
+      }
+      assign(context.scope, specifier.local.name, binding);
       if (isWasm && specifier.type !== 'ImportSpecifier') {
         context.scope.wasmImports.add(specifier.local.name);
       }

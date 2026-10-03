@@ -67,10 +67,10 @@ describe('a Node.js module that a file re-exports, and that stays unknown', () =
     expect(usages['src/internal.mjs']).toContain('dynamic node:crypto');
   });
 
-  it('stays unknown when the file is imported as a whole or re-exported', async () => {
+  it('stays unknown when the file is imported as a whole that is passed on, or re-exported', async () => {
     const whole = await scanned({
       'src/internal.mjs': exporter,
-      'src/index.mjs': "import * as all from './internal.mjs';\nall.crypto.createHash('md5');\n",
+      'src/index.mjs': "import * as all from './internal.mjs';\nuse(all);\n",
     });
     expect(whole['src/internal.mjs']).toContain('dynamic node:crypto');
     const reexported = await scanned({
@@ -246,5 +246,31 @@ describe('a file that another file reads partly by member', () => {
         "const files = require('./internal.js');\nfiles.crypto.createHash('md5');\nmodule.exports = {};\n",
     });
     expect(usages['src/internal.js']).not.toContain('dynamic node:crypto');
+  });
+});
+
+describe('a file that another file imports as a namespace and reads by member', () => {
+  it.each([
+    ['a member', "import * as all from './internal.mjs';\nall.crypto.createHash('md5');\n"],
+    [
+      'a member read twice',
+      "import * as all from './internal.mjs';\nall.crypto.createHash('md5');\nall.crypto.randomBytes(1);\n",
+    ],
+  ])('is read member by member for %s, and is not unknown in the exporter', async (_name, code) => {
+    const usages = await scanned({ 'src/internal.mjs': exporter, 'src/index.mjs': code });
+    expect(usages['src/index.mjs']).toContain('api node:crypto.createHash');
+    expect(usages['src/internal.mjs']).not.toContain('dynamic node:crypto');
+  });
+
+  it.each([
+    ['stored', "import * as all from './internal.mjs';\nconst saved = all;\nuse(saved);\n"],
+    [
+      'read with a computed key',
+      "import * as all from './internal.mjs';\nall[name].createHash('md5');\n",
+    ],
+    ['exported again', "import * as all from './internal.mjs';\nexport { all };\n"],
+  ])('stays unknown when the namespace is %s', async (_name, code) => {
+    const usages = await scanned({ 'src/internal.mjs': exporter, 'src/index.mjs': code });
+    expect(usages['src/internal.mjs']).toContain('dynamic node:crypto');
   });
 });
