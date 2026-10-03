@@ -1,7 +1,7 @@
 import type { TargetKey } from '@/types.ts';
 
 /** Bumped on any breaking change to the package result shape. */
-export const packageResultVersion = 1;
+export const packageResultVersion = 2;
 
 /** `unchecked`: the entry needs a module that the package does not declare, so it was left out of the summary. */
 export type PackageStatus = 'pass' | 'warn' | 'fail' | 'error' | 'unchecked';
@@ -14,6 +14,11 @@ export interface EntryStatus {
   message?: string;
   /** What the check did not cover, such as an optional peer dependency that is not installed. */
   notes?: string[];
+}
+
+export interface WorstEntry {
+  subpath: string;
+  status: PackageStatus;
 }
 
 export interface PackageEntryResult {
@@ -32,8 +37,10 @@ export interface PackageResult {
   /** Runtime versions of the pinned data, from `data/source.json`. */
   data: Record<string, string>;
   targets: TargetKey[];
-  /** Each target's worst status across the entries. */
+  /** Each target's status: the main entry (`.`), or the worst entry for a package without one. */
   summary: Partial<Record<TargetKey, PackageStatus>>;
+  /** The worst entry of a target, when it is worse than the main entry that decides the target. */
+  worst?: Partial<Record<TargetKey, WorstEntry>>;
   /** Settings and notes each target ran with, as `check` prints them. */
   context: Partial<Record<TargetKey, { settings: string; notes: string[] }>>;
   entries: PackageEntryResult[];
@@ -65,6 +72,47 @@ export function worstStatus(statuses: readonly PackageStatus[]): PackageStatus {
 export function summaryOf(statuses: readonly PackageStatus[]): PackageStatus {
   const checked = statuses.filter(status => status !== 'unchecked');
   return checked.length === 0 && statuses.length > 0 ? 'error' : worstStatus(checked);
+}
+
+/**
+ * The result of one target. The main entry decides it, because that is what an import of the
+ * package gets. A package without a main entry, or with one that was not checked, takes the worst
+ * entry. `worst` names the worst entry when it is worse than the result.
+ */
+export function targetResult(
+  entries: readonly PackageEntryResult[],
+  key: TargetKey,
+): { status: PackageStatus; worst?: WorstEntry } {
+  const found = entries.flatMap(entry => {
+    const status = entry.results[key]?.status;
+    return status === undefined ? [] : [{ subpath: entry.subpath, status }];
+  });
+  const all = summaryOf(found.map(item => item.status));
+  const main = found.find(item => item.subpath === '.');
+  if (main === undefined || main.status === 'unchecked') {
+    return { status: all };
+  }
+  const worst = found.find(item => item.status === all);
+  return severity[all] > severity[main.status] && worst !== undefined
+    ? { status: main.status, worst }
+    : { status: main.status };
+}
+
+/** The result of every target, and the worst entry where it is worse than the result. */
+export function summarize(
+  entries: readonly PackageEntryResult[],
+  targets: readonly TargetKey[],
+): Pick<PackageResult, 'summary' | 'worst'> {
+  const summary: PackageResult['summary'] = {};
+  const worst: NonNullable<PackageResult['worst']> = {};
+  for (const key of targets) {
+    const decided = targetResult(entries, key);
+    summary[key] = decided.status;
+    if (decided.worst !== undefined) {
+      worst[key] = decided.worst;
+    }
+  }
+  return Object.keys(worst).length === 0 ? { summary } : { summary, worst };
 }
 
 export function statusOf(errors: number, warnings: number): PackageStatus {

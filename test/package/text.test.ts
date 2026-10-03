@@ -4,7 +4,7 @@ import type { PackageResult } from '@/package/result.ts';
 import { formatPackageText } from '@/package/text.ts';
 
 const result: PackageResult = {
-  version: 1,
+  version: 2,
   package: '@s/p',
   resolved: '1.0.0',
   checkedAt: '2026-01-01T00:00:00.000Z',

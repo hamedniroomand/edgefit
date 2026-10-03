@@ -3,12 +3,13 @@ import type { Node } from 'oxc-parser';
 import type { ApiRef } from '@/types.ts';
 
 import { childNodes, isTypeOnly } from './ast.ts';
-import { followChain } from './chain.ts';
+import { followChain, isTestedChain } from './chain.ts';
 import type { VisitContext } from './context.ts';
 import {
   displayRef,
   escapes,
   isFeatureCheck,
+  isAwaitedCall,
   isGlobalRoot,
   isOnlyTested,
   isMemberWrite,
@@ -121,6 +122,9 @@ export class Walker implements VisitContext {
     this.#boundInit !== node &&
     escapes(node, parent, this.#outer(node));
 
+  readonly #awaited = (node: Node, parent: Node | undefined): boolean =>
+    parent !== undefined && isAwaitedCall(node, parent, this.#outer(node));
+
   public readonly useRef = (ref: ApiRef, offset: number, recordBare = true): void => {
     const chain = followChain(this.#stack, ref, offset, this.#scope);
     if (chain.kind === 'computed') {
@@ -144,7 +148,8 @@ export class Walker implements VisitContext {
     const { node, parent } = chain;
     if (
       isGlobalRoot(chain.ref) ||
-      (parent !== undefined && isFeatureCheck(node, parent)) ||
+      (parent !== undefined &&
+        (isFeatureCheck(node, parent) || isTestedChain(parent, this.#outer(node)))) ||
       isOptionalRead(node, parent)
     ) {
       return;
@@ -158,7 +163,7 @@ export class Walker implements VisitContext {
       return;
     }
     if (recordBare || chain.extended) {
-      this.collector.api(chain.ref, chain.offset);
+      this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
     }
     if (parent !== undefined && this.#escapes(chain.ref, node, parent)) {
       this.collector.dynamic(

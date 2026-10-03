@@ -97,3 +97,14 @@ describe('deno workspace settings', () => {
     );
   });
 });
+
+describe('deno lookups of fs modes', () => {
+  const target = createDenoTarget(emptyProject);
+
+  it('supports fs.F_OK, which fs.access takes from an undefined mode, and not the other modes', () => {
+    expect(target.lookup({ module: 'fs', path: ['F_OK'] }).status).toBe('supported');
+    for (const name of ['R_OK', 'W_OK', 'X_OK']) {
+      expect(target.lookup({ module: 'fs', path: [name] }).status).toBe('unsupported');
+    }
+  });
+});

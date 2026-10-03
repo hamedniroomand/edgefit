@@ -7,7 +7,7 @@ import type { TargetKey } from '@/types.ts';
 
 import { checkEntry, inSequence } from './check-entry.ts';
 import { packageEntries } from './entry.ts';
-import { packageResultVersion, summaryOf } from './result.ts';
+import { packageResultVersion, summarize } from './result.ts';
 import type { PackageResult } from './result.ts';
 import { parsePackageSpec } from './spec.ts';
 import type { PackageSpec } from './spec.ts';
@@ -60,10 +60,6 @@ export async function checkPackage(
       const row = await checkEntry(workspace.root, entry, index, targets, context);
       return row;
     });
-    const summary: PackageResult['summary'] = {};
-    for (const key of targets) {
-      summary[key] = summaryOf(rows.flatMap(row => row.results[key]?.status ?? []));
-    }
     return {
       version: packageResultVersion,
       package: workspace.name,
@@ -72,7 +68,7 @@ export async function checkPackage(
       edgefit: manifest.version,
       data: readRuntimeVersions(),
       targets,
-      summary,
+      ...summarize(rows, targets),
       context,
       entries: rows,
     };

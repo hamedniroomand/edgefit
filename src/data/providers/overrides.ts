@@ -16,6 +16,8 @@ interface OverrideEntry {
   except?: string[];
   /** The stub checks its arguments before it throws, which the runtime probe knows about. */
   validatesFirst?: boolean;
+  /** The API is missing on the target and the code works without it, so the runtime probe does not take a missing API as a stale entry. Only with status `supported`. */
+  missingHarmless?: true;
   /**
    * The API does not exist on the target, as when the matrix lacks it, not a stub that throws.
    * Only with status `unsupported`: a mocked or mismatched API exists.

@@ -124,7 +124,7 @@ function formatGuarded(report: TargetReport, paint: Paint, verbose: boolean): st
   return [
     paint(
       'dim',
-      'Guarded: the code checks for an API this target lacks or may lack before using it, catches the error of its absence, only runs on another runtime, or is listed as not reached, so these do not fail a check.',
+      'Guarded: the code checks for an API this target lacks or may lack before using it, catches its error, only runs on another runtime, or is listed as not reached, so these do not fail a check.',
     ),
     ...report.guarded.map(finding => formatFinding(finding, paint).join('\n')),
   ];

@@ -46,6 +46,7 @@ The matrix only records whether an API exists. Override files record what happen
 - `status` is `unsupported`, `mocked`, `mismatch` or `supported`.
 - `note` is the detail line users see. Say what happens, in plain words.
 - `source` is a path relative to the source URL in `source.json`, pinned to the runtime version. It becomes the `see` link in reports.
+- `missingHarmless` (optional, with `supported`) marks an API that is missing on the runtime while the code that uses it works without it, such as `fs.F_OK` on Deno. The runtime probe then does not report the missing API as a stale entry. Say in the `note` why it is harmless.
 - `validatesFirst` (optional) marks a stub that checks its arguments before it throws, as workerd's `vm.compileFunction` does. The runtime probe then does not take an argument error for a working implementation.
 
 ### Adding or changing an entry

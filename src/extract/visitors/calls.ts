@@ -102,8 +102,36 @@ function visitInherits(node: NodeOf<'CallExpression'>, context: VisitContext): b
   return true;
 }
 
+/** A call of a function that only returns a `require()` loads that module. The `require()` inside it records nothing. */
+function visitWrappedRequire(node: NodeOf<'CallExpression'>, context: VisitContext): boolean {
+  if (context.wrappers.requires.has(node)) {
+    return true;
+  }
+  const loaded = context.wrappers.requireCalls.get(node);
+  if (loaded === undefined) {
+    return false;
+  }
+  const module = builtinName(loaded.specifier);
+  const record = (): void => {
+    context.collector.native(loaded.specifier, node.start);
+    if (module !== undefined) {
+      context.useRef(moduleRef(module), node.start);
+    }
+  };
+  // The function has a `try` that stops the error of a module that is missing.
+  if (loaded.caught) {
+    context.collector.guards.caught(record);
+  } else {
+    record();
+  }
+  return true;
+}
+
 export const visitCall: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
   recordDynamicFunction(node, context);
+  if (visitWrappedRequire(node, context)) {
+    return;
+  }
   recordWasmBytes(node, context);
   if (isRequire(node.callee, context.scope)) {
     visitRequire(node, context);
