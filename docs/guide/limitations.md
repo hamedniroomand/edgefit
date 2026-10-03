@@ -54,6 +54,8 @@ Any other wrapper asks for all of the module.
 
 A variable that is declared without a value and set once to a `require()` result, such as `let c; c = require('node:crypto')`, is followed like a `const`. A declaration with a value that cannot be a module, such as `null`, an object or a conditional, is followed too. A declaration with a name, a member, a call or an `import()` as its value counts as a second write. Another declaration of the name (a parameter, a function or a second `var`), any other write to it in the file, or an export of it stops this.
 
+A file can export a Node.js module under a name, as in `import * as crypto from 'node:crypto'; export { crypto }`. A file of the graph that imports that name by name, as in `import { crypto } from './node.js'`, uses the module there, and its members are checked. The export is then not reported as `unknown`. It stays `unknown` when nothing imports the name, when a file imports the whole file (`import * as`, `import()`, `export * from`), or when the entry may export it. A module that a second file re-exports is not followed.
+
 A name counts as used when any used code mentions it. A property or a local variable of the same name also counts, which can only keep a finding, never hide one.
 
 ## Imports used only as types

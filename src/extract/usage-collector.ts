@@ -12,6 +12,10 @@ export class UsageCollector {
   public readonly guards = new GuardStack();
   /** Importing a Node.js module is not a use of it: only what is read from it is. */
   public readonly lazyNodeImports: boolean;
+  /** What the module exports that is a Node.js module of its own, by exported name. */
+  public readonly aliases = new Map<string, { ref: ApiRef; offset: number }>();
+  /** Imported local names that another module of the graph exports as a Node.js module. */
+  public readonly importedModules: ReadonlyMap<string, ApiRef>;
   /** Specifiers that resolve to a native addon. */
   readonly #nativeSpecifiers: ReadonlySet<string>;
   readonly #file: string;
@@ -22,7 +26,9 @@ export class UsageCollector {
     source: string,
     lazyNodeImports = false,
     nativeSpecifiers: ReadonlySet<string> = new Set(),
+    importedModules: ReadonlyMap<string, ApiRef> = new Map(),
   ) {
+    this.importedModules = importedModules;
     this.#file = file;
     this.#nativeSpecifiers = nativeSpecifiers;
     this.lazyNodeImports = lazyNodeImports;
