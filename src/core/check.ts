@@ -16,6 +16,7 @@ import {
   defaultLevels,
   loadSuggestions,
   loadUnreached,
+  readStoredModules,
 } from './findings.ts';
 import type { ModuleUsages, SupportedApi } from './findings.ts';
 import { leaveOutSupplied, scanModules, toPosix } from './scan.ts';
@@ -73,18 +74,19 @@ function describeNodeEnv(nodeEnv: string | undefined, fromConfig: boolean): stri
 }
 
 /**
- * The modules to check, the notes of the scan, and the loads of a name that the user gives. Build
- * output holds the callers of its own functions, so no name in it comes from a user.
+ * The modules to check, the notes of the scan, and the loads of a name that the user gives, with
+ * the stored modules read. Build output holds the callers of its own functions, so no name in it
+ * comes from a user.
  */
 function shownModules(
   scanned: ModuleUsages[],
   root: string,
   isBuilt: boolean,
 ): { modules: ModuleUsages[]; notes: string[]; supplied: SuppliedLoad[] } {
-  if (isBuilt) {
-    return { ...attributeOutput(scanned, root), supplied: [] };
-  }
-  return { ...leaveOutSupplied(scanned), notes: [] };
+  const shown = isBuilt
+    ? { ...attributeOutput(scanned, root), supplied: [] }
+    : { ...leaveOutSupplied(scanned), notes: [] };
+  return { ...shown, modules: readStoredModules(shown.modules) };
 }
 
 async function checkTarget(

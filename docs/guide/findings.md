@@ -195,6 +195,10 @@ guarded  unsupported  setImmediate  (vercel-edge)
 
 It applies to a check of the source and of build output alike. A release outside the listed range is checked as usual, so a new release is not assumed to behave the same. A weekly check reads the latest release and flags an entry whose file or APIs no longer match.
 
+### A module that a package file stores
+
+Some code keeps a Node.js module in a lookup table and reads it later, as `follow-redirects` does for `node:http` and `node:https`. A check cannot follow a module that is stored this way, so it reports the module as `unknown`. edgefit keeps a reviewed list of such files in `data/stored-modules.json`: the package, the releases it was read in, the file, the modules, the members that the file reads of them, why those are the only ones, and where that is stated. A listed file counts as a use of those members of the module, and the module is no longer `unknown`. A release below the listed range, another file, or a member that the list does not hold is checked as usual. A weekly check reads the latest release and flags an entry whose file or members no longer match.
+
 ### Production builds
 
 Every bundler replaces `process.env.NODE_ENV` with a constant for a production build and drops the code that the constant rules out. edgefit does the same on `workerd`, `netlify-edge` and `vercel-edge`, with `production` as the constant. Bun and Deno set no value, so on those targets both branches are checked. A comparison of `process.env.NODE_ENV` with a string decides which branch runs, in an `if`, `?:`, `&&`, `||`, an `else` branch, a guard clause, and a helper or `const` that holds the check. The branch that does not run is not checked, and an `import` or `require` in it is not followed. This is how React's development build, with its `MessageChannel`, stays out of a report.

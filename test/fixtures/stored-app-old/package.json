@@ -1,0 +1,5 @@
+{
+  "name": "stored-app-old",
+  "private": true,
+  "dependencies": { "follow-redirects": "1.13.0" }
+}
