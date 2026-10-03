@@ -112,12 +112,12 @@
     },
     {
       "package": "nodemailer",
-      "versions": { "min": "10.0.13", "max": "10.0.13" },
+      "versions": { "min": "10.0.13", "max": "10.0.14" },
       "file": "dist/esm/sendmail-transport/index.js",
       "apis": ["node:child_process", "node:child_process.spawn"],
       "target": "workerd",
       "reason": "Runs only with the sendmail transport, which starts a local `sendmail` binary. A Worker sends mail with the SMTP transport.",
-      "source": "https://github.com/nodemailer/nodemailer/blob/v10.0.13/src/sendmail-transport/index.ts#L150"
+      "source": "https://github.com/nodemailer/nodemailer/blob/v10.0.14/src/sendmail-transport/index.ts#L150"
     },
     {
       "package": "mongodb",
