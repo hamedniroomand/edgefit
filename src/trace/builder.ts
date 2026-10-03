@@ -48,6 +48,8 @@ export interface ModuleShape {
   stars: string[];
   /** What the module asks of each file it loads with `import('literal')`. */
   dynamicImports: DynamicImports;
+  /** What the module asks of each file it loads with `require('literal')`. */
+  requires: DynamicImports;
 }
 
 export function mentionsIn(node: Node, names = new Set<string>()): Set<string> {
@@ -109,6 +111,7 @@ export class ShapeBuilder {
     exports: new Map(),
     stars: [],
     dynamicImports: new Map(),
+    requires: new Map(),
   };
 
   public unit(node: Node, name?: string, mentions?: Set<string>): void {

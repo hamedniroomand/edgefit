@@ -80,16 +80,6 @@ describe('a Node.js module that a file re-exports, and that stays unknown', () =
     expect(reexported['src/internal.mjs']).toContain('dynamic node:crypto');
   });
 
-  it('when a file requires the file', async () => {
-    const usages = await scanned({
-      'src/internal.mjs': exporter,
-      'src/index.mjs': "const { crypto } = require('./internal.mjs');\ncrypto.createHash('md5');\n",
-    });
-    expect(usages['src/internal.mjs']).toContain('dynamic node:crypto');
-  });
-});
-
-describe('a Node.js module that a file loads with import() in a way that is not followed', () => {
   it.each([
     [
       'the whole result',
@@ -153,5 +143,45 @@ describe('a Node.js module that a file loads with import() by name', () => {
       'src/index.mjs': lazy,
     });
     expect(usages['src/internal.mjs']).not.toContain('api node:process.binding');
+  });
+});
+
+describe('a Node.js module that a CommonJS file exports and another file requires by name', () => {
+  const exporterCjs = "const crypto = require('node:crypto');\nexports.crypto = crypto;\n";
+
+  it('is that module in the file that destructures it', async () => {
+    const usages = await scanned({
+      'src/internal.js': exporterCjs,
+      'src/index.mjs': "const { crypto } = require('./internal.js');\ncrypto.createHash('md5');\n",
+    });
+    expect(usages['src/index.mjs']).toContain('api node:crypto.createHash');
+    expect(usages['src/internal.js']).not.toContain('dynamic node:crypto');
+  });
+
+  it('is followed through the form that tsc writes for import() and an interop helper', async () => {
+    const usages = await scanned({
+      'src/internal.js': exporterCjs,
+      'src/index.mjs':
+        "async function load() {\n  const { crypto } = await Promise.resolve().then(() => __importStar(require('./internal.js')));\n  return crypto.createHash('md5');\n}\nload();\n",
+    });
+    expect(usages['src/index.mjs']).toContain('api node:crypto.createHash');
+    expect(usages['src/internal.js']).not.toContain('dynamic node:crypto');
+  });
+
+  it('stays unknown when a file requires an ES module as a whole', async () => {
+    const usages = await scanned({
+      'src/internal.mjs': exporter,
+      'src/index.mjs': "const all = require('./internal.mjs');\nall.crypto.createHash('md5');\n",
+    });
+    expect(usages['src/internal.mjs']).toContain('dynamic node:crypto');
+  });
+
+  it.each([
+    ['the whole result', "const all = require('./internal.js');\nall.crypto.createHash('md5');"],
+    ['a rest element', "const { crypto, ...rest } = require('./internal.js');\nuse(rest);"],
+    ['a member of the call', "require('./internal.js').crypto.createHash('md5');"],
+  ])('stays unknown when a file requires it and keeps %s', async (_name, code) => {
+    const usages = await scanned({ 'src/internal.js': exporterCjs, 'src/index.mjs': code });
+    expect(usages['src/internal.js']).toContain('dynamic node:crypto');
   });
 });
