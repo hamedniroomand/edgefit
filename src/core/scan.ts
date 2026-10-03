@@ -56,7 +56,7 @@ export function scanModules(
           shape: options.trace,
           lazyNodeImports: options.lazyNodeImports,
           keepUnusedImports:
-            isProjectScript(file) && keepsUnusedImports(path.resolve(root, file), tsconfigs),
+            isProjectScript(file) && keepsUnusedImports(path.resolve(root, file), root, tsconfigs),
           nodeEnv: options.nodeEnv,
           nativeSpecifiers: new Set(
             module.links
