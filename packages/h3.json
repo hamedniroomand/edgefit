@@ -2,8 +2,8 @@
   "version": 1,
   "package": "h3",
   "resolved": "2.0.1-rc.32",
-  "checkedAt": "2026-10-02T10:36:43.005Z",
-  "edgefit": "0.6.2",
+  "checkedAt": "2026-10-03T00:14:59.556Z",
+  "edgefit": "0.9.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -11,7 +11,7 @@
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
     "deno-deploy": "2.5.0",
-    "netlify-edge": "2.4.2",
+    "netlify-edge": "2.3.1",
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
@@ -54,9 +54,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -75,9 +75,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -96,9 +96,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -117,9 +117,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -138,9 +138,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -156,17 +156,17 @@
         "workerd": {
           "status": "fail",
           "errors": 1,
-          "warnings": 2
+          "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -180,9 +180,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -264,9 +264,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",

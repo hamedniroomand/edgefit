@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-02T10:38:46.336Z",
-  "edgefit": "0.6.2",
+  "generatedAt": "2026-10-03T00:17:04.475Z",
+  "edgefit": "0.9.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -9,7 +9,7 @@
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
     "deno-deploy": "2.5.0",
-    "netlify-edge": "2.4.2",
+    "netlify-edge": "2.3.1",
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
@@ -86,13 +86,13 @@
       "subpaths": 12,
       "main": {
         "workerd": "warn",
-        "bun": "warn",
+        "bun": "pass",
         "deno": "pass"
       },
       "decidedBy": {
         "workerd": "./node",
-        "bun": ".",
-        "deno": "./node"
+        "bun": "./rules/cache",
+        "deno": "./rules/cache"
       }
     },
     {
@@ -272,13 +272,13 @@
       "summary": {
         "workerd": "fail",
         "bun": "warn",
-        "deno": "fail"
+        "deno": "warn"
       },
       "subpaths": 3,
       "main": {
         "workerd": "fail",
         "bun": "warn",
-        "deno": "fail"
+        "deno": "warn"
       },
       "decidedBy": {
         "workerd": ".",
@@ -342,20 +342,15 @@
       "file": "openai",
       "resolved": "7.27.0",
       "summary": {
-        "workerd": "warn",
-        "bun": "warn",
-        "deno": "warn"
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 38,
       "main": {
-        "workerd": "warn",
-        "bun": "warn",
-        "deno": "warn"
-      },
-      "decidedBy": {
-        "workerd": ".",
-        "bun": ".",
-        "deno": "."
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
       }
     },
     {
@@ -381,7 +376,7 @@
     {
       "name": "@aws-sdk/client-s3",
       "file": "aws-sdk__client-s3",
-      "resolved": "3.1145.0",
+      "resolved": "3.1146.0",
       "summary": {
         "workerd": "pass",
         "bun": "warn",
@@ -540,16 +535,13 @@
       "summary": {
         "workerd": "pass",
         "bun": "pass",
-        "deno": "warn"
+        "deno": "pass"
       },
       "subpaths": 1,
       "main": {
         "workerd": "pass",
         "bun": "pass",
-        "deno": "warn"
-      },
-      "decidedBy": {
-        "deno": "."
+        "deno": "pass"
       }
     },
     {
@@ -638,17 +630,18 @@
       "resolved": "5.12.5",
       "summary": {
         "workerd": "fail",
-        "bun": "pass",
-        "deno": "warn"
+        "bun": "fail",
+        "deno": "fail"
       },
       "subpaths": 1,
       "main": {
         "workerd": "fail",
-        "bun": "pass",
-        "deno": "warn"
+        "bun": "fail",
+        "deno": "fail"
       },
       "decidedBy": {
         "workerd": ".",
+        "bun": ".",
         "deno": "."
       }
     },
@@ -769,7 +762,7 @@
       "summary": {
         "workerd": "fail",
         "bun": "warn",
-        "deno": "fail"
+        "deno": "warn"
       },
       "subpaths": 2,
       "main": {
@@ -826,17 +819,14 @@
       "resolved": "2.1.0",
       "summary": {
         "workerd": "pass",
-        "bun": "warn",
+        "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
       "main": {
         "workerd": "pass",
-        "bun": "warn",
+        "bun": "pass",
         "deno": "pass"
-      },
-      "decidedBy": {
-        "bun": "."
       }
     },
     {
@@ -945,12 +935,12 @@
       "main": {
         "workerd": "fail",
         "bun": "fail",
-        "deno": "warn"
+        "deno": "pass"
       },
       "decidedBy": {
         "workerd": ".",
         "bun": ".",
-        "deno": "."
+        "deno": "./tracing"
       }
     },
     {
@@ -958,7 +948,7 @@
       "file": "firebase",
       "resolved": "12.19.0",
       "summary": {
-        "workerd": "warn",
+        "workerd": "fail",
         "bun": "warn",
         "deno": "fail"
       },
@@ -972,22 +962,22 @@
     {
       "name": "@sentry/node",
       "file": "sentry__node",
-      "resolved": "11.2.0",
+      "resolved": "11.4.0",
       "summary": {
         "workerd": "fail",
         "bun": "fail",
-        "deno": "fail"
+        "deno": "error"
       },
       "subpaths": 6,
       "main": {
         "workerd": "fail",
         "bun": "fail",
-        "deno": "fail"
+        "deno": "warn"
       },
       "decidedBy": {
         "workerd": ".",
         "bun": ".",
-        "deno": "."
+        "deno": "./vite"
       }
     },
     {
@@ -996,19 +986,17 @@
       "resolved": "7.7.0",
       "summary": {
         "workerd": "fail",
-        "bun": "warn",
-        "deno": "warn"
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 1,
       "main": {
         "workerd": "fail",
-        "bun": "warn",
-        "deno": "warn"
+        "bun": "pass",
+        "deno": "pass"
       },
       "decidedBy": {
-        "workerd": ".",
-        "bun": ".",
-        "deno": "."
+        "workerd": "."
       }
     },
     {
@@ -1017,19 +1005,17 @@
       "resolved": "9.10.3",
       "summary": {
         "workerd": "fail",
-        "bun": "warn",
-        "deno": "warn"
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 1,
       "main": {
         "workerd": "fail",
-        "bun": "warn",
-        "deno": "warn"
+        "bun": "pass",
+        "deno": "pass"
       },
       "decidedBy": {
-        "workerd": ".",
-        "bun": ".",
-        "deno": "."
+        "workerd": "."
       }
     },
     {
@@ -1078,18 +1064,17 @@
       "summary": {
         "workerd": "warn",
         "bun": "warn",
-        "deno": "warn"
+        "deno": "pass"
       },
       "subpaths": 1,
       "main": {
         "workerd": "warn",
         "bun": "warn",
-        "deno": "warn"
+        "deno": "pass"
       },
       "decidedBy": {
         "workerd": ".",
-        "bun": ".",
-        "deno": "."
+        "bun": "."
       }
     },
     {
@@ -1177,35 +1162,35 @@
       "summary": {
         "workerd": "fail",
         "bun": "pass",
-        "deno": "warn"
+        "deno": "pass"
       },
       "subpaths": 21,
       "main": {
         "workerd": "fail",
         "bun": "pass",
-        "deno": "warn"
+        "deno": "pass"
       },
       "decidedBy": {
-        "workerd": ".",
-        "deno": "."
+        "workerd": "."
       }
     },
     {
       "name": "pino",
       "file": "pino",
-      "resolved": "10.3.1",
+      "resolved": "10.4.0",
       "summary": {
         "workerd": "pass",
-        "bun": "pass",
-        "deno": "warn"
+        "bun": "fail",
+        "deno": "fail"
       },
       "subpaths": 1,
       "main": {
         "workerd": "pass",
-        "bun": "pass",
-        "deno": "warn"
+        "bun": "fail",
+        "deno": "fail"
       },
       "decidedBy": {
+        "bun": ".",
         "deno": "."
       }
     },

@@ -2,8 +2,8 @@
   "version": 1,
   "package": "marked",
   "resolved": "18.0.14",
-  "checkedAt": "2026-10-02T10:36:51.219Z",
-  "edgefit": "0.6.2",
+  "checkedAt": "2026-10-03T00:15:04.908Z",
+  "edgefit": "0.9.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -11,7 +11,7 @@
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
     "deno-deploy": "2.5.0",
-    "netlify-edge": "2.4.2",
+    "netlify-edge": "2.3.1",
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
@@ -25,7 +25,7 @@
   "summary": {
     "workerd": "fail",
     "bun": "warn",
-    "deno": "fail"
+    "deno": "warn"
   },
   "context": {
     "workerd": {
@@ -80,8 +80,8 @@
           "warnings": 2
         },
         "deno": {
-          "status": "fail",
-          "errors": 1,
+          "status": "warn",
+          "errors": 0,
           "warnings": 2
         }
       }

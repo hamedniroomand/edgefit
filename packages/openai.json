@@ -2,8 +2,8 @@
   "version": 1,
   "package": "openai",
   "resolved": "7.27.0",
-  "checkedAt": "2026-10-02T10:37:08.489Z",
-  "edgefit": "0.6.2",
+  "checkedAt": "2026-10-03T00:15:27.597Z",
+  "edgefit": "0.9.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -11,7 +11,7 @@
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
     "deno-deploy": "2.5.0",
-    "netlify-edge": "2.4.2",
+    "netlify-edge": "2.3.1",
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
@@ -23,9 +23,9 @@
     "deno"
   ],
   "summary": {
-    "workerd": "warn",
-    "bun": "warn",
-    "deno": "warn"
+    "workerd": "pass",
+    "bun": "pass",
+    "deno": "pass"
   },
   "context": {
     "workerd": {
@@ -49,19 +49,19 @@
       "specifier": "openai",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -154,19 +154,19 @@
       "specifier": "openai/azure",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -175,19 +175,19 @@
       "specifier": "openai/azure.js",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -196,19 +196,19 @@
       "specifier": "openai/azure.mjs",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -217,19 +217,19 @@
       "specifier": "openai/bedrock",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -238,19 +238,19 @@
       "specifier": "openai/bedrock.js",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -259,19 +259,19 @@
       "specifier": "openai/bedrock.mjs",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -280,19 +280,19 @@
       "specifier": "openai/client",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -301,19 +301,19 @@
       "specifier": "openai/client.js",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -322,19 +322,19 @@
       "specifier": "openai/client.mjs",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -406,19 +406,19 @@
       "specifier": "openai/index",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -427,19 +427,19 @@
       "specifier": "openai/index.js",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -448,19 +448,19 @@
       "specifier": "openai/index.mjs",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
