@@ -52,7 +52,7 @@ A `require` can be wrapped in a helper that compiled code adds. These helpers pa
 
 Any other wrapper asks for all of the module.
 
-A variable that is declared without a value and set once to a `require()` result, such as `let c; c = require('node:crypto')`, is followed like a `const`. Another declaration of the name (a parameter, a function or a second `var`), any other write to it in the file, or an export of it stops this.
+A variable that is declared without a value and set once to a `require()` result, such as `let c; c = require('node:crypto')`, is followed like a `const`. A declaration with a value that cannot be a module, such as `null`, an object or a conditional, is followed too. A declaration with a name, a member, a call or an `import()` as its value counts as a second write. Another declaration of the name (a parameter, a function or a second `var`), any other write to it in the file, or an export of it stops this.
 
 A name counts as used when any used code mentions it. A property or a local variable of the same name also counts, which can only keep a finding, never hide one.
 
@@ -62,7 +62,7 @@ In a TypeScript file, an import whose names are never used as values gives no fi
 
 The bundler keeps these imports when the `tsconfig.json` sets `verbatimModuleSyntax`, `preserveValueImports`, or `importsNotUsedAsValues` to `preserve` or `error`. edgefit then reports them. It has these limits:
 
-- It reads the nearest `tsconfig.json` of each file, and follows `extends` when the value is a relative path or a list of relative paths. A package name in `extends` is not followed.
+- It reads the nearest `tsconfig.json` of each file, up to the project root. A config above the root is not read. It follows `extends` when the value is a relative path or a list of relative paths. A package name in `extends` is not followed.
 - It does not read the `tsconfig` option of a bundler.
 - A name counts as used when it is read anywhere in the file. A local variable of the same name also counts, which can only keep a finding, never hide one.
 - It reads no tsconfig for files in `node_modules`, so their imports that are used only as types are skipped.
@@ -101,7 +101,7 @@ Mapping findings to packages needs sourcemaps. Without them, edgefit reads the `
 
 ## Constant module names only
 
-`import(name)` and `require(name)` are read when `name` is a `const` holding a plain string. A `let`, a value computed from other values, a function result or an object property is reported as `unknown`. So is any other access edgefit cannot follow, such as `obj[key]`. A key that is a symbol, or a `const` that holds one, is not reported, because a symbol cannot name an API. `unknown` warnings never fail a check unless you make them errors.
+`import(name)` and `require(name)` are read when `name` is a `const` holding a plain string. A function that only runs `import(name)` for its one parameter is read too, when every use of it is a call with a literal, such as `load('pkg')`. It is not read when it is exported, passed on, or called with anything else. A `let`, a value computed from other values, a function result or an object property is reported as `unknown`. So is any other access edgefit cannot follow, such as `obj[key]`. A key that is a symbol, or a `const` that holds one, is not reported, because a symbol cannot name an API. `unknown` warnings never fail a check unless you make them errors.
 
 ## Static members of a parent class
 

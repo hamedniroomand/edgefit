@@ -2,7 +2,7 @@
   import { withBase } from 'vitepress';
   import { computed, onMounted, ref } from 'vue';
 
-  type Status = 'pass' | 'warn' | 'fail' | 'error';
+  type Status = 'pass' | 'warn' | 'fail' | 'error' | 'unchecked';
 
   interface Row {
     name: string;
@@ -34,12 +34,19 @@
     }[];
   }
 
-  const symbols: Record<Status, string> = { pass: '✓', warn: '⚠', fail: '✗', error: '?' };
+  const symbols: Record<Status, string> = {
+    pass: '✓',
+    warn: '⚠',
+    fail: '✗',
+    error: '?',
+    unchecked: '–',
+  };
   const words: Record<Status, string> = {
     pass: 'passes',
     warn: 'warnings only',
     fail: 'fails',
     error: 'could not be checked',
+    unchecked: 'not checked',
   };
 
   const results = ref<Results | undefined>(undefined);
@@ -53,7 +60,7 @@
 
   const site = 'https://edgefit.kitdev.space';
 
-  const rank: Record<Status, number> = { pass: 0, warn: 1, error: 2, fail: 3 };
+  const rank: Record<Status, number> = { pass: 0, unchecked: 0, warn: 1, error: 2, fail: 3 };
 
   // A package that could not be installed or checked has no summary: it counts as `error`.
   function statuses(row: Row, key = ''): Status[] {
@@ -300,7 +307,8 @@
                           <small
                             v-if="
                               entry.results[key].status !== 'pass' &&
-                              entry.results[key].status !== 'error'
+                              entry.results[key].status !== 'error' &&
+                              entry.results[key].status !== 'unchecked'
                             "
                           >
                             {{ entry.results[key].errors }} errors,
@@ -358,7 +366,8 @@
   .ef-status-fail {
     color: var(--vp-c-red-1);
   }
-  .ef-status-error {
+  .ef-status-error,
+  .ef-status-unchecked {
     color: var(--vp-c-text-3);
   }
 </style>

@@ -5,7 +5,15 @@ import type { ApiRef } from '@/types.ts';
 import { childNodes, isTypeOnly } from './ast.ts';
 import { followChain } from './chain.ts';
 import type { VisitContext } from './context.ts';
-import { displayRef, escapes, isComparisonOperand, isFeatureCheck, isGlobalRoot } from './refs.ts';
+import {
+  displayRef,
+  escapes,
+  isFeatureCheck,
+  isGlobalRoot,
+  isOnlyTested,
+  isMemberWrite,
+  writtenObject,
+} from './refs.ts';
 import { createScope } from './scope.ts';
 import type { Scope } from './scope.ts';
 import type { UsageCollector } from './usage-collector.ts';
@@ -18,6 +26,7 @@ export class Walker implements VisitContext {
   public readonly nodeEnv: string | undefined;
   public readonly typeOnlyImports: ReadonlySet<string>;
   public readonly assigned: ReadonlyMap<string, Node>;
+  public readonly wrappers: VisitContext['wrappers'];
   readonly #stack: Node[] = [];
   #scope: Scope = createScope();
   #boundInit: Node | undefined;
@@ -28,12 +37,14 @@ export class Walker implements VisitContext {
     nodeEnv: string | undefined,
     typeOnlyImports: ReadonlySet<string>,
     assigned: ReadonlyMap<string, Node>,
+    wrappers: VisitContext['wrappers'],
   ) {
     this.collector = collector;
     this.globals = globals;
     this.nodeEnv = nodeEnv;
     this.typeOnlyImports = typeOnlyImports;
     this.assigned = assigned;
+    this.wrappers = wrappers;
   }
 
   public get scope(): Scope {
@@ -109,10 +120,7 @@ export class Walker implements VisitContext {
       // value or `undefined`, so there is nothing to follow.
       if (
         chain.memberParent === undefined ||
-        !(
-          isFeatureCheck(chain.member, chain.memberParent) ||
-          (isGlobalRoot(chain.ref) && isComparisonOperand(chain.member, chain.memberParent))
-        )
+        !isOnlyTested(chain.member, chain.memberParent, chain.ref)
       ) {
         this.collector.dynamic(
           chain.ref,
@@ -125,6 +133,14 @@ export class Walker implements VisitContext {
     }
     const { node, parent } = chain;
     if (isGlobalRoot(chain.ref) || (parent !== undefined && isFeatureCheck(node, parent))) {
+      return;
+    }
+    if (parent !== undefined && isMemberWrite(node, parent)) {
+      // Setting a missing member does not throw, but reading its object does.
+      const target = writtenObject(chain.ref, node);
+      if (target.ref.path.length > 0 && !isGlobalRoot(target.ref)) {
+        this.collector.api(target.ref, target.offset);
+      }
       return;
     }
     if (recordBare || chain.extended) {

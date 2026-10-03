@@ -52,6 +52,14 @@ function classifyApi(usage: Usage, target: Target): Classification | undefined {
  */
 function classifyDynamic(usage: Usage, target: Target): Classification | undefined {
   const reason = usage.reason ?? 'it cannot be analyzed statically';
+  // An export adds no way to reach a global that any code does not already have. The use site is checked.
+  if (
+    usage.exported === true &&
+    usage.api?.module === '*globals*' &&
+    target.lookup(usage.api).status === 'supported'
+  ) {
+    return undefined;
+  }
   if (usage.api !== undefined) {
     const covered = target.lookup(usage.api).status !== 'supported';
     // A leaf such as `(dynamic)` names this very usage, so no other finding covers it.

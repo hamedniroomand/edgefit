@@ -1,7 +1,9 @@
-import type { Node } from 'oxc-parser';
+import type { MemberExpression, Node } from 'oxc-parser';
 
 import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef } from '@/types.ts';
+
+import { strip } from './ast.ts';
 
 export const globalAliases = new Set(['global', 'globalThis', 'self']);
 
@@ -144,6 +146,29 @@ export function isFeatureCheck(node: Node, parent: Node): boolean {
   return parent.type === 'LogicalExpression' && parent.operator === '&&' && parent.left === node;
 }
 
+const writeOperators = new Set(['=', '??=', '||=']);
+
+/** Whether `node` is the member that `=`, `??=` or `||=` sets: `a.b = v`. */
+export function isMemberWrite(node: Node, parent: Node): node is MemberExpression {
+  return (
+    node.type === 'MemberExpression' &&
+    parent.type === 'AssignmentExpression' &&
+    parent.left === node &&
+    writeOperators.has(parent.operator)
+  );
+}
+
+/** The object of a member that is set, with the offset of the access that names it. */
+export function writtenObject(
+  ref: ApiRef,
+  node: MemberExpression,
+): { ref: ApiRef; offset: number } {
+  const object = strip(node.object);
+  return {
+    ref: { ...ref, path: ref.path.slice(0, -1) },
+    offset: object.type === 'MemberExpression' ? object.property.start : object.start,
+  };
+}
 const comparisonOperators = new Set(['==', '===', '!=', '!==']);
 
 /** Whether `node` is an operand of `==`, `===`, `!=` or `!==`, so only its identity is read. */
@@ -152,5 +177,12 @@ export function isComparisonOperand(node: Node, parent: Node): boolean {
     parent.type === 'BinaryExpression' &&
     comparisonOperators.has(parent.operator) &&
     (parent.left === node || parent.right === node)
+  );
+}
+
+/** Whether a computed read only tests for a member, or is a global that is only compared. */
+export function isOnlyTested(member: Node, parent: Node, ref: ApiRef): boolean {
+  return (
+    isFeatureCheck(member, parent) || (isGlobalRoot(ref) && isComparisonOperand(member, parent))
   );
 }

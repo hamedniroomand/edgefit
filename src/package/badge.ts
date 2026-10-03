@@ -7,6 +7,7 @@ const colors: Record<PackageStatus, string> = {
   warn: '#c99a1c',
   fail: '#c8443b',
   error: '#7b8794',
+  unchecked: '#7b8794',
 };
 
 const shieldsColors: Record<PackageStatus, string> = {
@@ -14,6 +15,7 @@ const shieldsColors: Record<PackageStatus, string> = {
   warn: 'yellow',
   fail: 'red',
   error: 'lightgrey',
+  unchecked: 'lightgrey',
 };
 
 // Verdana 11px is about 7px per character; padded like shields does, without measuring fonts.
