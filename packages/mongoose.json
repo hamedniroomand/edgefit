@@ -2,8 +2,8 @@
   "version": 2,
   "package": "mongoose",
   "resolved": "9.10.4",
-  "checkedAt": "2026-10-03T11:39:34.177Z",
-  "edgefit": "0.9.3",
+  "checkedAt": "2026-10-03T17:25:30.744Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,7 +23,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
+    "workerd": "pass",
     "bun": "pass",
     "deno": "pass"
   },
@@ -49,9 +49,9 @@
       "specifier": "mongoose",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 1,
-          "warnings": 2
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
         },
         "bun": {
           "status": "pass",

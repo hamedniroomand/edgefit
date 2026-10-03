@@ -2,8 +2,8 @@
   "version": 2,
   "package": "zod",
   "resolved": "4.6.5",
-  "checkedAt": "2026-10-03T11:39:32.385Z",
-  "edgefit": "0.9.3",
+  "checkedAt": "2026-10-03T17:25:15.860Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

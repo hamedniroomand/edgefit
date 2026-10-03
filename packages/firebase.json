@@ -2,8 +2,8 @@
   "version": 2,
   "package": "firebase",
   "resolved": "12.19.0",
-  "checkedAt": "2026-10-03T11:40:17.278Z",
-  "edgefit": "0.9.3",
+  "checkedAt": "2026-10-03T17:26:18.472Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -22,10 +22,25 @@
     "bun",
     "deno"
   ],
+  "main": "./app",
   "summary": {
-    "workerd": "fail",
-    "bun": "warn",
-    "deno": "fail"
+    "workerd": "pass",
+    "bun": "pass",
+    "deno": "pass"
+  },
+  "worst": {
+    "workerd": {
+      "subpath": "./ai",
+      "status": "fail"
+    },
+    "bun": {
+      "subpath": "./messaging/sw",
+      "status": "warn"
+    },
+    "deno": {
+      "subpath": "./firestore",
+      "status": "fail"
+    }
   },
   "context": {
     "workerd": {
@@ -716,5 +731,6 @@
         }
       }
     }
-  ]
+  ],
+  "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin."
 }

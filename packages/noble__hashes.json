@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@noble/hashes",
   "resolved": "2.4.0",
-  "checkedAt": "2026-10-03T11:39:51.298Z",
-  "edgefit": "0.9.3",
+  "checkedAt": "2026-10-03T17:25:34.102Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

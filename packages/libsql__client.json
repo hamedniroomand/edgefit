@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@libsql/client",
   "resolved": "0.18.0",
-  "checkedAt": "2026-10-03T11:40:20.749Z",
-  "edgefit": "0.9.3",
+  "checkedAt": "2026-10-03T17:26:22.865Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -24,8 +24,8 @@
   ],
   "summary": {
     "workerd": "pass",
-    "bun": "warn",
-    "deno": "warn"
+    "bun": "pass",
+    "deno": "pass"
   },
   "worst": {
     "workerd": {
@@ -60,14 +60,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         }
       }
     },
@@ -77,18 +77,18 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 1,
-          "warnings": 2
+          "errors": 2,
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         }
       }
     },
@@ -140,18 +140,18 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 1,
-          "warnings": 2
+          "errors": 2,
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         }
       }
     },

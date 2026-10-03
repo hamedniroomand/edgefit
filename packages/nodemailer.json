@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "nodemailer",
-  "resolved": "10.0.13",
-  "checkedAt": "2026-10-03T11:39:37.727Z",
-  "edgefit": "0.9.3",
+  "resolved": "10.0.14",
+  "checkedAt": "2026-10-03T17:25:34.888Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,7 +23,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "pass",
+    "workerd": "fail",
     "bun": "pass",
     "deno": "pass"
   },
@@ -49,8 +49,8 @@
       "specifier": "nodemailer",
       "results": {
         "workerd": {
-          "status": "pass",
-          "errors": 0,
+          "status": "fail",
+          "errors": 1,
           "warnings": 0
         },
         "bun": {
@@ -301,8 +301,8 @@
       "specifier": "nodemailer/lib/sendmail-transport",
       "results": {
         "workerd": {
-          "status": "pass",
-          "errors": 0,
+          "status": "fail",
+          "errors": 1,
           "warnings": 0
         },
         "bun": {

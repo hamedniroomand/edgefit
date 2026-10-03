@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-03T11:45:30.661Z",
-  "edgefit": "0.9.3",
+  "generatedAt": "2026-10-03T17:31:41.983Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -48,16 +48,16 @@
       "file": "elysia",
       "resolved": "1.4.30",
       "summary": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "pass",
-        "deno": "warn"
+        "deno": "pass"
       },
       "subpaths": 30
     },
     {
       "name": "h3",
       "file": "h3",
-      "resolved": "2.0.1-rc.33",
+      "resolved": "2.0.1",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -188,8 +188,8 @@
       "resolved": "3.24.5",
       "summary": {
         "workerd": "warn",
-        "bun": "warn",
-        "deno": "warn"
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 3
     },
@@ -246,17 +246,7 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 33,
-      "worst": {
-        "bun": {
-          "subpath": "./client.js",
-          "status": "warn"
-        },
-        "deno": {
-          "subpath": "./client.js",
-          "status": "warn"
-        }
-      }
+      "subpaths": 33
     },
     {
       "name": "@aws-sdk/client-s3",
@@ -380,8 +370,8 @@
       "resolved": "0.35.5",
       "summary": {
         "workerd": "fail",
-        "bun": "warn",
-        "deno": "warn"
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 1,
       "notes": "Native addon."
@@ -391,7 +381,7 @@
       "file": "bcrypt",
       "resolved": "6.0.0",
       "summary": {
-        "workerd": "pass",
+        "workerd": "fail",
         "bun": "pass",
         "deno": "pass"
       },
@@ -415,9 +405,9 @@
       "file": "express",
       "resolved": "5.2.1",
       "summary": {
-        "workerd": "warn",
-        "bun": "warn",
-        "deno": "warn"
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 1
     },
@@ -493,8 +483,8 @@
       "resolved": "1.2.0",
       "summary": {
         "workerd": "pass",
-        "bun": "warn",
-        "deno": "warn"
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 3
     },
@@ -512,14 +502,6 @@
         "workerd": {
           "subpath": "./bin/marked",
           "status": "fail"
-        },
-        "bun": {
-          "subpath": "./bin/marked",
-          "status": "warn"
-        },
-        "deno": {
-          "subpath": "./bin/marked",
-          "status": "warn"
         }
       }
     },
@@ -573,8 +555,8 @@
       "resolved": "8.11.2",
       "summary": {
         "workerd": "fail",
-        "bun": "warn",
-        "deno": "warn"
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 1
     },
@@ -627,11 +609,27 @@
       "file": "firebase",
       "resolved": "12.19.0",
       "summary": {
-        "workerd": "fail",
-        "bun": "warn",
-        "deno": "fail"
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
       },
-      "subpaths": 32
+      "subpaths": 32,
+      "main": "./app",
+      "worst": {
+        "workerd": {
+          "subpath": "./ai",
+          "status": "fail"
+        },
+        "bun": {
+          "subpath": "./messaging/sw",
+          "status": "warn"
+        },
+        "deno": {
+          "subpath": "./firestore",
+          "status": "fail"
+        }
+      },
+      "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin."
     },
     {
       "name": "@sentry/node",
@@ -649,7 +647,7 @@
       "file": "mongodb",
       "resolved": "7.7.0",
       "summary": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
@@ -660,7 +658,7 @@
       "file": "mongoose",
       "resolved": "9.10.4",
       "summary": {
-        "workerd": "fail",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
@@ -671,17 +669,11 @@
       "file": "better-sqlite3",
       "resolved": "13.0.3",
       "summary": {
-        "workerd": "warn",
-        "bun": "warn",
-        "deno": "warn"
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 9,
-      "worst": {
-        "workerd": {
-          "subpath": "./linux-x64",
-          "status": "fail"
-        }
-      },
       "notes": "Native addon."
     },
     {
@@ -689,7 +681,7 @@
       "file": "sqlite3",
       "resolved": "6.0.1",
       "summary": {
-        "workerd": "pass",
+        "workerd": "fail",
         "bun": "pass",
         "deno": "pass"
       },
@@ -738,8 +730,8 @@
       "resolved": "0.18.0",
       "summary": {
         "workerd": "pass",
-        "bun": "warn",
-        "deno": "warn"
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 6,
       "worst": {
@@ -774,9 +766,9 @@
     {
       "name": "nodemailer",
       "file": "nodemailer",
-      "resolved": "10.0.13",
+      "resolved": "10.0.14",
       "summary": {
-        "workerd": "pass",
+        "workerd": "fail",
         "bun": "pass",
         "deno": "pass"
       },

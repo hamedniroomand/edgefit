@@ -2,8 +2,8 @@
   "version": 2,
   "package": "mysql2",
   "resolved": "3.24.5",
-  "checkedAt": "2026-10-03T11:39:24.727Z",
-  "edgefit": "0.9.3",
+  "checkedAt": "2026-10-03T17:25:17.740Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -24,8 +24,8 @@
   ],
   "summary": {
     "workerd": "warn",
-    "bun": "warn",
-    "deno": "warn"
+    "bun": "pass",
+    "deno": "pass"
   },
   "context": {
     "workerd": {
@@ -51,17 +51,17 @@
         "workerd": {
           "status": "warn",
           "errors": 0,
-          "warnings": 2
+          "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -70,19 +70,19 @@
       "specifier": "mysql2/promise",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -91,19 +91,19 @@
       "specifier": "mysql2/promise.js",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     }

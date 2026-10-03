@@ -2,8 +2,8 @@
   "version": 2,
   "package": "express",
   "resolved": "5.2.1",
-  "checkedAt": "2026-10-03T11:39:30.434Z",
-  "edgefit": "0.9.3",
+  "checkedAt": "2026-10-03T17:25:23.721Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,9 @@
     "deno"
   ],
   "summary": {
-    "workerd": "warn",
-    "bun": "warn",
-    "deno": "warn"
+    "workerd": "pass",
+    "bun": "pass",
+    "deno": "pass"
   },
   "context": {
     "workerd": {
@@ -49,19 +49,28 @@
       "specifier": "express",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "loads a module the user names (view.js:81)"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "loads a module the user names (view.js:81)"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "loads a module the user names (view.js:81)"
+          ]
         }
       }
     }

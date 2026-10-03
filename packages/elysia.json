@@ -2,8 +2,8 @@
   "version": 2,
   "package": "elysia",
   "resolved": "1.4.30",
-  "checkedAt": "2026-10-03T11:39:39.943Z",
-  "edgefit": "0.9.3",
+  "checkedAt": "2026-10-03T17:25:27.330Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,9 @@
     "deno"
   ],
   "summary": {
-    "workerd": "warn",
+    "workerd": "pass",
     "bun": "pass",
-    "deno": "warn"
+    "deno": "pass"
   },
   "context": {
     "workerd": {
@@ -49,9 +49,9 @@
       "specifier": "elysia",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -59,9 +59,9 @@
           "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -133,9 +133,9 @@
       "specifier": "elysia/compose",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -143,9 +143,9 @@
           "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -217,9 +217,9 @@
       "specifier": "elysia/schema",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -227,9 +227,9 @@
           "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -280,9 +280,9 @@
       "specifier": "elysia/type-system",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -290,9 +290,9 @@
           "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -322,9 +322,9 @@
       "specifier": "elysia/type-system/utils",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -332,9 +332,9 @@
           "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -469,9 +469,9 @@
       "specifier": "elysia/adapter/bun",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -479,9 +479,9 @@
           "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -511,9 +511,9 @@
       "specifier": "elysia/adapter/bun/compose",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -521,9 +521,9 @@
           "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -532,9 +532,9 @@
       "specifier": "elysia/adapter/cloudflare-worker",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -542,9 +542,9 @@
           "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },

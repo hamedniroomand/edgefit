@@ -2,8 +2,8 @@
   "version": 2,
   "package": "sharp",
   "resolved": "0.35.5",
-  "checkedAt": "2026-10-03T11:39:27.598Z",
-  "edgefit": "0.9.3",
+  "checkedAt": "2026-10-03T17:25:21.248Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -24,8 +24,8 @@
   ],
   "summary": {
     "workerd": "fail",
-    "bun": "warn",
-    "deno": "warn"
+    "bun": "pass",
+    "deno": "pass"
   },
   "context": {
     "workerd": {
@@ -50,18 +50,18 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 2,
-          "warnings": 1
+          "errors": 3,
+          "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     }

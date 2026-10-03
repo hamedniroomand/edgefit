@@ -2,8 +2,8 @@
   "version": 2,
   "package": "bcrypt",
   "resolved": "6.0.0",
-  "checkedAt": "2026-10-03T11:40:09.542Z",
-  "edgefit": "0.9.3",
+  "checkedAt": "2026-10-03T17:26:16.532Z",
+  "edgefit": "0.10.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,7 +23,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "pass",
+    "workerd": "fail",
     "bun": "pass",
     "deno": "pass"
   },
@@ -49,8 +49,8 @@
       "specifier": "bcrypt",
       "results": {
         "workerd": {
-          "status": "pass",
-          "errors": 0,
+          "status": "fail",
+          "errors": 1,
           "warnings": 0
         },
         "bun": {
