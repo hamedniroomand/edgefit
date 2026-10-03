@@ -3,7 +3,7 @@ import type { Node } from 'oxc-parser';
 import type { ApiRef } from '@/types.ts';
 
 import { childNodes, isTypeOnly } from './ast.ts';
-import { followChain } from './chain.ts';
+import { followChain, isTestedChain } from './chain.ts';
 import type { VisitContext } from './context.ts';
 import {
   displayRef,
@@ -148,7 +148,8 @@ export class Walker implements VisitContext {
     const { node, parent } = chain;
     if (
       isGlobalRoot(chain.ref) ||
-      (parent !== undefined && isFeatureCheck(node, parent)) ||
+      (parent !== undefined &&
+        (isFeatureCheck(node, parent) || isTestedChain(parent, this.#outer(node)))) ||
       isOptionalRead(node, parent)
     ) {
       return;

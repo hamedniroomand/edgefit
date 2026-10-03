@@ -117,6 +117,7 @@ These checks are understood:
 
 - `if (x.y)`, `typeof x.y === 'function'`, `x.y !== undefined` and `'y' in x`, for the code they protect
 - `x.y && x.y()`, `!x.y || x.y()` and `x.y ? x.y() : fallback`
+- `x.y` in any place of an `&&` or `||` chain that is the test of an `if`, a loop or `?:`, or the operand of `!`, such as `if (a && x.y && b)`
 - `x.y?.()`, and `if (x.y?.z)` or `if (x.y?.z?.())`, which also protect `x.y`
 - a guard clause such as `if (!x.y) throw …` or `return`, for the rest of the block
 
