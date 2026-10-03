@@ -10,6 +10,7 @@ import {
   escapes,
   isFeatureCheck,
   isGlobalRoot,
+  isOnlyTested,
   isMemberWrite,
   isOptionalRead,
   writtenObject,
@@ -126,8 +127,11 @@ export class Walker implements VisitContext {
       if (!isGlobalRoot(chain.ref)) {
         this.collector.api(chain.ref, chain.offset);
       }
-      // `typeof x[key]` only tests for a member, so there is nothing to follow.
-      if (chain.memberParent === undefined || !isFeatureCheck(chain.member, chain.memberParent)) {
+      // A test for a member, or a global that is only compared, has nothing to follow.
+      if (
+        chain.memberParent === undefined ||
+        !isOnlyTested(chain.member, chain.memberParent, chain.ref)
+      ) {
         this.collector.dynamic(
           chain.ref,
           `${displayRef(chain.ref)}[<expression>]`,

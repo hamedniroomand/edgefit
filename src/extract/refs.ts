@@ -180,6 +180,7 @@ export function writtenObject(
     offset: object.type === 'MemberExpression' ? object.property.start : object.start,
   };
 }
+
 /**
  * Whether `node` ends in `a?.b` and its value is not called as `a?.b()`. Such a read gives
  * `undefined` when `b` is missing, so it checks for `b` and does not use it.
@@ -190,5 +191,23 @@ export function isOptionalRead(node: Node, parent: Node | undefined): boolean {
     member.type === 'MemberExpression' &&
     member.optional &&
     !(parent?.type === 'CallExpression' && parent.callee === node && !parent.optional)
+  );
+}
+
+const comparisonOperators = new Set(['==', '===', '!=', '!==']);
+
+/** Whether `node` is an operand of `==`, `===`, `!=` or `!==`, so only its identity is read. */
+export function isComparisonOperand(node: Node, parent: Node): boolean {
+  return (
+    parent.type === 'BinaryExpression' &&
+    comparisonOperators.has(parent.operator) &&
+    (parent.left === node || parent.right === node)
+  );
+}
+
+/** Whether a computed read only tests for a member, or is a global that is only compared. */
+export function isOnlyTested(member: Node, parent: Node, ref: ApiRef): boolean {
+  return (
+    isFeatureCheck(member, parent) || (isGlobalRoot(ref) && isComparisonOperand(member, parent))
   );
 }
