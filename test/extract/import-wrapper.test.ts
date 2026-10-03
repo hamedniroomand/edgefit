@@ -12,6 +12,12 @@ describe('a function that only imports its argument', () => {
     expect(usagesOf(`${wrapper}await load('node:fs/promises');`)).toEqual(direct);
   });
 
+  it('binds a name that holds the result of a call, so its members count', () => {
+    const usages = usagesOf(`${wrapper}const fs = await load('node:fs/promises');\nfs.stat('x');`);
+    expect(usages).toContain('api node:fs/promises.stat');
+    expect(usages.filter(usage => usage.startsWith('dynamic'))).toEqual([]);
+  });
+
   it('reads the calls that are not awaited as an import that nothing catches', () => {
     expect(usagesOf(`${wrapper}await Promise.all([load('node:vm'), load('node:fs')]);`)).toEqual(
       usagesOf("await Promise.all([import('node:vm'), import('node:fs')]);"),

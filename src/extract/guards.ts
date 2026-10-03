@@ -162,6 +162,7 @@ function checkGuards(node: Node, truth: boolean, context: BindingContext): Guard
       scope: check.scope,
       globals: context.globals,
       nodeEnv: context.nodeEnv,
+      wrappers: context.wrappers,
     });
   } finally {
     check.busy = false;

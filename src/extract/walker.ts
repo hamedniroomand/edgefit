@@ -44,7 +44,7 @@ export class Walker implements VisitContext {
   public readonly supplied: VisitContext['supplied'];
   readonly #stack: Node[] = [];
   #scope: Scope = createScope();
-  #boundInit: Node | undefined;
+  #bound: ReadonlySet<Node> = new Set();
 
   public constructor(
     collector: UsageCollector,
@@ -98,13 +98,13 @@ export class Walker implements VisitContext {
     visitPattern(pattern, this);
   };
 
-  public readonly visitBound = (init: Node): void => {
-    const previous = this.#boundInit;
-    this.#boundInit = init;
+  public readonly visitBound = (init: Node, bound: readonly Node[] = [init]): void => {
+    const previous = this.#bound;
+    this.#bound = new Set(bound);
     try {
       this.visit(init);
     } finally {
-      this.#boundInit = previous;
+      this.#bound = previous;
     }
   };
 
@@ -136,7 +136,7 @@ export class Walker implements VisitContext {
   /** Whether the value flows where its members may be used. Globals are reachable from any code, so passing one on hides nothing new. */
   readonly #escapes = (ref: ApiRef, node: Node, parent: Node): boolean =>
     ref.module !== '*globals*' &&
-    this.#boundInit !== node &&
+    !this.#bound.has(node) &&
     escapes(node, parent, this.#outer(node));
 
   /** A computed access: the object is a use, and the key is each string it may be, or unknown. */
