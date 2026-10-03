@@ -22,6 +22,7 @@ import {
   topLevelFunctions,
 } from './cjs-forms.ts';
 import type { Call, Helpers, ObjectLiteral, RequireUse } from './cjs-forms.ts';
+import { readableNestedBindings } from './cjs-nested.ts';
 
 class CommonJsReader {
   readonly #builder = new ShapeBuilder();
@@ -53,12 +54,36 @@ class CommonJsReader {
     for (const statement of this.#body) {
       this.#statement(statement);
     }
+    this.#readNestedRequires();
     this.#finish();
     return shape;
   }
 
+  /** A `require` inside a function asks for its module only when the code that holds it is used. */
+  #readNestedRequires(): void {
+    const { shape } = this.#builder;
+    const topLevel = new Map(
+      [...shape.imports].map(([local, source]) => [
+        local,
+        `${source.specifier}\0${source.imported}`,
+      ]),
+    );
+    for (const { found, local, imported } of readableNestedBindings(
+      this.#body,
+      this.#helpers,
+      topLevel,
+    )) {
+      this.#load(found);
+      shape.imports.set(local, { specifier: found.specifier, imported });
+      if (imported === '*') {
+        shape.bindings.add(local);
+      }
+    }
+  }
+
   #finish(): void {
     const { shape } = this.#builder;
+    const settled = this.#writer.settle();
     shape.units.sort((left, right) => left.start - right.start);
     // A module that is required in a way that is not read asks for all of it.
     const unread = new Set(
@@ -73,7 +98,7 @@ class CommonJsReader {
       }
     }
     shape.traceable =
-      this.#writer.settle() &&
+      settled &&
       !shape.units.some(
         unit =>
           // The body of a helper such as tsc's `__exportStar(m, exports)` names `exports` as a parameter.
@@ -196,6 +221,13 @@ class CommonJsReader {
       return false;
     }
     const [first, second] = args as [Node, Node];
+    if (
+      callee.type === 'MemberExpression' &&
+      isExportsObject(callee.object) &&
+      isName(callee.property, '__defineGetter__')
+    ) {
+      return this.#writer.defineGetter([first, second]);
+    }
     const helper = helperName(callee, this.#helpers);
     if (helper !== undefined && this.#helpers.getters.has(helper) && isExportsObject(first)) {
       return this.#writer.getters(second);

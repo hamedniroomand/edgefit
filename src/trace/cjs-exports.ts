@@ -14,6 +14,7 @@ import {
   requiredBy,
 } from './cjs-forms.ts';
 import type { Helpers, ObjectLiteral, RequireUse } from './cjs-forms.ts';
+import { exportedAs, loadTimeExport, objectExport } from './cjs-values.ts';
 
 /** What the reader of a module gives the reader of its exports. */
 export interface ExportContext {
@@ -30,8 +31,8 @@ export class ExportWriter {
   #writes = 0;
   /** Set when `module.exports` is assigned: the name it was set to, if it was a variable. */
   #assigned: { name?: string } | undefined;
-  /** The objects `exports.k = obj.k` copies from. */
-  readonly #mirrors: string[] = [];
+  /** The writes `exports.k = obj.k`, which copy from the object that `module.exports` may be set to. */
+  readonly #mirrors: { from: string; name: string; value: Node }[] = [];
   /** The variables that were set to an object literal and read as exports. */
   readonly #objects = new Set<string>();
   #unreadable = false;
@@ -55,17 +56,32 @@ export class ExportWriter {
 
   /** Whether everything the module writes to its exports could be read. */
   public settle(): boolean {
+    if (this.#assigned === undefined) {
+      // Nothing replaced `exports`, so `exports.k = obj.k` is an export like any other.
+      for (const { name, value } of this.#mirrors.splice(0)) {
+        loadTimeExport(this.#context.builder, name, value);
+      }
+    }
+    const { shape } = this.#context.builder;
     const named = this.#assigned?.name;
     // What `module.exports` was set to replaces `exports`, so the only writes to `exports` that
     // can be left alone are copies of it. Without that, a copy is an export like any other.
-    const stray = this.#mirrors.filter(name => name !== named).length;
+    const stray = this.#mirrors.filter(mirror => mirror.from !== named).length;
     const mixed =
       this.#assigned === undefined ? this.#mirrors.length > 0 : this.#writes + stray > 0;
+    // A function or a class that waits to be used is read as it is, when nothing else names it.
+    const waiting = named !== undefined && !this.#objects.has(named) && shape.declared.has(named);
     const used =
       named !== undefined &&
-      (!this.#objects.has(named) ||
-        this.#context.builder.shape.units.some(unit => rootNames(unit).has(named)));
-    return !(this.#unreadable || mixed || used);
+      ((!this.#objects.has(named) && !waiting) ||
+        shape.units.some(
+          unit => rootNames(unit).has(named) && shape.declared.get(named)?.includes(unit) !== true,
+        ));
+    const readable = !(this.#unreadable || mixed || used);
+    if (readable && waiting) {
+      shape.moduleExports = { local: named };
+    }
+    return readable;
   }
 
   /** `Object.defineProperty(exports, 'name', { get })` or `{ value }`. */
@@ -159,7 +175,7 @@ export class ExportWriter {
       const from = strip(value.object);
       if (from.type === 'Identifier') {
         // `exports.a = obj.a`, which copies onto the object that `module.exports = obj` replaced.
-        this.#mirrors.push(from.name);
+        this.#mirrors.push({ from: from.name, name, value });
         return true;
       }
     }
@@ -178,32 +194,33 @@ export class ExportWriter {
       return true;
     }
     if (value.type === 'ObjectExpression') {
-      this.#exportObject(name, value);
+      objectExport(this.#context.builder, name, value);
       return true;
     }
     if (isFunction(value) || (value.type === 'ClassExpression' && isLazyClass(value))) {
       this.#export(name, value, value);
       return true;
     }
-    return false;
+    const source = exportedAs(this.#context.builder, value);
+    if (source === undefined) {
+      loadTimeExport(this.#context.builder, name, value);
+    } else {
+      // `exports.b = exports.a`: the same export under another name.
+      this.#context.builder.export(name, source);
+    }
+    return true;
   }
 
-  /** Only a function or a lazy class in the object waits for the export to be used. The rest runs when the module loads. */
-  #exportObject(name: string, object: ObjectLiteral): void {
-    const { builder } = this.#context;
-    for (const property of object.properties) {
-      const value =
-        property.type === 'Property' && !property.computed ? strip(property.value) : undefined;
-      if (
-        value !== undefined &&
-        (isFunction(value) || (value.type === 'ClassExpression' && isLazyClass(value)))
-      ) {
-        builder.unit(property, exportKey(name), mentionsIn(value));
-      } else {
-        builder.unit(property);
-      }
+  /** `exports.__defineGetter__('name', () => …)`: the function runs when the export is read. */
+  public defineGetter([key, getter]: [Node, Node]): boolean {
+    const name = stringLiteral(key);
+    const value = strip(getter);
+    if (name === undefined || !isFunction(value)) {
+      return false;
     }
-    builder.export(name, { local: exportKey(name) });
+    this.#writes += 1;
+    this.#export(name, value, value);
+    return true;
   }
 
   /** `module.exports = value`. */

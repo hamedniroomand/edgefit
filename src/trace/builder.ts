@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, isTypeOnly } from '@/extract/ast.ts';
+import { childNodes, isTypeOnly, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 
 import type { DynamicImports } from './dynamic-imports.ts';
@@ -44,6 +44,8 @@ export interface ModuleShape {
   /** Every specifier a static `import` or `export … from` names. */
   specifiers: Set<string>;
   exports: Map<string, ExportSource>;
+  /** The function or class that `module.exports` is set to. Anything asked of the module keeps it. */
+  moduleExports?: { local: string };
   /** The modules `export * from` re-exports. */
   stars: string[];
   /** What the module asks of each file it loads with `import('literal')`. */
@@ -52,9 +54,23 @@ export interface ModuleShape {
   requires: DynamicImports;
 }
 
+/** Whether the value is a call of `require`, whose result the declared name holds. */
+function isRequireCall(node: Node): boolean {
+  const call = strip(node);
+  return (
+    call.type === 'CallExpression' &&
+    call.callee.type === 'Identifier' &&
+    call.callee.name === 'require'
+  );
+}
+
 export function mentionsIn(node: Node, names = new Set<string>()): Set<string> {
   if (isTypeOnly(node)) {
     return names;
+  }
+  if (node.type === 'VariableDeclarator' && node.init !== null && isRequireCall(node.init)) {
+    // The name that a `require` declares is a use only where the code reads it.
+    return mentionsIn(node.init, names);
   }
   if (
     node.type === 'MemberExpression' &&
