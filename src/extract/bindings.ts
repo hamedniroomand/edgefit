@@ -5,6 +5,7 @@ import type { ApiRef } from '@/types.ts';
 
 import { staticKey, staticString, strip, unwrap } from './ast.ts';
 import type { NodeOf } from './ast.ts';
+import type { ImportWrappers } from './import-wrappers.ts';
 import {
   globalAliases,
   globalRef,
@@ -21,6 +22,8 @@ export interface BindingContext {
   globals: ReadonlySet<string>;
   /** What a bundler replaces `process.env.NODE_ENV` with, or `undefined` when it is not fixed. */
   nodeEnv: string | undefined;
+  /** The functions that only run `import()` for their argument, from `findImportWrappers`. */
+  wrappers: ImportWrappers;
 }
 
 function tracked(ref: ApiRef): Binding {
@@ -154,6 +157,12 @@ function lazyWrappedModule(node: NodeOf<'CallExpression'>, scope: Scope): string
 }
 
 function resolveCall(node: NodeOf<'CallExpression'>, context: BindingContext): Binding | undefined {
+  // A call of a function that only imports its argument stands for the import of its literal.
+  const imported = context.wrappers.calls.get(node);
+  const importedModule = imported === undefined ? undefined : builtinName(imported);
+  if (importedModule !== undefined) {
+    return tracked(moduleRef(importedModule));
+  }
   const wrapped = wrappedModule(node, context.scope) ?? lazyWrappedModule(node, context.scope);
   if (wrapped !== undefined) {
     return tracked(moduleRef(wrapped));

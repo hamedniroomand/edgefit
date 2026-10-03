@@ -6,6 +6,7 @@ import type { NodeOf } from '@/extract/ast.ts';
 import { fileMembers, foldedString, resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { displayRef, isGlobalRoot, memberRef, moduleRef } from '@/extract/refs.ts';
+import { isGlobal } from '@/extract/runtimes.ts';
 import { assign, isBound, lookup, lookupStringObject } from '@/extract/scope.ts';
 import type { Binding } from '@/extract/scope.ts';
 import { destructuredLoad, requireOf } from '@/trace/dynamic-imports.ts';
@@ -128,9 +129,63 @@ function bindFileNamespace(node: NodeOf<'VariableDeclarator'>, context: VisitCon
   return true;
 }
 
+/** The array literal of `Promise.all([…])`, whether or not the call is awaited. */
+function promiseAllList(
+  init: Node | null,
+  context: VisitContext,
+): NodeOf<'ArrayExpression'> | undefined {
+  const call = init === null ? undefined : strip(init);
+  const callee = call?.type === 'CallExpression' ? strip(call.callee) : undefined;
+  const list = call?.type === 'CallExpression' ? call.arguments[0] : undefined;
+  return callee?.type === 'MemberExpression' &&
+    staticKey(callee.property, callee.computed) === 'all' &&
+    isGlobal(callee.object, 'Promise', context) &&
+    list?.type === 'ArrayExpression'
+    ? list
+    : undefined;
+}
+
+/**
+ * `const [a, b] = await Promise.all([x, y])` binds `a` to what `x` is and `b` to what `y` is.
+ * A name, or an object pattern, binds when its value is a module that edgefit tracks. The elements from the first spread
+ * or hole on are not matched by position, and neither is a rest element, so those names stay unbound.
+ */
+function bindPromiseAll(node: NodeOf<'VariableDeclarator'>, context: VisitContext): boolean {
+  const { id, init } = node;
+  const list = id.type === 'ArrayPattern' ? promiseAllList(init, context) : undefined;
+  if (id.type !== 'ArrayPattern' || list === undefined || init === null) {
+    return false;
+  }
+  const ordered = list.elements.findIndex(
+    element => element === null || element.type === 'SpreadElement',
+  );
+  const matched = ordered === -1 ? list.elements : list.elements.slice(0, ordered);
+  const bound = new Map<Node, { target: Node; ref: ApiRef }>();
+  for (const [index, element] of matched.entries()) {
+    const target = id.elements[index];
+    const value = element === null ? undefined : resolveBinding(element, context);
+    const names = target?.type === 'Identifier' || target?.type === 'ObjectPattern';
+    if (element !== null && names && isBound(value) && value !== 'require') {
+      bound.set(element, { target, ref: value.ref });
+    }
+  }
+  if (bound.size === 0) {
+    return false;
+  }
+  context.visitPattern(id);
+  context.visitBound(init, [...bound.keys()]);
+  for (const { target, ref } of bound.values()) {
+    bindTarget(target, ref, context, false);
+  }
+  return true;
+}
+
 export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, context) => {
   const { id, init } = node;
   if (bindFileNamespace(node, context)) {
+    return;
+  }
+  if (bindPromiseAll(node, context)) {
     return;
   }
   bindLoadedNames(node, context);
