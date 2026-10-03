@@ -25,6 +25,10 @@ export interface Scope {
   checks: Map<string, Check>;
   /** `const` names bound to a plain string, which can stand in for a literal specifier. */
   strings: Map<string, string>;
+  /** `const` names bound to one of a known set of strings: a plain string, or a member of an object of strings. */
+  keys: Map<string, readonly string[]>;
+  /** `const` names bound to an object literal whose values are all plain strings. */
+  stringObjects: Map<string, readonly string[]>;
   /** `const` names bound to a symbol, which can never name an API. */
   symbols: Set<string>;
   /** Names bound to a WebAssembly module by `import mod from './x.wasm'`. */
@@ -37,6 +41,8 @@ export function createScope(parent?: Scope): Scope {
     names: new Map(),
     checks: new Map(),
     strings: new Map(),
+    keys: new Map(),
+    stringObjects: new Map(),
     symbols: new Set(),
     wasmImports: new Set(),
     parent,
@@ -53,6 +59,33 @@ export function lookupString(scope: Scope | undefined, name: string): string | u
     return value;
   }
   return scope.names.has(name) ? undefined : lookupString(scope.parent, name);
+}
+
+function lookupSet(
+  scope: Scope | undefined,
+  name: string,
+  field: 'keys' | 'stringObjects',
+): readonly string[] | undefined {
+  if (scope === undefined) {
+    return undefined;
+  }
+  return (
+    scope[field].get(name) ??
+    (scope.names.has(name) ? undefined : lookupSet(scope.parent, name, field))
+  );
+}
+
+/** The strings a `const` may hold, unless a nearer declaration of the name shadows it. */
+export function lookupKeys(scope: Scope | undefined, name: string): readonly string[] | undefined {
+  return lookupSet(scope, name, 'keys');
+}
+
+/** The values of a `const` object literal of plain strings, unless a nearer declaration shadows it. */
+export function lookupStringObject(
+  scope: Scope | undefined,
+  name: string,
+): readonly string[] | undefined {
+  return lookupSet(scope, name, 'stringObjects');
 }
 
 /** Whether the name is an imported WebAssembly module, unless a nearer declaration shadows it. */

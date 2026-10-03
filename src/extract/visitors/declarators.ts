@@ -1,11 +1,11 @@
 import type { Node } from 'oxc-parser';
 
-import { isSymbolKey, staticKey, staticString } from '@/extract/ast.ts';
+import { isSymbolKey, staticKey, staticString, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { displayRef, isGlobalRoot, memberRef } from '@/extract/refs.ts';
-import { assign, isBound, lookup } from '@/extract/scope.ts';
+import { assign, isBound, lookup, lookupStringObject } from '@/extract/scope.ts';
 import type { Binding } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
@@ -134,11 +134,49 @@ export function bindAssigned(node: NodeOf<'AssignmentExpression'>, context: Visi
   return true;
 }
 
+/** The values of an object literal when every one is a plain string. */
+function stringValues(node: Node | null): string[] | undefined {
+  if (node?.type !== 'ObjectExpression') {
+    return undefined;
+  }
+  const values = node.properties.map(property =>
+    property.type === 'Property' ? staticString(property.value) : undefined,
+  );
+  // An object with no value gives an empty set, and silence is not an answer.
+  return values.length > 0 && values.every(value => value !== undefined)
+    ? (values as string[])
+    : undefined;
+}
+
+/**
+ * Remembers what a `const` may hold when that is a known set of strings: `const name = 'text'`,
+ * an object of strings, or `const key = object[something]` of such an object.
+ */
+function recordKeys(name: string, init: Node | null, context: VisitContext): void {
+  const value = staticString(init);
+  const values = stringValues(init);
+  const inner = init === null ? undefined : strip(init);
+  const object =
+    inner?.type === 'MemberExpression' && inner.computed && inner.object.type === 'Identifier'
+      ? lookupStringObject(context.scope, inner.object.name)
+      : undefined;
+  if (value !== undefined) {
+    context.scope.keys.set(name, [value]);
+  } else if (values !== undefined) {
+    context.scope.stringObjects.set(name, values);
+  } else if (object !== undefined) {
+    context.scope.keys.set(name, object);
+  }
+}
+
 /** Remembers `const name = 'text'`, so `import(name)` can be read like `import('text')`. */
 export const visitDeclaration: Visitor<NodeOf<'VariableDeclaration'>> = (node, context) => {
   if (node.kind === 'const') {
     for (const { id, init } of node.declarations) {
       const value = id.type === 'Identifier' ? staticString(init) : undefined;
+      if (id.type === 'Identifier') {
+        recordKeys(id.name, init, context);
+      }
       if (id.type === 'Identifier' && value !== undefined) {
         context.scope.strings.set(id.name, value);
       } else if (id.type === 'Identifier' && init !== null && isSymbolKey(init)) {
