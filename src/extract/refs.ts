@@ -3,7 +3,9 @@ import type { MemberExpression, Node } from 'oxc-parser';
 import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef } from '@/types.ts';
 
-import { strip, unwrap } from './ast.ts';
+import { staticKey, strip, unwrap } from './ast.ts';
+import { parameterReads } from './local-functions.ts';
+import type { LocalFunction, ParameterRead } from './local-functions.ts';
 
 export const globalAliases = new Set(['global', 'globalThis', 'self']);
 
@@ -231,5 +233,37 @@ export function isAwaitedCall(node: Node, parent: Node, outer: readonly Node[]):
 export function isPromiseApi(ref: ApiRef): boolean {
   return (
     ref.module.endsWith('/promises') || ref.path.includes('promises') || ref.path.includes('subtle')
+  );
+}
+
+/**
+ * The member reads that the function of the file makes on the parameter that a value is passed to.
+ * The value is an argument, or the value of a property of an object literal that is an argument.
+ * `parent` is the parent of `node`, and `outer` holds the ancestors above it, nearest first.
+ */
+export function findParameterReads(
+  node: Node,
+  parent: Node,
+  outer: readonly Node[],
+  functions: ReadonlyMap<string, LocalFunction>,
+): ParameterRead[] | undefined {
+  const [grand, great] = outer;
+  const inObject =
+    parent.type === 'Property' &&
+    parent.value === node &&
+    grand?.type === 'ObjectExpression' &&
+    great?.type === 'CallExpression';
+  const call = inObject ? great : parent;
+  const argument = inObject ? grand : node;
+  const key = inObject ? staticKey(parent.key, parent.computed) : undefined;
+  const callee = call.type === 'CallExpression' ? strip(call.callee) : undefined;
+  const fn = callee?.type === 'Identifier' ? functions.get(callee.name) : undefined;
+  const index =
+    call.type === 'CallExpression' ? call.arguments.findIndex(item => item === argument) : -1;
+  if (fn === undefined || index < 0 || (inObject && key === undefined)) {
+    return undefined;
+  }
+  return parameterReads(fn, index, inObject)?.filter(
+    read => !inObject || read.key === undefined || read.key === key,
   );
 }

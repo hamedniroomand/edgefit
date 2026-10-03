@@ -121,7 +121,7 @@
     },
     {
       "package": "mongodb",
-      "versions": { "min": "7.7.0", "max": "7.7.0" },
+      "versions": { "min": "7.6.0", "max": "7.7.0" },
       "file": "lib/client-side-encryption/mongocryptd_manager.js",
       "apis": ["node:child_process", "node:child_process.spawn"],
       "target": "workerd",

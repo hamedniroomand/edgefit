@@ -8,6 +8,7 @@ import type { VisitContext } from './context.ts';
 import {
   displayRef,
   escapes,
+  findParameterReads,
   isFeatureCheck,
   isAwaitedCall,
   normalizeRef,
@@ -39,6 +40,8 @@ export class Walker implements VisitContext {
   public readonly typeOnlyImports: ReadonlySet<string>;
   public readonly assigned: ReadonlyMap<string, Node>;
   public readonly wrappers: VisitContext['wrappers'];
+  public readonly functions: VisitContext['functions'];
+  public readonly supplied: VisitContext['supplied'];
   readonly #stack: Node[] = [];
   #scope: Scope = createScope();
   #boundInit: Node | undefined;
@@ -50,6 +53,8 @@ export class Walker implements VisitContext {
     typeOnlyImports: ReadonlySet<string>,
     assigned: ReadonlyMap<string, Node>,
     wrappers: VisitContext['wrappers'],
+    functions: VisitContext['functions'],
+    supplied: VisitContext['supplied'],
   ) {
     this.collector = collector;
     this.globals = globals;
@@ -57,6 +62,8 @@ export class Walker implements VisitContext {
     this.typeOnlyImports = typeOnlyImports;
     this.assigned = assigned;
     this.wrappers = wrappers;
+    this.functions = functions;
+    this.supplied = supplied;
   }
 
   public get scope(): Scope {
@@ -167,6 +174,18 @@ export class Walker implements VisitContext {
     return true;
   };
 
+  /**
+   * A value passed to a function of the file that only reads members of that parameter is a use
+   * of those members. The same goes for a value in an object literal that is passed that way.
+   */
+  readonly #followIntoFunction = (ref: ApiRef, node: Node, parent: Node): boolean => {
+    const reads = findParameterReads(node, parent, this.#outer(node), this.functions);
+    for (const read of reads ?? []) {
+      this.collector.api({ ...ref, path: [...ref.path, ...read.path] }, read.offset);
+    }
+    return reads !== undefined;
+  };
+
   readonly #awaited = (node: Node, parent: Node | undefined): boolean =>
     parent !== undefined && isAwaitedCall(node, parent, this.#outer(node));
 
@@ -194,7 +213,11 @@ export class Walker implements VisitContext {
     if (recordBare || chain.extended) {
       this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
     }
-    if (parent !== undefined && this.#escapes(chain.ref, node, parent)) {
+    if (
+      parent !== undefined &&
+      this.#escapes(chain.ref, node, parent) &&
+      !this.#followIntoFunction(chain.ref, node, parent)
+    ) {
       this.collector.dynamic(
         chain.ref,
         displayRef(chain.ref),

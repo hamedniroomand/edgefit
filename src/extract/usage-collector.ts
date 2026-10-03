@@ -100,6 +100,7 @@ export class UsageCollector {
     reason: string,
     offset: number,
     exported = false,
+    supplied = false,
   ): void {
     if (this.guards.dead()) {
       return;
@@ -112,6 +113,7 @@ export class UsageCollector {
       reason,
       location: this.location(offset),
       ...(exported ? { exported: true as const } : {}),
+      ...(supplied ? { supplied: true as const } : {}),
       ...this.#polyfill(),
       ...this.#runtimes(),
     });

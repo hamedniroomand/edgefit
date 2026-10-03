@@ -35,6 +35,7 @@ export function formatJson(result: CheckResult): string {
       ignored: targetReport.ignored,
       findings: targetReport.findings.map(withId),
       guarded: targetReport.guarded.map(withId),
+      suppliedLoads: targetReport.suppliedLoads,
     })),
   };
   return `${JSON.stringify(report, null, 2)}\n`;

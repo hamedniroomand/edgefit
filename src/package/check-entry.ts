@@ -18,9 +18,12 @@ function errorMessage(error: unknown): string {
 function entryStatus(report: TargetReport): EntryStatus {
   const errors = report.findings.filter(finding => finding.level === 'error').length;
   const warnings = report.findings.length - errors;
-  const notes = (report.missingPeers ?? []).map(
-    name => `peer ${name} not installed, checked in your project`,
-  );
+  const notes = [
+    ...(report.missingPeers ?? []).map(
+      name => `peer ${name} not installed, checked in your project`,
+    ),
+    ...(report.suppliedLoads ?? []).map(({ place }) => `loads a module the user names (${place})`),
+  ];
   return {
     status: statusOf(errors, warnings),
     errors,
