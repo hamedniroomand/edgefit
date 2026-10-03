@@ -42,6 +42,34 @@ describe('following a variable that is assigned a module', () => {
   });
 });
 
+describe('following a variable that starts with a value', () => {
+  const initial = "var c = typeof self !== 'undefined' ? self.crypto || self.msCrypto : null;\n";
+
+  it('follows a module that replaces the value', () => {
+    const usages = usagesOf(
+      `${initial}(function () {\n  c = require('node:crypto');\n  if (c && c.randomBytes) {\n    c.randomBytes(8);\n  }\n})();`,
+      'lib/index.ts',
+    );
+    expect(usages).toContain('api node:crypto.randomBytes [guarded]');
+    expect(usages.some(usage => usage.startsWith('dynamic'))).toBe(false);
+  });
+
+  it.each([
+    ['null', "let c = null;\nc = require('fs');\nc.watch('.');"],
+    ['an object', "let c = {};\nc = require('fs');\nc.watch('.');"],
+  ])('follows a module that replaces %s', (_name, source) => {
+    expect(usagesOf(source, 'lib/index.ts')).toContain('api node:fs.watch');
+  });
+
+  it('does not follow a variable that is set to two modules', () => {
+    const usages = usagesOf(
+      `${initial}c = require('node:crypto');\nc = require('node:fs');\nc.watch('.');`,
+      'lib/index.ts',
+    );
+    expect(usages).not.toContain('api node:fs.watch');
+  });
+});
+
 describe('reporting a variable that is assigned a module', () => {
   it.each([
     ['passed to a function', "let c;\nc = require('fs');\nuse(c);"],
@@ -63,7 +91,7 @@ describe('not following a variable that is assigned a module', () => {
     ['set by destructuring', "let c;\n[c] = list;\nc = require('fs');\nc.watch('.');"],
     ['exported in a list', "let c;\nc = require('fs');\nc.watch('.');\nexport { c };"],
     ['exported in place', "export let c;\nc = require('fs');\nc.watch('.');"],
-    ['declared with a value', "let c = {};\nc = require('fs');\nc.watch('.');"],
+    ['declared with a call', "let c = make();\nc = require('fs');\nc.watch('.');"],
     ['declared again with a value', "var c;\nc = require('fs');\nvar c = other;\nc.watch('.');"],
     ['a function', "var c;\nc = require('fs');\nfunction c() {}\nc.watch('.');"],
     ['a parameter', "function f(c) { c = require('fs'); c.watch('.'); }"],

@@ -1,7 +1,9 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes } from './ast.ts';
+import { childNodes, strip } from './ast.ts';
 import { patternNames } from './declarations.ts';
+
+const bindable = new Set(['Identifier', 'MemberExpression', 'CallExpression', 'ImportExpression']);
 
 type Tally = { writes: number; declarations: number; value: Node | undefined };
 
@@ -24,7 +26,8 @@ function writtenNames(node: Node): string[] {
     return patternNames(node.argument);
   }
   if (node.type === 'VariableDeclarator') {
-    return node.init === null ? [] : patternNames(node.id);
+    // A value that cannot be a module is replaced by the one that `=` sets. Any other value is a write.
+    return node.init === null || !bindable.has(strip(node.init).type) ? [] : patternNames(node.id);
   }
   if (node.type === 'ForInStatement' || node.type === 'ForOfStatement') {
     return [...declaredNames(node.left), ...patternNames(node.left)];
@@ -49,8 +52,9 @@ function writtenNames(node: Node): string[] {
 }
 
 /**
- * The value of each name that is declared once without a value and set once with `=`, such as
- * `let c; c = require('fs')`. The count is by name only. A name that two scopes share counts for
+ * The value of each name that is declared once and set once with `=`, such as
+ * `let c; c = require('fs')`. A declaration with a value that cannot be a module, such as `let c = null`,
+ * is not counted as a write. The count is by name only. A name that two scopes share counts for
  * both, so a name in the result has no other declaration or write in the file. An export counts
  * as a write, because other code can read the name.
  */
