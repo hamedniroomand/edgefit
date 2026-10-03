@@ -67,6 +67,23 @@ describe('checkPackage', () => {
   });
 });
 
+describe('checkPackage with a main subpath', () => {
+  it('takes the result from the subpath that the caller names as the main entry', async () => {
+    const result = await checkPackage(pack('scoped'), { targets: ['workerd'], main: './node' });
+    expect(result.main).toBe('./node');
+    expect(result.summary.workerd).toBe(result.entries[1]?.results.workerd?.status);
+    expect(result.worst).toBeUndefined();
+  });
+
+  it('leaves main out when no subpath is named, and rejects one that is not an entry', async () => {
+    const plain = await checkPackage(pack('plain'), { targets: ['workerd'] });
+    expect(plain.main).toBeUndefined();
+    await expect(
+      checkPackage(pack('plain'), { targets: ['workerd'], main: './missing' }),
+    ).rejects.toThrow('has no checked entry ./missing');
+  });
+});
+
 describe.skipIf(process.env.EDGEFIT_REGISTRY_TESTS === undefined)('registry', () => {
   it('checks a package from the registry', async () => {
     const result = await checkPackage('jose@^5', { targets: ['workerd'] });

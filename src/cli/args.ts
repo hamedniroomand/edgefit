@@ -50,6 +50,8 @@ export interface PackageArgs {
   color: boolean;
   exports: string[];
   skip: string[];
+  /** The subpath that decides the result, for a package without a `.` entry. */
+  main: string | undefined;
   keep: boolean;
   registry: string | undefined;
   /** Where to write the badge SVG. */
@@ -200,6 +202,7 @@ export function parsePackageArgs(argv: string[]): PackageArgs {
       color: projectOptions.color,
       export: { type: 'string', multiple: true },
       skip: { type: 'string', multiple: true },
+      main: { type: 'string' },
       keep: { type: 'boolean' },
       registry: { type: 'string' },
       badge: { type: 'string' },
@@ -223,6 +226,7 @@ export function parsePackageArgs(argv: string[]): PackageArgs {
     color: values.color ?? true,
     exports: values.export ?? [],
     skip: values.skip ?? [],
+    main: values.main,
     keep: values.keep ?? false,
     registry: values.registry,
     badge: values.badge,

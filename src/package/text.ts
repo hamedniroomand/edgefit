@@ -65,6 +65,10 @@ function noteLines(result: PackageResult): string[] {
   return [...bySubpaths].map(([note, subpaths]) => `  ${note}: ${[...subpaths].join(', ')}`);
 }
 
+function mainLines(result: PackageResult): string[] {
+  return result.main === undefined ? [] : [`  main entry: ${result.main}`];
+}
+
 function worstLines(result: PackageResult, paint: Paint): string[] {
   return result.targets.flatMap(key => {
     const found = result.worst?.[key];
@@ -133,6 +137,7 @@ export function formatPackageText(result: PackageResult, options: { color: boole
     paint('dim', `  checked ${result.checkedAt.slice(0, 10)} with edgefit ${result.edgefit}`),
     '',
     ...gridLines(result, paint),
+    ...mainLines(result),
     ...worstLines(result, paint),
     ...noteLines(result).map(line => paint('dim', line)),
     ...problemLines(result, paint),

@@ -51,6 +51,21 @@ describe('the result of a target', () => {
   });
 });
 
+describe('the main entry that the caller names', () => {
+  it('is the status of the subpath that the caller names as the main entry', () => {
+    const entries = [entry('./app', 'pass'), entry('./ai', 'fail'), entry('./auth', 'warn')];
+    expect(targetResult(entries, 'workerd')).toEqual({ status: 'fail' });
+    expect(targetResult(entries, 'workerd', './app')).toEqual({
+      status: 'pass',
+      worst: { subpath: './ai', status: 'fail' },
+    });
+    expect(summarize(entries, ['workerd'], './app')).toEqual({
+      summary: { workerd: 'pass' },
+      worst: { workerd: { subpath: './ai', status: 'fail' } },
+    });
+  });
+});
+
 describe('the text of a package result', () => {
   it('names the worst subpath when it is worse than the main entry', () => {
     const entries = [entry('.', 'pass'), entry('./node', 'fail')];
@@ -69,5 +84,23 @@ describe('the text of a package result', () => {
     const text = formatPackageText(result as never, { color: false });
     expect(text).toContain('worst subpath on workerd: ./node ✗');
     expect(text).toContain('overall');
+  });
+
+  it('names the subpath that the caller chose as the main entry', () => {
+    const entries = [entry('./app', 'pass'), entry('./ai', 'fail')];
+    const result = {
+      version: 2,
+      package: 'p',
+      resolved: '1.0.0',
+      checkedAt: '2026-01-01T00:00:00.000Z',
+      edgefit: '0.9.2',
+      data: {},
+      targets: ['workerd'],
+      context: {},
+      entries,
+      main: './app',
+      ...summarize(entries, ['workerd'], './app'),
+    } as const;
+    expect(formatPackageText(result as never, { color: false })).toContain('main entry: ./app');
   });
 });

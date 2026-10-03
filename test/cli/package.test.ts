@@ -36,6 +36,11 @@ describe('parsePackageArgs', () => {
     });
   });
 
+  it('reads the subpath that decides the result', () => {
+    expect(parsePackageArgs(['firebase', '--main', './app'])).toMatchObject({ main: './app' });
+    expect(parsePackageArgs(['firebase']).main).toBeUndefined();
+  });
+
   it('needs exactly one package', () => {
     expect(() => parsePackageArgs([])).toThrow(EdgefitError);
     expect(() => parsePackageArgs(['a', 'b'])).toThrow(EdgefitError);

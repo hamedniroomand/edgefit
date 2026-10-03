@@ -18,6 +18,7 @@ export async function runPackage(argv: string[], io: CliIo): Promise<number> {
     targets: args.targets,
     subpaths: args.exports,
     skip: args.skip,
+    main: args.main,
     registry: args.registry,
     keep: args.keep,
     onKeep: directory => {
