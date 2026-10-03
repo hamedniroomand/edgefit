@@ -1,3 +1,4 @@
+import { realpathSync } from 'node:fs';
 import path from 'node:path';
 
 import { build } from 'esbuild';
@@ -6,6 +7,7 @@ import type { Loader, Message, Metafile, Plugin } from 'esbuild';
 import { toResolveError } from './errors.ts';
 import { acceptMissingPeers, importKey, optionalPeers } from './optional-peers.ts';
 import { runtimeExternals } from './runtime-externals.ts';
+import { tsconfigRawFor } from './tsconfig.ts';
 
 /** An import of a module in the graph, as esbuild resolved it. */
 export interface ImportLink {
@@ -104,6 +106,7 @@ async function bundleMetafile(options: ResolveOptions, accepted: Set<string>): P
       conditions: [...options.conditions],
       mainFields: mainFields[options.platform],
       loader: assetLoaders,
+      tsconfigRaw: tsconfigRawFor(options.root),
       define,
       logLevel: 'silent',
       plugins: [...(options.plugins ?? []), runtimeExternals, optionalPeers(accepted)],
@@ -118,7 +121,9 @@ async function bundleMetafile(options: ResolveOptions, accepted: Set<string>): P
 }
 
 /** Resolves the module graph from an entry the way the target's bundler would. */
-export async function resolveGraph(options: ResolveOptions): Promise<ModuleGraph> {
+export async function resolveGraph(requested: ResolveOptions): Promise<ModuleGraph> {
+  // esbuild reports importers by real path, so the root must be a real path too.
+  const options = { ...requested, root: realpathSync(requested.root) };
   const accepted = new Set<string>();
   const metafile = await bundleMetafile(options, accepted);
   const modules = new Map<string, GraphModule>();

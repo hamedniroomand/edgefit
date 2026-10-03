@@ -51,7 +51,7 @@ function compilerOptions(file: string, seen: Set<string>): Record<string, unknow
   >;
 }
 
-function directoryKeeps(directory: string, cache: Map<string, boolean>): boolean {
+function directoryKeeps(directory: string, root: string, cache: Map<string, boolean>): boolean {
   const cached = cache.get(directory);
   if (cached !== undefined) {
     return cached;
@@ -61,8 +61,8 @@ function directoryKeeps(directory: string, cache: Map<string, boolean>): boolean
   let result = false;
   if (existsSync(config)) {
     result = keeps(compilerOptions(config, new Set()));
-  } else if (up !== directory) {
-    result = directoryKeeps(up, cache);
+  } else if (directory !== root && up !== directory) {
+    result = directoryKeeps(up, root, cache);
   }
   cache.set(directory, result);
   return result;
@@ -70,8 +70,32 @@ function directoryKeeps(directory: string, cache: Map<string, boolean>): boolean
 
 /**
  * Whether the bundler keeps an import that nothing uses as a value. It reads the nearest
- * `tsconfig.json`, as esbuild does. Pass one `cache` to many calls to read each directory once.
+ * `tsconfig.json` from the file up to `root`. A config above the root is not read, because the
+ * platform does not read it. Pass one `cache` to many calls to read each directory once.
  */
-export function keepsUnusedImports(file: string, cache = new Map<string, boolean>()): boolean {
-  return directoryKeeps(path.dirname(file), cache);
+export function keepsUnusedImports(
+  file: string,
+  root: string,
+  cache = new Map<string, boolean>(),
+): boolean {
+  return directoryKeeps(path.dirname(file), root, cache);
+}
+
+/**
+ * Settings that stop esbuild from reading a `tsconfig.json` above the root. They apply when the
+ * root has no config and a directory above it has one.
+ */
+export function tsconfigRawFor(root: string): string | undefined {
+  if (existsSync(path.join(root, 'tsconfig.json'))) {
+    return undefined;
+  }
+  for (let directory = path.dirname(root); ; directory = path.dirname(directory)) {
+    if (existsSync(path.join(directory, 'tsconfig.json'))) {
+      // ponytail: this also hides a nested config below the root. Add a resolve plugin to keep it.
+      return '{}';
+    }
+    if (directory === path.dirname(directory)) {
+      return undefined;
+    }
+  }
 }

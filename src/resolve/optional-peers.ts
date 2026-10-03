@@ -13,31 +13,37 @@ export function importKey(importer: string, specifier: string): string {
   return `${importer}\0${specifier}`;
 }
 
-/**
- * The optional peer dependencies of the nearest named package.json above a file. A nested
- * manifest such as `esm/package.json` holds only `type` and is skipped.
- */
-function optionalPeersOf(file: string): ReadonlySet<string> {
+type Manifest = {
+  name?: unknown;
+  dependencies?: Record<string, unknown>;
+  peerDependencies?: Record<string, unknown>;
+  optionalDependencies?: Record<string, unknown>;
+  peerDependenciesMeta?: Record<string, { optional?: boolean } | undefined>;
+};
+
+/** The nearest named package.json above a file. A nested manifest such as `esm/package.json` holds only `type` and is skipped. */
+export function manifestOf(file: string): Manifest | undefined {
   for (let directory = path.dirname(file); ; directory = path.dirname(directory)) {
     const manifest = path.join(directory, 'package.json');
     const found = existsSync(manifest)
-      ? (JSON.parse(readFileSync(manifest, 'utf8')) as {
-          name?: unknown;
-          peerDependenciesMeta?: Record<string, { optional?: boolean } | undefined>;
-        })
+      ? (JSON.parse(readFileSync(manifest, 'utf8')) as Manifest)
       : undefined;
     if (typeof found?.name === 'string') {
-      const { peerDependenciesMeta } = found;
-      return new Set(
-        Object.entries(peerDependenciesMeta ?? {})
-          .filter(([, meta]) => meta?.optional === true)
-          .map(([name]) => name),
-      );
+      return found;
     }
     if (path.dirname(directory) === directory) {
-      return new Set();
+      return undefined;
     }
   }
+}
+
+/** The optional peer dependencies of the package that holds a file. */
+function optionalPeersOf(file: string): ReadonlySet<string> {
+  return new Set(
+    Object.entries(manifestOf(file)?.peerDependenciesMeta ?? {})
+      .filter(([, meta]) => meta?.optional === true)
+      .map(([name]) => name),
+  );
 }
 
 /**

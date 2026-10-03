@@ -7,7 +7,8 @@ import type { EdgefitConfig, TargetKey } from '@/types.ts';
 import { entrySource } from './entry.ts';
 import type { PackageEntry } from './entry.ts';
 import { statusOf } from './result.ts';
-import type { PackageEntryResult, PackageResult } from './result.ts';
+import type { EntryStatus, PackageEntryResult, PackageResult } from './result.ts';
+import { neededMessage, undeclaredModules } from './unchecked.ts';
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -46,8 +47,13 @@ export async function checkEntry(
       };
     }
   } catch (error) {
+    const needed = undeclaredModules(error, root);
+    const outcome: EntryStatus =
+      needed.length > 0
+        ? { status: 'unchecked', errors: 0, warnings: 0, message: neededMessage(needed) }
+        : { status: 'error', errors: 0, warnings: 0, message: errorMessage(error) };
     for (const key of targets) {
-      row.results[key] = { status: 'error', errors: 0, warnings: 0, message: errorMessage(error) };
+      row.results[key] = outcome;
     }
   }
   return row;

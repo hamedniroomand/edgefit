@@ -4,7 +4,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { keepsUnusedImports } from '@/resolve/tsconfig.ts';
+import { keepsUnusedImports, tsconfigRawFor } from '@/resolve/tsconfig.ts';
 
 function project(files: Record<string, string>): string {
   const root = mkdtempSync(path.join(tmpdir(), 'edgefit-tsconfig-'));
@@ -17,9 +17,10 @@ function project(files: Record<string, string>): string {
 
 describe('reading whether the bundler keeps unused imports', () => {
   it('is false without a tsconfig or without the options', () => {
-    expect(keepsUnusedImports(path.join(project({}), 'src/a.ts'))).toBe(false);
+    const empty = project({});
+    expect(keepsUnusedImports(path.join(empty, 'src/a.ts'), empty)).toBe(false);
     const root = project({ 'tsconfig.json': '{ "compilerOptions": { "strict": true } }' });
-    expect(keepsUnusedImports(path.join(root, 'src/a.ts'))).toBe(false);
+    expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(false);
   });
 
   it('is true for verbatimModuleSyntax and preserveValueImports', () => {
@@ -27,7 +28,7 @@ describe('reading whether the bundler keeps unused imports', () => {
       const root = project({
         'tsconfig.json': `// note\n{ "compilerOptions": { "${name}": true, }, }`,
       });
-      expect(keepsUnusedImports(path.join(root, 'src/a.ts'))).toBe(true);
+      expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(true);
     }
   });
 
@@ -38,9 +39,9 @@ describe('reading whether the bundler keeps unused imports', () => {
       'packages/a/tsconfig.json': '{ "extends": "../../tsconfig.base.json" }',
       'packages/b/tsconfig.json': '{ "compilerOptions": { "verbatimModuleSyntax": false } }',
     });
-    expect(keepsUnusedImports(path.join(root, 'src/a.ts'))).toBe(true);
-    expect(keepsUnusedImports(path.join(root, 'packages/a/src/a.ts'))).toBe(true);
-    expect(keepsUnusedImports(path.join(root, 'packages/b/src/a.ts'))).toBe(false);
+    expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(true);
+    expect(keepsUnusedImports(path.join(root, 'packages/a/src/a.ts'), root)).toBe(true);
+    expect(keepsUnusedImports(path.join(root, 'packages/b/src/a.ts'), root)).toBe(false);
   });
 });
 
@@ -54,7 +55,7 @@ describe('reading the tsconfig options that keep imports', () => {
       const root = project({
         'tsconfig.json': `{ "compilerOptions": { "importsNotUsedAsValues": "${value}" } }`,
       });
-      expect(keepsUnusedImports(path.join(root, 'src/a.ts'))).toBe(expected);
+      expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(expected);
     }
   });
 
@@ -64,7 +65,7 @@ describe('reading the tsconfig options that keep imports', () => {
       'tsconfig.json':
         '{ "extends": "./base.json", "compilerOptions": { "importsNotUsedAsValues": "remove" } }',
     });
-    expect(keepsUnusedImports(path.join(root, 'src/a.ts'))).toBe(true);
+    expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(true);
   });
 });
 
@@ -77,7 +78,7 @@ describe('reading a tree of extended configs', () => {
       'c.json': '{ "extends": "./base.json" }',
       'tsconfig.json': '{ "extends": ["./b.json", "./c.json"] }',
     });
-    expect(keepsUnusedImports(path.join(root, 'src/a.ts'))).toBe(true);
+    expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(true);
   });
 
   it('lets the last config in an extends list win', () => {
@@ -89,9 +90,9 @@ describe('reading a tree of extended configs', () => {
       'two/tsconfig.json': '{ "extends": ["../b.json", "../a.json"] }',
       'three/tsconfig.json': '{ "extends": ["../a.json", "../c.json"] }',
     });
-    expect(keepsUnusedImports(path.join(root, 'one/a.ts'))).toBe(false);
-    expect(keepsUnusedImports(path.join(root, 'two/a.ts'))).toBe(true);
-    expect(keepsUnusedImports(path.join(root, 'three/a.ts'))).toBe(true);
+    expect(keepsUnusedImports(path.join(root, 'one/a.ts'), root)).toBe(false);
+    expect(keepsUnusedImports(path.join(root, 'two/a.ts'), root)).toBe(true);
+    expect(keepsUnusedImports(path.join(root, 'three/a.ts'), root)).toBe(true);
   });
 
   it('stops at a package extends and at a loop', () => {
@@ -99,7 +100,31 @@ describe('reading a tree of extended configs', () => {
       'tsconfig.json': '{ "extends": "@tsconfig/node22/tsconfig.json" }',
       'loop/tsconfig.json': '{ "extends": "./tsconfig.json" }',
     });
-    expect(keepsUnusedImports(path.join(root, 'src/a.ts'))).toBe(false);
-    expect(keepsUnusedImports(path.join(root, 'loop/a.ts'))).toBe(false);
+    expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(false);
+    expect(keepsUnusedImports(path.join(root, 'loop/a.ts'), root)).toBe(false);
+  });
+});
+
+describe('a tsconfig above the project root', () => {
+  const above = '{ "compilerOptions": { "verbatimModuleSyntax": true } }';
+
+  it('is not read for the unused imports', () => {
+    const outer = project({ 'tsconfig.json': above, 'app/src/a.ts': '' });
+    const root = path.join(outer, 'app');
+    expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(false);
+    expect(keepsUnusedImports(path.join(root, 'src/a.ts'), outer)).toBe(true);
+  });
+
+  it('is read when the project has its own', () => {
+    const outer = project({ 'tsconfig.json': '{}', 'app/tsconfig.json': above });
+    const root = path.join(outer, 'app');
+    expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(true);
+  });
+
+  it('is hidden from esbuild only when the root has none and one is above', () => {
+    const outer = project({ 'tsconfig.json': above, 'app/a.ts': '', 'own/tsconfig.json': above });
+    expect(tsconfigRawFor(path.join(outer, 'app'))).toBe('{}');
+    expect(tsconfigRawFor(path.join(outer, 'own'))).toBeUndefined();
+    expect(tsconfigRawFor(project({}))).toBeUndefined();
   });
 });

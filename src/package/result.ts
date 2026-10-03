@@ -3,13 +3,14 @@ import type { TargetKey } from '@/types.ts';
 /** Bumped on any breaking change to the package result shape. */
 export const packageResultVersion = 1;
 
-export type PackageStatus = 'pass' | 'warn' | 'fail' | 'error';
+/** `unchecked`: the entry needs a module that the package does not declare, so it was left out of the summary. */
+export type PackageStatus = 'pass' | 'warn' | 'fail' | 'error' | 'unchecked';
 
 export interface EntryStatus {
   status: PackageStatus;
   errors: number;
   warnings: number;
-  /** Why the entry could not be checked. Only with `status: "error"`. */
+  /** Why the entry could not be checked. Only with `status: "error"` or `"unchecked"`. */
   message?: string;
 }
 
@@ -37,7 +38,13 @@ export interface PackageResult {
 }
 
 // A warning is never rounded up to a pass, and a check that failed to run is not a pass either.
-const severity: Record<PackageStatus, number> = { pass: 0, warn: 1, error: 2, fail: 3 };
+const severity: Record<PackageStatus, number> = {
+  pass: 0,
+  unchecked: 0,
+  warn: 1,
+  error: 2,
+  fail: 3,
+};
 
 export function worstStatus(statuses: readonly PackageStatus[]): PackageStatus {
   let worst: PackageStatus = 'pass';
@@ -47,6 +54,15 @@ export function worstStatus(statuses: readonly PackageStatus[]): PackageStatus {
     }
   }
   return worst;
+}
+
+/**
+ * The status of a target from the status of each entry. An unchecked entry is left out. When
+ * every entry is unchecked, nothing was checked, and that is an error.
+ */
+export function summaryOf(statuses: readonly PackageStatus[]): PackageStatus {
+  const checked = statuses.filter(status => status !== 'unchecked');
+  return checked.length === 0 && statuses.length > 0 ? 'error' : worstStatus(checked);
 }
 
 export function statusOf(errors: number, warnings: number): PackageStatus {
