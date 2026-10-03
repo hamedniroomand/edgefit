@@ -56,7 +56,7 @@ export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context)
   }
 };
 
-function exportLocal(local: Node, exported: string, context: VisitContext): void {
+export function exportLocal(local: Node, exported: string, context: VisitContext): void {
   const binding = local.type === 'Identifier' ? lookup(context.scope, local.name) : undefined;
   // The global object says nothing about which API is used, wherever it goes.
   if (isTracked(binding) && !isGlobalRoot(binding.ref)) {
@@ -98,6 +98,21 @@ export const visitExportNamed: Visitor<NodeOf<'ExportNamedDeclaration'>> = (node
 };
 
 /** `export default name` of a module is an export of that module. */
+/** The name that `exports.name = …` or `module.exports.name = …` sets, if `node` is that member. */
+export function commonJsExportName(node: Node): string | undefined {
+  if (node.type !== 'MemberExpression') {
+    return undefined;
+  }
+  const { object } = node;
+  const isExports = object.type === 'Identifier' && object.name === 'exports';
+  const isModuleExports =
+    object.type === 'MemberExpression' &&
+    object.object.type === 'Identifier' &&
+    object.object.name === 'module' &&
+    staticKey(object.property, object.computed) === 'exports';
+  return isExports || isModuleExports ? staticKey(node.property, node.computed) : undefined;
+}
+
 export const visitExportDefault: Visitor<NodeOf<'ExportDefaultDeclaration'>> = (node, context) => {
   if (node.declaration.type === 'Identifier') {
     const binding = lookup(context.scope, node.declaration.name);
