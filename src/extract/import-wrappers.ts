@@ -1,6 +1,8 @@
 import type { Node } from 'oxc-parser';
 
 import { childNodes, staticString, strip } from './ast.ts';
+import { findLoaderObjects } from './loader-objects.ts';
+import type { Loader } from './loader-objects.ts';
 
 export type ImportWrappers = {
   /** The literal specifier of each call of a followed wrapper, by call. */
@@ -11,6 +13,8 @@ export type ImportWrappers = {
   requireCalls: ReadonlyMap<Node, { specifier: string; caught: boolean }>;
   /** The `require('literal')` inside each such function. The calls stand for it. */
   requires: ReadonlySet<Node>;
+  /** The modules that a call of a function in an object of such functions may load, see `findLoaderObjects`. */
+  loaderCalls: ReadonlyMap<Node, readonly Loader[]>;
 };
 
 type Candidate = {
@@ -59,7 +63,7 @@ function givesNothing(statement: Node | undefined): boolean {
 }
 
 /** A function with no parameter that only returns `require('literal')`, with or without a `try` that returns nothing. */
-function requireWrapperOf(
+export function requireWrapperOf(
   fn: Node,
 ): { call: Node; specifier: string; caught: boolean } | undefined {
   if (!isFunctionNode(fn) || fn.params.length > 0) {
@@ -243,5 +247,10 @@ export function findImportWrappers(body: readonly Node[]): ImportWrappers {
       }
     }
   }
-  return result;
+  const loaders = findLoaderObjects(body, requireWrapperOf);
+  return {
+    ...result,
+    requires: new Set([...result.requires, ...loaders.requires]),
+    loaderCalls: loaders.calls,
+  };
 }

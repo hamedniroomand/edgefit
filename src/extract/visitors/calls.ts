@@ -109,20 +109,17 @@ function visitInherits(node: NodeOf<'CallExpression'>, context: VisitContext): b
   return true;
 }
 
-/** A call of a function that only returns a `require()` loads that module. The `require()` inside it records nothing. */
-function visitWrappedRequire(node: NodeOf<'CallExpression'>, context: VisitContext): boolean {
-  if (context.wrappers.requires.has(node)) {
-    return true;
-  }
-  const loaded = context.wrappers.requireCalls.get(node);
-  if (loaded === undefined) {
-    return false;
-  }
+/** Records the load of a module by a function that only returns a `require()` of it. */
+function recordRequired(
+  loaded: { specifier: string; caught: boolean },
+  offset: number,
+  context: VisitContext,
+): void {
   const module = builtinName(loaded.specifier);
   const record = (): void => {
-    context.collector.native(loaded.specifier, node.start);
+    context.collector.native(loaded.specifier, offset);
     if (module !== undefined) {
-      context.useRef(moduleRef(module), node.start);
+      context.useRef(moduleRef(module), offset);
     }
   };
   // The function has a `try` that stops the error of a module that is missing.
@@ -131,7 +128,22 @@ function visitWrappedRequire(node: NodeOf<'CallExpression'>, context: VisitConte
   } else {
     record();
   }
-  return true;
+}
+
+/**
+ * A call of a function that only returns a `require()` loads that module, and so does a call of
+ * one of the functions of an object of such functions. The `require()` inside them records nothing.
+ */
+function visitWrappedRequire(node: NodeOf<'CallExpression'>, context: VisitContext): boolean {
+  if (context.wrappers.requires.has(node)) {
+    return true;
+  }
+  const loaded = context.wrappers.requireCalls.get(node);
+  const several = context.wrappers.loaderCalls.get(node) ?? (loaded === undefined ? [] : [loaded]);
+  for (const load of several) {
+    recordRequired(load, node.start, context);
+  }
+  return loaded !== undefined || context.wrappers.loaderCalls.has(node);
 }
 
 export const visitCall: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
