@@ -159,7 +159,7 @@ describe('guarded findings', () => {
 
   it('are listed with --verbose', () => {
     const text = formatText(resultOf([], 0, [guarded]), { color: false, verbose: true });
-    expect(text).toContain('Guarded: the code checks for an API this target lacks');
+    expect(text).toContain('Guarded: the code checks for an API this target lacks or may lack');
     expect(text).toContain('guarded  unsupported  node:fs.watch');
     expect(text).toContain('0 errors, 0 warnings');
   });

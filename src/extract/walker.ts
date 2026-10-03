@@ -11,6 +11,7 @@ import {
   isFeatureCheck,
   isGlobalRoot,
   isMemberWrite,
+  isOptionalRead,
   writtenObject,
 } from './refs.ts';
 import { createScope } from './scope.ts';
@@ -127,7 +128,11 @@ export class Walker implements VisitContext {
       return;
     }
     const { node, parent } = chain;
-    if (isGlobalRoot(chain.ref) || (parent !== undefined && isFeatureCheck(node, parent))) {
+    if (
+      isGlobalRoot(chain.ref) ||
+      (parent !== undefined && isFeatureCheck(node, parent)) ||
+      isOptionalRead(node, parent)
+    ) {
       return;
     }
     if (parent !== undefined && isMemberWrite(node, parent)) {
