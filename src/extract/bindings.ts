@@ -5,7 +5,14 @@ import type { ApiRef } from '@/types.ts';
 
 import { staticKey, staticString, unwrap } from './ast.ts';
 import type { NodeOf } from './ast.ts';
-import { globalRef, isInteropHelper, memberRef, moduleRef } from './refs.ts';
+import {
+  globalAliases,
+  globalRef,
+  isGlobalRoot,
+  isInteropHelper,
+  memberRef,
+  moduleRef,
+} from './refs.ts';
 import { isTracked, lookup, lookupString } from './scope.ts';
 import type { Binding, Scope } from './scope.ts';
 
@@ -131,6 +138,15 @@ function resolveCall(node: NodeOf<'CallExpression'>, context: BindingContext): B
   return argument === undefined ? undefined : resolveBinding(argument, context);
 }
 
+/** Whether `node` is the global object under any of its names, even a name the target lacks. */
+function isGlobalObject(node: Node, context: BindingContext): boolean {
+  if (node.type === 'Identifier' && lookup(context.scope, node.name) === undefined) {
+    return node.name === 'window' || globalAliases.has(node.name);
+  }
+  const binding = resolveBinding(node, context);
+  return isTracked(binding) && isGlobalRoot(binding.ref);
+}
+
 /** What an expression evaluates to, as far as edgefit tracks it. Records nothing. */
 export function resolveBinding(node: Node, context: BindingContext): Binding | undefined {
   if (node.type === 'Identifier') {
@@ -147,6 +163,14 @@ export function resolveBinding(node: Node, context: BindingContext): Binding | u
   }
   if (node.type === 'CallExpression') {
     return resolveCall(node, context);
+  }
+  // `typeof window !== 'undefined' ? window : globalThis` is the global object either way.
+  if (
+    node.type === 'ConditionalExpression' &&
+    isGlobalObject(node.consequent, context) &&
+    isGlobalObject(node.alternate, context)
+  ) {
+    return tracked(globalRef('globalThis'));
   }
   if (node.type === 'ImportExpression') {
     const specifier = moduleSpecifier(node.source, context.scope);
