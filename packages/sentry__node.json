@@ -2,8 +2,8 @@
   "version": 1,
   "package": "@sentry/node",
   "resolved": "11.4.0",
-  "checkedAt": "2026-10-03T00:16:43.722Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:36:52.021Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -25,7 +25,7 @@
   "summary": {
     "workerd": "fail",
     "bun": "fail",
-    "deno": "error"
+    "deno": "warn"
   },
   "context": {
     "workerd": {
@@ -91,22 +91,22 @@
       "specifier": "@sentry/node/vite",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         },
         "bun": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         },
         "deno": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         }
       }
     },
@@ -115,22 +115,22 @@
       "specifier": "@sentry/node/rollup",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         },
         "bun": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         },
         "deno": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         }
       }
     },
@@ -139,22 +139,22 @@
       "specifier": "@sentry/node/webpack",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         },
         "bun": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         },
         "deno": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         }
       }
     },
@@ -163,22 +163,22 @@
       "specifier": "@sentry/node/esbuild",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         },
         "bun": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         },
         "deno": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/oxc-parser/src-js/wasm.js:1:15: Could not resolve \"@oxc-parser/binding-wasm32-wasip1\""
+          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
         }
       }
     }

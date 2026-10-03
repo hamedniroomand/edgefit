@@ -2,8 +2,8 @@
   "version": 1,
   "package": "koa",
   "resolved": "3.2.1",
-  "checkedAt": "2026-10-03T00:15:18.575Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:31:50.984Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,7 +23,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "warn",
+    "workerd": "pass",
     "bun": "warn",
     "deno": "warn"
   },
@@ -49,14 +49,14 @@
       "specifier": "koa",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "bun": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3
+          "warnings": 1
         },
         "deno": {
           "status": "warn",

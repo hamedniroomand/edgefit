@@ -2,8 +2,8 @@
   "version": 1,
   "package": "@upstash/redis",
   "resolved": "1.39.0",
-  "checkedAt": "2026-10-03T00:15:02.842Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:31:46.446Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,7 +23,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "warn",
+    "workerd": "pass",
     "bun": "pass",
     "deno": "pass"
   },
@@ -49,9 +49,9 @@
       "specifier": "@upstash/redis",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -70,9 +70,9 @@
       "specifier": "@upstash/redis/node",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -91,9 +91,9 @@
       "specifier": "@upstash/redis/cloudflare",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -112,9 +112,9 @@
       "specifier": "@upstash/redis/cloudflare.js",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -133,9 +133,9 @@
       "specifier": "@upstash/redis/cloudflare.mjs",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -154,9 +154,9 @@
       "specifier": "@upstash/redis/fastly",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -175,9 +175,9 @@
       "specifier": "@upstash/redis/fastly.js",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -196,9 +196,9 @@
       "specifier": "@upstash/redis/fastly.mjs",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",

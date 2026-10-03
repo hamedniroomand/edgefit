@@ -2,8 +2,8 @@
   "version": 1,
   "package": "lodash-es",
   "resolved": "4.18.1",
-  "checkedAt": "2026-10-03T00:15:02.365Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:31:38.759Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

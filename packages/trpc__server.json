@@ -2,8 +2,8 @@
   "version": 1,
   "package": "@trpc/server",
   "resolved": "11.19.0",
-  "checkedAt": "2026-10-03T00:15:08.750Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:31:47.371Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,9 @@
     "deno"
   ],
   "summary": {
-    "workerd": "error",
-    "bun": "error",
-    "deno": "error"
+    "workerd": "pass",
+    "bun": "pass",
+    "deno": "pass"
   },
   "context": {
     "workerd": {
@@ -154,22 +154,22 @@
       "specifier": "@trpc/server/adapters/next-app-dir",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/@trpc/server/dist/adapters/next-app-dir.mjs:4:33: Could not resolve \"next/navigation\""
+          "message": "needs \"next\", which the package does not declare"
         },
         "bun": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/@trpc/server/dist/adapters/next-app-dir.mjs:4:33: Could not resolve \"next/navigation\""
+          "message": "needs \"next\", which the package does not declare"
         },
         "deno": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/@trpc/server/dist/adapters/next-app-dir.mjs:4:33: Could not resolve \"next/navigation\""
+          "message": "needs \"next\", which the package does not declare"
         }
       }
     },

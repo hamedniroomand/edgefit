@@ -2,8 +2,8 @@
   "version": 1,
   "package": "@aws-sdk/client-s3",
   "resolved": "3.1146.0",
-  "checkedAt": "2026-10-03T00:16:20.708Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:33:32.526Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

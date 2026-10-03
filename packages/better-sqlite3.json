@@ -2,8 +2,8 @@
   "version": 1,
   "package": "better-sqlite3",
   "resolved": "13.0.3",
-  "checkedAt": "2026-10-03T00:15:33.187Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:32:49.106Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

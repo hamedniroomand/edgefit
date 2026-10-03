@@ -2,8 +2,8 @@
   "version": 1,
   "package": "elysia",
   "resolved": "1.4.30",
-  "checkedAt": "2026-10-03T00:15:06.421Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:31:49.567Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -24,7 +24,7 @@
   ],
   "summary": {
     "workerd": "warn",
-    "bun": "warn",
+    "bun": "pass",
     "deno": "warn"
   },
   "context": {
@@ -54,9 +54,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "warn",
@@ -138,9 +138,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "warn",
@@ -222,9 +222,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "warn",
@@ -285,9 +285,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "warn",
@@ -327,9 +327,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "warn",
@@ -474,9 +474,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "warn",
@@ -516,9 +516,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "warn",
@@ -537,9 +537,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "warn",

@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-03T00:17:04.475Z",
-  "edgefit": "0.9.0",
+  "generatedAt": "2026-10-03T08:37:15.421Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -59,18 +59,17 @@
       "resolved": "1.4.30",
       "summary": {
         "workerd": "warn",
-        "bun": "warn",
+        "bun": "pass",
         "deno": "warn"
       },
       "subpaths": 30,
       "main": {
         "workerd": "warn",
-        "bun": "warn",
+        "bun": "pass",
         "deno": "warn"
       },
       "decidedBy": {
         "workerd": ".",
-        "bun": ".",
         "deno": "."
       }
     },
@@ -85,7 +84,7 @@
       },
       "subpaths": 12,
       "main": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
@@ -228,9 +227,9 @@
       "file": "drizzle-orm",
       "resolved": "0.45.3",
       "summary": {
-        "workerd": "error",
-        "bun": "error",
-        "deno": "error"
+        "workerd": "warn",
+        "bun": "warn",
+        "deno": "warn"
       },
       "subpaths": 447,
       "main": {
@@ -239,9 +238,9 @@
         "deno": "pass"
       },
       "decidedBy": {
-        "workerd": "./expo-sqlite",
-        "bun": "./expo-sqlite",
-        "deno": "./expo-sqlite"
+        "workerd": "./better-sqlite3/driver",
+        "bun": "./better-sqlite3/driver",
+        "deno": "./better-sqlite3/driver"
       }
     },
     {
@@ -263,7 +262,8 @@
         "workerd": ".",
         "bun": ".",
         "deno": "."
-      }
+      },
+      "notes": "Needs a generated client; run `edgefit check` on a project after `prisma generate`."
     },
     {
       "name": "mysql2",
@@ -307,18 +307,15 @@
       "file": "upstash__redis",
       "resolved": "1.39.0",
       "summary": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 8,
       "main": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
-      },
-      "decidedBy": {
-        "workerd": "."
       }
     },
     {
@@ -514,18 +511,15 @@
       "file": "node-fetch",
       "resolved": "3.3.2",
       "summary": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
       "main": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
-      },
-      "decidedBy": {
-        "workerd": "."
       }
     },
     {
@@ -650,18 +644,17 @@
       "file": "koa",
       "resolved": "3.2.1",
       "summary": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "warn",
         "deno": "warn"
       },
       "subpaths": 1,
       "main": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "warn",
         "deno": "warn"
       },
       "decidedBy": {
-        "workerd": ".",
         "bun": ".",
         "deno": "."
       }
@@ -906,20 +899,15 @@
       "file": "trpc__server",
       "resolved": "11.19.0",
       "summary": {
-        "workerd": "error",
-        "bun": "error",
-        "deno": "error"
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 15,
       "main": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
-      },
-      "decidedBy": {
-        "workerd": "./adapters/next-app-dir",
-        "bun": "./adapters/next-app-dir",
-        "deno": "./adapters/next-app-dir"
       }
     },
     {
@@ -966,7 +954,7 @@
       "summary": {
         "workerd": "fail",
         "bun": "fail",
-        "deno": "error"
+        "deno": "warn"
       },
       "subpaths": 6,
       "main": {
@@ -977,7 +965,7 @@
       "decidedBy": {
         "workerd": ".",
         "bun": ".",
-        "deno": "./vite"
+        "deno": "."
       }
     },
     {
@@ -1002,7 +990,7 @@
     {
       "name": "mongoose",
       "file": "mongoose",
-      "resolved": "9.10.3",
+      "resolved": "9.10.4",
       "summary": {
         "workerd": "fail",
         "bun": "pass",
@@ -1062,19 +1050,15 @@
       "file": "redis",
       "resolved": "6.3.0",
       "summary": {
-        "workerd": "warn",
-        "bun": "warn",
+        "workerd": "pass",
+        "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
       "main": {
-        "workerd": "warn",
-        "bun": "warn",
+        "workerd": "pass",
+        "bun": "pass",
         "deno": "pass"
-      },
-      "decidedBy": {
-        "workerd": ".",
-        "bun": "."
       }
     },
     {
@@ -1140,19 +1124,15 @@
       "file": "resend",
       "resolved": "6.32.0",
       "summary": {
-        "workerd": "warn",
-        "bun": "warn",
+        "workerd": "pass",
+        "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
       "main": {
-        "workerd": "warn",
-        "bun": "warn",
+        "workerd": "pass",
+        "bun": "pass",
         "deno": "pass"
-      },
-      "decidedBy": {
-        "workerd": ".",
-        "bun": "."
       }
     },
     {
@@ -1266,20 +1246,15 @@
       "file": "ohash",
       "resolved": "2.0.12",
       "summary": {
-        "workerd": "warn",
-        "bun": "warn",
-        "deno": "warn"
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 3,
       "main": {
-        "workerd": "warn",
-        "bun": "warn",
-        "deno": "warn"
-      },
-      "decidedBy": {
-        "workerd": ".",
-        "bun": ".",
-        "deno": "."
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
       }
     },
     {
@@ -1319,20 +1294,15 @@
       "file": "tweetnacl",
       "resolved": "1.0.3",
       "summary": {
-        "workerd": "warn",
-        "bun": "warn",
-        "deno": "warn"
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
       },
       "subpaths": 1,
       "main": {
-        "workerd": "warn",
-        "bun": "warn",
-        "deno": "warn"
-      },
-      "decidedBy": {
-        "workerd": ".",
-        "bun": ".",
-        "deno": "."
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
       }
     },
     {

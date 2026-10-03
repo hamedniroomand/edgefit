@@ -2,8 +2,8 @@
   "version": 1,
   "package": "h3",
   "resolved": "2.0.1-rc.32",
-  "checkedAt": "2026-10-03T00:14:59.556Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:31:38.104Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -49,9 +49,9 @@
       "specifier": "h3",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -70,9 +70,9 @@
       "specifier": "h3/deno",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -91,9 +91,9 @@
       "specifier": "h3/bun",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -112,9 +112,9 @@
       "specifier": "h3/cloudflare",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -133,9 +133,9 @@
       "specifier": "h3/service-worker",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -156,7 +156,7 @@
         "workerd": {
           "status": "fail",
           "errors": 1,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -175,9 +175,9 @@
       "specifier": "h3/generic",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -217,9 +217,9 @@
       "specifier": "h3/rules",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -240,7 +240,7 @@
         "workerd": {
           "status": "warn",
           "errors": 0,
-          "warnings": 2
+          "warnings": 1
         },
         "bun": {
           "status": "warn",
@@ -259,9 +259,9 @@
       "specifier": "h3/rules/proxy",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -280,9 +280,9 @@
       "specifier": "h3/rules/compiler",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "bun": {
           "status": "pass",

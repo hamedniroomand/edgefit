@@ -2,8 +2,8 @@
   "version": 1,
   "package": "drizzle-orm",
   "resolved": "0.45.3",
-  "checkedAt": "2026-10-03T00:16:17.119Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:33:28.127Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,9 @@
     "deno"
   ],
   "summary": {
-    "workerd": "error",
-    "bun": "error",
-    "deno": "error"
+    "workerd": "warn",
+    "bun": "warn",
+    "deno": "warn"
   },
   "context": {
     "workerd": {
@@ -1015,22 +1015,22 @@
       "specifier": "drizzle-orm/expo-sqlite",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         },
         "bun": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         },
         "deno": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         }
       }
     },
@@ -1039,22 +1039,22 @@
       "specifier": "drizzle-orm/expo-sqlite/migrator",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/migrator.js:1:39: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         },
         "bun": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/migrator.js:1:39: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         },
         "deno": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/migrator.js:1:39: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         }
       }
     },
@@ -1063,22 +1063,22 @@
       "specifier": "drizzle-orm/expo-sqlite/query",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         },
         "bun": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         },
         "deno": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/expo-sqlite/query.js:2:37: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         }
       }
     },
@@ -2767,22 +2767,22 @@
       "specifier": "drizzle-orm/op-sqlite/migrator",
       "results": {
         "workerd": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/op-sqlite/migrator.js:1:39: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         },
         "bun": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/op-sqlite/migrator.js:1:39: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         },
         "deno": {
-          "status": "error",
+          "status": "unchecked",
           "errors": 0,
           "warnings": 0,
-          "message": "Could not resolve the module graph:\nnode_modules/drizzle-orm/op-sqlite/migrator.js:1:39: Could not resolve \"react\""
+          "message": "needs \"react\", which the package does not declare"
         }
       }
     },

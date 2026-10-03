@@ -2,8 +2,8 @@
   "version": 1,
   "package": "stripe",
   "resolved": "23.0.0",
-  "checkedAt": "2026-10-03T00:15:00.620Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:31:39.460Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

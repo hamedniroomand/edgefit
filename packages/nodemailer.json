@@ -2,8 +2,8 @@
   "version": 1,
   "package": "nodemailer",
   "resolved": "10.0.13",
-  "checkedAt": "2026-10-03T00:15:15.587Z",
-  "edgefit": "0.9.0",
+  "checkedAt": "2026-10-03T08:31:48.251Z",
+  "edgefit": "0.9.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
