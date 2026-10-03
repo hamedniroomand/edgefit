@@ -143,3 +143,14 @@ export function isFeatureCheck(node: Node, parent: Node): boolean {
   }
   return parent.type === 'LogicalExpression' && parent.operator === '&&' && parent.left === node;
 }
+
+const comparisonOperators = new Set(['==', '===', '!=', '!==']);
+
+/** Whether `node` is an operand of `==`, `===`, `!=` or `!==`, so only its identity is read. */
+export function isComparisonOperand(node: Node, parent: Node): boolean {
+  return (
+    parent.type === 'BinaryExpression' &&
+    comparisonOperators.has(parent.operator) &&
+    (parent.left === node || parent.right === node)
+  );
+}

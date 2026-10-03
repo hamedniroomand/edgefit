@@ -5,7 +5,7 @@ import type { ApiRef } from '@/types.ts';
 import { childNodes, isTypeOnly } from './ast.ts';
 import { followChain } from './chain.ts';
 import type { VisitContext } from './context.ts';
-import { displayRef, escapes, isFeatureCheck, isGlobalRoot } from './refs.ts';
+import { displayRef, escapes, isComparisonOperand, isFeatureCheck, isGlobalRoot } from './refs.ts';
 import { createScope } from './scope.ts';
 import type { Scope } from './scope.ts';
 import type { UsageCollector } from './usage-collector.ts';
@@ -105,8 +105,15 @@ export class Walker implements VisitContext {
       if (!isGlobalRoot(chain.ref)) {
         this.collector.api(chain.ref, chain.offset);
       }
-      // `typeof x[key]` only tests for a member, so there is nothing to follow.
-      if (chain.memberParent === undefined || !isFeatureCheck(chain.member, chain.memberParent)) {
+      // `typeof x[key]` only tests for a member, and a global that is only compared is the same
+      // value or `undefined`, so there is nothing to follow.
+      if (
+        chain.memberParent === undefined ||
+        !(
+          isFeatureCheck(chain.member, chain.memberParent) ||
+          (isGlobalRoot(chain.ref) && isComparisonOperand(chain.member, chain.memberParent))
+        )
+      ) {
         this.collector.dynamic(
           chain.ref,
           `${displayRef(chain.ref)}[<expression>]`,
