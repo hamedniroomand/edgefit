@@ -64,26 +64,9 @@ function keepPrevious(name, file, error) {
   return true;
 }
 
-function entryColumns(entries, summary) {
-  const main = entries.find(entry => entry.subpath === '.');
-  const decidedBy = {};
-  for (const [target, status] of Object.entries(summary)) {
-    // The first subpath with the worst status decides it.
-    const decider = entries.find(entry => entry.results[target]?.status === status);
-    if (status !== 'pass' && decider !== undefined) {
-      decidedBy[target] = decider.subpath;
-    }
-  }
-  return {
-    ...(main === undefined
-      ? {}
-      : {
-          main: Object.fromEntries(
-            Object.entries(main.results).map(([target, result]) => [target, result.status]),
-          ),
-        }),
-    ...(Object.keys(decidedBy).length === 0 ? {} : { decidedBy }),
-  };
+/** The worst entry of each target, where it is worse than the result of the target. */
+function worstColumns(worst) {
+  return worst === undefined || Object.keys(worst).length === 0 ? {} : { worst };
 }
 
 let sample;
@@ -117,14 +100,14 @@ for (const { name } of readList()) {
     resolved: result.resolved,
     summary: result.summary,
     subpaths: result.entries.length,
-    ...(result.error === undefined ? entryColumns(result.entries, result.summary) : {}),
+    ...(result.error === undefined ? worstColumns(result.worst) : {}),
     ...(result.error === undefined ? {} : { error: result.error }),
     ...(result.notes === undefined ? {} : { notes: result.notes }),
   });
 }
 
 const results = {
-  version: 1,
+  version: 2,
   generatedAt: new Date().toISOString(),
   edgefit: sample?.edgefit,
   data: sample?.data ?? {},

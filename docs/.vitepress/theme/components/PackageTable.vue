@@ -9,8 +9,7 @@
     file: string;
     resolved: string | null;
     summary: Record<string, Status>;
-    main?: Record<string, Status>;
-    decidedBy?: Record<string, string>;
+    worst?: Record<string, { subpath: string; status: Status }>;
     subpaths: number;
     error?: string;
     notes?: string;
@@ -98,20 +97,12 @@
     }
   }
 
-  function mainDiffers(row: Row, key: string): boolean {
-    return row.main?.[key] !== undefined && row.main[key] !== row.summary[key];
-  }
-
   function cellTitle(row: Row, key: string): string {
-    const main = row.main?.[key];
-    const decider = row.decidedBy?.[key];
     const overall = row.summary[key];
     const parts = [`${key}: ${overall ? words[overall] : ''}`];
-    if (decider !== undefined) {
-      parts.push(`decided by ${decider}`);
-    }
-    if (main !== undefined && mainDiffers(row, key)) {
-      parts.push(`main entry ${words[main]}`);
+    const worst = row.worst?.[key];
+    if (worst !== undefined) {
+      parts.push(`worst subpath ${worst.subpath} ${words[worst.status]}`);
     }
     return parts.join(', ');
   }
@@ -165,9 +156,9 @@
         <a :href="withBase('/guide/packages')">What a pass means</a>
       </p>
       <p class="ef-packages-legend">
-        A target with two marks shows the main entry first and the worst subpath second, smaller. A
-        target with one mark has the same result for both. The status filter and the sort use the
-        worst result.
+        The first mark is the result of the main entry, which is what an import of the package gets.
+        A second, smaller mark is the worst subpath, when it is worse. The status filter and the
+        sort use the first mark. A package without a main entry shows its worst subpath.
       </p>
       <div class="ef-packages-controls">
         <input
@@ -254,17 +245,13 @@
                 :title="cellTitle(row, key)"
               >
                 <template v-if="row.summary[key]">
+                  <span :class="`ef-status-${row.summary[key]}`">{{
+                    symbols[row.summary[key]]
+                  }}</span>
                   <span
-                    v-if="mainDiffers(row, key)"
-                    :class="`ef-status-${row.main[key]}`"
-                    >{{ symbols[row.main[key]] }}</span
-                  >
-                  <span
-                    :class="[
-                      `ef-status-${row.summary[key]}`,
-                      { 'ef-worst': mainDiffers(row, key) },
-                    ]"
-                    >{{ symbols[row.summary[key]] }}</span
+                    v-if="row.worst?.[key]"
+                    :class="[`ef-status-${row.worst[key].status}`, 'ef-worst']"
+                    >{{ symbols[row.worst[key].status] }}</span
                   >
                 </template>
               </td>

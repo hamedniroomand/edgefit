@@ -117,7 +117,7 @@ edgefit check --format json
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "package": "@scope/name",
   "resolved": "2.3.1",
   "checkedAt": "2026-09-30T12:00:00.000Z",
@@ -125,6 +125,7 @@ edgefit check --format json
   "data": { "workerd": "1.20260929.1", "bun": "1.4.2", "deno": "2.9.7" },
   "targets": ["workerd", "bun", "deno"],
   "summary": { "workerd": "pass", "bun": "pass", "deno": "warn" },
+  "worst": { "workerd": { "subpath": "./node", "status": "fail" } },
   "context": { "workerd": { "settings": "compatibility_date …", "notes": [] } },
   "entries": [
     {
@@ -136,9 +137,9 @@ edgefit check --format json
 }
 ```
 
-`status` is `pass`, `warn` (warnings only), `fail` (an error) or `error` (the entry could not be checked, with a `message`). `resolved` is the installed version, never the requested range. `summary` is each target's worst status.
+`status` is `pass`, `warn` (warnings only), `fail` (an error), `error` (the entry could not be checked, with a `message`) or `unchecked` (the entry needs a module that the package does not declare, with a `message`). `summary` is the status of the main entry for each target, or of the worst entry for a package without a checked main entry. `worst` names the worst entry of a target, and is only there when it is worse than `summary`. `resolved` is the installed version, never the requested range. `summary` is each target's worst status.
 
-The table's `results.json` lists one row per package with `name`, `file`, `resolved`, `summary`, `subpaths`, and `error` when the package could not be installed or checked.
+The table's `results.json` lists one row per package with `name`, `file`, `resolved`, `summary`, `worst`, `subpaths`, and `error` when the package could not be installed or checked.
 
 ## diff
 
