@@ -18,6 +18,8 @@ A subpath passes when there are no findings, warns when there are only warnings,
 
 The result of a target is the result of the main entry (`.`), because that is what an import of the package gets. When a subpath is worse, `edgefit package` names it on a `worst subpath` line, and the [package table](/packages/) shows it as a second, smaller mark, and names it in the tooltip of the cell. The row detail lists the subpaths that are not a pass, with their finding counts. The status filter and the sort of the table use the result of the main entry. A package without a main entry, or whose main entry could not be checked, takes the worst subpath.
 
+A package that has no `.` entry, such as `firebase`, can name the subpath that stands for it: `edgefit package firebase --main ./app`. The result of a target then comes from that subpath, `edgefit package` prints `main entry: ./app`, and the worst subpath is still named when it is worse. A row of the table does the same with a `main` field in `table/packages.json`. The subpath has to be one that is checked, so it cannot be one that `--skip` or `--export` leaves out.
+
 ## What a pass means
 
 A static check found no API that the target lacks or stubs, in code reachable from the package's public entry points with every export used. It was checked against [pinned data](/guide/status), for the resolved version on the check date.

@@ -100,6 +100,7 @@ for (const { name } of readList()) {
     resolved: result.resolved,
     summary: result.summary,
     subpaths: result.entries.length,
+    ...(result.error === undefined && result.main !== undefined ? { main: result.main } : {}),
     ...(result.error === undefined ? worstColumns(result.worst) : {}),
     ...(result.error === undefined ? {} : { error: result.error }),
     ...(result.notes === undefined ? {} : { notes: result.notes }),

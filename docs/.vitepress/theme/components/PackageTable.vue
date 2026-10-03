@@ -9,6 +9,7 @@
     file: string;
     resolved: string | null;
     summary: Record<string, Status>;
+    main?: string;
     worst?: Record<string, { subpath: string; status: Status }>;
     subpaths: number;
     error?: string;
@@ -100,6 +101,9 @@
   function cellTitle(row: Row, key: string): string {
     const overall = row.summary[key];
     const parts = [`${key}: ${overall ? words[overall] : ''}`];
+    if (row.main !== undefined) {
+      parts.push(`main entry ${row.main}`);
+    }
     const worst = row.worst?.[key];
     if (worst !== undefined) {
       parts.push(`worst subpath ${worst.subpath} ${words[worst.status]}`);
@@ -171,7 +175,8 @@
       <p class="ef-packages-legend">
         The first mark is the result of the main entry, which is what an import of the package gets.
         A second, smaller mark is the worst subpath, when it is worse. The status filter and the
-        sort use the first mark. A package without a main entry shows its worst subpath.
+        sort use the first mark. A package without a main entry shows its worst subpath, unless its
+        row names the subpath that stands for it.
       </p>
       <div class="ef-packages-controls">
         <input

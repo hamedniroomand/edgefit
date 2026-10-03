@@ -30,6 +30,9 @@ readList().forEach((entry, position) => {
   for (const subpath of entry.skip ?? []) {
     args.push('--skip', subpath);
   }
+  if (entry.main !== undefined) {
+    args.push('--main', entry.main);
+  }
   const run = spawnSync(process.execPath, args, { encoding: 'utf8', timeout: timeoutMs });
   let result;
   try {

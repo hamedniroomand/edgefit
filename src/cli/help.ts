@@ -47,6 +47,7 @@ Usage for package: edgefit package <name[@version]|dir|file.tgz> [options]
   --target <name>    Target runtime (repeatable). Default: ${compareTargetKeys.join(', ')}
   --export <subpath> Check only this \`exports\` subpath, e.g. ./client (repeatable)
   --skip <subpath>   Leave out this subpath (repeatable)
+  --main <subpath>   The subpath that decides the result, for a package without a . entry
   --badge <file>     Also write a badge SVG
   --registry <url>   npm registry to install from
   --keep             Keep the temporary project for debugging

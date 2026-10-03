@@ -37,6 +37,8 @@ export interface PackageResult {
   /** Runtime versions of the pinned data, from `data/source.json`. */
   data: Record<string, string>;
   targets: TargetKey[];
+  /** The subpath that decides each target when the package has no `.` entry, or when the caller names one. Left out otherwise. */
+  main?: string;
   /** Each target's status: the main entry (`.`), or the worst entry for a package without one. */
   summary: Partial<Record<TargetKey, PackageStatus>>;
   /** The worst entry of a target, when it is worse than the main entry that decides the target. */
@@ -76,19 +78,21 @@ export function summaryOf(statuses: readonly PackageStatus[]): PackageStatus {
 
 /**
  * The result of one target. The main entry decides it, because that is what an import of the
- * package gets. A package without a main entry, or with one that was not checked, takes the worst
- * entry. `worst` names the worst entry when it is worse than the result.
+ * package gets: `.`, or the subpath that the caller names with `main`. A package without a main
+ * entry, or with one that was not checked, takes the worst entry. `worst` names the worst entry
+ * when it is worse than the result.
  */
 export function targetResult(
   entries: readonly PackageEntryResult[],
   key: TargetKey,
+  mainSubpath = '.',
 ): { status: PackageStatus; worst?: WorstEntry } {
   const found = entries.flatMap(entry => {
     const status = entry.results[key]?.status;
     return status === undefined ? [] : [{ subpath: entry.subpath, status }];
   });
   const all = summaryOf(found.map(item => item.status));
-  const main = found.find(item => item.subpath === '.');
+  const main = found.find(item => item.subpath === mainSubpath);
   if (main === undefined || main.status === 'unchecked') {
     return { status: all };
   }
@@ -102,11 +106,12 @@ export function targetResult(
 export function summarize(
   entries: readonly PackageEntryResult[],
   targets: readonly TargetKey[],
+  mainSubpath?: string,
 ): Pick<PackageResult, 'summary' | 'worst'> {
   const summary: PackageResult['summary'] = {};
   const worst: NonNullable<PackageResult['worst']> = {};
   for (const key of targets) {
-    const decided = targetResult(entries, key);
+    const decided = targetResult(entries, key, mainSubpath);
     summary[key] = decided.status;
     if (decided.worst !== undefined) {
       worst[key] = decided.worst;

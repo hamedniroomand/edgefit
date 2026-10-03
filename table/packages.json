@@ -159,7 +159,9 @@
       "name": "@supabase/supabase-js"
     },
     {
-      "name": "firebase"
+      "name": "firebase",
+      "main": "./app",
+      "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin."
     },
     {
       "name": "@sentry/node"

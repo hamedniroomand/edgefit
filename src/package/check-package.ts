@@ -7,6 +7,7 @@ import type { TargetKey } from '@/types.ts';
 
 import { checkEntry, inSequence } from './check-entry.ts';
 import { packageEntries } from './entry.ts';
+import type { PackageEntry } from './entry.ts';
 import { packageResultVersion, summarize } from './result.ts';
 import type { PackageResult } from './result.ts';
 import { parsePackageSpec } from './spec.ts';
@@ -20,10 +21,26 @@ export interface CheckPackageOptions {
   subpaths?: readonly string[];
   /** Subpaths to leave out. */
   skip?: readonly string[];
+  /** The subpath that decides the result of each target, for a package that has no `.` entry. */
+  main?: string;
   registry?: string;
   /** Keep the temporary project, and report where it is through `onKeep`. */
   keep?: boolean;
   onKeep?: (directory: string) => void;
+}
+
+/** The subpath that the caller names as the main entry has to be one of the entries to check. */
+function assertMain(
+  name: string,
+  entries: readonly PackageEntry[],
+  main: string | undefined,
+): void {
+  if (main !== undefined && !entries.some(entry => entry.subpath === main)) {
+    throw new EdgefitError(
+      `${name} has no checked entry ${main} to use as the main entry.`,
+      `Use one of: ${entries.map(entry => entry.subpath).join(', ')}.`,
+    );
+  }
 }
 
 /**
@@ -55,6 +72,7 @@ export async function checkPackage(
         options.subpaths === undefined ? undefined : 'Check the --export subpaths.',
       );
     }
+    assertMain(workspace.name, entries, options.main);
     const context: PackageResult['context'] = {};
     const rows = await inSequence(entries, async (entry, index) => {
       const row = await checkEntry(workspace.root, entry, index, targets, context);
@@ -68,7 +86,8 @@ export async function checkPackage(
       edgefit: manifest.version,
       data: readRuntimeVersions(),
       targets,
-      ...summarize(rows, targets),
+      ...(options.main === undefined ? {} : { main: options.main }),
+      ...summarize(rows, targets, options.main),
       context,
       entries: rows,
     };

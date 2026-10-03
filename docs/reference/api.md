@@ -58,7 +58,7 @@ Installs a package without running it and checks each public entry point. Return
 function checkPackage(spec: string, options?: CheckPackageOptions): Promise<PackageResult>;
 ```
 
-`spec` is what `edgefit package` takes. The options are `targets`, `subpaths`, `skip`, `registry` and `keep`. `renderBadge(result, { target? })`, `badgeMessage` and `shieldsEndpoint` build the badge from a result.
+`spec` is what `edgefit package` takes. The options are `targets`, `subpaths`, `skip`, `main`, `registry` and `keep`. `main` names the subpath that decides the result of each target, for a package without a `.` entry. `renderBadge(result, { target? })`, `badgeMessage` and `shieldsEndpoint` build the badge from a result.
 
 ## loadConfig(root, file?)
 

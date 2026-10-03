@@ -15,6 +15,9 @@ export function readList(
     } else if (seen.has(entry.name)) {
       problems.push(`listed twice: ${entry.name}`);
     }
+    if (entry.main !== undefined && !/^\.\/\S+$/u.test(entry.main)) {
+      problems.push(`main is not a subpath of ${entry.name}: ${JSON.stringify(entry.main)}`);
+    }
     seen.add(entry.name);
   }
   if (problems.length > 0) {
