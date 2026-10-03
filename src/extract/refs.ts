@@ -3,6 +3,8 @@ import type { Node } from 'oxc-parser';
 import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef } from '@/types.ts';
 
+import { strip } from './ast.ts';
+
 export const globalAliases = new Set(['global', 'globalThis', 'self']);
 
 // Helpers that wrap `require()` results in Babel, TypeScript, esbuild and Rollup output.
@@ -142,4 +144,17 @@ export function isFeatureCheck(node: Node, parent: Node): boolean {
     return parent.test === node;
   }
   return parent.type === 'LogicalExpression' && parent.operator === '&&' && parent.left === node;
+}
+
+/**
+ * Whether `node` ends in `a?.b` and its value is not called as `a?.b()`. Such a read gives
+ * `undefined` when `b` is missing, so it checks for `b` and does not use it.
+ */
+export function isOptionalRead(node: Node, parent: Node | undefined): boolean {
+  const member = strip(node);
+  return (
+    member.type === 'MemberExpression' &&
+    member.optional &&
+    !(parent?.type === 'CallExpression' && parent.callee === node && !parent.optional)
+  );
 }

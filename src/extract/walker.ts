@@ -5,7 +5,7 @@ import type { ApiRef } from '@/types.ts';
 import { childNodes, isTypeOnly } from './ast.ts';
 import { followChain } from './chain.ts';
 import type { VisitContext } from './context.ts';
-import { displayRef, escapes, isFeatureCheck, isGlobalRoot } from './refs.ts';
+import { displayRef, escapes, isFeatureCheck, isGlobalRoot, isOptionalRead } from './refs.ts';
 import { createScope } from './scope.ts';
 import type { Scope } from './scope.ts';
 import type { UsageCollector } from './usage-collector.ts';
@@ -117,7 +117,11 @@ export class Walker implements VisitContext {
       return;
     }
     const { node, parent } = chain;
-    if (isGlobalRoot(chain.ref) || (parent !== undefined && isFeatureCheck(node, parent))) {
+    if (
+      isGlobalRoot(chain.ref) ||
+      (parent !== undefined && isFeatureCheck(node, parent)) ||
+      isOptionalRead(node, parent)
+    ) {
       return;
     }
     if (recordBare || chain.extended) {

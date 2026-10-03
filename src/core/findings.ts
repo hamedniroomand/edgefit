@@ -98,7 +98,8 @@ function isIgnored(finding: Finding, rules: readonly IgnoreRule[]): boolean {
 
 /**
  * Drops `node:fs` when the same file also has a finding for a member such as `node:fs.watch`,
- * so an unsupported module is not reported twice for one use.
+ * so an unsupported module is not reported twice for one use. A guarded member hides the module
+ * only when the module is unknown, because the data says nothing about either.
  */
 function withoutRedundantModules(findings: readonly Finding[]): Finding[] {
   return findings.filter(
@@ -108,7 +109,7 @@ function withoutRedundantModules(findings: readonly Finding[]): Finding[] {
           other !== finding &&
           other.location.file === finding.location.file &&
           other.category === finding.category &&
-          (other.guarded !== true || finding.guarded === true) &&
+          (other.guarded !== true || finding.guarded === true || finding.category === 'unknown') &&
           other.api.startsWith(`${finding.api}.`),
       ),
   );
@@ -172,7 +173,8 @@ function toFinding(
   const target: TargetKey = options.target.info.key;
   const unreached = unreachedFor(module, usage, options);
   const guarded =
-    (usage.guarded === true && classification.absent) ||
+    (usage.guarded === true &&
+      (classification.absent || (usage.kind === 'api' && classification.category === 'unknown'))) ||
     isOtherRuntime(usage, options.target) ||
     isShadowedPolyfill(usage, options.target) ||
     unreached !== undefined;
@@ -190,7 +192,8 @@ function toFinding(
     chain: module.chain,
     ...(classification.source === undefined ? {} : { source: classification.source }),
     ...(suggestion === undefined ? {} : { suggestion }),
-    // A check only protects code from an API the target lacks; one that exists and throws still fails.
+    // A check only protects code from an API the target lacks, or may lack when the data does not say.
+    // One that exists and throws still fails.
     // Code that only runs on another runtime is never reached, whatever it uses.
     ...(guarded ? { guarded: true as const } : {}),
     ...(unreached === undefined
