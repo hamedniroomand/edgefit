@@ -3,6 +3,8 @@ import type { Node } from 'oxc-parser';
 import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef } from '@/types.ts';
 
+import { unwrap } from './ast.ts';
+
 export const globalAliases = new Set(['global', 'globalThis', 'self']);
 
 // Helpers that wrap `require()` results in Babel, TypeScript, esbuild and Rollup output.
@@ -106,8 +108,19 @@ function isThisArgument(node: Node, call: Node): boolean {
   );
 }
 
-/** Whether a value flows somewhere edgefit does not follow, such as a call argument or a return. */
-export function escapes(node: Node, parent: Node): boolean {
+/**
+ * Whether a value flows somewhere edgefit does not follow, such as a call argument or a return.
+ * `outer` holds the ancestors above `parent`, nearest first. The last value of a sequence goes where the
+ * sequence goes, so `(0, ns.fn)()` calls `ns.fn`.
+ */
+export function escapes(node: Node, parent: Node, outer: readonly Node[] = []): boolean {
+  const [grand, ...rest] = outer;
+  const passesOn =
+    unwrap(parent) === node ||
+    (parent.type === 'SequenceExpression' && parent.expressions.at(-1) === node);
+  if (passesOn && grand !== undefined) {
+    return escapes(parent, grand, rest);
+  }
   if (parent.type === 'CallExpression') {
     return parent.callee !== node && !isThisArgument(node, parent);
   }

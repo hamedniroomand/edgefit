@@ -99,6 +99,10 @@ export class Walker implements VisitContext {
     }
   };
 
+  /** The ancestors above the parent of `node`, nearest first. */
+  readonly #outer = (node: Node): Node[] =>
+    this.#stack.slice(0, this.#stack.lastIndexOf(node) - 1).reverse();
+
   public readonly useRef = (ref: ApiRef, offset: number, recordBare = true): void => {
     const chain = followChain(this.#stack, ref, offset, this.#scope);
     if (chain.kind === 'computed') {
@@ -125,7 +129,12 @@ export class Walker implements VisitContext {
     }
     // Globals are reachable from any code, so passing one on hides nothing new.
     const fromGlobal = chain.ref.module === '*globals*';
-    if (!fromGlobal && parent !== undefined && this.#boundInit !== node && escapes(node, parent)) {
+    if (
+      !fromGlobal &&
+      parent !== undefined &&
+      this.#boundInit !== node &&
+      escapes(node, parent, this.#outer(node))
+    ) {
       this.collector.dynamic(
         chain.ref,
         displayRef(chain.ref),
