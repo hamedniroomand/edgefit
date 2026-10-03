@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "@anthropic-ai/sdk",
   "resolved": "0.131.0",
-  "checkedAt": "2026-10-03T08:31:47.035Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:39:44.992Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -24,8 +24,18 @@
   ],
   "summary": {
     "workerd": "pass",
-    "bun": "warn",
-    "deno": "warn"
+    "bun": "pass",
+    "deno": "pass"
+  },
+  "worst": {
+    "bun": {
+      "subpath": "./client.js",
+      "status": "warn"
+    },
+    "deno": {
+      "subpath": "./client.js",
+      "status": "warn"
+    }
   },
   "context": {
     "workerd": {
@@ -54,14 +64,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0
         }
       }
     },
@@ -138,14 +148,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0
         }
       }
     },
@@ -180,14 +190,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0
         }
       }
     },
@@ -264,14 +274,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0
         }
       }
     },
@@ -306,14 +316,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0
         }
       }
     },
@@ -453,14 +463,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0
         }
       }
     },
@@ -495,14 +505,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0
         }
       }
     },
@@ -705,14 +715,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0
         }
       }
     },

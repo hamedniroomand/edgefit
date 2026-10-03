@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "@trpc/server",
   "resolved": "11.19.0",
-  "checkedAt": "2026-10-03T08:31:47.371Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:39:35.627Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

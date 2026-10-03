@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "kysely",
   "resolved": "0.29.6",
-  "checkedAt": "2026-10-03T08:32:23.520Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:40:18.084Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,23 @@
     "deno"
   ],
   "summary": {
-    "workerd": "warn",
-    "bun": "warn",
-    "deno": "warn"
+    "workerd": "pass",
+    "bun": "pass",
+    "deno": "pass"
+  },
+  "worst": {
+    "workerd": {
+      "subpath": "./migration",
+      "status": "warn"
+    },
+    "bun": {
+      "subpath": "./migration",
+      "status": "warn"
+    },
+    "deno": {
+      "subpath": "./migration",
+      "status": "warn"
+    }
   },
   "context": {
     "workerd": {

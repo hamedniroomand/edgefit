@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "zustand",
   "resolved": "5.0.15",
-  "checkedAt": "2026-10-03T08:31:51.947Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:39:51.808Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,9 @@
     "deno"
   ],
   "summary": {
-    "workerd": "warn",
-    "bun": "warn",
-    "deno": "warn"
+    "workerd": "pass",
+    "bun": "pass",
+    "deno": "pass"
   },
   "context": {
     "workerd": {
@@ -49,19 +49,28 @@
       "specifier": "zustand",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer react not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer react not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer react not installed, checked in your project"
+          ]
         }
       }
     }

@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "winston",
   "resolved": "3.19.0",
-  "checkedAt": "2026-10-03T08:32:00.526Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:39:49.059Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -25,7 +25,7 @@
   "summary": {
     "workerd": "pass",
     "bun": "pass",
-    "deno": "fail"
+    "deno": "pass"
   },
   "context": {
     "workerd": {
@@ -59,8 +59,8 @@
           "warnings": 0
         },
         "deno": {
-          "status": "fail",
-          "errors": 1,
+          "status": "pass",
+          "errors": 0,
           "warnings": 0
         }
       }

@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "marked",
   "resolved": "18.0.14",
-  "checkedAt": "2026-10-03T08:31:43.518Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:39:31.442Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,23 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
-    "bun": "warn",
-    "deno": "warn"
+    "workerd": "pass",
+    "bun": "pass",
+    "deno": "pass"
+  },
+  "worst": {
+    "workerd": {
+      "subpath": "./bin/marked",
+      "status": "fail"
+    },
+    "bun": {
+      "subpath": "./bin/marked",
+      "status": "warn"
+    },
+    "deno": {
+      "subpath": "./bin/marked",
+      "status": "warn"
+    }
   },
   "context": {
     "workerd": {

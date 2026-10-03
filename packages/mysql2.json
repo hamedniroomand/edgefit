@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "mysql2",
   "resolved": "3.24.5",
-  "checkedAt": "2026-10-03T08:31:37.589Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:39:24.727Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,7 +23,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
+    "workerd": "warn",
     "bun": "warn",
     "deno": "warn"
   },
@@ -49,8 +49,8 @@
       "specifier": "mysql2",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 1,
+          "status": "warn",
+          "errors": 0,
           "warnings": 2
         },
         "bun": {
@@ -70,8 +70,8 @@
       "specifier": "mysql2/promise",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 1,
+          "status": "warn",
+          "errors": 0,
           "warnings": 1
         },
         "bun": {
@@ -91,8 +91,8 @@
       "specifier": "mysql2/promise.js",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 1,
+          "status": "warn",
+          "errors": 0,
           "warnings": 1
         },
         "bun": {

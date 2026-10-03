@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "mongodb",
   "resolved": "7.7.0",
-  "checkedAt": "2026-10-03T08:31:47.954Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:39:37.539Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,7 +23,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
+    "workerd": "warn",
     "bun": "pass",
     "deno": "pass"
   },
@@ -49,8 +49,8 @@
       "specifier": "mongodb",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 1,
+          "status": "warn",
+          "errors": 0,
           "warnings": 2
         },
         "bun": {

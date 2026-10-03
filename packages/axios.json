@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "axios",
   "resolved": "1.20.0",
-  "checkedAt": "2026-10-03T08:31:49.901Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:39:49.278Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,15 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
+    "workerd": "pass",
     "bun": "pass",
     "deno": "warn"
+  },
+  "worst": {
+    "workerd": {
+      "subpath": "./lib/adapters/http.js",
+      "status": "fail"
+    }
   },
   "context": {
     "workerd": {

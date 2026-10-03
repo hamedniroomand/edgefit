@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "firebase",
   "resolved": "12.19.0",
-  "checkedAt": "2026-10-03T08:32:09.334Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:40:17.278Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -54,9 +54,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -75,9 +75,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -96,9 +96,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -117,9 +117,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -138,9 +138,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -159,9 +159,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -180,9 +180,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -201,9 +201,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -222,9 +222,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "fail",
@@ -243,9 +243,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "fail",
@@ -264,9 +264,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -285,9 +285,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -306,9 +306,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -327,9 +327,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -348,9 +348,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -371,7 +371,7 @@
         "bun": {
           "status": "warn",
           "errors": 0,
-          "warnings": 2
+          "warnings": 1
         },
         "deno": {
           "status": "warn",
@@ -390,14 +390,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -411,9 +411,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -432,9 +432,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -453,9 +453,9 @@
           "warnings": 1
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -474,9 +474,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -495,9 +495,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -516,9 +516,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -537,9 +537,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -558,9 +558,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -579,9 +579,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "fail",
@@ -600,9 +600,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -621,9 +621,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -644,7 +644,7 @@
         "bun": {
           "status": "warn",
           "errors": 0,
-          "warnings": 2
+          "warnings": 1
         },
         "deno": {
           "status": "warn",
@@ -663,14 +663,14 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 2
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     },
@@ -684,9 +684,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -705,9 +705,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "pass",

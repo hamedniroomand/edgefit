@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "h3",
-  "resolved": "2.0.1-rc.32",
-  "checkedAt": "2026-10-03T08:31:38.104Z",
-  "edgefit": "0.9.1",
+  "resolved": "2.0.1-rc.33",
+  "checkedAt": "2026-10-03T11:39:29.384Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,15 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
-    "bun": "warn",
-    "deno": "warn"
+    "workerd": "pass",
+    "bun": "pass",
+    "deno": "pass"
+  },
+  "worst": {
+    "workerd": {
+      "subpath": "./node",
+      "status": "fail"
+    }
   },
   "context": {
     "workerd": {
@@ -238,19 +244,28 @@
       "specifier": "h3/rules/cache",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer ocache not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer ocache not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer ocache not installed, checked in your project"
+          ]
         }
       }
     },

@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "sqlite3",
   "resolved": "6.0.1",
-  "checkedAt": "2026-10-03T08:31:58.833Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:39:47.217Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "ky",
   "resolved": "2.1.0",
-  "checkedAt": "2026-10-03T08:33:35.121Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:41:34.122Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

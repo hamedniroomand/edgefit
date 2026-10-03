@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "better-sqlite3",
   "resolved": "13.0.3",
-  "checkedAt": "2026-10-03T08:32:49.106Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:40:28.137Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,15 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
+    "workerd": "warn",
     "bun": "warn",
     "deno": "warn"
+  },
+  "worst": {
+    "workerd": {
+      "subpath": "./linux-x64",
+      "status": "fail"
+    }
   },
   "context": {
     "workerd": {

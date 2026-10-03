@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "drizzle-orm",
   "resolved": "0.45.3",
-  "checkedAt": "2026-10-03T08:33:28.127Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:41:25.981Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,9 @@
     "deno"
   ],
   "summary": {
-    "workerd": "warn",
-    "bun": "warn",
-    "deno": "warn"
+    "workerd": "pass",
+    "bun": "pass",
+    "deno": "pass"
   },
   "context": {
     "workerd": {
@@ -574,19 +574,28 @@
       "specifier": "drizzle-orm/better-sqlite3/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer better-sqlite3 not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer better-sqlite3 not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer better-sqlite3 not installed, checked in your project"
+          ]
         }
       }
     },
@@ -595,19 +604,28 @@
       "specifier": "drizzle-orm/better-sqlite3",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer better-sqlite3 not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer better-sqlite3 not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer better-sqlite3 not installed, checked in your project"
+          ]
         }
       }
     },
@@ -1108,19 +1126,28 @@
       "specifier": "drizzle-orm/gel/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer gel not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer gel not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer gel not installed, checked in your project"
+          ]
         }
       }
     },
@@ -1129,19 +1156,28 @@
       "specifier": "drizzle-orm/gel",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer gel not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer gel not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer gel not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2137,19 +2173,28 @@
       "specifier": "drizzle-orm/mysql2/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2158,19 +2203,28 @@
       "specifier": "drizzle-orm/mysql2",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2242,19 +2296,28 @@
       "specifier": "drizzle-orm/libsql/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2263,19 +2326,28 @@
       "specifier": "drizzle-orm/libsql",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2389,19 +2461,28 @@
       "specifier": "drizzle-orm/neon-http/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2410,19 +2491,28 @@
       "specifier": "drizzle-orm/neon-http",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2473,19 +2563,28 @@
       "specifier": "drizzle-orm/neon-serverless/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2494,19 +2593,28 @@
       "specifier": "drizzle-orm/neon-serverless",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2536,19 +2644,28 @@
       "specifier": "drizzle-orm/neon-serverless/session",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2557,19 +2674,34 @@
       "specifier": "drizzle-orm/netlify-db/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project",
+            "peer @netlify/db not installed, checked in your project",
+            "peer pg not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project",
+            "peer @netlify/db not installed, checked in your project",
+            "peer pg not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project",
+            "peer @netlify/db not installed, checked in your project",
+            "peer pg not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2578,19 +2710,34 @@
       "specifier": "drizzle-orm/netlify-db",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project",
+            "peer @netlify/db not installed, checked in your project",
+            "peer pg not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project",
+            "peer @netlify/db not installed, checked in your project",
+            "peer pg not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 3
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project",
+            "peer @netlify/db not installed, checked in your project",
+            "peer pg not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2599,19 +2746,28 @@
       "specifier": "drizzle-orm/netlify-db/migrator",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2620,19 +2776,28 @@
       "specifier": "drizzle-orm/netlify-db/session",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @neondatabase/serverless not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2641,19 +2806,28 @@
       "specifier": "drizzle-orm/node-postgres/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2662,19 +2836,28 @@
       "specifier": "drizzle-orm/node-postgres",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         }
       }
     },
@@ -2704,19 +2887,28 @@
       "specifier": "drizzle-orm/node-postgres/session",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer pg not installed, checked in your project"
+          ]
         }
       }
     },
@@ -3337,19 +3529,28 @@
       "specifier": "drizzle-orm/pglite/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @electric-sql/pglite not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @electric-sql/pglite not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @electric-sql/pglite not installed, checked in your project"
+          ]
         }
       }
     },
@@ -3358,19 +3559,28 @@
       "specifier": "drizzle-orm/pglite",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @electric-sql/pglite not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @electric-sql/pglite not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @electric-sql/pglite not installed, checked in your project"
+          ]
         }
       }
     },
@@ -3400,19 +3610,28 @@
       "specifier": "drizzle-orm/pglite/session",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @electric-sql/pglite not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @electric-sql/pglite not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @electric-sql/pglite not installed, checked in your project"
+          ]
         }
       }
     },
@@ -3421,19 +3640,28 @@
       "specifier": "drizzle-orm/planetscale-serverless/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @planetscale/database not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @planetscale/database not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @planetscale/database not installed, checked in your project"
+          ]
         }
       }
     },
@@ -3442,19 +3670,28 @@
       "specifier": "drizzle-orm/planetscale-serverless",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @planetscale/database not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @planetscale/database not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @planetscale/database not installed, checked in your project"
+          ]
         }
       }
     },
@@ -3505,19 +3742,28 @@
       "specifier": "drizzle-orm/postgres-js/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer postgres not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer postgres not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer postgres not installed, checked in your project"
+          ]
         }
       }
     },
@@ -3526,19 +3772,28 @@
       "specifier": "drizzle-orm/postgres-js",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer postgres not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer postgres not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer postgres not installed, checked in your project"
+          ]
         }
       }
     },
@@ -3631,19 +3886,28 @@
       "specifier": "drizzle-orm/singlestore/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         }
       }
     },
@@ -3652,19 +3916,28 @@
       "specifier": "drizzle-orm/singlestore",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer mysql2 not installed, checked in your project"
+          ]
         }
       }
     },
@@ -4744,19 +5017,28 @@
       "specifier": "drizzle-orm/tidb-serverless/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @tidbcloud/serverless not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @tidbcloud/serverless not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @tidbcloud/serverless not installed, checked in your project"
+          ]
         }
       }
     },
@@ -4765,19 +5047,28 @@
       "specifier": "drizzle-orm/tidb-serverless",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @tidbcloud/serverless not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @tidbcloud/serverless not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @tidbcloud/serverless not installed, checked in your project"
+          ]
         }
       }
     },
@@ -4828,19 +5119,28 @@
       "specifier": "drizzle-orm/vercel-postgres/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @vercel/postgres not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @vercel/postgres not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @vercel/postgres not installed, checked in your project"
+          ]
         }
       }
     },
@@ -4849,19 +5149,28 @@
       "specifier": "drizzle-orm/vercel-postgres",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @vercel/postgres not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @vercel/postgres not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @vercel/postgres not installed, checked in your project"
+          ]
         }
       }
     },
@@ -4891,19 +5200,28 @@
       "specifier": "drizzle-orm/vercel-postgres/session",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @vercel/postgres not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @vercel/postgres not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @vercel/postgres not installed, checked in your project"
+          ]
         }
       }
     },
@@ -4996,19 +5314,28 @@
       "specifier": "drizzle-orm/aws-data-api/common",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         }
       }
     },
@@ -5017,19 +5344,28 @@
       "specifier": "drizzle-orm/aws-data-api/pg/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         }
       }
     },
@@ -5038,19 +5374,28 @@
       "specifier": "drizzle-orm/aws-data-api/pg",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         }
       }
     },
@@ -5080,19 +5425,28 @@
       "specifier": "drizzle-orm/aws-data-api/pg/session",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @aws-sdk/client-rds-data not installed, checked in your project"
+          ]
         }
       }
     },
@@ -5164,19 +5518,28 @@
       "specifier": "drizzle-orm/cache/upstash/cache",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @upstash/redis not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @upstash/redis not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @upstash/redis not installed, checked in your project"
+          ]
         }
       }
     },
@@ -5185,19 +5548,28 @@
       "specifier": "drizzle-orm/cache/upstash",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @upstash/redis not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @upstash/redis not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @upstash/redis not installed, checked in your project"
+          ]
         }
       }
     },
@@ -6739,19 +7111,28 @@
       "specifier": "drizzle-orm/libsql/http",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -6760,19 +7141,28 @@
       "specifier": "drizzle-orm/libsql/node",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -6781,19 +7171,28 @@
       "specifier": "drizzle-orm/libsql/sqlite3",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -6802,19 +7201,28 @@
       "specifier": "drizzle-orm/libsql/wasm",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client-wasm not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client-wasm not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client-wasm not installed, checked in your project"
+          ]
         }
       }
     },
@@ -6823,19 +7231,28 @@
       "specifier": "drizzle-orm/libsql/web",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -6844,19 +7261,28 @@
       "specifier": "drizzle-orm/libsql/ws",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -7810,19 +8236,28 @@
       "specifier": "drizzle-orm/prisma/mysql/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -7831,19 +8266,28 @@
       "specifier": "drizzle-orm/prisma/mysql",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -7873,19 +8317,28 @@
       "specifier": "drizzle-orm/prisma/pg/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -7894,19 +8347,28 @@
       "specifier": "drizzle-orm/prisma/pg",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -7936,19 +8398,28 @@
       "specifier": "drizzle-orm/prisma/sqlite/driver",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         }
       }
     },
@@ -7957,19 +8428,28 @@
       "specifier": "drizzle-orm/prisma/sqlite",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "notes": [
+            "peer @prisma/client not installed, checked in your project"
+          ]
         }
       }
     },

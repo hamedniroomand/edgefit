@@ -1,9 +1,9 @@
 {
-  "version": 1,
+  "version": 2,
   "package": "@libsql/client",
   "resolved": "0.18.0",
-  "checkedAt": "2026-10-03T08:32:11.787Z",
-  "edgefit": "0.9.1",
+  "checkedAt": "2026-10-03T11:40:20.749Z",
+  "edgefit": "0.9.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,15 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
+    "workerd": "pass",
     "bun": "warn",
     "deno": "warn"
+  },
+  "worst": {
+    "workerd": {
+      "subpath": "./node",
+      "status": "fail"
+    }
   },
   "context": {
     "workerd": {
@@ -71,7 +77,7 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 2,
+          "errors": 1,
           "warnings": 2
         },
         "bun": {
@@ -134,7 +140,7 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 2,
+          "errors": 1,
           "warnings": 2
         },
         "bun": {
