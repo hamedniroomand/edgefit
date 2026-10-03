@@ -23,6 +23,8 @@ export interface ScanOptions {
   /** The target's platform stubs out a Node.js module it lacks, so only reading from one fails. */
   lazyNodeImports?: boolean;
   nodeEnv: string | undefined;
+  /** Do not report an optional peer dependency that is not installed. The caller lists it instead. */
+  leaveOutMissingPeers?: boolean;
 }
 
 // esbuild's metafile also lists JSON and asset inputs, which hold no code.
@@ -31,6 +33,11 @@ const scriptFile = /\.[cm]?[jt]sx?$/u;
 // A package ships its own build settings, so the project's `tsconfig.json` does not apply to it.
 function isProjectScript(file: string): boolean {
   return isTypeScript(file) && !file.includes('node_modules');
+}
+
+/** The optional peers to report as unknown: none when the caller lists them instead. */
+function peers(module: GraphModule, options: ScanOptions): readonly string[] {
+  return options.leaveOutMissingPeers === true ? [] : module.missingPeers;
 }
 
 export interface Script {
@@ -86,7 +93,7 @@ export function extractScripts(
     return {
       file,
       found: dropFollowed(second, aliases?.followed.get(file)),
-      unchecked: uncheckedImports(toPosix(file), source, module.externals, module.missingPeers),
+      unchecked: uncheckedImports(toPosix(file), source, module.externals, peers(module, options)),
     };
   });
 }

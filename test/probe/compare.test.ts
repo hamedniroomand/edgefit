@@ -93,3 +93,13 @@ describe('compareOutcomes against the matrix', () => {
     ).toEqual([]);
   });
 });
+
+describe('compareOutcomes of an API that is missing on purpose', () => {
+  it('accepts an API that is missing on purpose, and not one that works', () => {
+    const harmless = { ...override('supported'), missingHarmless: true as const };
+    expect(compareOutcomes({ 'a.x': 'missing' }, { 'a.x': harmless }, {})).toEqual([]);
+    expect(
+      compareOutcomes({ 'a.x': 'missing' }, { 'a.x': override('supported') }, {}),
+    ).toHaveLength(1);
+  });
+});
