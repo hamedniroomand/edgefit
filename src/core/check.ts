@@ -17,8 +17,9 @@ import {
   loadSuggestions,
   loadUnreached,
 } from './findings.ts';
-import type { SupportedApi } from './findings.ts';
-import { scanModules, toPosix } from './scan.ts';
+import type { ModuleUsages, SupportedApi } from './findings.ts';
+import { leaveOutSupplied, scanModules, toPosix } from './scan.ts';
+import type { SuppliedLoad } from './scan.ts';
 
 export interface CheckOptions {
   /** Project root. Defaults to the current working directory. */
@@ -47,6 +48,8 @@ export interface TargetReport {
   supported: SupportedApi[];
   /** The optional peer dependencies that are not installed, and that the code reaches. Only with `missingPeersAsNotes`. */
   missingPeers?: string[];
+  /** Where the code loads a module that its user names. These are not findings. */
+  suppliedLoads?: SuppliedLoad[];
 }
 
 /** A target left out of the run because it has no entry. */
@@ -67,6 +70,21 @@ function describeNodeEnv(nodeEnv: string | undefined, fromConfig: boolean): stri
     return 'NODE_ENV not fixed, so both branches of a check are followed';
   }
   return `NODE_ENV ${nodeEnv} (${fromConfig ? 'from the config' : "as the platform's build"})`;
+}
+
+/**
+ * The modules to check, the notes of the scan, and the loads of a name that the user gives. Build
+ * output holds the callers of its own functions, so no name in it comes from a user.
+ */
+function shownModules(
+  scanned: ModuleUsages[],
+  root: string,
+  isBuilt: boolean,
+): { modules: ModuleUsages[]; notes: string[]; supplied: SuppliedLoad[] } {
+  if (isBuilt) {
+    return { ...attributeOutput(scanned, root), supplied: [] };
+  }
+  return { ...leaveOutSupplied(scanned), notes: [] };
 }
 
 async function checkTarget(
@@ -93,9 +111,7 @@ async function checkTarget(
     nodeEnv,
     leaveOutMissingPeers: options.missingPeersAsNotes,
   });
-  const { modules, notes } = isBuilt
-    ? attributeOutput(scanned, root)
-    : { modules: scanned, notes: [] };
+  const { modules, notes, supplied } = shownModules(scanned, root, isBuilt);
   const { findings, guarded, ignored } = collectFindings(modules, {
     target,
     levels: { ...defaultLevels, ...config.levels },
@@ -116,6 +132,7 @@ async function checkTarget(
     guarded,
     ignored,
     supported: options.includeSupported === true ? collectSupported(modules, target) : [],
+    suppliedLoads: supplied,
     ...(options.missingPeersAsNotes === true ? { missingPeers: missingPeersOf(graph) } : {}),
   };
 }

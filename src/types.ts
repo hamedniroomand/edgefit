@@ -51,6 +51,8 @@ export interface Usage {
   location: Location;
   /** Set for a dynamic usage that is an export of a name bound to the API. */
   exported?: true;
+  /** Set for a `require()` or `import()` of a name that the user of the function gives, such as a parameter. */
+  supplied?: true;
   /** Set when a `try` with a `catch` that does not throw again stops the error of this use, and no check guards it. */
   caught?: true;
   /** Set when the code only runs if the API exists, for example inside `if (x.y)`. */

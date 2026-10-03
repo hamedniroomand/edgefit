@@ -2,6 +2,7 @@ import { styleText } from 'node:util';
 
 import type { CheckResult, SkippedTarget, TargetReport } from '@/core/check.ts';
 import { describeEntries } from '@/core/entries.ts';
+import { suppliedNote } from '@/core/supplied.ts';
 import type { Finding } from '@/types.ts';
 
 import {
@@ -42,7 +43,10 @@ function formatHeader(report: TargetReport, paint: Paint): string[] {
     paint('dim', `  data ${target.data}`),
     paint('dim', `  settings ${target.settings}`),
   ];
-  for (const note of target.notes) {
+  for (const note of [
+    ...target.notes,
+    ...(report.suppliedLoads ?? []).map(load => suppliedNote(load)),
+  ]) {
     lines.push(paint('yellow', `  note: ${note}`));
   }
   return lines;

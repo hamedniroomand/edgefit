@@ -70,7 +70,14 @@ function visitRequire(node: NodeOf<'CallExpression'>, context: VisitContext): vo
   if (specifier === undefined) {
     // A `try` catches the error of a `require` that fails, so a caught one is only unknown.
     const ref = context.collector.guards.isCaught() ? undefined : dynamicRequire;
-    context.collector.dynamic(ref, 'require(<expression>)', computedModuleReason, node.start);
+    context.collector.dynamic(
+      ref,
+      'require(<expression>)',
+      computedModuleReason,
+      node.start,
+      false,
+      context.supplied.has(node),
+    );
     context.visit(argument);
     return;
   }
@@ -178,7 +185,14 @@ export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node,
   }
   const specifier = moduleSpecifier(node.source, context.scope);
   if (specifier === undefined) {
-    context.collector.dynamic(undefined, 'import(<expression>)', computedModuleReason, node.start);
+    context.collector.dynamic(
+      undefined,
+      'import(<expression>)',
+      computedModuleReason,
+      node.start,
+      false,
+      context.supplied.has(node),
+    );
     context.visitChildren(node);
     return;
   }

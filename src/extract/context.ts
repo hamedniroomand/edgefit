@@ -14,6 +14,8 @@ export interface VisitContext extends BindingContext {
   readonly typeOnlyImports: ReadonlySet<string>;
   /** The value of each name that is set once after its declaration, from `findAssigned`. */
   readonly assigned: ReadonlyMap<string, Node>;
+  /** The `require()` and `import()` of a name that a parameter of the enclosing function gives, see `findSuppliedLoads`. */
+  readonly supplied: ReadonlySet<Node>;
   /** The functions that only run `import()` for their argument, from `findImportWrappers`. */
   readonly wrappers: ImportWrappers;
   /** The functions that a plain name of the file stands for, see `findLocalFunctions`. */
