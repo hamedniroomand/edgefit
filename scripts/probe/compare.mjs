@@ -15,6 +15,10 @@ export function matrixHas(tree, api) {
 }
 
 function overrideDisagreement(override, outcome) {
+  // An API that is missing on purpose, because the code works without it.
+  if (override.missingHarmless === true && outcome === 'missing') {
+    return undefined;
+  }
   const stub = override.status === 'unsupported';
   const probedAsStub = MISSING_OR_UNSUPPORTED.has(outcome);
   // A lookup finds a stub as `present`, so it agrees with a stub unless the override says absent.
