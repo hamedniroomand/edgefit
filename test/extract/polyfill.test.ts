@@ -18,7 +18,7 @@ describe('a module stored in a global that is only set when it is missing', () =
     );
     expect(usagesOf(`${crypto}globalThis.crypto || (globalThis.crypto = crypto);`)).toEqual([
       'api node:crypto',
-      'api crypto',
+      'api crypto [guarded]',
       ...stored.slice(1),
     ]);
     expect(

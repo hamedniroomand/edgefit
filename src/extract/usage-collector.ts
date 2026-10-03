@@ -2,7 +2,7 @@ import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef, Location, RuntimeCondition, Usage } from '@/types.ts';
 
 import { GuardStack } from './guard-stack.ts';
-import { normalizeRef } from './refs.ts';
+import { isPromiseApi, normalizeRef } from './refs.ts';
 
 export class UsageCollector {
   public readonly usages: Usage[] = [];
@@ -45,7 +45,7 @@ export class UsageCollector {
     return { file: this.#file, line: low + 1, column: offset - (this.#lineStarts[low] ?? 0) + 1 };
   }
 
-  public api(ref: ApiRef, offset: number): void {
+  public api(ref: ApiRef, offset: number, awaited = false): void {
     if (this.guards.dead()) {
       return;
     }
@@ -55,6 +55,8 @@ export class UsageCollector {
     }
     const api = normalizeRef(ref);
     const guarded = this.guards.covers(api);
+    // A rejected promise that nothing awaits is not an error of the `try`.
+    const caught = this.guards.isCaught() && (awaited || !isPromiseApi(api));
     this.offsets.push(offset);
     this.usages.push({
       kind: 'api',
@@ -62,6 +64,7 @@ export class UsageCollector {
       display: displayApi(api.module, api.path),
       location: this.location(offset),
       ...(guarded ? { guarded: true as const } : {}),
+      ...(caught ? { caught: true as const } : {}),
       ...this.#runtimes(),
     });
   }
