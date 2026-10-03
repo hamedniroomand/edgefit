@@ -1,3 +1,7 @@
+import { mkdtempSync, rmSync, symlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+
 import type { Message } from 'esbuild';
 import { describe, expect, it } from 'vite-plus/test';
 
@@ -59,5 +63,21 @@ describe('optional peer dependencies', () => {
     const accepted = new Set<string>();
     expect(acceptMissingPeers(fixture('peer-app'), messages, accepted)).toBe(true);
     expect(acceptMissingPeers(fixture('peer-app'), messages, accepted)).toBe(false);
+  });
+});
+
+describe('optional peer dependencies behind a symlinked root', () => {
+  it('accepts the peer when the root is reached through a symlink', async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'edgefit-link-'));
+    const link = path.join(dir, 'peer-app');
+    symlinkSync(fixture('peer-app'), link);
+    try {
+      const graph = await resolveGraph({ ...options('src/optional.ts'), root: link });
+      expect(graph.modules.get('node_modules/with-peer/index.js')?.missingPeers).toEqual([
+        'react/jsx-runtime',
+      ]);
+    } finally {
+      rmSync(dir, { recursive: true });
+    }
   });
 });

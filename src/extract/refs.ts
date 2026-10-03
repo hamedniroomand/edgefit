@@ -1,9 +1,9 @@
-import type { Node } from 'oxc-parser';
+import type { MemberExpression, Node } from 'oxc-parser';
 
 import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef } from '@/types.ts';
 
-import { unwrap } from './ast.ts';
+import { strip, unwrap } from './ast.ts';
 
 export const globalAliases = new Set(['global', 'globalThis', 'self']);
 
@@ -155,4 +155,28 @@ export function isFeatureCheck(node: Node, parent: Node): boolean {
     return parent.test === node;
   }
   return parent.type === 'LogicalExpression' && parent.operator === '&&' && parent.left === node;
+}
+
+const writeOperators = new Set(['=', '??=', '||=']);
+
+/** Whether `node` is the member that `=`, `??=` or `||=` sets: `a.b = v`. */
+export function isMemberWrite(node: Node, parent: Node): node is MemberExpression {
+  return (
+    node.type === 'MemberExpression' &&
+    parent.type === 'AssignmentExpression' &&
+    parent.left === node &&
+    writeOperators.has(parent.operator)
+  );
+}
+
+/** The object of a member that is set, with the offset of the access that names it. */
+export function writtenObject(
+  ref: ApiRef,
+  node: MemberExpression,
+): { ref: ApiRef; offset: number } {
+  const object = strip(node.object);
+  return {
+    ref: { ...ref, path: ref.path.slice(0, -1) },
+    offset: object.type === 'MemberExpression' ? object.property.start : object.start,
+  };
 }

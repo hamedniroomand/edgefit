@@ -41,7 +41,8 @@
       "name": "drizzle-orm"
     },
     {
-      "name": "@prisma/client"
+      "name": "@prisma/client",
+      "notes": "Needs a generated client; run `edgefit check` on a project after `prisma generate`."
     },
     {
       "name": "mysql2"

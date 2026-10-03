@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.9.1
+
+### Patch Changes
+
+- [#139](https://github.com/hamedniroomand/edgefit/pull/139) [`9e46e8f`](https://github.com/hamedniroomand/edgefit/commit/9e46e8f6dbfdc3258066724b4ddf2bfa19595767) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Do not report a write to a missing member as unsupported. `process.report.excludeNetwork = true` no longer gives an error on Bun, because the write does not throw when `process.report` exists. A write to a member of a missing object is still reported.
+
+- [#138](https://github.com/hamedniroomand/edgefit/pull/138) [`5394622`](https://github.com/hamedniroomand/edgefit/commit/5394622304c6e22e9b912273886bb52a3642c774) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Accept an optional peer dependency when the project root is behind a symlink. `edgefit package` on macOS no longer gives `?` for a package with an optional peer.
+
+- [#140](https://github.com/hamedniroomand/edgefit/pull/140) [`6a06a99`](https://github.com/hamedniroomand/edgefit/commit/6a06a99d3c21c568d2ff39285076d2e798fb73ff) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Stop the `tsconfig.json` search at the project root. A config above the root no longer makes an import that the project uses only as a type fail to resolve. A project with no config of its own is checked as if the bundler had none.
+
+- [#149](https://github.com/hamedniroomand/edgefit/pull/149) [`25d2e7b`](https://github.com/hamedniroomand/edgefit/commit/25d2e7ba6be5d473e545c7d15361f7e6533dbdff) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - `edgefit package` lists a subpath that needs a module the package does not declare as not checked, instead of failing the whole package. The result of the other subpaths decides the row.
+
+## 0.9.0
+
+### Minor Changes
+
+- [#107](https://github.com/hamedniroomand/edgefit/pull/107) [`34bd26d`](https://github.com/hamedniroomand/edgefit/commit/34bd26d5d3851a56d0f1ecb55a175ef88d6ea3e9) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Add a stable `id` to each finding in the JSON report, and publish the JSON schema of the report. The npm package includes the schema as `edgefit/schema/report-v2.json`. Build output with no file of the project is now one finding for each API, so `edgefit diff` does not report it as fixed and new when a chunk name changes.
+
 ## 0.8.0
 
 ### Minor Changes

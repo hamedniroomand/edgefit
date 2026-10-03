@@ -3,6 +3,7 @@ import type { Node } from 'oxc-parser';
 import type { ApiRef } from '@/types.ts';
 
 import type { BindingContext } from './bindings.ts';
+import type { ImportWrappers } from './import-wrappers.ts';
 import type { Scope } from './scope.ts';
 import type { UsageCollector } from './usage-collector.ts';
 
@@ -12,6 +13,8 @@ export interface VisitContext extends BindingContext {
   readonly typeOnlyImports: ReadonlySet<string>;
   /** The value of each name that is set once after its declaration, from `findAssigned`. */
   readonly assigned: ReadonlyMap<string, Node>;
+  /** The functions that only run `import()` for their argument, from `findImportWrappers`. */
+  readonly wrappers: ImportWrappers;
   visit: (node: Node | null | undefined) => void;
   visitAll: (nodes: readonly (Node | null)[]) => void;
   visitChildren: (node: Node) => void;

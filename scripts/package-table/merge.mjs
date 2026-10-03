@@ -25,7 +25,7 @@ const previousRows = new Map(
 const stale = [];
 const { renderBadge, shieldsEndpoint } = await import(pathToFileURL(path.resolve(dist)).href);
 
-const rank = { pass: 0, warn: 1, error: 2, fail: 3 };
+const rank = { pass: 0, unchecked: 0, warn: 1, error: 2, fail: 3 };
 mkdirSync(path.join(out, 'packages'), { recursive: true });
 mkdirSync(path.join(out, 'badges'), { recursive: true });
 

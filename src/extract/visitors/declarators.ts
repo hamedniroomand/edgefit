@@ -78,7 +78,8 @@ function assignedBinding(id: Node, context: VisitContext): Binding | undefined {
 
 export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, context) => {
   const { id, init } = node;
-  const binding = init === null ? assignedBinding(id, context) : resolveBinding(init, context);
+  const initial = init === null ? undefined : resolveBinding(init, context);
+  const binding = isBound(initial) ? initial : assignedBinding(id, context);
   if (!isBound(binding)) {
     context.visitPattern(id);
     context.visit(init);
@@ -91,7 +92,11 @@ export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, con
       binding === 'require' ? binding : { ref: binding.ref, recorded: false },
     );
     if (init !== null) {
-      context.visitBound(init);
+      if (isBound(initial)) {
+        context.visitBound(init);
+      } else {
+        context.visit(init);
+      }
     }
     return;
   }

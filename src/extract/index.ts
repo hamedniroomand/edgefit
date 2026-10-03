@@ -6,6 +6,7 @@ import type { ModuleShape } from '@/trace/shape.ts';
 import type { Usage } from '@/types.ts';
 
 import { findAssigned } from './assigned.ts';
+import { findImportWrappers } from './import-wrappers.ts';
 import { typeOnlyImports } from './type-only-imports.ts';
 import { UsageCollector } from './usage-collector.ts';
 import { Walker } from './walker.ts';
@@ -54,7 +55,7 @@ function sourceTypeFor(file: string): ParserOptions['sourceType'] {
   return /\.m[jt]s$/u.test(file) ? 'module' : 'unambiguous';
 }
 
-function parse(file: string, source: string): ParseResult {
+export function parse(file: string, source: string): ParseResult {
   const options: ParserOptions = {
     lang: languageFor(file),
     sourceType: sourceTypeFor(file),
@@ -98,9 +99,14 @@ export function extractModule(
     options.keepUnusedImports === true || !isTypeScript(file)
       ? new Set<string>()
       : typeOnlyImports(body);
-  new Walker(collector, options.globals, options.nodeEnv, dropped, findAssigned(body)).visit(
-    result.program as Node,
-  );
+  new Walker(
+    collector,
+    options.globals,
+    options.nodeEnv,
+    dropped,
+    findAssigned(body),
+    findImportWrappers(body),
+  ).visit(result.program as Node);
   return {
     usages: collector.usages,
     offsets: collector.offsets,

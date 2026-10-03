@@ -55,6 +55,60 @@
       "target": "vercel-edge",
       "reason": "Runs only inside `if (registry)`, and `registry` is set only when `globalThis.FinalizationRegistry` exists. Vercel edge functions have no FinalizationRegistry, so the branch never runs there.",
       "source": "https://github.com/vercel/next.js/blob/v16.3.8/packages/next/src/server/lib/clone-response.ts#L5"
+    },
+    {
+      "package": "postal-mime",
+      "versions": { "min": "2.7.6", "max": "2.7.6" },
+      "file": "src/decode-strings.js",
+      "apis": ["FileReader"],
+      "target": "workerd",
+      "reason": "Runs only when `blob.arrayBuffer` is missing. workerd has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
+      "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/workerd/api/blob.h#L57"
+    },
+    {
+      "package": "postal-mime",
+      "versions": { "min": "2.7.6", "max": "2.7.6" },
+      "file": "src/decode-strings.js",
+      "apis": ["FileReader"],
+      "target": "bun",
+      "reason": "Runs only when `blob.arrayBuffer` is missing. Bun has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
+      "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.2/packages/bun-types/globals.d.ts#L1527"
+    },
+    {
+      "package": "postal-mime",
+      "versions": { "min": "4.0.2", "max": "4.0.2" },
+      "file": "dist/esm/decode-strings.js",
+      "apis": ["FileReader"],
+      "target": "workerd",
+      "reason": "Runs only when `blob.arrayBuffer` is missing. workerd has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
+      "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/workerd/api/blob.h#L57"
+    },
+    {
+      "package": "postal-mime",
+      "versions": { "min": "4.0.2", "max": "4.0.2" },
+      "file": "dist/esm/decode-strings.js",
+      "apis": ["FileReader"],
+      "target": "bun",
+      "reason": "Runs only when `blob.arrayBuffer` is missing. Bun has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
+      "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.2/packages/bun-types/globals.d.ts#L1527"
+    },
+    {
+      "package": "postal-mime",
+      "versions": { "min": "4.0.2", "max": "4.0.2" },
+      "file": "dist/cjs/decode-strings.js",
+      "apis": ["FileReader"],
+      "target": "workerd",
+      "reason": "Runs only when `blob.arrayBuffer` is missing. workerd has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
+      "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/workerd/api/blob.h#L57"
+    },
+    {
+      "package": "postal-mime",
+      "versions": { "min": "4.0.2", "max": "4.0.2" },
+      "file": "dist/cjs/decode-strings.js",
+      "apis": ["FileReader"],
+      "target": "bun",
+      "reason": "Runs only when `blob.arrayBuffer` is missing. Bun has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
+      "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.2/packages/bun-types/globals.d.ts#L1527"
     }
   ]
 }
