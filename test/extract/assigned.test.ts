@@ -112,3 +112,25 @@ describe('not following a variable that is assigned a module', () => {
     expect(usagesOf(source, 'lib/index.ts')).toEqual([]);
   });
 });
+
+describe('a fallback that a catch assigns', () => {
+  it('follows a variable that a catch gives a fallback that is not a module', () => {
+    const source =
+      "let http2;\ntry {\n  http2 = require('node:http2');\n} catch {\n  http2 = { constants: {} };\n}\nhttp2.connect('x');";
+    const usages = usagesOf(source, 'lib/index.ts');
+    expect(usages).toContain('api node:http2.connect');
+    expect(usages.some(usage => usage.startsWith('dynamic'))).toBe(false);
+  });
+
+  it('keeps a second write that may hold a module, even when it can also be null', () => {
+    const source =
+      "let m;\ntry {\n  m = require('node:http2');\n} catch {\n  m = other ? require('node:vm') : null;\n}\nm.connect('x');";
+    expect(usagesOf(source, 'lib/index.ts')).not.toContain('api node:http2.connect');
+  });
+
+  it('keeps a second write that can be a module', () => {
+    const source =
+      "let http2;\ntry {\n  http2 = require('node:http2');\n} catch {\n  http2 = other;\n}\nhttp2.connect('x');";
+    expect(usagesOf(source, 'lib/index.ts')).not.toContain('api node:http2.connect');
+  });
+});

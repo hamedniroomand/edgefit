@@ -1,6 +1,7 @@
 import type { Node } from 'oxc-parser';
 
 import { childNodes, strip } from './ast.ts';
+import type { NodeOf } from './ast.ts';
 import { patternNames } from './declarations.ts';
 
 const bindable = new Set(['Identifier', 'MemberExpression', 'CallExpression', 'ImportExpression']);
@@ -17,10 +18,27 @@ function nameOf(node: { id: { name: string } | null }): string[] {
   return node.id === null ? [] : [node.id.name];
 }
 
+const fallbackValues = new Set([
+  'Literal',
+  'ObjectExpression',
+  'ArrayExpression',
+  'TemplateLiteral',
+]);
+
+/** `name = value` with a literal, an object, an array or a template, which cannot be a module. */
+function isFallback(node: NodeOf<'AssignmentExpression'>): boolean {
+  return (
+    node.operator === '=' &&
+    node.left.type === 'Identifier' &&
+    fallbackValues.has(strip(node.right).type)
+  );
+}
+
 /** The names that `node` sets to a value. A declaration without a value sets nothing. */
 function writtenNames(node: Node): string[] {
   if (node.type === 'AssignmentExpression') {
-    return patternNames(node.left);
+    // A fallback such as `x = {}` in a `catch` is a value that cannot be a module, as for a declaration.
+    return isFallback(node) ? [] : patternNames(node.left);
   }
   if (node.type === 'UpdateExpression') {
     return patternNames(node.argument);
@@ -75,7 +93,11 @@ export function findAssigned(body: readonly Node[]): Map<string, Node> {
         tally(name).declarations += 1;
       }
     }
-    if (node.type === 'AssignmentExpression' && node.left.type === 'Identifier') {
+    if (
+      node.type === 'AssignmentExpression' &&
+      node.left.type === 'Identifier' &&
+      !isFallback(node)
+    ) {
       tally(node.left.name).value = node.operator === '=' ? node.right : undefined;
     }
     for (const child of childNodes(node)) {
