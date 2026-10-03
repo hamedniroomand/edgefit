@@ -54,6 +54,13 @@ function absentGuard(node: Node, context: BindingContext, key?: string): Guard[]
   ];
 }
 
+/** `a?.b` is truthy only when `a` exists too, so the object is known as well as the member. */
+function optionalObject(node: Node, truth: boolean, context: BindingContext): Guard[] {
+  return truth && node.type === 'MemberExpression' && node.optional
+    ? guardFor(node.object, context)
+    : [];
+}
+
 function isNullish(node: Node): boolean {
   const inner = strip(node);
   return (
@@ -161,6 +168,31 @@ function checkGuards(node: Node, truth: boolean, context: BindingContext): Guard
   }
 }
 
+/** What a call as a test tells, or `undefined` when it tells nothing by itself. */
+function callGuards(
+  node: NodeOf<'CallExpression'>,
+  truth: boolean,
+  context: BindingContext,
+): Guard[] | undefined {
+  const [only] = node.arguments;
+  // `Boolean(x)` is truthy exactly when `x` is.
+  if (
+    node.arguments.length === 1 &&
+    only?.type !== 'SpreadElement' &&
+    only !== undefined &&
+    strip(node.callee).type === 'Identifier' &&
+    isUnbound(strip(node.callee), 'Boolean', context)
+  ) {
+    return guardsWhen(only, truth, context);
+  }
+  const agent = agentRuntime(node, context);
+  if (agent !== undefined) {
+    return runtimeGuard(agent, truth);
+  }
+  // `f?.()` is truthy only when `f` exists and was called.
+  return node.optional && truth ? guardsWhen(node.callee, true, context) : undefined;
+}
+
 /** The APIs that must exist, and what is known of the runtime, whenever `test` evaluates to `truth`. */
 export function guardsWhen(test: Node, truth: boolean, context: BindingContext): Guard[] {
   const node = strip(test);
@@ -186,23 +218,16 @@ export function guardsWhen(test: Node, truth: boolean, context: BindingContext):
     return comparisonGuard(node, truth, context) ?? [];
   }
   if (node.type === 'CallExpression') {
-    const [only] = node.arguments;
-    // `Boolean(x)` is truthy exactly when `x` is.
-    if (
-      node.arguments.length === 1 &&
-      only?.type !== 'SpreadElement' &&
-      only !== undefined &&
-      strip(node.callee).type === 'Identifier' &&
-      isUnbound(strip(node.callee), 'Boolean', context)
-    ) {
-      return guardsWhen(only, truth, context);
-    }
-    const agent = agentRuntime(node, context);
-    if (agent !== undefined) {
-      return runtimeGuard(agent, truth);
+    const guards = callGuards(node, truth, context);
+    if (guards !== undefined) {
+      return guards;
     }
   }
-  return [...checkGuards(node, truth, context), ...presence(node, truth, context)];
+  return [
+    ...checkGuards(node, truth, context),
+    ...presence(node, truth, context),
+    ...optionalObject(node, truth, context),
+  ];
 }
 
 /** Whether a branch always leaves the code around it, so what follows only runs without it. */

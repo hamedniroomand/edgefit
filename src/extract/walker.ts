@@ -12,6 +12,7 @@ import {
   isGlobalRoot,
   isOnlyTested,
   isMemberWrite,
+  isOptionalRead,
   writtenObject,
 } from './refs.ts';
 import { createScope } from './scope.ts';
@@ -116,8 +117,7 @@ export class Walker implements VisitContext {
       if (!isGlobalRoot(chain.ref)) {
         this.collector.api(chain.ref, chain.offset);
       }
-      // `typeof x[key]` only tests for a member, and a global that is only compared is the same
-      // value or `undefined`, so there is nothing to follow.
+      // A test for a member, or a global that is only compared, has nothing to follow.
       if (
         chain.memberParent === undefined ||
         !isOnlyTested(chain.member, chain.memberParent, chain.ref)
@@ -132,7 +132,11 @@ export class Walker implements VisitContext {
       return;
     }
     const { node, parent } = chain;
-    if (isGlobalRoot(chain.ref) || (parent !== undefined && isFeatureCheck(node, parent))) {
+    if (
+      isGlobalRoot(chain.ref) ||
+      (parent !== undefined && isFeatureCheck(node, parent)) ||
+      isOptionalRead(node, parent)
+    ) {
       return;
     }
     if (parent !== undefined && isMemberWrite(node, parent)) {

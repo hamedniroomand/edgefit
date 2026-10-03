@@ -107,7 +107,7 @@ if (typeof subtle.getPublicKey != 'function') {
 await subtle.getPublicKey(key, []);
 ```
 
-When the target does not have the API, a usage that only runs after such a check is a guarded finding. It is left out of the list and does not fail a check. The report counts them (`1 guarded usage hidden`), and `--verbose` lists them. In JSON they are under `guarded`, next to `findings`.
+When the target does not have the API, or the data does not cover it, a usage that only runs after such a check is a guarded finding. An API that the data does not cover is then not an `unknown` warning. It is left out of the list and does not fail a check. The report counts them (`1 guarded usage hidden`), and `--verbose` lists them. In JSON they are under `guarded`, next to `findings`.
 
 A check does not protect an API that exists and throws or does nothing, such as `fs.watch` on Workers, because the check passes and the call still fails. Those stay findings, and so do `mocked` and `mismatch` results. Code that does not run at all on the target is the exception, see [Runtime checks](#runtime-checks).
 
@@ -117,7 +117,7 @@ These checks are understood:
 
 - `if (x.y)`, `typeof x.y === 'function'`, `x.y !== undefined` and `'y' in x`, for the code they protect
 - `x.y && x.y()`, `!x.y || x.y()` and `x.y ? x.y() : fallback`
-- `x.y?.()`
+- `x.y?.()`, and `if (x.y?.z)` or `if (x.y?.z?.())`, which also protect `x.y`
 - a guard clause such as `if (!x.y) throw …` or `return`, for the rest of the block
 
 A check only covers the API it names, and anything below it. `if (fs.watchFile)` does not guard `fs.watch`.
