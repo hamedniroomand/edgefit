@@ -60,6 +60,7 @@ function exportLocal(local: Node, context: VisitContext): void {
       displayRef(binding.ref),
       'exported, so its members may be used elsewhere',
       local.start,
+      true,
     );
   }
 }

@@ -84,7 +84,13 @@ export class UsageCollector {
   }
 
   /** Records an access edgefit cannot follow statically. */
-  public dynamic(ref: ApiRef | undefined, display: string, reason: string, offset: number): void {
+  public dynamic(
+    ref: ApiRef | undefined,
+    display: string,
+    reason: string,
+    offset: number,
+    exported = false,
+  ): void {
     if (this.guards.dead()) {
       return;
     }
@@ -95,6 +101,7 @@ export class UsageCollector {
       display,
       reason,
       location: this.location(offset),
+      ...(exported ? { exported: true as const } : {}),
       ...this.#polyfill(),
       ...this.#runtimes(),
     });
