@@ -6,6 +6,7 @@ import { isTracked, lookup } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
 import { bindAssigned } from './declarators.ts';
+import { commonJsExportName, exportLocal } from './modules.ts';
 
 export const visitIdentifier: Visitor<NodeOf<'Identifier'>> = (node, context) => {
   const binding = lookup(context.scope, node.name);
@@ -57,6 +58,15 @@ function polyfilledGlobal(
 }
 
 export const visitAssignment: Visitor<NodeOf<'AssignmentExpression'>> = (node, context) => {
+  // `exports.crypto = crypto` exports a name that is a Node.js module, as `export { crypto }` does.
+  const exported = node.operator === '=' ? commonJsExportName(node.left) : undefined;
+  if (exported !== undefined && node.right.type === 'Identifier') {
+    const binding = lookup(context.scope, node.right.name);
+    if (isTracked(binding) && binding.ref.module !== '*globals*') {
+      exportLocal(node.right, exported, context);
+      return;
+    }
+  }
   // Writing to a plain name neither reads it nor changes what edgefit tracks.
   if (node.left.type === 'Identifier') {
     context.collector.guards.drop(node.left.name);

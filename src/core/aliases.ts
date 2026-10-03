@@ -33,10 +33,13 @@ function openedFiles(
   const opened = new Set<string>();
   // Only an `import` statement binds the names, so a file that is required is read in a way not followed.
   for (const [file, module] of graph.modules) {
-    const dynamic = modules.get(file)?.shape?.dynamicImports;
+    const shape = modules.get(file)?.shape;
     for (const link of module.links.filter(item => item.kind !== 'import-statement')) {
-      // An `import()` that only destructures names is followed, like an import of those names.
-      if (!(link.kind === 'dynamic-import' && dynamic?.get(link.original ?? '') instanceof Set)) {
+      // An `import()` or `require()` that only destructures names is followed, like an import of those names.
+      const loaded = { 'dynamic-import': shape?.dynamicImports, 'require-call': shape?.requires }[
+        link.kind
+      ];
+      if (!(loaded?.get(link.original ?? '') instanceof Set)) {
         opened.add(link.path);
       }
     }
@@ -89,12 +92,12 @@ export function followAliases(
       }
     }
   }
-  seedDynamicImports(graph, modules, demands, opened, { seeds, followed });
+  seedLoads(graph, modules, demands, opened, { seeds, followed });
   return { seeds, followed };
 }
 
-/** The same for the names that a file destructures from `await import('./file')`. */
-function seedDynamicImports(
+/** The same for the names that a file destructures from `await import('./file')` or `require('./file')`. */
+function seedLoads(
   graph: ModuleGraph,
   modules: ReadonlyMap<string, ExtractedModule>,
   demands: ReadonlyMap<string, Demand>,
@@ -102,10 +105,22 @@ function seedDynamicImports(
   found: FollowedAliases,
 ): void {
   for (const [file, { shape }] of modules) {
-    for (const [specifier, names] of shape?.dynamicImports ?? []) {
+    const loads = [
+      ...[...(shape?.dynamicImports ?? [])].map(([specifier, names]) => ({
+        specifier,
+        names,
+        kind: 'dynamic-import',
+      })),
+      ...[...(shape?.requires ?? [])].map(([specifier, names]) => ({
+        specifier,
+        names,
+        kind: 'require-call',
+      })),
+    ];
+    for (const { specifier, names, kind } of loads) {
       const target = graph.modules
         .get(file)
-        ?.links.find(link => link.kind === 'dynamic-import' && link.original === specifier)?.path;
+        ?.links.find(link => link.kind === kind && link.original === specifier)?.path;
       if (!(names instanceof Set) || target === undefined) {
         continue;
       }

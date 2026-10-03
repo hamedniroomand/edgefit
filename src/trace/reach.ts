@@ -33,6 +33,14 @@ class Demands {
   }
 }
 
+/** What a module asks of the files that it loads with `import()` or `require()`, by the kind of the link. */
+function loadsFor(
+  shape: ModuleShape | undefined,
+  kind: string,
+): ModuleShape['dynamicImports'] | undefined {
+  return { 'dynamic-import': shape?.dynamicImports, 'require-call': shape?.requires }[kind];
+}
+
 /**
  * Asks for every export of the modules that something may reach in any way: the entry, and
  * anything imported other than by a static import whose specifier was read from a module that
@@ -50,10 +58,12 @@ function seedDemands(graph: ModuleGraph, shapes: ReadonlyMap<string, ModuleShape
         shape?.traceable === true &&
         isStatic(link.kind) &&
         shape.specifiers.has(link.original ?? '');
-      // A file loaded with `import()` that only gets destructured by name is asked for those names.
+      // A file loaded with `import()` or `require()` that only gets destructured by name is asked
+      // for those names. An understood `require` is already read through `named`.
+      const loaded = loadsFor(shape, link.kind);
       const asked =
-        link.kind === 'dynamic-import' && shape?.traceable === true
-          ? shape.dynamicImports.get(link.original ?? '')
+        shape?.traceable === true && (link.kind === 'dynamic-import' || !named)
+          ? loaded?.get(link.original ?? '')
           : undefined;
       if (asked instanceof Set) {
         demands.raise(link.path, asked);
