@@ -109,6 +109,24 @@
       "target": "bun",
       "reason": "Runs only when `blob.arrayBuffer` is missing. Bun has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
       "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.2/packages/bun-types/globals.d.ts#L1527"
+    },
+    {
+      "package": "nodemailer",
+      "versions": { "min": "10.0.13", "max": "10.0.13" },
+      "file": "dist/esm/sendmail-transport/index.js",
+      "apis": ["node:child_process", "node:child_process.spawn"],
+      "target": "workerd",
+      "reason": "Runs only with the sendmail transport, which starts a local `sendmail` binary. A Worker sends mail with the SMTP transport.",
+      "source": "https://github.com/nodemailer/nodemailer/blob/v10.0.13/src/sendmail-transport/index.ts#L150"
+    },
+    {
+      "package": "mongodb",
+      "versions": { "min": "7.7.0", "max": "7.7.0" },
+      "file": "lib/client-side-encryption/mongocryptd_manager.js",
+      "apis": ["node:child_process", "node:child_process.spawn"],
+      "target": "workerd",
+      "reason": "Runs only in `MongocryptdManager.spawn()`, which starts a local `mongocryptd` process for automatic encryption. A driver without automatic encryption does not call it.",
+      "source": "https://github.com/mongodb/node-mongodb-native/blob/v7.7.0/src/client-side-encryption/mongocryptd_manager.ts#L53"
     }
   ]
 }

@@ -16,8 +16,22 @@ function compare(left, right) {
 
 const inRange = (version, { min, max }) => compare(version, min) >= 0 && compare(version, max) <= 0;
 
-/** The text to look for in a file: the API as the code writes it. */
-const needle = api => api.replace(/^node:/u, '');
+/**
+ * Whether the file uses the API as the code writes it. A member of a Node.js module may be read
+ * as `module.member`, or imported by its name: `import { spawn } from 'node:child_process'` and
+ * `const { spawn } = require('child_process')`.
+ */
+function uses(text, api) {
+  const name = api.replace(/^node:/u, '');
+  if (!api.startsWith('node:')) {
+    return text.includes(name);
+  }
+  const [module, ...path] = name.split('.');
+  const named =
+    [`node:${module}`, `'${module}'`, `"${module}"`].some(item => text.includes(item)) &&
+    text.includes(path.at(-1) ?? '');
+  return text.includes(name) || named;
+}
 
 function run(command, args, cwd) {
   return execFileSync(command, args, { cwd, encoding: 'utf8' }).trim();
@@ -49,7 +63,7 @@ for (const name of new Set(entries.map(entry => entry.package))) {
       continue;
     }
     const text = readFileSync(file, 'utf8');
-    for (const api of entry.apis.filter(api => !text.includes(needle(api)))) {
+    for (const api of entry.apis.filter(api => !uses(text, api))) {
       problems.push(`${name}@${version}: ${entry.file} no longer uses ${api}.`);
     }
   }
