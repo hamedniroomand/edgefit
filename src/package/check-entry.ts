@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { check } from '@/core/check.ts';
+import type { TargetReport } from '@/core/check.ts';
 import type { EdgefitConfig, TargetKey } from '@/types.ts';
 
 import { entrySource } from './entry.ts';
@@ -12,6 +13,20 @@ import { neededMessage, undeclaredModules } from './unchecked.ts';
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+function entryStatus(report: TargetReport): EntryStatus {
+  const errors = report.findings.filter(finding => finding.level === 'error').length;
+  const warnings = report.findings.length - errors;
+  const notes = (report.missingPeers ?? []).map(
+    name => `peer ${name} not installed, checked in your project`,
+  );
+  return {
+    status: statusOf(errors, warnings),
+    errors,
+    warnings,
+    ...(notes.length > 0 ? { notes } : {}),
+  };
 }
 
 export async function checkEntry(
@@ -36,11 +51,9 @@ export async function checkEntry(
     deno: { configFile: false },
   };
   try {
-    const checked = await check({ root, config });
+    const checked = await check({ root, config, missingPeersAsNotes: true });
     for (const report of checked.reports) {
-      const errors = report.findings.filter(finding => finding.level === 'error').length;
-      const warnings = report.findings.length - errors;
-      row.results[report.target.key] = { status: statusOf(errors, warnings), errors, warnings };
+      row.results[report.target.key] = entryStatus(report);
       context[report.target.key] ??= {
         settings: report.target.settings,
         notes: [...report.target.notes],

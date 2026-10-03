@@ -52,6 +52,19 @@ function gridLines(result: PackageResult, paint: Paint): string[] {
   ];
 }
 
+/** What each entry did not cover, grouped by the note, with the subpaths that have it. */
+function noteLines(result: PackageResult): string[] {
+  const bySubpaths = new Map<string, Set<string>>();
+  for (const entry of result.entries) {
+    for (const key of result.targets) {
+      for (const note of entry.results[key]?.notes ?? []) {
+        bySubpaths.set(note, (bySubpaths.get(note) ?? new Set<string>()).add(entry.subpath));
+      }
+    }
+  }
+  return [...bySubpaths].map(([note, subpaths]) => `  ${note}: ${[...subpaths].join(', ')}`);
+}
+
 function worstLines(result: PackageResult, paint: Paint): string[] {
   return result.targets.flatMap(key => {
     const found = result.worst?.[key];
@@ -121,6 +134,7 @@ export function formatPackageText(result: PackageResult, options: { color: boole
     '',
     ...gridLines(result, paint),
     ...worstLines(result, paint),
+    ...noteLines(result).map(line => paint('dim', line)),
     ...problemLines(result, paint),
     ...footerLines(result, paint),
   ];

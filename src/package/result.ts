@@ -12,6 +12,8 @@ export interface EntryStatus {
   warnings: number;
   /** Why the entry could not be checked. Only with `status: "error"` or `"unchecked"`. */
   message?: string;
+  /** What the check did not cover, such as an optional peer dependency that is not installed. */
+  notes?: string[];
 }
 
 export interface WorstEntry {

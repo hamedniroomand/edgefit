@@ -32,6 +32,8 @@ export interface ScanOptions {
   /** The target's platform stubs out a Node.js module it lacks, so only reading from one fails. */
   lazyNodeImports?: boolean;
   nodeEnv: string | undefined;
+  /** Do not report an optional peer dependency that is not installed. The caller lists it instead. */
+  leaveOutMissingPeers?: boolean;
 }
 
 /** Extracts runtime API usages from every script in the graph, with its package and import chain. */
@@ -64,7 +66,12 @@ export function scanModules(
               .flatMap(link => link.original ?? []),
           ),
         }),
-        unchecked: uncheckedImports(posixFile, source, module.externals, module.missingPeers),
+        unchecked: uncheckedImports(
+          posixFile,
+          source,
+          module.externals,
+          options.leaveOutMissingPeers === true ? [] : module.missingPeers,
+        ),
       };
     });
   const reached = options.trace

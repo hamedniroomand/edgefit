@@ -68,3 +68,7 @@ A ✓ is only as good as [what a pass means](#what-a-pass-means). The `⚠` rows
 ## Adding a package to the table
 
 Open an issue with the package request form, or a pull request that adds one line to `table/packages.json`. CI runs `edgefit package` on the added package, so the pull request shows its result.
+
+## Optional peer dependencies
+
+`edgefit package` does not install peer dependencies. An optional peer that is not installed gives no finding. The entry lists it as a note, `peer react not installed, checked in your project`, in the output of `edgefit package`, in the `notes` of the entry in the JSON result, and in the row detail of the table. The status of the entry comes from the other findings. `edgefit check` on a project does not change: a missing optional peer there is still an `unknown` warning, because the code of the project can reach it.
