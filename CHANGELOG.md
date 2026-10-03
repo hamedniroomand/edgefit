@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.11.0
+
+### Minor Changes
+
+- [#202](https://github.com/hamedniroomand/edgefit/pull/202) [`e58940d`](https://github.com/hamedniroomand/edgefit/commit/e58940d6854c7b98f454aeb646f2780c27460c2f) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read `exports.name = { … }` as the export `name`. The functions and methods in the object count once the export is used. Any other value in it, such as a call, a member read or a spread, counts when the module loads. A CommonJS module with such an export, such as `credentials` in `@grpc/grpc-js`, can now be traced, so the exports that nothing uses are left out of the check.
+
+- [#204](https://github.com/hamedniroomand/edgefit/pull/204) [`7b03938`](https://github.com/hamedniroomand/edgefit/commit/7b039385698ef216bbf5b7605e4ab9d834fb2283) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read more forms of a CommonJS module, so that a file such as `index.js` of `mysql2` can be traced. `exports.__defineGetter__('name', fn)` is a getter export. `exports.name = <value>` is an export when the module computes the value when it loads, and `exports.other = exports.name` is the same export under another name. `module.exports = name` is read when `name` is a function or class of the module that nothing else names. A `require` inside a function asks for its module only when the function is used. A Worker that imports `createConnection` from `mysql2` no longer gets the finding of `createServer`.
+
+- [#206](https://github.com/hamedniroomand/edgefit/pull/206) [`166aa7c`](https://github.com/hamedniroomand/edgefit/commit/166aa7ca4634ea076b97d49cfc702b44b08b0649) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - List the findings that only some exports of a package entry reach under those exports, and do not count them in the status of the entry. `edgefit package mysql2` now passes on Workers, with `createServer` named with its `mismatch node:net.createServer`, because only that export needs a port that a Worker cannot open. The package result has `exports` for each entry and `worstExport` for each target, `edgefit package` prints a line for each export and the worst export, and the package table shows the worst export as a third mark and in the row detail. `check` takes the option `byExport`, which sets `Finding.exports`. The result version stays 2, since the fields are new.
+
+- [#203](https://github.com/hamedniroomand/edgefit/pull/203) [`09ada3b`](https://github.com/hamedniroomand/edgefit/commit/09ada3b4b02da5aae46dfddd0c59581ce013196d) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Add `data/stored-modules.json`, a reviewed list of package files that keep a Node.js module in a lookup table and read only some members of it. A listed file counts as a use of those members, so the module is no longer reported as `unknown`. The first entry is `follow-redirects`, which `axios` uses for `node:http` and `node:https`. `edgefit package axios` now passes on Deno.
+
+### Patch Changes
+
+- [#207](https://github.com/hamedniroomand/edgefit/pull/207) [`15e7e05`](https://github.com/hamedniroomand/edgefit/commit/15e7e0509da99f3672c1ee618daf3c19c2fdaf04) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Cover `nodemailer` 10.0.14 in the list of code that a package ships and a target does not run. The `node:child_process.spawn` finding of the sendmail transport is guarded on workerd for this release, as it is for 10.0.13.
+
+- [#208](https://github.com/hamedniroomand/edgefit/pull/208) [`39c5dfc`](https://github.com/hamedniroomand/edgefit/commit/39c5dfc839859a90136bdc36a977179714b98470) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Cover `postal-mime` 4.0.3 and 4.0.4 in the list of code that a package ships and a target does not run. The `FileReader` finding of `blobToArrayBuffer` is guarded on workerd and Bun for these releases, as it is for 4.0.2.
+
 ## 0.10.0
 
 ### Minor Changes
