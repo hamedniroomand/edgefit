@@ -180,3 +180,15 @@ export function writtenObject(
     offset: object.type === 'MemberExpression' ? object.property.start : object.start,
   };
 }
+/**
+ * Whether `node` ends in `a?.b` and its value is not called as `a?.b()`. Such a read gives
+ * `undefined` when `b` is missing, so it checks for `b` and does not use it.
+ */
+export function isOptionalRead(node: Node, parent: Node | undefined): boolean {
+  const member = strip(node);
+  return (
+    member.type === 'MemberExpression' &&
+    member.optional &&
+    !(parent?.type === 'CallExpression' && parent.callee === node && !parent.optional)
+  );
+}

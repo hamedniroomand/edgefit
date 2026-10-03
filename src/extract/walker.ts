@@ -11,6 +11,7 @@ import {
   isFeatureCheck,
   isGlobalRoot,
   isMemberWrite,
+  isOptionalRead,
   writtenObject,
 } from './refs.ts';
 import { createScope } from './scope.ts';
@@ -113,6 +114,12 @@ export class Walker implements VisitContext {
   readonly #outer = (node: Node): Node[] =>
     this.#stack.slice(0, this.#stack.lastIndexOf(node) - 1).reverse();
 
+  /** Whether the value flows where its members may be used. Globals are reachable from any code, so passing one on hides nothing new. */
+  readonly #escapes = (ref: ApiRef, node: Node, parent: Node): boolean =>
+    ref.module !== '*globals*' &&
+    this.#boundInit !== node &&
+    escapes(node, parent, this.#outer(node));
+
   public readonly useRef = (ref: ApiRef, offset: number, recordBare = true): void => {
     const chain = followChain(this.#stack, ref, offset, this.#scope);
     if (chain.kind === 'computed') {
@@ -131,7 +138,11 @@ export class Walker implements VisitContext {
       return;
     }
     const { node, parent } = chain;
-    if (isGlobalRoot(chain.ref) || (parent !== undefined && isFeatureCheck(node, parent))) {
+    if (
+      isGlobalRoot(chain.ref) ||
+      (parent !== undefined && isFeatureCheck(node, parent)) ||
+      isOptionalRead(node, parent)
+    ) {
       return;
     }
     if (parent !== undefined && isMemberWrite(node, parent)) {
@@ -145,14 +156,7 @@ export class Walker implements VisitContext {
     if (recordBare || chain.extended) {
       this.collector.api(chain.ref, chain.offset);
     }
-    // Globals are reachable from any code, so passing one on hides nothing new.
-    const fromGlobal = chain.ref.module === '*globals*';
-    if (
-      !fromGlobal &&
-      parent !== undefined &&
-      this.#boundInit !== node &&
-      escapes(node, parent, this.#outer(node))
-    ) {
+    if (parent !== undefined && this.#escapes(chain.ref, node, parent)) {
       this.collector.dynamic(
         chain.ref,
         displayRef(chain.ref),
