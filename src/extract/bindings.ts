@@ -3,7 +3,7 @@ import type { Node } from 'oxc-parser';
 import { builtinName } from '@/data/builtins.ts';
 import type { ApiRef } from '@/types.ts';
 
-import { staticKey, staticString, unwrap } from './ast.ts';
+import { staticKey, staticString, strip, unwrap } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import {
   globalAliases,
@@ -42,12 +42,33 @@ export function fileMembers(
   return members.size > 0 ? members : undefined;
 }
 
+/**
+ * The string that an expression spells out, directly, through a `const`, or by joining such strings
+ * with a template literal or `+`: `` `card${suffix}` `` with `const suffix = 'inal'`.
+ */
+export function foldedString(node: Node | null | undefined, scope: Scope): string | undefined {
+  const inner = node === null || node === undefined ? undefined : strip(node);
+  if (inner?.type === 'Identifier') {
+    return lookupString(scope, inner.name);
+  }
+  if (inner?.type === 'TemplateLiteral') {
+    const parts = inner.quasis.flatMap((quasi, index) => [
+      quasi.value.cooked ?? undefined,
+      index < inner.expressions.length ? foldedString(inner.expressions[index], scope) : '',
+    ]);
+    return parts.every(part => part !== undefined) ? parts.join('') : undefined;
+  }
+  if (inner?.type === 'BinaryExpression' && inner.operator === '+') {
+    const left = foldedString(inner.left, scope);
+    const right = foldedString(inner.right, scope);
+    return left === undefined || right === undefined ? undefined : left + right;
+  }
+  return staticString(inner);
+}
+
 /** The module name an `import()` or `require()` argument spells out, directly or through a `const`. */
 export function moduleSpecifier(node: Node | null | undefined, scope: Scope): string | undefined {
-  if (node?.type === 'Identifier') {
-    return lookupString(scope, node.name);
-  }
-  return staticString(node);
+  return foldedString(node, scope);
 }
 
 export function isRequire(callee: Node, scope: Scope): boolean {

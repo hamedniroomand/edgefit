@@ -47,12 +47,40 @@ describe('leaving non-constant specifiers alone', () => {
     ]);
   });
 
-  it('keeps reporting a constant that is not a plain string', () => {
-    expect(usagesOf("const name = 'f' + 's';\nawait import(name);")).toEqual([
+  it('keeps reporting a constant that joins a name that is not a constant', () => {
+    expect(usagesOf("const name = 'f' + s;\nawait import(name);")).toEqual([
       'dynamic import(<expression>)',
     ]);
     expect(usagesOf('const name = `f${s}`;\nawait import(name);')).toEqual([
       'dynamic import(<expression>)',
+    ]);
+    expect(usagesOf("let part = 's';\nawait import(`f${part}`);")).toEqual([
+      'dynamic import(<expression>)',
+    ]);
+  });
+});
+
+describe('joining constant strings in a specifier', () => {
+  it('reads a template literal of constants as the string it spells', () => {
+    expect(usagesOf("const end = 's';\nawait import(`f${end}`);")).toEqual(['api node:fs']);
+  });
+
+  it('reads an empty constant in a template, as a package that avoids a bundler warning does', () => {
+    const source =
+      "const TERMINATOR = '';\ntry {\n  require(`fs${TERMINATOR}`).watch('.');\n} catch {}";
+    expect(usagesOf(source)).toEqual(['api node:fs.watch [guarded]']);
+  });
+
+  it('reads a + of strings and constants, and a constant that holds one', () => {
+    expect(usagesOf("const a = 'f';\nconst name = a + 's';\nawait import(name);")).toEqual([
+      'api node:fs',
+    ]);
+    expect(usagesOf("await import('node:' + 'vm');")).toEqual(['api node:vm']);
+  });
+
+  it('reads a template with a prefix of constants and a literal part', () => {
+    expect(usagesOf("const scheme = 'node';\nawait import(`${scheme}:vm`);")).toEqual([
+      'api node:vm',
     ]);
   });
 });
