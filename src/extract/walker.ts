@@ -5,7 +5,14 @@ import type { ApiRef } from '@/types.ts';
 import { childNodes, isTypeOnly } from './ast.ts';
 import { followChain } from './chain.ts';
 import type { VisitContext } from './context.ts';
-import { displayRef, escapes, isFeatureCheck, isGlobalRoot } from './refs.ts';
+import {
+  displayRef,
+  escapes,
+  isFeatureCheck,
+  isGlobalRoot,
+  isMemberWrite,
+  writtenObject,
+} from './refs.ts';
 import { createScope } from './scope.ts';
 import type { Scope } from './scope.ts';
 import type { UsageCollector } from './usage-collector.ts';
@@ -118,6 +125,14 @@ export class Walker implements VisitContext {
     }
     const { node, parent } = chain;
     if (isGlobalRoot(chain.ref) || (parent !== undefined && isFeatureCheck(node, parent))) {
+      return;
+    }
+    if (parent !== undefined && isMemberWrite(node, parent)) {
+      // Setting a missing member does not throw, but reading its object does.
+      const target = writtenObject(chain.ref, node);
+      if (target.ref.path.length > 0 && !isGlobalRoot(target.ref)) {
+        this.collector.api(target.ref, target.offset);
+      }
       return;
     }
     if (recordBare || chain.extended) {
