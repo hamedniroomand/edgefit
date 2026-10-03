@@ -19,6 +19,7 @@ vp run -r test    # run the tests
 vp run -r build   # build the packages
 vp run ready      # all of the above, as CI runs it
 vp run docs:dev   # the docs site; docs:build and docs:preview too
+vp run docs:results # download the package table results for the docs site
 ```
 
 The [contributing guide](https://edgefit.kitdev.space/contributing/) covers the repository layout and architecture, how the compatibility data is maintained, and how to add a [suggested fix](https://edgefit.kitdev.space/contributing/suggestions).

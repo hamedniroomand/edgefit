@@ -44,6 +44,7 @@
     "docs:build": "vp run edgefit-docs#build",
     "docs:dev": "vp run edgefit-docs#dev",
     "docs:preview": "vp run edgefit-docs#preview",
+    "docs:results": "git fetch --depth 1 origin package-results && mkdir -p docs/public/packages && git archive FETCH_HEAD | tar -x -C docs/public/packages",
     "format": "vp fmt",
     "lint": "vp lint",
     "prepare": "vp config",
