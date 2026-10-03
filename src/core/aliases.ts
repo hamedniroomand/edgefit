@@ -47,9 +47,6 @@ function openedFiles(
   for (const [file, { shape }] of modules) {
     const specifiers = [
       ...(shape?.stars ?? []),
-      ...[...(shape?.imports.values() ?? [])]
-        .filter(item => item.imported === '*')
-        .map(item => item.specifier),
       ...[...(shape?.exports.values() ?? [])].flatMap(item =>
         'specifier' in item ? item.specifier : [],
       ),
@@ -93,6 +90,7 @@ export function followAliases(
     }
   }
   seedLoads(graph, modules, demands, opened, { seeds, followed });
+  seedNamespaces(graph, modules, demands, opened, { seeds, followed });
   return { seeds, followed };
 }
 
@@ -142,6 +140,41 @@ function seedLoads(
             target,
             (found.followed.get(target) ?? new Set<number>()).add(alias.offset),
           );
+        }
+      }
+    }
+  }
+}
+
+/**
+ * The same for a whole file that a module imports as `import * as ns` and reads by member. The file
+ * is asked for the names that the graph reads from it, so each of them that is a Node.js module
+ * there is that module in this module.
+ */
+function seedNamespaces(
+  graph: ModuleGraph,
+  modules: ReadonlyMap<string, ExtractedModule>,
+  demands: ReadonlyMap<string, Demand>,
+  opened: ReadonlySet<string>,
+  found: FollowedAliases,
+): void {
+  for (const [file, { shape }] of modules) {
+    const specifiers = [...(shape?.imports ?? [])].flatMap(([local, item]) =>
+      item.imported === '*' && shape?.bindings.has(local) === true ? item.specifier : [],
+    );
+    for (const specifier of new Set(specifiers)) {
+      const target = targetOf(graph, file, specifier);
+      const asked = target === undefined ? undefined : demands.get(target);
+      for (const name of asked instanceof Set ? asked : []) {
+        const alias = target === undefined ? undefined : modules.get(target)?.aliases.get(name);
+        if (target === undefined || alias === undefined) {
+          continue;
+        }
+        const own = found.seeds.get(file) ?? new Map<string, ApiRef>();
+        found.seeds.set(file, own.set(`${specifier}\0${name}`, alias.ref));
+        if (!opened.has(target)) {
+          const offsets = found.followed.get(target) ?? new Set<number>();
+          found.followed.set(target, offsets.add(alias.offset));
         }
       }
     }

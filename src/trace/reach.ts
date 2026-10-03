@@ -60,11 +60,9 @@ function seedDemands(graph: ModuleGraph, shapes: ReadonlyMap<string, ModuleShape
         shape.specifiers.has(link.original ?? '');
       // A file loaded with `import()` or `require()` that only gets destructured by name is asked
       // for those names. An understood `require` is already read through `named`.
-      const loaded = loadsFor(shape, link.kind);
-      const asked =
-        shape?.traceable === true && (link.kind === 'dynamic-import' || !named)
-          ? loaded?.get(link.original ?? '')
-          : undefined;
+      const loaded = loadsFor(shape, link.kind)?.get(link.original ?? '');
+      // The names a file reads are known whether or not its own exports can be told apart.
+      const asked = link.kind === 'dynamic-import' || !named ? loaded : undefined;
       if (asked instanceof Set) {
         demands.raise(link.path, asked);
       } else if (!named) {
