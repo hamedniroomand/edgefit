@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.9.2
+
+### Patch Changes
+
+- [#147](https://github.com/hamedniroomand/edgefit/pull/147) [`f534708`](https://github.com/hamedniroomand/edgefit/commit/f534708d9192ed3f8a7f64f1f75ae009305cf76a) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Follow a variable that holds a value when it is declared and is set once to a required module, such as `var crypto = null; crypto = require('crypto')`. A member read on the variable is a use of the module, and a check on it is a guard.
+
+- [#144](https://github.com/hamedniroomand/edgefit/pull/144) [`1c97f9d`](https://github.com/hamedniroomand/edgefit/commit/1c97f9d3bd6a98e5f224e95cf56e7cfa319a2a60) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Do not report a computed read of the global object that is only compared. `globalThis[name] === value` no longer gives an `unknown` warning. A call, a member read or a value passed on is still reported.
+
+- [#145](https://github.com/hamedniroomand/edgefit/pull/145) [`e51d8cc`](https://github.com/hamedniroomand/edgefit/commit/e51d8ccdcac3aa911953684ca70cceb4293d6af1) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - An exported alias of a global that the target has, such as `export { FastURL }` for `URL`, is no longer reported as unknown.
+
+- [#142](https://github.com/hamedniroomand/edgefit/pull/142) [`1d367a3`](https://github.com/hamedniroomand/edgefit/commit/1d367a36203391660b2f719365313c457122cd75) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read a conditional of the global object, such as `typeof window !== 'undefined' ? window : globalThis`, as an alias of the global object. A member check through the alias now guards the same global.
+
+- [#148](https://github.com/hamedniroomand/edgefit/pull/148) [`7712c77`](https://github.com/hamedniroomand/edgefit/commit/7712c77eaa97c22a207a5c79ece3c56df3b995c3) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Follow a function that only runs `import(specifier)` for its one parameter, such as `const load = specifier => import(specifier)`, when every use of it is a call with a literal. Each call is read as an import of the literal, and the module is added to the graph. A function that is exported, passed on, or called with anything else is still reported as `import(<expression>)`.
+
+- [#143](https://github.com/hamedniroomand/edgefit/pull/143) [`227c3a2`](https://github.com/hamedniroomand/edgefit/commit/227c3a284dd37d2a3073843dd18bb0a17d8411dd) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read optional chaining as a check. `a?.b` and `a?.b?.()` no longer use `b`, and an `if` that tests them guards its branch. A guarded use of an API that the data does not cover is listed as guarded, not as an `unknown` warning.
+
+- [#150](https://github.com/hamedniroomand/edgefit/pull/150) [`9be1e09`](https://github.com/hamedniroomand/edgefit/commit/9be1e09c5a574487e2a5750baf8476826158eef5) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - List the `FileReader` fallback of `postal-mime` as code that `workerd` and Bun never reach. Both have `Blob.prototype.arrayBuffer`, which the function checks first, so the finding is reported as guarded.
+
+- [#146](https://github.com/hamedniroomand/edgefit/pull/146) [`bebf6d6`](https://github.com/hamedniroomand/edgefit/commit/bebf6d60af95c28da083c8dd6f80aa1e1e689178) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read a call through a sequence expression, such as `(0, ns.member)()` in `tsc` output, as a call of the member. A module that the call reaches through `__importDefault` is no longer reported as passed on as a value.
+
 ## 0.9.1
 
 ### Patch Changes
