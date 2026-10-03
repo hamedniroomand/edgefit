@@ -3,7 +3,7 @@ import type { Node } from 'oxc-parser';
 import { builtinName } from '@/data/builtins.ts';
 import { isSymbolKey, staticKey, staticString, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
-import { fileMembers, resolveBinding } from '@/extract/bindings.ts';
+import { fileMembers, foldedString, resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { displayRef, isGlobalRoot, memberRef, moduleRef } from '@/extract/refs.ts';
 import { assign, isBound, lookup, lookupStringObject } from '@/extract/scope.ts';
@@ -230,7 +230,7 @@ function recordKeys(name: string, init: Node | null, context: VisitContext): voi
 export const visitDeclaration: Visitor<NodeOf<'VariableDeclaration'>> = (node, context) => {
   if (node.kind === 'const') {
     for (const { id, init } of node.declarations) {
-      const value = id.type === 'Identifier' ? staticString(init) : undefined;
+      const value = id.type === 'Identifier' ? foldedString(init, context.scope) : undefined;
       if (id.type === 'Identifier') {
         recordKeys(id.name, init, context);
       }
