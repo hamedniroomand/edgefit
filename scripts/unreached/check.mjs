@@ -41,7 +41,8 @@ const problems = [];
 for (const name of new Set(entries.map(entry => entry.package))) {
   const { version, root } = download(name);
   const own = entries.filter(entry => entry.package === name);
-  for (const entry of own) {
+  // An entry for an older release describes that release, not the latest one.
+  for (const entry of own.filter(item => inRange(version, item.versions))) {
     const file = path.join(root, entry.file);
     if (!existsSync(file)) {
       problems.push(`${name}@${version}: ${entry.file} no longer exists.`);
