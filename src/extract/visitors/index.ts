@@ -5,7 +5,13 @@ import type { Visitor } from '@/extract/context.ts';
 import { visitCall, visitImportExpression, visitNew } from './calls.ts';
 import { visitDeclaration, visitDeclarator } from './declarators.ts';
 import { visitConditional, visitIf, visitLogical, visitTry } from './guards.ts';
-import { visitExportAll, visitExportNamed, visitImport, visitImportEquals } from './modules.ts';
+import {
+  visitExportAll,
+  visitExportDefault,
+  visitExportNamed,
+  visitImport,
+  visitImportEquals,
+} from './modules.ts';
 import {
   skip,
   visitAssignment,
@@ -47,6 +53,7 @@ const visitors: VisitorMap = {
   ImportDeclaration: visitImport,
   ExportNamedDeclaration: visitExportNamed,
   ExportAllDeclaration: visitExportAll,
+  ExportDefaultDeclaration: visitExportDefault,
   TSImportEqualsDeclaration: visitImportEquals,
   IfStatement: visitIf,
   TryStatement: visitTry,

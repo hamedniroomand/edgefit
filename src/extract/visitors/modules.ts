@@ -28,7 +28,12 @@ export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context)
   if (module === undefined) {
     const isWasm = wasmSource.test(node.source.value);
     for (const specifier of used) {
-      assign(context.scope, specifier.local.name, null);
+      const alias = context.collector.importedModules.get(specifier.local.name);
+      assign(
+        context.scope,
+        specifier.local.name,
+        alias === undefined ? null : { ref: alias, recorded: false },
+      );
       if (isWasm && specifier.type !== 'ImportSpecifier') {
         context.scope.wasmImports.add(specifier.local.name);
       }
@@ -51,10 +56,11 @@ export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context)
   }
 };
 
-function exportLocal(local: Node, context: VisitContext): void {
+export function exportLocal(local: Node, exported: string, context: VisitContext): void {
   const binding = local.type === 'Identifier' ? lookup(context.scope, local.name) : undefined;
   // The global object says nothing about which API is used, wherever it goes.
   if (isTracked(binding) && !isGlobalRoot(binding.ref)) {
+    context.collector.aliases.set(exported, { ref: binding.ref, offset: local.start });
     context.collector.dynamic(
       binding.ref,
       displayRef(binding.ref),
@@ -82,13 +88,40 @@ export const visitExportNamed: Visitor<NodeOf<'ExportNamedDeclaration'>> = (node
       continue;
     }
     if (module === undefined) {
-      exportLocal(specifier.local, context);
+      exportLocal(specifier.local, staticKey(specifier.exported, false) ?? 'default', context);
     } else {
       const ref = namedRef(module, specifier.local);
       context.collector.api(ref, specifier.local.start);
       context.collector.dynamic(ref, displayRef(ref), 're-exported', specifier.local.start);
     }
   }
+};
+
+/** `export default name` of a module is an export of that module. */
+/** The name that `exports.name = …` or `module.exports.name = …` sets, if `node` is that member. */
+export function commonJsExportName(node: Node): string | undefined {
+  if (node.type !== 'MemberExpression') {
+    return undefined;
+  }
+  const { object } = node;
+  const isExports = object.type === 'Identifier' && object.name === 'exports';
+  const isModuleExports =
+    object.type === 'MemberExpression' &&
+    object.object.type === 'Identifier' &&
+    object.object.name === 'module' &&
+    staticKey(object.property, object.computed) === 'exports';
+  return isExports || isModuleExports ? staticKey(node.property, node.computed) : undefined;
+}
+
+export const visitExportDefault: Visitor<NodeOf<'ExportDefaultDeclaration'>> = (node, context) => {
+  if (node.declaration.type === 'Identifier') {
+    const binding = lookup(context.scope, node.declaration.name);
+    if (isTracked(binding) && binding.ref.module !== '*globals*') {
+      exportLocal(node.declaration, 'default', context);
+      return;
+    }
+  }
+  context.visitChildren(node);
 };
 
 export const visitExportAll: Visitor<NodeOf<'ExportAllDeclaration'>> = (node, context) => {

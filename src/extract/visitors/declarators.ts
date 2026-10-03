@@ -8,6 +8,7 @@ import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { displayRef, isGlobalRoot, memberRef, moduleRef } from '@/extract/refs.ts';
 import { assign, isBound, lookup } from '@/extract/scope.ts';
 import type { Binding } from '@/extract/scope.ts';
+import { destructuredLoad } from '@/trace/dynamic-imports.ts';
 import type { ApiRef } from '@/types.ts';
 
 type DestructuredProperty = NodeOf<'ObjectPattern'>['properties'][number];
@@ -86,8 +87,22 @@ function wrapperBinding(init: Node, context: VisitContext): Binding | undefined 
   return module === undefined ? undefined : { ref: moduleRef(module), recorded: false };
 }
 
+/** `const { crypto } = await import('./file')` or `require('./file')` binds the names that another file exports as a Node.js module. */
+function bindLoadedNames(node: NodeOf<'VariableDeclarator'>, context: VisitContext): void {
+  for (const kind of ['import', 'require'] as const) {
+    const found = destructuredLoad(node, kind);
+    for (const [local, name] of found?.names ?? []) {
+      const alias = context.collector.importedModules.get(`${found?.specifier ?? ''}\0${name}`);
+      if (alias !== undefined) {
+        assign(context.scope, local, { ref: alias, recorded: false });
+      }
+    }
+  }
+}
+
 export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, context) => {
   const { id, init } = node;
+  bindLoadedNames(node, context);
   const initial =
     init === null ? undefined : (wrapperBinding(init, context) ?? resolveBinding(init, context));
   const binding = isBound(initial) ? initial : assignedBinding(id, context);

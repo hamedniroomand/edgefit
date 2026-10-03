@@ -3,7 +3,7 @@ import type { Node, ParseResult, ParserOptions } from 'oxc-parser';
 
 import { collectShape } from '@/trace/shape.ts';
 import type { ModuleShape } from '@/trace/shape.ts';
-import type { Usage } from '@/types.ts';
+import type { ApiRef, Usage } from '@/types.ts';
 
 import { findAssigned } from './assigned.ts';
 import { findImportWrappers } from './import-wrappers.ts';
@@ -24,6 +24,8 @@ export interface ExtractOptions {
   keepUnusedImports?: boolean;
   /** Specifiers of the file that resolve to a native addon, as written in the source. */
   nativeSpecifiers?: ReadonlySet<string>;
+  /** Imported local names that another module of the graph exports as a Node.js module. */
+  importedModules?: ReadonlyMap<string, ApiRef>;
 }
 
 export interface ExtractedModule {
@@ -32,6 +34,8 @@ export interface ExtractedModule {
   offsets: number[];
   /** Set when `shape` was asked for and the file could be parsed. */
   shape: ModuleShape | undefined;
+  /** The exports that are a Node.js module, by exported name, with where the export is written. */
+  aliases: ReadonlyMap<string, { ref: ApiRef; offset: number }>;
 }
 
 function languageFor(file: string): ParserOptions['lang'] {
@@ -70,6 +74,11 @@ export function parse(file: string, source: string): ParseResult {
   return retry.errors.length === 0 ? retry : result;
 }
 
+function finish(collector: UsageCollector, shape?: ModuleShape): ExtractedModule {
+  const { usages, offsets, aliases } = collector;
+  return { usages, offsets, aliases, shape };
+}
+
 /** Parses a file and returns every runtime API use in it, and where each one is. */
 export function extractModule(
   file: string,
@@ -81,6 +90,7 @@ export function extractModule(
     source,
     options.lazyNodeImports === true,
     options.nativeSpecifiers,
+    options.importedModules,
   );
   const result = parse(file, source);
   const [error] = result.errors;
@@ -91,7 +101,7 @@ export function extractModule(
       `the file could not be parsed: ${error.message}`,
       error.labels[0]?.start ?? 0,
     );
-    return { usages: collector.usages, offsets: collector.offsets, shape: undefined };
+    return finish(collector);
   }
   const body = result.program.body as Node[];
   // Only a TypeScript compiler drops an import because its names are not used as values.
@@ -107,14 +117,10 @@ export function extractModule(
     findAssigned(body),
     findImportWrappers(body),
   ).visit(result.program as Node);
-  return {
-    usages: collector.usages,
-    offsets: collector.offsets,
-    shape:
-      options.shape === true
-        ? collectShape(body, result.module.hasModuleSyntax, dropped)
-        : undefined,
-  };
+  return finish(
+    collector,
+    options.shape === true ? collectShape(body, result.module.hasModuleSyntax, dropped) : undefined,
+  );
 }
 
 /** Parses a file and returns every runtime API use in it. */

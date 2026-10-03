@@ -18,6 +18,10 @@ class Demands {
     return this.#demands.get(file) ?? new Set();
   }
 
+  public all(): ReadonlyMap<string, Demand> {
+    return this.#demands;
+  }
+
   /** Adds to what is asked of a module, and says whether that asked for something new. */
   public raise(file: string, names: Demand): boolean {
     const current = this.get(file);
@@ -27,6 +31,14 @@ class Demands {
     this.#demands.set(file, names === 'all' ? 'all' : new Set([...current, ...names]));
     return true;
   }
+}
+
+/** What a module asks of the files that it loads with `import()` or `require()`, by the kind of the link. */
+function loadsFor(
+  shape: ModuleShape | undefined,
+  kind: string,
+): ModuleShape['dynamicImports'] | undefined {
+  return { 'dynamic-import': shape?.dynamicImports, 'require-call': shape?.requires }[kind];
 }
 
 /**
@@ -46,7 +58,16 @@ function seedDemands(graph: ModuleGraph, shapes: ReadonlyMap<string, ModuleShape
         shape?.traceable === true &&
         isStatic(link.kind) &&
         shape.specifiers.has(link.original ?? '');
-      if (!named) {
+      // A file loaded with `import()` or `require()` that only gets destructured by name is asked
+      // for those names. An understood `require` is already read through `named`.
+      const loaded = loadsFor(shape, link.kind);
+      const asked =
+        shape?.traceable === true && (link.kind === 'dynamic-import' || !named)
+          ? loaded?.get(link.original ?? '')
+          : undefined;
+      if (asked instanceof Set) {
+        demands.raise(link.path, asked);
+      } else if (!named) {
         demands.raise(link.path, 'all');
       }
     }
@@ -62,7 +83,7 @@ function seedDemands(graph: ModuleGraph, shapes: ReadonlyMap<string, ModuleShape
 export function traceReach(
   graph: ModuleGraph,
   shapes: ReadonlyMap<string, ModuleShape>,
-): Map<string, Set<Unit>> {
+): { traced: Map<string, Set<Unit>>; demands: ReadonlyMap<string, Demand> } {
   const demands = seedDemands(graph, shapes);
   const traced = new Map<string, Set<Unit>>();
   const queue = [...graph.modules.keys()];
@@ -80,7 +101,7 @@ export function traceReach(
       }
     }
   }
-  return traced;
+  return { traced, demands: demands.all() };
 }
 
 /** The unit of a module that holds the offset, if it is in one. */
@@ -101,18 +122,30 @@ export function unitAt(shape: ModuleShape, offset: number): Unit | undefined {
   return undefined;
 }
 
-/** The usages of each module that sit in code something uses. The rest are left out. */
-export function reachedUsages(
-  graph: ModuleGraph,
-  modules: ReadonlyMap<string, ExtractedModule>,
-): Map<string, Usage[]> {
+function shapesOf(modules: ReadonlyMap<string, ExtractedModule>): Map<string, ModuleShape> {
   const shapes = new Map<string, ModuleShape>();
   for (const [file, module] of modules) {
     if (module.shape !== undefined) {
       shapes.set(file, module.shape);
     }
   }
-  const traced = traceReach(graph, shapes);
+  return shapes;
+}
+
+/** The export names that the modules of the graph ask of each module, or `all`. */
+export function exportDemands(
+  graph: ModuleGraph,
+  modules: ReadonlyMap<string, ExtractedModule>,
+): ReadonlyMap<string, Demand> {
+  return traceReach(graph, shapesOf(modules)).demands;
+}
+
+/** The usages of each module that sit in code something uses. The rest are left out. */
+export function reachedUsages(
+  graph: ModuleGraph,
+  modules: ReadonlyMap<string, ExtractedModule>,
+): Map<string, Usage[]> {
+  const { traced } = traceReach(graph, shapesOf(modules));
   return new Map(
     [...modules].map(([file, module]) => {
       const live = traced.get(file);
