@@ -70,11 +70,14 @@ describe.skipIf(!built)('next.js on vercel-edge, from the build output', () => {
   // a computed `import()`. That code is in the bundle, with no file of the project behind it.
   it('puts the code of the bundler under build output, not under your code', async () => {
     const warnings = ((await report())?.findings ?? []).filter(finding => finding.level === 'warning');
-    const owners = warnings.map(finding => `${finding.api} ${finding.buildOutput === true}`);
+    const owners = warnings.map(
+      finding =>
+        `${finding.api} ${finding.buildOutput === true} ${1 + finding.otherLocations.length}`,
+    );
     expect(owners.toSorted()).toEqual([
-      ...Array.from({ length: 3 }, () => 'import(<expression>) true'),
-      ...Array.from({ length: 3 }, () => 'node:async_hooks true'),
-      ...Array.from({ length: 3 }, () => 'node:buffer true'),
+      'import(<expression>) true 3',
+      'node:async_hooks true 3',
+      'node:buffer true 3',
     ]);
     expect(warnings.every(finding => finding.package === undefined)).toBe(true);
   });

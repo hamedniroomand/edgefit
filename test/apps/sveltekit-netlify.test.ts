@@ -32,11 +32,13 @@ describe.skipIf(!built)('sveltekit on netlify-edge, from the build output', () =
   it('reports no error, and puts the warnings under build output', async () => {
     const found = await report('.netlify');
     expect(found?.findings.filter(finding => finding.level === 'error')).toEqual([]);
-    const warnings = found?.findings.map(finding => `${finding.api} ${finding.buildOutput}`) ?? [];
+    const warnings =
+      found?.findings.map(
+        finding => `${finding.api} ${finding.buildOutput} ${1 + finding.otherLocations.length}`,
+      ) ?? [];
     expect(warnings.toSorted()).toEqual([
-      'globalThis[<expression>] true',
-      'globalThis[<expression>] true',
-      'import(<expression>) true',
+      'globalThis[<expression>] true 2',
+      'import(<expression>) true 1',
     ]);
   });
 });
