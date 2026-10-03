@@ -4,6 +4,7 @@ import type { ApiRef } from '@/types.ts';
 
 import type { BindingContext } from './bindings.ts';
 import type { ImportWrappers } from './import-wrappers.ts';
+import type { LocalFunction } from './local-functions.ts';
 import type { Scope } from './scope.ts';
 import type { UsageCollector } from './usage-collector.ts';
 
@@ -15,6 +16,8 @@ export interface VisitContext extends BindingContext {
   readonly assigned: ReadonlyMap<string, Node>;
   /** The functions that only run `import()` for their argument, from `findImportWrappers`. */
   readonly wrappers: ImportWrappers;
+  /** The functions that a plain name of the file stands for, see `findLocalFunctions`. */
+  readonly functions: ReadonlyMap<string, LocalFunction>;
   visit: (node: Node | null | undefined) => void;
   visitAll: (nodes: readonly (Node | null)[]) => void;
   visitChildren: (node: Node) => void;

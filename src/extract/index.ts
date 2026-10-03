@@ -7,6 +7,7 @@ import type { ApiRef, Usage } from '@/types.ts';
 
 import { findAssigned } from './assigned.ts';
 import { findImportWrappers } from './import-wrappers.ts';
+import { findLocalFunctions } from './local-functions.ts';
 import { typeOnlyImports } from './type-only-imports.ts';
 import { UsageCollector } from './usage-collector.ts';
 import { Walker } from './walker.ts';
@@ -116,6 +117,7 @@ export function extractModule(
     dropped,
     findAssigned(body),
     findImportWrappers(body),
+    findLocalFunctions(body),
   ).visit(result.program as Node);
   return finish(
     collector,
