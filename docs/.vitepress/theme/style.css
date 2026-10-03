@@ -115,6 +115,10 @@ body {
 .VPNav {
   border-bottom: 1px solid var(--vp-c-divider);
   background: color-mix(in srgb, var(--vp-c-bg) 88%, transparent);
+}
+
+/* A filter on `.VPNav` would make it the box of the fixed mobile menu, and the menu would have no height. */
+.VPNavBar {
   backdrop-filter: blur(16px) saturate(160%);
 }
 
