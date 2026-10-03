@@ -2,8 +2,8 @@
   "version": 2,
   "package": "mysql2",
   "resolved": "3.24.5",
-  "checkedAt": "2026-10-03T17:25:17.740Z",
-  "edgefit": "0.10.0",
+  "checkedAt": "2026-10-03T21:06:11.238Z",
+  "edgefit": "0.11.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,9 +23,16 @@
     "deno"
   ],
   "summary": {
-    "workerd": "warn",
+    "workerd": "pass",
     "bun": "pass",
     "deno": "pass"
+  },
+  "worstExport": {
+    "workerd": {
+      "subpath": ".",
+      "name": "createServer",
+      "status": "warn"
+    }
   },
   "context": {
     "workerd": {
@@ -49,9 +56,23 @@
       "specifier": "mysql2",
       "results": {
         "workerd": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0,
+          "exports": [
+            {
+              "name": "createServer",
+              "level": "warning",
+              "findings": [
+                {
+                  "api": "node:net.createServer",
+                  "category": "mismatch",
+                  "level": "warning",
+                  "detail": "listen() works only on a port the platform declares for the worker, and other ports fail with EADDRNOTAVAIL"
+                }
+              ]
+            }
+          ]
         },
         "bun": {
           "status": "pass",

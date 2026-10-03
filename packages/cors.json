@@ -2,8 +2,8 @@
   "version": 2,
   "package": "cors",
   "resolved": "2.8.6",
-  "checkedAt": "2026-10-03T17:26:41.157Z",
-  "edgefit": "0.10.0",
+  "checkedAt": "2026-10-03T21:07:29.656Z",
+  "edgefit": "0.11.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

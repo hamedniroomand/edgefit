@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@sinclair/typebox",
   "resolved": "0.34.52",
-  "checkedAt": "2026-10-03T17:26:10.418Z",
-  "edgefit": "0.10.0",
+  "checkedAt": "2026-10-03T21:06:49.022Z",
+  "edgefit": "0.11.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

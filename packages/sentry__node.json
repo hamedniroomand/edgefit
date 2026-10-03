@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.4.0",
-  "checkedAt": "2026-10-03T17:31:21.603Z",
-  "edgefit": "0.10.0",
+  "checkedAt": "2026-10-03T21:13:29.057Z",
+  "edgefit": "0.11.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -24,8 +24,21 @@
   ],
   "summary": {
     "workerd": "fail",
-    "bun": "fail",
+    "bun": "warn",
     "deno": "warn"
+  },
+  "worst": {
+    "bun": {
+      "subpath": "./import",
+      "status": "fail"
+    }
+  },
+  "worstExport": {
+    "bun": {
+      "subpath": ".",
+      "name": "eveInstrumentation",
+      "status": "fail"
+    }
   },
   "context": {
     "workerd": {
@@ -51,12 +64,154 @@
         "workerd": {
           "status": "fail",
           "errors": 8,
-          "warnings": 11
+          "warnings": 8,
+          "exports": [
+            {
+              "name": "eveInstrumentation",
+              "level": "warning",
+              "findings": [
+                {
+                  "api": "node:worker_threads.threadId",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                },
+                {
+                  "api": "node:worker_threads.parentPort",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                },
+                {
+                  "api": "node:worker_threads.MessageChannel",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                }
+              ]
+            },
+            {
+              "name": "init",
+              "level": "warning",
+              "findings": [
+                {
+                  "api": "node:worker_threads.threadId",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                },
+                {
+                  "api": "node:worker_threads.parentPort",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                },
+                {
+                  "api": "node:worker_threads.MessageChannel",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                }
+              ]
+            },
+            {
+              "name": "initWithoutDefaultIntegrations",
+              "level": "warning",
+              "findings": [
+                {
+                  "api": "node:worker_threads.threadId",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                },
+                {
+                  "api": "node:worker_threads.parentPort",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                },
+                {
+                  "api": "node:worker_threads.MessageChannel",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                }
+              ]
+            },
+            {
+              "name": "NodeClient",
+              "level": "warning",
+              "findings": [
+                {
+                  "api": "node:worker_threads.threadId",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                },
+                {
+                  "api": "node:worker_threads.MessageChannel",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                }
+              ]
+            }
+          ]
         },
         "bun": {
-          "status": "fail",
-          "errors": 1,
-          "warnings": 5
+          "status": "warn",
+          "errors": 0,
+          "warnings": 5,
+          "exports": [
+            {
+              "name": "eveInstrumentation",
+              "level": "error",
+              "findings": [
+                {
+                  "api": "node:module.register",
+                  "category": "mocked",
+                  "level": "error",
+                  "detail": "does nothing; use Bun.plugin for loader hooks"
+                }
+              ]
+            },
+            {
+              "name": "init",
+              "level": "error",
+              "findings": [
+                {
+                  "api": "node:module.register",
+                  "category": "mocked",
+                  "level": "error",
+                  "detail": "does nothing; use Bun.plugin for loader hooks"
+                }
+              ]
+            },
+            {
+              "name": "initWithoutDefaultIntegrations",
+              "level": "error",
+              "findings": [
+                {
+                  "api": "node:module.register",
+                  "category": "mocked",
+                  "level": "error",
+                  "detail": "does nothing; use Bun.plugin for loader hooks"
+                }
+              ]
+            },
+            {
+              "name": "NodeClient",
+              "level": "error",
+              "findings": [
+                {
+                  "api": "node:module.register",
+                  "category": "mocked",
+                  "level": "error",
+                  "detail": "does nothing; use Bun.plugin for loader hooks"
+                }
+              ]
+            }
+          ]
         },
         "deno": {
           "status": "warn",

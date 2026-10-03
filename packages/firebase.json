@@ -2,8 +2,8 @@
   "version": 2,
   "package": "firebase",
   "resolved": "12.19.0",
-  "checkedAt": "2026-10-03T17:26:18.472Z",
-  "edgefit": "0.10.0",
+  "checkedAt": "2026-10-03T21:06:43.421Z",
+  "edgefit": "0.11.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -39,7 +39,7 @@
     },
     "deno": {
       "subpath": "./firestore",
-      "status": "fail"
+      "status": "warn"
     }
   },
   "context": {
@@ -242,8 +242,8 @@
           "warnings": 0
         },
         "deno": {
-          "status": "fail",
-          "errors": 1,
+          "status": "warn",
+          "errors": 0,
           "warnings": 2
         }
       }
@@ -263,8 +263,8 @@
           "warnings": 0
         },
         "deno": {
-          "status": "fail",
-          "errors": 1,
+          "status": "warn",
+          "errors": 0,
           "warnings": 2
         }
       }
@@ -599,8 +599,8 @@
           "warnings": 0
         },
         "deno": {
-          "status": "fail",
-          "errors": 1,
+          "status": "warn",
+          "errors": 0,
           "warnings": 2
         }
       }

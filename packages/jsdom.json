@@ -2,8 +2,8 @@
   "version": 2,
   "package": "jsdom",
   "resolved": "30.1.1",
-  "checkedAt": "2026-10-03T17:26:43.209Z",
-  "edgefit": "0.10.0",
+  "checkedAt": "2026-10-03T21:06:22.942Z",
+  "edgefit": "0.11.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -51,7 +51,21 @@
         "workerd": {
           "status": "fail",
           "errors": 4,
-          "warnings": 8
+          "warnings": 7,
+          "exports": [
+            {
+              "name": "JSDOM",
+              "level": "warning",
+              "findings": [
+                {
+                  "api": "node:vm.isContext",
+                  "category": "unknown",
+                  "level": "warning",
+                  "detail": "is not covered by the compatibility data"
+                }
+              ]
+            }
+          ]
         },
         "bun": {
           "status": "warn",

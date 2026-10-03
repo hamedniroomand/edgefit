@@ -2,8 +2,8 @@
   "version": 2,
   "package": "ajv",
   "resolved": "8.20.0",
-  "checkedAt": "2026-10-03T17:25:37.143Z",
-  "edgefit": "0.10.0",
+  "checkedAt": "2026-10-03T21:05:44.396Z",
+  "edgefit": "0.11.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

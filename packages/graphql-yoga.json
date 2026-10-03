@@ -2,8 +2,8 @@
   "version": 2,
   "package": "graphql-yoga",
   "resolved": "5.24.1",
-  "checkedAt": "2026-10-03T17:25:28.544Z",
-  "edgefit": "0.10.0",
+  "checkedAt": "2026-10-03T21:07:06.685Z",
+  "edgefit": "0.11.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

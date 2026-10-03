@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-03T17:31:41.983Z",
-  "edgefit": "0.10.0",
+  "generatedAt": "2026-10-03T21:13:52.906Z",
+  "edgefit": "0.11.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -187,11 +187,18 @@
       "file": "mysql2",
       "resolved": "3.24.5",
       "summary": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 3
+      "subpaths": 3,
+      "worstExport": {
+        "workerd": {
+          "subpath": ".",
+          "name": "createServer",
+          "status": "warn"
+        }
+      }
     },
     {
       "name": "ioredis",
@@ -332,7 +339,7 @@
       "summary": {
         "workerd": "pass",
         "bun": "pass",
-        "deno": "warn"
+        "deno": "pass"
       },
       "subpaths": 13,
       "worst": {
@@ -626,7 +633,7 @@
         },
         "deno": {
           "subpath": "./firestore",
-          "status": "fail"
+          "status": "warn"
         }
       },
       "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin."
@@ -637,10 +644,23 @@
       "resolved": "11.4.0",
       "summary": {
         "workerd": "fail",
-        "bun": "fail",
+        "bun": "warn",
         "deno": "warn"
       },
-      "subpaths": 6
+      "subpaths": 6,
+      "worst": {
+        "bun": {
+          "subpath": "./import",
+          "status": "fail"
+        }
+      },
+      "worstExport": {
+        "bun": {
+          "subpath": ".",
+          "name": "eveInstrumentation",
+          "status": "fail"
+        }
+      }
     },
     {
       "name": "mongodb",
@@ -768,7 +788,7 @@
       "file": "nodemailer",
       "resolved": "10.0.14",
       "summary": {
-        "workerd": "fail",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
