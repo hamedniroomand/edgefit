@@ -6,6 +6,7 @@ import type { Loader, Message, Metafile, Plugin } from 'esbuild';
 import { toResolveError } from './errors.ts';
 import { acceptMissingPeers, importKey, optionalPeers } from './optional-peers.ts';
 import { runtimeExternals } from './runtime-externals.ts';
+import { tsconfigRawFor } from './tsconfig.ts';
 
 /** An import of a module in the graph, as esbuild resolved it. */
 export interface ImportLink {
@@ -104,6 +105,7 @@ async function bundleMetafile(options: ResolveOptions, accepted: Set<string>): P
       conditions: [...options.conditions],
       mainFields: mainFields[options.platform],
       loader: assetLoaders,
+      tsconfigRaw: tsconfigRawFor(options.root),
       define,
       logLevel: 'silent',
       plugins: [...(options.plugins ?? []), runtimeExternals, optionalPeers(accepted)],

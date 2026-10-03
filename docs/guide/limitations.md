@@ -62,7 +62,7 @@ In a TypeScript file, an import whose names are never used as values gives no fi
 
 The bundler keeps these imports when the `tsconfig.json` sets `verbatimModuleSyntax`, `preserveValueImports`, or `importsNotUsedAsValues` to `preserve` or `error`. edgefit then reports them. It has these limits:
 
-- It reads the nearest `tsconfig.json` of each file, and follows `extends` when the value is a relative path or a list of relative paths. A package name in `extends` is not followed.
+- It reads the nearest `tsconfig.json` of each file, up to the project root. A config above the root is not read. It follows `extends` when the value is a relative path or a list of relative paths. A package name in `extends` is not followed.
 - It does not read the `tsconfig` option of a bundler.
 - A name counts as used when it is read anywhere in the file. A local variable of the same name also counts, which can only keep a finding, never hide one.
 - It reads no tsconfig for files in `node_modules`, so their imports that are used only as types are skipped.
