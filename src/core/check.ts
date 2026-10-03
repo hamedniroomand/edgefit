@@ -35,6 +35,8 @@ export interface CheckOptions {
   includeSupported?: boolean;
   /** List an optional peer dependency that is not installed as `TargetReport.missingPeers`, not as a finding. */
   missingPeersAsNotes?: boolean;
+  /** Name the exports of the package that the entry imports on a finding that only some of them reach, as `Finding.exports`. */
+  byExport?: boolean;
 }
 
 export interface TargetReport {
@@ -112,6 +114,7 @@ async function checkTarget(
     lazyNodeImports: target.lazyNodeImports,
     nodeEnv,
     leaveOutMissingPeers: options.missingPeersAsNotes,
+    byExport: options.byExport,
   });
   const { modules, notes, supplied } = shownModules(scanned, root, isBuilt);
   const { findings, guarded, ignored } = collectFindings(modules, {

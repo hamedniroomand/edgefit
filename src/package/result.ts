@@ -1,4 +1,4 @@
-import type { TargetKey } from '@/types.ts';
+import type { Category, TargetKey } from '@/types.ts';
 
 /** Bumped on any breaking change to the package result shape. */
 export const packageResultVersion = 2;
@@ -6,10 +6,30 @@ export const packageResultVersion = 2;
 /** `unchecked`: the entry needs a module that the package does not declare, so it was left out of the summary. */
 export type PackageStatus = 'pass' | 'warn' | 'fail' | 'error' | 'unchecked';
 
+/** A finding that only some exports of an entry reach. */
+export interface ExportFinding {
+  api: string;
+  category: Category;
+  level: 'error' | 'warning';
+  /** What is wrong, without repeating the API. */
+  detail: string;
+}
+
+/** The findings that an entry has only when its export `name` is used. */
+export interface ExportResult {
+  name: string;
+  /** The worst level of its findings. */
+  level: 'error' | 'warning';
+  findings: ExportFinding[];
+}
+
 export interface EntryStatus {
   status: PackageStatus;
+  /** The findings that stay count here: the ones in the module body, or that every export reaches. */
   errors: number;
   warnings: number;
+  /** The findings that only some exports reach, by export. They do not change `status`. */
+  exports?: ExportResult[];
   /** Why the entry could not be checked. Only with `status: "error"` or `"unchecked"`. */
   message?: string;
   /** What the check did not cover, such as an optional peer dependency that is not installed. */
@@ -18,6 +38,13 @@ export interface EntryStatus {
 
 export interface WorstEntry {
   subpath: string;
+  status: PackageStatus;
+}
+
+/** The export with the worst findings of the entries that decide a target. */
+export interface WorstExport {
+  subpath: string;
+  name: string;
   status: PackageStatus;
 }
 
@@ -43,6 +70,8 @@ export interface PackageResult {
   summary: Partial<Record<TargetKey, PackageStatus>>;
   /** The worst entry of a target, when it is worse than the main entry that decides the target. */
   worst?: Partial<Record<TargetKey, WorstEntry>>;
+  /** The export with the worst findings that only some exports reach, among all entries, when it is worse than the result of the target. */
+  worstExport?: Partial<Record<TargetKey, WorstExport>>;
   /** Settings and notes each target ran with, as `check` prints them. */
   context: Partial<Record<TargetKey, { settings: string; notes: string[] }>>;
   entries: PackageEntryResult[];
@@ -102,22 +131,46 @@ export function targetResult(
     : { status: main.status };
 }
 
-/** The result of every target, and the worst entry where it is worse than the result. */
+/** The export with the worst findings among all entries of a target. An export with an error ranks above one with a warning. */
+export function worstExportOf(
+  entries: readonly PackageEntryResult[],
+  key: TargetKey,
+): WorstExport | undefined {
+  const found = entries.flatMap(entry =>
+    (entry.results[key]?.exports ?? []).map(item => ({
+      subpath: entry.subpath,
+      name: item.name,
+      status: item.level === 'error' ? ('fail' as const) : ('warn' as const),
+    })),
+  );
+  return found.toSorted((a, b) => severity[b.status] - severity[a.status])[0];
+}
+
+/** The result of every target, and the worst entry and the worst export where they are worse than the result. */
 export function summarize(
   entries: readonly PackageEntryResult[],
   targets: readonly TargetKey[],
   mainSubpath?: string,
-): Pick<PackageResult, 'summary' | 'worst'> {
+): Pick<PackageResult, 'summary' | 'worst' | 'worstExport'> {
   const summary: PackageResult['summary'] = {};
   const worst: NonNullable<PackageResult['worst']> = {};
+  const worstExport: NonNullable<PackageResult['worstExport']> = {};
   for (const key of targets) {
     const decided = targetResult(entries, key, mainSubpath);
     summary[key] = decided.status;
     if (decided.worst !== undefined) {
       worst[key] = decided.worst;
     }
+    const exported = worstExportOf(entries, key);
+    if (exported !== undefined && severity[exported.status] > severity[decided.status]) {
+      worstExport[key] = exported;
+    }
   }
-  return Object.keys(worst).length === 0 ? { summary } : { summary, worst };
+  return {
+    summary,
+    ...(Object.keys(worst).length === 0 ? {} : { worst }),
+    ...(Object.keys(worstExport).length === 0 ? {} : { worstExport }),
+  };
 }
 
 export function statusOf(errors: number, warnings: number): PackageStatus {

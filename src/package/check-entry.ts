@@ -7,6 +7,7 @@ import type { EdgefitConfig, TargetKey } from '@/types.ts';
 
 import { entrySource } from './entry.ts';
 import type { PackageEntry } from './entry.ts';
+import { resultsByExport } from './exports.ts';
 import { statusOf } from './result.ts';
 import type { EntryStatus, PackageEntryResult, PackageResult } from './result.ts';
 import { neededMessage, undeclaredModules } from './unchecked.ts';
@@ -16,8 +17,10 @@ function errorMessage(error: unknown): string {
 }
 
 function entryStatus(report: TargetReport): EntryStatus {
-  const errors = report.findings.filter(finding => finding.level === 'error').length;
-  const warnings = report.findings.length - errors;
+  const staying = report.findings.filter(finding => finding.exports === undefined);
+  const errors = staying.filter(finding => finding.level === 'error').length;
+  const warnings = staying.length - errors;
+  const exports = resultsByExport(report.findings);
   const notes = [
     ...(report.missingPeers ?? []).map(
       name => `peer ${name} not installed, checked in your project`,
@@ -28,6 +31,7 @@ function entryStatus(report: TargetReport): EntryStatus {
     status: statusOf(errors, warnings),
     errors,
     warnings,
+    ...(exports.length > 0 ? { exports } : {}),
     ...(notes.length > 0 ? { notes } : {}),
   };
 }
@@ -54,7 +58,7 @@ export async function checkEntry(
     deno: { configFile: false },
   };
   try {
-    const checked = await check({ root, config, missingPeersAsNotes: true });
+    const checked = await check({ root, config, missingPeersAsNotes: true, byExport: true });
     for (const report of checked.reports) {
       row.results[report.target.key] = entryStatus(report);
       context[report.target.key] ??= {

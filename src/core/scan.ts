@@ -1,5 +1,6 @@
 import type { ModuleGraph } from '@/resolve/graph.ts';
 import { PackageResolver } from '@/resolve/packages.ts';
+import { tagUsagesByExport } from '@/trace/by-export.ts';
 import { reachedUsages } from '@/trace/reach.ts';
 
 import { ImportChains } from './chains.ts';
@@ -22,9 +23,14 @@ export function scanModules(
   const packages = new PackageResolver(root);
   const chains = new ImportChains(graph, packages);
   const scripts = extractScripts(graph, root, globals, options);
-  const reached = options.trace
-    ? reachedUsages(graph, new Map(scripts.map(({ file, found }) => [file, found])))
-    : new Map(scripts.map(({ file, found }) => [file, found.usages]));
+  const modules = new Map(scripts.map(({ file, found }) => [file, found]));
+  const traced = options.trace ? reachedUsages(graph, modules) : undefined;
+  const reached =
+    traced === undefined
+      ? new Map(scripts.map(({ file, found }) => [file, found.usages]))
+      : options.byExport === true
+        ? tagUsagesByExport(graph, modules, traced)
+        : traced;
   return scripts.map(({ file, unchecked }) => ({
     file,
     package: packages.packageFor(file),

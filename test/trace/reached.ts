@@ -20,11 +20,11 @@ function linksOf(imports: Record<string, string>): ImportLink[] {
   });
 }
 
-/** The API usages each file keeps once only the code the entry reaches is left. */
-export function reached(
+/** The graph and the extracted modules of the files. */
+export function build(
   files: Record<string, Source>,
   entry = 'index.js',
-): Record<string, string[]> {
+): { graph: ModuleGraph; modules: Map<string, ExtractedModule> } {
   const modules = new Map<string, ExtractedModule>();
   const graph: ModuleGraph = { entries: [entry], modules: new Map<string, GraphModule>() };
   for (const [file, { code, imports = {} }] of Object.entries(files)) {
@@ -37,6 +37,15 @@ export function reached(
     });
     modules.set(file, extractModule(file, code, { globals, shape: true, nodeEnv: 'production' }));
   }
+  return { graph, modules };
+}
+
+/** The API usages each file keeps once only the code the entry reaches is left. */
+export function reached(
+  files: Record<string, Source>,
+  entry = 'index.js',
+): Record<string, string[]> {
+  const { graph, modules } = build(files, entry);
   return Object.fromEntries(
     [...reachedUsages(graph, modules)].map(([file, usages]) => [
       file,

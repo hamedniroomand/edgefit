@@ -41,10 +41,18 @@ describe('checkPackage', () => {
     expect(result.package).toBe('@edgefit-fixture/scoped');
     expect(result.entries.map(entry => entry.subpath)).toEqual(['.', './node']);
     expect(result.entries[0]?.results.workerd?.status).toBe('pass');
-    expect(result.entries[1]?.results.workerd?.status).not.toBe('pass');
-    // The main entry decides the result, and the worst subpath is named next to it.
+    // The error sits behind the export watchIt, so it is listed under it and does not set the status.
+    expect(result.entries[1]?.results.workerd).toMatchObject({
+      status: 'pass',
+      errors: 0,
+      exports: [{ name: 'watchIt', level: 'error' }],
+    });
     expect(result.summary.workerd).toBe('pass');
-    expect(result.worst?.workerd?.subpath).toBe('./node');
+    expect(result.worstExport?.workerd).toMatchObject({
+      subpath: './node',
+      name: 'watchIt',
+      status: 'fail',
+    });
     expect(result.summary.bun).toBeDefined();
   });
 
