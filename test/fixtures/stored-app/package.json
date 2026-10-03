@@ -1,0 +1,5 @@
+{
+  "name": "stored-app",
+  "private": true,
+  "dependencies": { "follow-redirects": "1.16.1" }
+}

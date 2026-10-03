@@ -20,6 +20,7 @@ import type { Classification } from './classify.ts';
 /** Re-exported so the check reads the shipped suggestions through the same module that applies them. */
 export { loadSuggestions } from '@/data/suggestions.ts';
 export { loadUnreached } from '@/data/unreached.ts';
+export { readStoredModules } from './stored-modules.ts';
 
 export const defaultLevels: Record<Category, Level> = {
   unsupported: 'error',

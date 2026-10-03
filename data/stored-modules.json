@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "description": "Modules that a package file stores and passes on, where the file reads only the listed members of them. Without an entry a check reports the module as unknown, because it cannot follow a module that is kept in a lookup table. Each entry names the package, the releases it was read in (a missing max has no upper end), the file inside the package, the modules, the members that the file reads, why those are the only ones, and where that is stated. The weekly check flags an entry whose file or members no longer match, and a release that no entry covers.",
+  "entries": [
+    {
+      "package": "follow-redirects",
+      "versions": { "min": "1.14.0" },
+      "file": "index.js",
+      "modules": ["node:http", "node:https"],
+      "members": ["request"],
+      "reason": "wrap() keeps each module in the table nativeProtocols and calls nativeProtocol.request in RedirectableRequest. It sets its own get on each wrapped module, so it never calls the get of the native module.",
+      "source": "https://github.com/follow-redirects/follow-redirects/blob/v1.16.1/index.js#L347-L361"
+    }
+  ]
+}
