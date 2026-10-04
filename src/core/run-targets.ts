@@ -32,6 +32,8 @@ export function shownModules(
   return { ...shown, modules: readStoredModules(shown.modules) };
 }
 
+type Outcome<TReport> = { key: TargetKey; value: TReport } | { key: TargetKey; reason: unknown };
+
 /**
  * Waits for every target. A target that fails with an `EdgefitError` is kept as failed, so the
  * others still have a report. When no target has a report, the first error is thrown. Any other
@@ -40,20 +42,24 @@ export function shownModules(
 export async function settleTargets<TReport>(
   pending: readonly { key: TargetKey; report: Promise<TReport> }[],
 ): Promise<{ reports: TReport[]; failed: FailedTarget[] }> {
-  const promises: Promise<TReport>[] = [];
-  for (const { report } of pending) {
-    promises.push(report);
-  }
-  const settled = await Promise.allSettled(promises);
+  const settled = await Promise.all(
+    pending.map(async ({ key, report }): Promise<Outcome<TReport>> => {
+      try {
+        return { key, value: await report };
+      } catch (reason: unknown) {
+        return { key, reason };
+      }
+    }),
+  );
   const reports: TReport[] = [];
   const failed: FailedTarget[] = [];
-  for (const [index, outcome] of settled.entries()) {
-    if (outcome.status === 'fulfilled') {
+  for (const outcome of settled) {
+    if ('value' in outcome) {
       reports.push(outcome.value);
     } else if (outcome.reason instanceof EdgefitError) {
       const { message, hint } = outcome.reason;
       failed.push({
-        key: pending[index]?.key ?? 'workerd',
+        key: outcome.key,
         message,
         ...(hint === undefined ? {} : { hint }),
         error: outcome.reason,
