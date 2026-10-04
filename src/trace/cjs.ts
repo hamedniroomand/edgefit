@@ -29,6 +29,8 @@ class CommonJsReader {
   readonly #helpers: Helpers;
   /** The `require` calls whose use is understood. */
   readonly #read = new Set<Node>();
+  /** The `require` calls that are the whole value of a declarator that binds or destructures the result. */
+  readonly #bound = new Set<Node>();
   readonly #writer: ExportWriter;
   readonly #body: readonly Node[];
 
@@ -68,12 +70,15 @@ class CommonJsReader {
         `${source.specifier}\0${source.imported}`,
       ]),
     );
-    for (const { found, local, imported } of readableNestedBindings(
+    for (const { found, local, imported, direct } of readableNestedBindings(
       this.#body,
       this.#helpers,
       topLevel,
     )) {
       this.#load(found);
+      if (direct) {
+        this.#bound.add(found.call);
+      }
       shape.imports.set(local, { specifier: found.specifier, imported });
       if (imported === '*') {
         shape.bindings.add(local);
@@ -97,6 +102,11 @@ class CommonJsReader {
         shape.specifiers.delete(specifier);
       }
     }
+    for (const call of this.#body.flatMap(statement => requireCalls(statement))) {
+      if (!this.#bound.has(call)) {
+        shape.unboundRequires.add(requireCall(call)?.specifier ?? '');
+      }
+    }
     shape.traceable =
       settled &&
       !shape.units.some(
@@ -105,6 +115,13 @@ class CommonJsReader {
           !(unit.name !== undefined && isHelperName(unit.name)) &&
           [...opaqueNames].some(name => rootNames(unit).has(name)),
       );
+  }
+
+  /** Notes a `require` that is the whole value of the declarator that binds or destructures it. */
+  #markBound(required: RequireUse, init: Node | null): void {
+    if (init !== null && strip(init) === required.call) {
+      this.#bound.add(required.call);
+    }
   }
 
   /** A `require` whose use is understood, which also loads the module. */
@@ -140,6 +157,7 @@ class CommonJsReader {
     if (required !== undefined && required.member === undefined && id.type === 'Identifier') {
       // `const x = require('s')`: what is read from `x` is what is asked of `s`.
       this.#load(required);
+      this.#markBound(required, init);
       this.#builder.unit(node, id.name, new Set());
       this.#builder.shape.imports.set(id.name, { specifier: required.specifier, imported: '*' });
       this.#builder.shape.bindings.add(id.name);
@@ -149,6 +167,7 @@ class CommonJsReader {
       const names = destructuredNames(id);
       if (names !== undefined) {
         this.#load(required);
+        this.#markBound(required, init);
         for (const [local, imported, property] of names) {
           this.#builder.unit(property, local, new Set());
           this.#builder.shape.imports.set(local, { specifier: required.specifier, imported });

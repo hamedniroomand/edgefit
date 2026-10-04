@@ -119,6 +119,16 @@ export function commonJsExportName(node: Node): string | undefined {
   return isExports || isModuleExports ? staticKey(node.property, node.computed) : undefined;
 }
 
+/** Whether `node` is `module.exports` itself, which `module.exports = value` replaces. */
+export function isWholeExports(node: Node): boolean {
+  return (
+    node.type === 'MemberExpression' &&
+    node.object.type === 'Identifier' &&
+    node.object.name === 'module' &&
+    staticKey(node.property, node.computed) === 'exports'
+  );
+}
+
 export const visitExportDefault: Visitor<NodeOf<'ExportDefaultDeclaration'>> = (node, context) => {
   if (node.declaration.type === 'Identifier') {
     const binding = lookup(context.scope, node.declaration.name);

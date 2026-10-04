@@ -30,6 +30,12 @@ function tracked(ref: ApiRef): Binding {
   return { ref, recorded: false };
 }
 
+/**
+ * The alias key of `module.exports = name`, the whole export of a CommonJS file. It starts with a
+ * null character, so no export name that a file writes can be the same.
+ */
+export const wholeExport = '\0module.exports';
+
 /** What the names that a file exports stand for in the importer, by the specifier that loads it, from the seeds of `followAliases`. */
 export function fileMembers(
   imported: ReadonlyMap<string, ApiRef>,
@@ -38,7 +44,7 @@ export function fileMembers(
   const prefix = `${specifier}\0`;
   const members = new Map<string, ApiRef>();
   for (const [key, ref] of imported) {
-    if (key.startsWith(prefix)) {
+    if (key.startsWith(prefix) && key !== `${prefix}${wholeExport}`) {
       members.set(key.slice(prefix.length), ref);
     }
   }

@@ -1,12 +1,18 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes } from '@/extract/ast.ts';
+import { childNodes, strip } from '@/extract/ast.ts';
 
 import { destructuredNames, requiredBy } from './cjs-forms.ts';
 import type { Helpers, RequireUse } from './cjs-forms.ts';
 
 /** A name that a `require` gives inside a function or a block: the module, or one export of it as `*`. */
-export type NestedBinding = { found: RequireUse; local: string; imported: string };
+export type NestedBinding = {
+  found: RequireUse;
+  local: string;
+  imported: string;
+  /** The `require` call is the whole value of the declarator, with no helper around it. */
+  direct: boolean;
+};
 
 /** The names of `const x = require('s')` and `const { a } = require('s')`. */
 function bindingsOf(declarator: Node, helpers: Helpers): NestedBinding[] {
@@ -18,11 +24,12 @@ function bindingsOf(declarator: Node, helpers: Helpers): NestedBinding[] {
     return [];
   }
   const { id } = declarator;
+  const direct = strip(declarator.init) === found.call;
   if (id.type === 'Identifier') {
-    return [{ found, local: id.name, imported: '*' }];
+    return [{ found, local: id.name, imported: '*', direct }];
   }
   const names = id.type === 'ObjectPattern' ? destructuredNames(id) : undefined;
-  return (names ?? []).map(([local, imported]) => ({ found, local, imported }));
+  return (names ?? []).map(([local, imported]) => ({ found, local, imported, direct }));
 }
 
 /** The declarations of a `require` that are not at the top level of the module. */

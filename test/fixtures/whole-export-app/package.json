@@ -1,0 +1,5 @@
+{
+  "name": "whole-export-app",
+  "private": true,
+  "dependencies": { "protobufjs": "7.6.6" }
+}

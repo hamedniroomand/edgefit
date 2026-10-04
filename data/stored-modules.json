@@ -10,6 +10,15 @@
       "members": ["request"],
       "reason": "wrap() keeps each module in the table nativeProtocols and calls nativeProtocol.request in RedirectableRequest. It sets its own get on each wrapped module, so it never calls the get of the native module.",
       "source": "https://github.com/follow-redirects/follow-redirects/blob/v1.16.1/index.js#L347-L361"
+    },
+    {
+      "package": "protobufjs",
+      "versions": { "min": "7.6.0" },
+      "file": "src/util/fs.js",
+      "modules": ["node:fs"],
+      "members": ["readFileSync"],
+      "reason": "src/util.js sets util.fs to the export of this file, and src/root.js reads only util.fs.readFileSync in a third file. A store into a property of another module's export object cannot be followed from the file that reads it.",
+      "source": "https://github.com/protobufjs/protobuf.js/blob/protobufjs-v7.6.6/src/root.js#L203"
     }
   ]
 }

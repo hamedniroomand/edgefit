@@ -52,6 +52,8 @@ export interface ModuleShape {
   dynamicImports: DynamicImports;
   /** What the module asks of each file it loads with `require('literal')`. */
   requires: DynamicImports;
+  /** The specifiers that some `require` loads without binding or destructuring the result directly. */
+  unboundRequires: Set<string>;
 }
 
 /** Whether the value is a call of `require`, whose result the declared name holds. */
@@ -128,6 +130,7 @@ export class ShapeBuilder {
     stars: [],
     dynamicImports: new Map(),
     requires: new Map(),
+    unboundRequires: new Set(),
   };
 
   public unit(node: Node, name?: string, mentions?: Set<string>): void {

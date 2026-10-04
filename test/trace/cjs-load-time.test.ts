@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { entry, reached } from './reached.ts';
+import { build, entry, lib, reached } from './reached.ts';
 import type { Source } from './reached.ts';
 
 const fs = "const fs = require('node:fs');\n";
@@ -174,5 +174,14 @@ describe('a module that sets its exports to a function or a class that is declar
       'lib.js': lib,
     });
     expect(found['lib.js']).toContain('node:fs.watch');
+  });
+});
+
+describe('the requires of a module that is not CommonJS', () => {
+  it('leave no unbound require in the shape of an ES module', () => {
+    const { modules } = build({
+      'index.js': lib("import x from './x.js';\nexport const y = fs.watch(x);"),
+    });
+    expect(modules.get('index.js')?.shape?.unboundRequires).toEqual(new Set());
   });
 });
