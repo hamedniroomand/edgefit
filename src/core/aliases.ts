@@ -1,3 +1,4 @@
+import { wholeExport } from '@/extract/bindings.ts';
 import type { ExtractedModule } from '@/extract/index.ts';
 import type { ModuleGraph } from '@/resolve/graph.ts';
 import type { Demand } from '@/trace/analyze.ts';
@@ -44,6 +45,18 @@ function openedFiles(
       }
     }
   }
+  for (const target of reexportedFiles(graph, modules)) {
+    opened.add(target);
+  }
+  return opened;
+}
+
+/** Files that another file re-exports: with `export *`, `export { x } from`, or `exports.x = require('./file')`. */
+function reexportedFiles(
+  graph: ModuleGraph,
+  modules: ReadonlyMap<string, ExtractedModule>,
+): Set<string> {
+  const reexported = new Set<string>();
   for (const [file, { shape }] of modules) {
     const specifiers = [
       ...(shape?.stars ?? []),
@@ -54,11 +67,11 @@ function openedFiles(
     for (const specifier of specifiers) {
       const target = targetOf(graph, file, specifier);
       if (target !== undefined) {
-        opened.add(target);
+        reexported.add(target);
       }
     }
   }
-  return opened;
+  return reexported;
 }
 
 /**
@@ -91,6 +104,7 @@ export function followAliases(
   }
   seedLoads(graph, modules, demands, opened, { seeds, followed });
   seedNamespaces(graph, modules, demands, opened, { seeds, followed });
+  seedWholeExports(graph, modules, { seeds, followed });
   return { seeds, followed };
 }
 
@@ -179,6 +193,64 @@ function seedNamespaces(
       }
     }
   }
+}
+
+/**
+ * A file that sets `module.exports` to a Node.js module is that module in the files that
+ * `require` it. The importer binds the result to a name, or destructures it, and its own code
+ * reads that name, so what it does with the module is seen there. When every file that loads it
+ * does so, nothing reaches the module unseen and the export is followed.
+ */
+function seedWholeExports(
+  graph: ModuleGraph,
+  modules: ReadonlyMap<string, ExtractedModule>,
+  found: FollowedAliases,
+): void {
+  const reexported = reexportedFiles(graph, modules);
+  for (const [target, { aliases }] of modules) {
+    const whole = aliases.get(wholeExport);
+    if (whole === undefined) {
+      continue;
+    }
+    const importers = [...graph.modules].flatMap(([file, module]) =>
+      module.links.filter(link => link.path === target).map(link => ({ file, link })),
+    );
+    const seen = importers.every(
+      ({ file, link }) =>
+        link.kind === 'require-call' && bindsLoad(modules.get(file)?.shape, link.original ?? ''),
+    );
+    for (const { file, link } of importers) {
+      const key = `${link.original ?? ''}\0${wholeExport}`;
+      found.seeds.set(
+        file,
+        (found.seeds.get(file) ?? new Map<string, ApiRef>()).set(key, whole.ref),
+      );
+    }
+    if (
+      importers.length > 0 &&
+      seen &&
+      !reexported.has(target) &&
+      !graph.entries.includes(target)
+    ) {
+      found.followed.set(
+        target,
+        (found.followed.get(target) ?? new Set<number>()).add(whole.offset),
+      );
+    }
+  }
+}
+
+/** Whether every `require(specifier)` of a file is the value of a declarator that binds the result to a name or destructures it. */
+function bindsLoad(shape: ExtractedModule['shape'], specifier: string): boolean {
+  return (
+    shape !== undefined &&
+    shape.specifiers.has(specifier) &&
+    !shape.unboundRequires.has(specifier) &&
+    [...shape.imports].some(
+      ([local, item]) =>
+        item.specifier === specifier && (item.imported !== '*' || shape.bindings.has(local)),
+    )
+  );
 }
 
 /** Drops the `unknown` of the exports that are followed, from the module that writes them. */

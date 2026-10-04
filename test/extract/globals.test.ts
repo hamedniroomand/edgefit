@@ -49,7 +49,6 @@ describe('dynamic access', () => {
   it('reports a module object that escapes', () => {
     expect(usagesOf("const fs = require('fs');\nmodule.exports = fs;", 'lib/index.js')).toEqual([
       'api node:fs',
-      'api node:fs',
       'dynamic node:fs',
     ]);
   });

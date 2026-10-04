@@ -1,13 +1,13 @@
 import type { NodeOf } from '@/extract/ast.ts';
 import { staticKey, strip } from '@/extract/ast.ts';
-import { resolveBinding } from '@/extract/bindings.ts';
+import { resolveBinding, wholeExport } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { globalRef, normalizeRef } from '@/extract/refs.ts';
 import { isTracked, lookup } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
 import { bindAssigned } from './declarators.ts';
-import { commonJsExportName, exportLocal } from './modules.ts';
+import { commonJsExportName, exportLocal, isWholeExports } from './modules.ts';
 
 export const visitIdentifier: Visitor<NodeOf<'Identifier'>> = (node, context) => {
   const binding = lookup(context.scope, node.name);
@@ -79,7 +79,12 @@ function polyfilledGlobal(
 
 export const visitAssignment: Visitor<NodeOf<'AssignmentExpression'>> = (node, context) => {
   // `exports.crypto = crypto` exports a name that is a Node.js module, as `export { crypto }` does.
-  const exported = node.operator === '=' ? commonJsExportName(node.left) : undefined;
+  const exported =
+    node.operator === '=' && isWholeExports(node.left)
+      ? wholeExport
+      : node.operator === '='
+        ? commonJsExportName(node.left)
+        : undefined;
   if (exported !== undefined && node.right.type === 'Identifier') {
     const binding = lookup(context.scope, node.right.name);
     if (isTracked(binding) && binding.ref.module !== '*globals*') {
