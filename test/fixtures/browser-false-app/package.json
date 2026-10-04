@@ -1,0 +1,5 @@
+{
+  "name": "browser-false-app",
+  "private": true,
+  "dependencies": { "mapper": "1.0.0" }
+}
