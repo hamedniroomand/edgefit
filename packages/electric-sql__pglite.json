@@ -1,0 +1,202 @@
+{
+  "version": 2,
+  "package": "@electric-sql/pglite",
+  "resolved": "0.5.8",
+  "checkedAt": "2026-10-04T22:02:36.533Z",
+  "edgefit": "0.12.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "unenv": "2.0.0-rc.24",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.3.1",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "fail",
+    "bun": "pass",
+    "deno": "pass"
+  },
+  "worst": {
+    "bun": {
+      "subpath": "./worker",
+      "status": "fail"
+    }
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), entries from --entry or the config, NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), entries from --entry or the config, NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "@electric-sql/pglite",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./template",
+      "specifier": "@electric-sql/pglite/template",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./live",
+      "specifier": "@electric-sql/pglite/live",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./worker",
+      "specifier": "@electric-sql/pglite/worker",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 3,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./nodefs",
+      "specifier": "@electric-sql/pglite/nodefs",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./opfs-ahp",
+      "specifier": "@electric-sql/pglite/opfs-ahp",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./basefs",
+      "specifier": "@electric-sql/pglite/basefs",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    }
+  ],
+  "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support."
+}

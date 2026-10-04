@@ -2,8 +2,8 @@
   "version": 2,
   "package": "zustand",
   "resolved": "5.0.15",
-  "checkedAt": "2026-10-03T21:06:09.791Z",
-  "edgefit": "0.11.0",
+  "checkedAt": "2026-10-04T22:01:51.931Z",
+  "edgefit": "0.12.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

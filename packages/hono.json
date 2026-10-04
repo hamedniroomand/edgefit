@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "hono",
-  "resolved": "4.13.12",
-  "checkedAt": "2026-10-03T21:06:46.999Z",
-  "edgefit": "0.11.0",
+  "resolved": "4.13.13",
+  "checkedAt": "2026-10-04T22:01:14.085Z",
+  "edgefit": "0.12.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -299,6 +299,27 @@
     {
       "subpath": "./route",
       "specifier": "hono/route",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./mount",
+      "specifier": "hono/mount",
       "results": {
         "workerd": {
           "status": "pass",

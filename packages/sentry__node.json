@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.4.0",
-  "checkedAt": "2026-10-03T21:13:29.057Z",
-  "edgefit": "0.11.0",
+  "checkedAt": "2026-10-04T22:11:46.531Z",
+  "edgefit": "0.12.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -245,19 +245,17 @@
       "subpath": "./vite",
       "specifier": "@sentry/node/vite",
       "results": {
-        "workerd": {
-          "status": "unchecked",
-          "errors": 0,
-          "warnings": 0,
-          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
-        },
         "bun": {
-          "status": "unchecked",
-          "errors": 0,
-          "warnings": 0,
-          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
+          "status": "fail",
+          "errors": 1,
+          "warnings": 9
         },
         "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 4
+        },
+        "workerd": {
           "status": "unchecked",
           "errors": 0,
           "warnings": 0,
@@ -269,19 +267,17 @@
       "subpath": "./rollup",
       "specifier": "@sentry/node/rollup",
       "results": {
-        "workerd": {
-          "status": "unchecked",
-          "errors": 0,
-          "warnings": 0,
-          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
-        },
         "bun": {
-          "status": "unchecked",
-          "errors": 0,
-          "warnings": 0,
-          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
+          "status": "fail",
+          "errors": 1,
+          "warnings": 9
         },
         "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 4
+        },
+        "workerd": {
           "status": "unchecked",
           "errors": 0,
           "warnings": 0,
@@ -293,19 +289,17 @@
       "subpath": "./webpack",
       "specifier": "@sentry/node/webpack",
       "results": {
-        "workerd": {
-          "status": "unchecked",
-          "errors": 0,
-          "warnings": 0,
-          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
-        },
         "bun": {
-          "status": "unchecked",
-          "errors": 0,
-          "warnings": 0,
-          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
+          "status": "fail",
+          "errors": 1,
+          "warnings": 9
         },
         "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 4
+        },
+        "workerd": {
           "status": "unchecked",
           "errors": 0,
           "warnings": 0,
@@ -317,19 +311,17 @@
       "subpath": "./esbuild",
       "specifier": "@sentry/node/esbuild",
       "results": {
-        "workerd": {
-          "status": "unchecked",
-          "errors": 0,
-          "warnings": 0,
-          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
-        },
         "bun": {
-          "status": "unchecked",
-          "errors": 0,
-          "warnings": 0,
-          "message": "needs \"@oxc-parser/binding-wasm32-wasip1\", which the package does not declare"
+          "status": "fail",
+          "errors": 1,
+          "warnings": 9
         },
         "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 4
+        },
+        "workerd": {
           "status": "unchecked",
           "errors": 0,
           "warnings": 0,

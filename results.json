@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-03T21:13:52.906Z",
-  "edgefit": "0.11.0",
+  "generatedAt": "2026-10-04T22:12:13.833Z",
+  "edgefit": "0.12.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -24,13 +24,13 @@
     {
       "name": "hono",
       "file": "hono",
-      "resolved": "4.13.12",
+      "resolved": "4.13.13",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 75
+      "subpaths": 76
     },
     {
       "name": "itty-router",
@@ -236,7 +236,7 @@
     {
       "name": "openai",
       "file": "openai",
-      "resolved": "7.27.0",
+      "resolved": "7.28.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -476,7 +476,7 @@
     {
       "name": "jsdom",
       "file": "jsdom",
-      "resolved": "30.1.1",
+      "resolved": "30.1.2",
       "summary": {
         "workerd": "fail",
         "bun": "warn",
@@ -632,7 +632,7 @@
           "status": "warn"
         },
         "deno": {
-          "subpath": "./firestore",
+          "subpath": "./messaging/sw",
           "status": "warn"
         }
       },
@@ -914,6 +914,408 @@
         "deno": "pass"
       },
       "subpaths": 23
+    },
+    {
+      "name": "@google/genai",
+      "file": "google__genai",
+      "resolved": "2.27.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 6,
+      "worst": {
+        "workerd": {
+          "subpath": "./node",
+          "status": "fail"
+        }
+      }
+    },
+    {
+      "name": "@langchain/core",
+      "file": "langchain__core",
+      "resolved": "1.2.14",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 72
+    },
+    {
+      "name": "@clickhouse/client",
+      "file": "clickhouse__client",
+      "resolved": "1.23.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "@auth/core",
+      "file": "auth__core",
+      "resolved": "0.41.3",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 4
+    },
+    {
+      "name": "passport",
+      "file": "passport",
+      "resolved": "0.7.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "twilio",
+      "file": "twilio",
+      "resolved": "6.1.2",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "@sendgrid/mail",
+      "file": "sendgrid__mail",
+      "resolved": "8.1.6",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "@slack/web-api",
+      "file": "slack__web-api",
+      "resolved": "8.2.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "posthog-node",
+      "file": "posthog-node",
+      "resolved": "5.55.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 4
+    },
+    {
+      "name": "amqplib",
+      "file": "amqplib",
+      "resolved": "2.2.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 2
+    },
+    {
+      "name": "busboy",
+      "file": "busboy",
+      "resolved": "1.6.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "multer",
+      "file": "multer",
+      "resolved": "2.4.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "jszip",
+      "file": "jszip",
+      "resolved": "3.10.2",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "pdf-lib",
+      "file": "pdf-lib",
+      "resolved": "1.17.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "fast-xml-parser",
+      "file": "fast-xml-parser",
+      "resolved": "5.11.2",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "ejs",
+      "file": "ejs",
+      "resolved": "7.0.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "markdown-it",
+      "file": "markdown-it",
+      "resolved": "15.0.2",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 2
+    },
+    {
+      "name": "luxon",
+      "file": "luxon",
+      "resolved": "3.7.2",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "moment",
+      "file": "moment",
+      "resolved": "2.31.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "rxjs",
+      "file": "rxjs",
+      "resolved": "7.8.2",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 6
+    },
+    {
+      "name": "qs",
+      "file": "qs",
+      "resolved": "6.16.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "yup",
+      "file": "yup",
+      "resolved": "1.7.1",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "joi",
+      "file": "joi",
+      "resolved": "18.2.9",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "bignumber.js",
+      "file": "bignumber.js",
+      "resolved": "11.1.5",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "semver",
+      "file": "semver",
+      "resolved": "7.8.5",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "mime",
+      "file": "mime",
+      "resolved": "4.1.0",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 4
+    },
+    {
+      "name": "iconv-lite",
+      "file": "iconv-lite",
+      "resolved": "0.7.3",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1
+    },
+    {
+      "name": "unstorage",
+      "file": "unstorage",
+      "resolved": "1.17.5",
+      "summary": {
+        "workerd": "pass",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 2
+    },
+    {
+      "name": "firebase-admin",
+      "file": "firebase-admin",
+      "resolved": "14.5.0",
+      "summary": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 18,
+      "worst": {
+        "bun": {
+          "subpath": "./firestore",
+          "status": "warn"
+        },
+        "deno": {
+          "subpath": "./firestore",
+          "status": "fail"
+        }
+      },
+      "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run."
+    },
+    {
+      "name": "@google-cloud/storage",
+      "file": "google-cloud__storage",
+      "resolved": "8.2.0",
+      "summary": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1,
+      "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run."
+    },
+    {
+      "name": "mssql",
+      "file": "mssql",
+      "resolved": "12.7.2",
+      "summary": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1,
+      "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either."
+    },
+    {
+      "name": "argon2",
+      "file": "argon2",
+      "resolved": "0.45.1",
+      "summary": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1,
+      "notes": "argon2 is a native addon, so use bcryptjs or a WebAssembly hash on Workers."
+    },
+    {
+      "name": "@electric-sql/pglite",
+      "file": "electric-sql__pglite",
+      "resolved": "0.5.8",
+      "summary": {
+        "workerd": "fail",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 7,
+      "worst": {
+        "bun": {
+          "subpath": "./worker",
+          "status": "fail"
+        }
+      },
+      "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support."
+    },
+    {
+      "name": "socket.io",
+      "file": "socket.io",
+      "resolved": "4.8.4",
+      "summary": {
+        "workerd": "warn",
+        "bun": "pass",
+        "deno": "pass"
+      },
+      "subpaths": 1,
+      "notes": "On Workers the browser build of engine.io-parser reads a Blob with FileReader, which Workers do not have."
     }
   ]
 }

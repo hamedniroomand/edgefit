@@ -1,0 +1,437 @@
+{
+  "version": 2,
+  "package": "firebase-admin",
+  "resolved": "14.5.0",
+  "checkedAt": "2026-10-04T22:03:16.891Z",
+  "edgefit": "0.12.1",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "unenv": "2.0.0-rc.24",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.3.1",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "fail",
+    "bun": "pass",
+    "deno": "pass"
+  },
+  "worst": {
+    "bun": {
+      "subpath": "./firestore",
+      "status": "warn"
+    },
+    "deno": {
+      "subpath": "./firestore",
+      "status": "fail"
+    }
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), entries from --entry or the config, NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), entries from --entry or the config, NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "firebase-admin",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./app",
+      "specifier": "firebase-admin/app",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./app-check",
+      "specifier": "firebase-admin/app-check",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./auth",
+      "specifier": "firebase-admin/auth",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./phone-number-verification",
+      "specifier": "firebase-admin/phone-number-verification",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./database",
+      "specifier": "firebase-admin/database",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./data-connect",
+      "specifier": "firebase-admin/data-connect",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./eventarc",
+      "specifier": "firebase-admin/eventarc",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./extensions",
+      "specifier": "firebase-admin/extensions",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./firestore",
+      "specifier": "firebase-admin/firestore",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 6,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1
+        },
+        "deno": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./functions",
+      "specifier": "firebase-admin/functions",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./installations",
+      "specifier": "firebase-admin/installations",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./machine-learning",
+      "specifier": "firebase-admin/machine-learning",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./messaging",
+      "specifier": "firebase-admin/messaging",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./project-management",
+      "specifier": "firebase-admin/project-management",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./remote-config",
+      "specifier": "firebase-admin/remote-config",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./security-rules",
+      "specifier": "firebase-admin/security-rules",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./storage",
+      "specifier": "firebase-admin/storage",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 2,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    }
+  ],
+  "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run."
+}
