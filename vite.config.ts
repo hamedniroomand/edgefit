@@ -116,6 +116,8 @@ export default defineConfig({
         test: {
           name: 'apps',
           include: ['test/apps/**/*.test.ts'],
+          // A real framework build can take longer than the default under coverage.
+          testTimeout: 30_000,
         },
       },
     ],

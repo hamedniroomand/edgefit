@@ -24,6 +24,7 @@ export interface RuntimeGuard {
 /** The code never runs, because a bundler removes it: `process.env.NODE_ENV` is a constant. */
 export interface DeadGuard {
   kind: 'dead';
+  main?: boolean;
 }
 
 /** The API is known to be missing inside the code a check protects. */
@@ -153,6 +154,10 @@ export class GuardStack {
 
   /** Whether a bundler removes the code at this point. */
   public readonly dead = (): boolean => this.#guards.some(guard => guard.kind === 'dead');
+
+  /** Whether the code runs only when the file is the CommonJS entry module. */
+  public readonly mainOnly = (): boolean =>
+    this.#guards.some(guard => guard.kind === 'dead' && guard.main === true);
 
   /** What is known of the runtime at this point. */
   public readonly runtimes = (): RuntimeCondition[] =>

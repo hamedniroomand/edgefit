@@ -34,6 +34,8 @@ function isCheck(node: Node, parent: Node | undefined, outer: readonly Node[]): 
 }
 
 export class Walker implements VisitContext {
+  public readonly imported: boolean;
+  public readonly mainOnlyNodes = new Set<Node>();
   public readonly collector: UsageCollector;
   public readonly globals: ReadonlySet<string>;
   public readonly nodeEnv: string | undefined;
@@ -55,7 +57,9 @@ export class Walker implements VisitContext {
     wrappers: VisitContext['wrappers'],
     functions: VisitContext['functions'],
     supplied: VisitContext['supplied'],
+    imported = false,
   ) {
+    this.imported = imported;
     this.collector = collector;
     this.globals = globals;
     this.nodeEnv = nodeEnv;
@@ -73,6 +77,9 @@ export class Walker implements VisitContext {
   public readonly visit = (node: Node | null | undefined): void => {
     if (node === null || node === undefined || isTypeOnly(node)) {
       return;
+    }
+    if (this.collector.guards.mainOnly()) {
+      this.mainOnlyNodes.add(node);
     }
     this.withAncestor(node, () => {
       const visitor = visitorFor(node);

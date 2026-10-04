@@ -6,7 +6,7 @@ import { isEquality, isInequality, staticKey, strip, stringLiteral } from './ast
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import { globalAliases } from './refs.ts';
-import { isTracked, lookup } from './scope.ts';
+import { isFactoryModule, isTracked, lookup } from './scope.ts';
 
 // Which runtime a global, or a key of `process.versions`, belongs to.
 const globalRuntimes = new Map<string, Runtime>([
@@ -145,6 +145,31 @@ export function nodeEnvMatches(node: Node, context: BindingContext): boolean | u
     : [node.right, node.left];
   const text = isEnvVariable(value, 'NODE_ENV', context) ? stringLiteral(literal) : undefined;
   return text === undefined || context.nodeEnv === undefined ? undefined : text === context.nodeEnv;
+}
+
+/** Imported files cannot be the CommonJS entry module. */
+export function mainModuleMatches(node: Node, context: BindingContext): boolean | undefined {
+  if (context.imported !== true || node.type !== 'BinaryExpression') {
+    return undefined;
+  }
+  const isMain = (value: Node): boolean => {
+    const inner = strip(value);
+    return (
+      inner.type === 'MemberExpression' &&
+      staticKey(inner.property, inner.computed) === 'main' &&
+      isUnbound(strip(inner.object), 'require', context)
+    );
+  };
+  const isModule = (value: Node): boolean => {
+    const inner = strip(value);
+    return (
+      isUnbound(inner, 'module', context) ||
+      (inner.type === 'Identifier' && isFactoryModule(context.scope, inner.name))
+    );
+  };
+  return (isMain(node.left) && isModule(node.right)) || (isMain(node.right) && isModule(node.left))
+    ? false
+    : undefined;
 }
 
 /**

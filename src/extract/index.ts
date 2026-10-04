@@ -16,6 +16,7 @@ import { Walker } from './walker.ts';
 export interface ExtractOptions {
   /** Global names worth tracking, such as `process` and `Buffer`. */
   globals: ReadonlySet<string>;
+  imported?: boolean;
   /** What `process.env.NODE_ENV` is replaced with, or `undefined` when it is not fixed. */
   nodeEnv: string | undefined;
   /** Also split the module into the pieces that run on load and the pieces that wait to be used. */
@@ -112,7 +113,7 @@ export function extractModule(
       ? new Set<string>()
       : typeOnlyImports(body);
   const functions = findLocalFunctions(body);
-  new Walker(
+  const walker = new Walker(
     collector,
     options.globals,
     options.nodeEnv,
@@ -121,7 +122,10 @@ export function extractModule(
     findImportWrappers(body),
     functions,
     findSuppliedLoads(body, functions),
-  ).visit(result.program as Node);
+    options.imported,
+  );
+  walker.visit(result.program as Node);
+  collector.omitMainFunctions(body, functions, walker.mainOnlyNodes);
   return finish(
     collector,
     options.shape === true ? collectShape(body, result.module.hasModuleSyntax, dropped) : undefined,

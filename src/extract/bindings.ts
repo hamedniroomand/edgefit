@@ -18,6 +18,7 @@ import { isTracked, lookup, lookupString } from './scope.ts';
 import type { Binding, Scope } from './scope.ts';
 
 export interface BindingContext {
+  imported?: boolean;
   scope: Scope;
   globals: ReadonlySet<string>;
   /** What a bundler replaces `process.env.NODE_ENV` with, or `undefined` when it is not fixed. */
