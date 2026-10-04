@@ -97,8 +97,10 @@ export const visitExportNamed: Visitor<NodeOf<'ExportNamedDeclaration'>> = (node
       exportLocal(specifier.local, staticKey(specifier.exported, false) ?? 'default', context);
     } else {
       const ref = namedRef(module, specifier.local);
+      const exported = staticKey(specifier.exported, false) ?? 'default';
+      context.collector.aliases.set(exported, { ref, offset: specifier.local.start });
       context.collector.api(ref, specifier.local.start);
-      context.collector.dynamic(ref, displayRef(ref), 're-exported', specifier.local.start);
+      context.collector.dynamic(ref, displayRef(ref), 're-exported', specifier.local.start, true);
     }
   }
 };
@@ -142,11 +144,22 @@ export const visitExportDefault: Visitor<NodeOf<'ExportDefaultDeclaration'>> = (
 
 export const visitExportAll: Visitor<NodeOf<'ExportAllDeclaration'>> = (node, context) => {
   const module = builtinName(node.source.value);
-  if (module !== undefined) {
-    const ref = moduleRef(module);
-    context.collector.api(ref, node.source.start);
-    context.collector.dynamic(ref, displayRef(ref), 're-exported with export *', node.start);
+  if (module === undefined) {
+    return;
   }
+  const ref = moduleRef(module);
+  const exported = node.exported === null ? undefined : staticKey(node.exported, false);
+  if (exported !== undefined) {
+    context.collector.aliases.set(exported, { ref, offset: node.start });
+  }
+  context.collector.api(ref, node.source.start);
+  context.collector.dynamic(
+    ref,
+    displayRef(ref),
+    're-exported with export *',
+    node.start,
+    exported !== undefined,
+  );
 };
 
 /** TypeScript's `import fs = require('fs')`. */
