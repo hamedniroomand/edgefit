@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
-import { parse } from 'jsonc-parser';
+import { parseJSONC } from 'confbox';
 
 interface TsConfig {
   extends?: unknown;
@@ -10,8 +10,12 @@ interface TsConfig {
 
 function readConfig(file: string): TsConfig {
   // A tsconfig that does not parse is left to the bundler to report.
-  const config: unknown = parse(readFileSync(file, 'utf8'), [], { allowTrailingComma: true });
-  return typeof config === 'object' && config !== null ? config : {};
+  try {
+    const config: unknown = parseJSONC(readFileSync(file, 'utf8'), { allowTrailingComma: true });
+    return typeof config === 'object' && config !== null ? config : {};
+  } catch {
+    return {};
+  }
 }
 
 function keeps(options: Record<string, unknown>): boolean {

@@ -15,6 +15,22 @@ function project(files: Record<string, string>): string {
   return root;
 }
 
+describe('a tsconfig that gives no compiler options', () => {
+  it('is not valid JSON', () => {
+    const root = project({
+      'tsconfig.json': '{ "compilerOptions": { "verbatimModuleSyntax": true }',
+    });
+    expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(false);
+  });
+
+  it('is not an object', () => {
+    for (const text of ['null', '1']) {
+      const root = project({ 'tsconfig.json': text });
+      expect(keepsUnusedImports(path.join(root, 'src/a.ts'), root)).toBe(false);
+    }
+  });
+});
+
 describe('reading whether the bundler keeps unused imports', () => {
   it('is false without a tsconfig or without the options', () => {
     const empty = project({});
