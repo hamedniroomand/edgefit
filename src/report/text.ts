@@ -2,6 +2,7 @@ import { styleText } from 'node:util';
 
 import type { CheckResult, SkippedTarget, TargetReport } from '@/core/check.ts';
 import { describeEntries } from '@/core/entries.ts';
+import type { FailedTarget } from '@/core/run-targets.ts';
 import { suppliedNote } from '@/core/supplied.ts';
 import type { Finding } from '@/types.ts';
 
@@ -141,6 +142,16 @@ export function formatSkipped(skipped: readonly SkippedTarget[], paint: Paint): 
   );
 }
 
+/** The error of each target that could not be checked, with its hint. */
+export function formatFailed(failed: readonly FailedTarget[], paint: Paint): string[] {
+  return failed.map(target =>
+    [
+      paint('red', `edgefit · ${target.key} could not be checked: ${target.message}`),
+      ...(target.hint === undefined ? [] : [paint('dim', `  ${target.hint}`)]),
+    ].join('\n'),
+  );
+}
+
 export function formatText(result: CheckResult, options: TextOptions): string {
   const paint = painter(options);
   const sections = result.reports.map(report => {
@@ -160,6 +171,10 @@ export function formatText(result: CheckResult, options: TextOptions): string {
     return `${formatHeader(report, paint).join('\n')}\n\n${body}${tail}`;
   });
   const skipped = formatSkipped(result.skipped, paint);
-  const all = [...sections, ...(skipped.length > 0 ? [skipped.join('\n')] : [])];
+  const all = [
+    ...sections,
+    ...(skipped.length > 0 ? [skipped.join('\n')] : []),
+    ...formatFailed(result.failed ?? [], paint),
+  ];
   return `${all.join('\n\n')}\n\n${summaryLine(result)}\n`;
 }

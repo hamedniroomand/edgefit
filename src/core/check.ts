@@ -1,7 +1,6 @@
 import path from 'node:path';
 import process from 'node:process';
 
-import { attributeOutput } from '@/built/attribute.ts';
 import { builtEntries, isBuildOutput } from '@/built/entry.ts';
 import { missingPeersOf, resolveGraph } from '@/resolve/graph.ts';
 import { createTarget } from '@/targets/index.ts';
@@ -16,11 +15,14 @@ import {
   defaultLevels,
   loadSuggestions,
   loadUnreached,
-  readStoredModules,
 } from './findings.ts';
-import type { ModuleUsages, SupportedApi } from './findings.ts';
-import { leaveOutSupplied, scanModules, toPosix } from './scan.ts';
+import type { SupportedApi } from './findings.ts';
+import { shownModules, settleTargets } from './run-targets.ts';
+import type { FailedTarget } from './run-targets.ts';
+import { scanModules, toPosix } from './scan.ts';
 import type { SuppliedLoad } from './scan.ts';
+
+export type { FailedTarget } from './run-targets.ts';
 
 export interface CheckOptions {
   /** Project root. Defaults to the current working directory. */
@@ -66,6 +68,8 @@ export interface CheckResult {
   root: string;
   reports: TargetReport[];
   skipped: SkippedTarget[];
+  /** The targets that failed while others were checked. Left out when every target was checked. */
+  failed?: FailedTarget[];
 }
 
 function describeNodeEnv(nodeEnv: string | undefined, fromConfig: boolean): string {
@@ -73,22 +77,6 @@ function describeNodeEnv(nodeEnv: string | undefined, fromConfig: boolean): stri
     return 'NODE_ENV not fixed, so both branches of a check are followed';
   }
   return `NODE_ENV ${nodeEnv} (${fromConfig ? 'from the config' : "as the platform's build"})`;
-}
-
-/**
- * The modules to check, the notes of the scan, and the loads of a name that the user gives, with
- * the stored modules read. Build output holds the callers of its own functions, so no name in it
- * comes from a user.
- */
-function shownModules(
-  scanned: ModuleUsages[],
-  root: string,
-  isBuilt: boolean,
-): { modules: ModuleUsages[]; notes: string[]; supplied: SuppliedLoad[] } {
-  const shown = isBuilt
-    ? { ...attributeOutput(scanned, root), supplied: [] }
-    : { ...leaveOutSupplied(scanned), notes: [] };
-  return { ...shown, modules: readStoredModules(shown.modules) };
 }
 
 async function checkTarget(
@@ -152,18 +140,26 @@ export async function check(options: CheckOptions = {}): Promise<CheckResult> {
     built === undefined
       ? entriesFor(root, targets, config)
       : targets.map(() => ({ ...builtEntries(root, built), source: '--built', built: true }));
-  const pending: Promise<TargetReport>[] = [];
+  const pending: { key: TargetKey; report: Promise<TargetReport> }[] = [];
   const skipped: SkippedTarget[] = [];
   for (const [index, target] of targets.entries()) {
     const own = entries[index];
     if (own === undefined) {
       skipped.push({ key: target.info.key, searched: target.entries.searched });
     } else {
-      pending.push(checkTarget(target, own, root, options));
+      pending.push({ key: target.info.key, report: checkTarget(target, own, root, options) });
     }
   }
-  const reports = await Promise.all(pending);
-  return { root, reports, skipped };
+  const { reports, failed } = await settleTargets(pending);
+  return { root, reports, skipped, ...(failed.length > 0 ? { failed } : {}) };
+}
+
+/** 2 when a target could not be checked, 1 when there are errors, else 0. */
+export function exitCodeOf(result: CheckResult): number {
+  if ((result.failed ?? []).length > 0) {
+    return 2;
+  }
+  return countLevels(result).errors > 0 ? 1 : 0;
 }
 
 export function countLevels(result: CheckResult): { errors: number; warnings: number } {

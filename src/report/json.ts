@@ -1,5 +1,6 @@
 import { countLevels } from '@/core/check.ts';
 import type { CheckResult, SkippedTarget } from '@/core/check.ts';
+import type { FailedTarget } from '@/core/run-targets.ts';
 import { EdgefitError } from '@/errors.ts';
 import { findingId } from '@/report/finding-id.ts';
 import type { Finding, TargetKey } from '@/types.ts';
@@ -23,11 +24,28 @@ function withId(finding: Finding): Finding & { id: string } {
   return { id: findingId(finding), ...finding };
 }
 
+/** The targets that could not be checked, left out when there are none. */
+export function failedJson(result: CheckResult): { failed?: FailedJson[] } {
+  const failed = result.failed ?? [];
+  return failed.length === 0 ? {} : { failed: failed.map(item => failedEntry(item)) };
+}
+
+function failedEntry({ key, message, hint }: FailedTarget): FailedJson {
+  return hint === undefined ? { target: key, message } : { target: key, message, hint };
+}
+
+export interface FailedJson {
+  target: TargetKey;
+  message: string;
+  hint?: string;
+}
+
 export function formatJson(result: CheckResult): string {
   const report = {
     version: jsonReportVersion,
     summary: countLevels(result),
     skipped: result.skipped,
+    ...failedJson(result),
     targets: result.reports.map(targetReport => ({
       ...targetReport.target,
       entries: targetReport.entries,

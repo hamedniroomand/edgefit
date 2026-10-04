@@ -4,7 +4,7 @@ import { describeEntries } from '@/core/entries.ts';
 import { compareRows } from './compare.ts';
 import type { CompareCell, CompareOptions, CompareRow } from './compare.ts';
 import { summaryLine } from './summary.ts';
-import { formatFinding, formatSkipped, painter } from './text.ts';
+import { formatFailed, formatFinding, formatSkipped, painter } from './text.ts';
 import type { Paint, TextOptions } from './text.ts';
 
 export interface CompareTextOptions extends TextOptions, CompareOptions {
@@ -24,7 +24,7 @@ const symbols: Record<CompareCell | 'unreached', { symbol: string; style: Parame
   };
 
 const legend =
-  '✓ supported  ~ mismatch or mocked  ✗ unsupported  ! missing per Web API data  ? unknown  – not reached or ignored';
+  '✓ supported  ~ mismatch or mocked  ✗ unsupported  ! missing per Web API data  ? unknown  – not reached, ignored or not checked';
 
 const gap = '  ';
 
@@ -65,7 +65,8 @@ function compareHeader(result: CheckResult, entries: readonly string[], paint: P
 /** One table of the reached APIs across targets. */
 export function formatCompareText(result: CheckResult, options: CompareTextOptions): string {
   const paint = painter(options);
-  const keys = result.reports.map(report => report.target.key);
+  const failedKeys = (result.failed ?? []).map(target => target.key);
+  const keys = [...result.reports.map(report => report.target.key), ...failedKeys];
   const entries = result.reports.map(report => describeEntries(report.entries));
   const header = compareHeader(result, entries, paint);
   const rows = compareRows(result, options);
@@ -74,6 +75,7 @@ export function formatCompareText(result: CheckResult, options: CompareTextOptio
       report.target.notes.map(note => paint('yellow', `note (${report.target.key}): ${note}`)),
     ),
     ...formatSkipped(result.skipped, paint),
+    ...formatFailed(result.failed ?? [], paint),
   ];
   if (rows.length === 0) {
     const clean = paint('green', 'No known incompatible reachable APIs found.');

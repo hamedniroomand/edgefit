@@ -1,4 +1,5 @@
 import type { CheckResult, SkippedTarget } from '@/core/check.ts';
+import type { FailedTarget } from '@/core/run-targets.ts';
 import type { Finding } from '@/types.ts';
 
 import { chainLine, fixLine, ownerName, skippedMessage, summaryLine } from './summary.ts';
@@ -41,12 +42,19 @@ export function skippedWarning(target: SkippedTarget): string {
   return `::warning title=${title}::${escapeData(skippedMessage(target))}`;
 }
 
+/** An error with no file, for a target that could not be checked. */
+export function failedError(target: FailedTarget): string {
+  const title = escapeProperty(`edgefit: ${target.key} could not be checked`);
+  return `::error title=${title}::${escapeData(target.message)}`;
+}
+
 export function formatGithub(result: CheckResult): string {
   const lines = result.reports.flatMap(report =>
     report.findings.map(finding => annotation(finding)),
   );
   lines.push(
     ...result.skipped.map(target => skippedWarning(target)),
+    ...(result.failed ?? []).map(target => failedError(target)),
     `edgefit: ${summaryLine(result)}`,
   );
   return `${lines.join('\n')}\n`;

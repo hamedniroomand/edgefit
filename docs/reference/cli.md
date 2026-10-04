@@ -118,8 +118,8 @@ Colors are on when stdout is a terminal. They are off when `--no-color` is passe
 
 ## Exit codes
 
-| Code | Meaning                                                                |
-| ---- | ---------------------------------------------------------------------- |
-| `0`  | No error-level findings (for `diff`: nothing that matches `--fail-on`) |
-| `1`  | Error-level findings (for `diff`: findings that match `--fail-on`)     |
-| `2`  | Invalid arguments or config, or a project that could not be resolved   |
+| Code | Meaning                                                                                                                    |
+| ---- | -------------------------------------------------------------------------------------------------------------------------- |
+| `0`  | No error-level findings (for `diff`: nothing that matches `--fail-on`)                                                     |
+| `1`  | Error-level findings (for `diff`: findings that match `--fail-on`)                                                         |
+| `2`  | Invalid arguments or config, a project that could not be resolved, or a target that could not be checked while others were |

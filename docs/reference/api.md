@@ -35,6 +35,8 @@ function check(options?: CheckOptions): Promise<CheckResult>;
 interface CheckResult {
   root: string;
   reports: TargetReport[];
+  /** Targets whose module graph could not be resolved while others were checked. Left out when none failed. */
+  failed?: { key: TargetKey; message: string; hint?: string; error: Error }[];
 }
 
 interface TargetReport {
@@ -114,4 +116,4 @@ try {
 
 ## Types
 
-All public types are exported: `EdgefitConfig`, `CheckOptions`, `CheckResult`, `TargetReport`, `TargetInfo`, `Finding`, `Category`, `Level`, `TargetKey`, `IgnoreRule`, `Location`, `PackageInfo`, `SupportedApi` and `ReportFormat`.
+All public types are exported: `EdgefitConfig`, `CheckOptions`, `CheckResult`, `FailedTarget`, `TargetReport`, `TargetInfo`, `Finding`, `Category`, `Level`, `TargetKey`, `IgnoreRule`, `Location`, `PackageInfo`, `SupportedApi` and `ReportFormat`.
