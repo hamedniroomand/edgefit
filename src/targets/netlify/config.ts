@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { parse } from 'smol-toml';
+import { parseTOML } from 'confbox';
 
 import { EdgefitError } from '@/errors.ts';
 import type { NetlifyOptions } from '@/types.ts';
@@ -23,7 +23,7 @@ function readNetlifyConfig(root: string, file: string): NetlifyConfig {
     edge_functions?: unknown;
   };
   try {
-    toml = parse(readFileSync(file, 'utf8')) as typeof toml;
+    toml = parseTOML(readFileSync(file, 'utf8')) as typeof toml;
   } catch (error) {
     const reason = error instanceof Error ? error.message.split('\n')[0] : String(error);
     throw new EdgefitError(`Could not parse ${path.relative(root, file)}: ${reason}`);

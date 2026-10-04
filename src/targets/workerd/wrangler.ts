@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { parse as parseToml } from 'smol-toml';
+import { parseTOML } from 'confbox';
 
 import { parseJsonc } from '@/targets/jsonc.ts';
 
@@ -54,7 +54,7 @@ export function readWranglerConfig(file: string): WranglerConfig {
   let raw: unknown;
   if (file.endsWith('.toml')) {
     try {
-      raw = parseToml(text);
+      raw = parseTOML(text);
     } catch (error) {
       throw new Error(`Could not parse ${file}: ${(error as Error).message}`, { cause: error });
     }

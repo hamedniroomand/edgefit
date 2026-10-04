@@ -9,9 +9,15 @@ describe('parsing JSONC', () => {
     expect(parseJsonc(text, 'wrangler.jsonc')).toEqual({ main: 'src/index.ts', flags: ['a'] });
   });
 
-  it('names the file and offset of a syntax error', () => {
+  it('names the file and the JSON parse error', () => {
+    let reason = '';
+    try {
+      JSON.parse('{ "main": }');
+    } catch (error) {
+      reason = (error as Error).message;
+    }
     expect(() => parseJsonc('{ "main": }', 'wrangler.jsonc')).toThrow(
-      /Could not parse wrangler\.jsonc: invalid JSON at offset \d+/u,
+      `Could not parse wrangler.jsonc: ${reason}`,
     );
   });
 });
