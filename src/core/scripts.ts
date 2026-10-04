@@ -68,6 +68,7 @@ export interface Script {
 }
 
 type Extraction = {
+  entries: ReadonlySet<string>;
   root: string;
   globals: ReadonlySet<string>;
   options: ScanOptions;
@@ -76,7 +77,7 @@ type Extraction = {
 };
 
 function extractOne(
-  { root, globals, options, tsconfigs, native }: Extraction,
+  { root, globals, options, tsconfigs, native, entries }: Extraction,
   file: string,
   module: GraphModule,
   source: string,
@@ -84,6 +85,7 @@ function extractOne(
 ): ExtractedModule {
   return extractModule(toPosix(file), source, {
     globals,
+    imported: !entries.has(file),
     shape: options.trace,
     lazyNodeImports: options.lazyNodeImports,
     keepUnusedImports:
@@ -106,7 +108,14 @@ export function extractScripts(
   options: ScanOptions,
 ): Script[] {
   const native = new NativePackages(root);
-  const context = { root, globals, options, tsconfigs: new Map<string, boolean>(), native };
+  const context = {
+    root,
+    globals,
+    options,
+    tsconfigs: new Map<string, boolean>(),
+    native,
+    entries: new Set(graph.entries),
+  };
   const first = [...graph.modules]
     .filter(([file]) => scriptFile.test(file))
     .map(([file, module]) => {

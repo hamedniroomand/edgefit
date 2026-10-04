@@ -227,3 +227,9 @@ No known incompatible reachable APIs found.
 ```
 
 The wording is deliberate. It means none of the APIs edgefit could see are known to be a problem. It is not a guarantee that the project works.
+
+## Code behind a main module check
+
+An imported CommonJS file is not the project entry. In that file, edgefit treats `require.main === module` as false. It also reads the comparison in the reverse order, `module === require.main`. Code behind the check is not checked. This includes named functions used only by that code, with the helpers and bindings they use. A function that is exported or used elsewhere stays checked. Repeated local names stay checked.
+
+The actual graph entry keeps both branches. A local variable or parameter named `require` or `module` does not count as the CommonJS check. One parameter counts: the second parameter of a CommonJS factory, such as the `__commonJS` helper of esbuild. A factory is a function with two parameters that is given to a local helper. The helper makes a `{ exports: {} }` object. The factory sets `exports` on its second parameter and does not write to that parameter.

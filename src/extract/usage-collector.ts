@@ -1,10 +1,22 @@
+import type { Node } from 'oxc-parser';
+
 import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef, Location, RuntimeCondition, Usage } from '@/types.ts';
 
 import { GuardStack } from './guard-stack.ts';
+import type { LocalFunction } from './local-functions.ts';
+import { omitMainFunctions } from './main-only.ts';
 import { isPromiseApi, normalizeRef } from './refs.ts';
 
 export class UsageCollector {
+  public readonly omitMainFunctions = (
+    body: readonly Node[],
+    functions: ReadonlyMap<string, LocalFunction>,
+    dead: ReadonlySet<Node>,
+  ): void => {
+    omitMainFunctions(body, functions, dead, this);
+  };
+
   public readonly usages: Usage[] = [];
   /** Where each usage was found in the source, in the order of `usages`. */
   public readonly offsets: number[] = [];

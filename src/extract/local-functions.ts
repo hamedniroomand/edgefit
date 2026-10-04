@@ -17,7 +17,7 @@ function isFunction(node: Node): node is LocalFunction {
 }
 
 /** The names that a node declares, and the function it declares when it has one. */
-function declared(node: Node): { names: string[]; fn?: LocalFunction } {
+export function declared(node: Node): { names: string[]; fn?: LocalFunction } {
   if (node.type === 'FunctionDeclaration') {
     return { names: node.id === null ? [] : [node.id.name], fn: node };
   }
@@ -76,7 +76,7 @@ function keyOf(member: Node): string | undefined {
 }
 
 /** Whether `node` is the name of a member or of an object property, which no variable holds. */
-function isPropertyName(node: Node, parent: Node | undefined): boolean {
+export function isPropertyName(node: Node, parent: Node | undefined): boolean {
   return (
     (parent?.type === 'MemberExpression' && parent.property === node && !parent.computed) ||
     (parent?.type === 'Property' && parent.key === node && !parent.computed && !parent.shorthand)

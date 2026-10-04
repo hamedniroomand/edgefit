@@ -1,6 +1,7 @@
 import type { NodeOf } from '@/extract/ast.ts';
 import type { Visitor } from '@/extract/context.ts';
 import { collectBlockNames, collectLexicalNames, patternNames } from '@/extract/declarations.ts';
+import { factoryModule } from '@/extract/main-only.ts';
 import { createScope, declare } from '@/extract/scope.ts';
 
 import { visitStatements } from './guards.ts';
@@ -26,6 +27,10 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
     names.push(...collectBlockNames(body.body));
   }
   declare(scope, names);
+  const module = factoryModule(node, context.parent(), context.functions);
+  if (module !== undefined) {
+    scope.modules.add(module);
+  }
   // A function may be called after the `try` block around it has ended.
   context.collector.guards.deferred(() => {
     context.inScope(scope, () => {

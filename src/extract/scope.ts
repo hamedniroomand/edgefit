@@ -38,6 +38,8 @@ export interface Scope {
   symbols: Set<string>;
   /** Names bound to a WebAssembly module by `import mod from './x.wasm'`. */
   wasmImports: Set<string>;
+  /** The `module` parameter of a CommonJS factory, as in esbuild's `__commonJS` helper. */
+  modules: Set<string>;
   parent: Scope | undefined;
 }
 
@@ -50,6 +52,7 @@ export function createScope(parent?: Scope): Scope {
     stringObjects: new Map(),
     symbols: new Set(),
     wasmImports: new Set(),
+    modules: new Set(),
     parent,
   };
 }
@@ -101,6 +104,14 @@ export function isWasmImport(scope: Scope | undefined, name: string): boolean {
   return (
     scope.wasmImports.has(name) || (!scope.names.has(name) && isWasmImport(scope.parent, name))
   );
+}
+
+/** Whether the name is the `module` parameter of a CommonJS factory, unless a nearer declaration shadows it. */
+export function isFactoryModule(scope: Scope | undefined, name: string): boolean {
+  if (scope === undefined) {
+    return false;
+  }
+  return scope.modules.has(name) || (!scope.names.has(name) && isFactoryModule(scope.parent, name));
 }
 
 /** True when the name is a `const` symbol, unless a nearer declaration of the name shadows it. */
