@@ -66,7 +66,7 @@ edgefit check --format json
 }
 ```
 
-`skipped` lists the targets left out because they have no entry, each as `{ key, searched }`, where `searched` names the places the target looked. It is empty when every target ran.
+`skipped` lists the targets left out because they have no entry, each as `{ key, searched }`, where `searched` names the places the target looked. It is empty when every target ran. `failed` lists the targets whose module graph could not be resolved while other targets were checked, each as `{ target, message, hint? }`. It is left out when every target was checked, and the exit code is 2 when it is there.
 
 `entries` lists every entry the target was checked from, relative to the root, sorted. A target that has no entry of its own and uses another target's lists those.
 

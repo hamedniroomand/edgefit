@@ -26,6 +26,18 @@
         }
       }
     },
+    "failed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["target", "message"],
+        "properties": {
+          "target": { "$ref": "#/definitions/targetKey" },
+          "message": { "type": "string" },
+          "hint": { "type": "string" }
+        }
+      }
+    },
     "targets": { "type": "array", "items": { "$ref": "#/definitions/target" } }
   },
   "definitions": {

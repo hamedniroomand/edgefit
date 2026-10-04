@@ -1,0 +1,6 @@
+{
+  "name": "edgefit-fixture-browser-missing",
+  "version": "1.0.0",
+  "main": "./index.js",
+  "browser": "./browser.js"
+}

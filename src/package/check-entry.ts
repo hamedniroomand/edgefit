@@ -36,6 +36,14 @@ function entryStatus(report: TargetReport): EntryStatus {
   };
 }
 
+/** The cell of a target that could not be checked: not checked when the package misses a module it does not declare, else an error. */
+function failedStatus(error: unknown, root: string): EntryStatus {
+  const needed = undeclaredModules(error, root);
+  return needed.length > 0
+    ? { status: 'unchecked', errors: 0, warnings: 0, message: neededMessage(needed) }
+    : { status: 'error', errors: 0, warnings: 0, message: errorMessage(error) };
+}
+
 export async function checkEntry(
   root: string,
   entry: PackageEntry,
@@ -66,12 +74,11 @@ export async function checkEntry(
         notes: [...report.target.notes],
       };
     }
+    for (const failed of checked.failed ?? []) {
+      row.results[failed.key] = failedStatus(failed.error, root);
+    }
   } catch (error) {
-    const needed = undeclaredModules(error, root);
-    const outcome: EntryStatus =
-      needed.length > 0
-        ? { status: 'unchecked', errors: 0, warnings: 0, message: neededMessage(needed) }
-        : { status: 'error', errors: 0, warnings: 0, message: errorMessage(error) };
+    const outcome = failedStatus(error, root);
     for (const key of targets) {
       row.results[key] = outcome;
     }

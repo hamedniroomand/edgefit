@@ -75,6 +75,19 @@ describe('checkPackage', () => {
   });
 });
 
+describe('checkPackage with a target whose graph does not resolve', () => {
+  it('is not checked on that target only, and has a result on the others', async () => {
+    const result = await checkPackage(fixture('packages/browser-missing'), {
+      targets: ['workerd', 'bun', 'deno'],
+    });
+    const row = result.entries[0]?.results;
+    expect(row?.workerd?.status).toBe('unchecked');
+    expect(row?.workerd?.message).toContain('edgefit-missing-wasm');
+    expect(row?.bun?.status).toBe('pass');
+    expect(row?.deno?.status).toBe('pass');
+  }, 60_000);
+});
+
 describe('checkPackage with a main subpath', () => {
   it('takes the result from the subpath that the caller names as the main entry', async () => {
     const result = await checkPackage(pack('scoped'), { targets: ['workerd'], main: './node' });

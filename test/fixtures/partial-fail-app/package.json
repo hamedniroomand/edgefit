@@ -1,0 +1,5 @@
+{
+  "name": "partial-fail-app",
+  "private": true,
+  "dependencies": { "hash-lib": "1.0.0" }
+}
