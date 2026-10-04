@@ -132,6 +132,9 @@ export function missingPeersOf(graph: ModuleGraph): string[] {
   return [...new Set(names)].toSorted();
 }
 
+/** esbuild names a module that the `browser` field maps to `false` with this prefix. It is an empty module, not a file. */
+const disabledPrefix = '(disabled):';
+
 /** Resolves the module graph from an entry the way the target's bundler would. */
 export async function resolveGraph(requested: ResolveOptions): Promise<ModuleGraph> {
   // esbuild reports importers by real path, so the root must be a real path too.
@@ -140,7 +143,12 @@ export async function resolveGraph(requested: ResolveOptions): Promise<ModuleGra
   const metafile = await bundleMetafile(options, accepted);
   const modules = new Map<string, GraphModule>();
   for (const [file, input] of Object.entries(metafile.inputs)) {
-    const internal = input.imports.filter(item => item.external !== true);
+    if (file.startsWith(disabledPrefix)) {
+      continue;
+    }
+    const internal = input.imports.filter(
+      item => item.external !== true && !item.path.startsWith(disabledPrefix),
+    );
     const imports = internal.map(item => item.path);
     const links = internal.map(item => ({
       path: item.path,
