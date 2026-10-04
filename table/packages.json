@@ -230,6 +230,114 @@
     },
     {
       "name": "@noble/curves"
+    },
+    {
+      "name": "@google/genai"
+    },
+    {
+      "name": "@langchain/core"
+    },
+    {
+      "name": "@clickhouse/client"
+    },
+    {
+      "name": "@auth/core"
+    },
+    {
+      "name": "passport"
+    },
+    {
+      "name": "twilio"
+    },
+    {
+      "name": "@sendgrid/mail"
+    },
+    {
+      "name": "@slack/web-api"
+    },
+    {
+      "name": "posthog-node"
+    },
+    {
+      "name": "amqplib"
+    },
+    {
+      "name": "busboy"
+    },
+    {
+      "name": "multer"
+    },
+    {
+      "name": "jszip"
+    },
+    {
+      "name": "pdf-lib"
+    },
+    {
+      "name": "fast-xml-parser"
+    },
+    {
+      "name": "ejs"
+    },
+    {
+      "name": "markdown-it"
+    },
+    {
+      "name": "luxon"
+    },
+    {
+      "name": "moment"
+    },
+    {
+      "name": "rxjs"
+    },
+    {
+      "name": "qs"
+    },
+    {
+      "name": "yup"
+    },
+    {
+      "name": "joi"
+    },
+    {
+      "name": "bignumber.js"
+    },
+    {
+      "name": "semver"
+    },
+    {
+      "name": "mime"
+    },
+    {
+      "name": "iconv-lite"
+    },
+    {
+      "name": "unstorage"
+    },
+    {
+      "name": "firebase-admin",
+      "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run."
+    },
+    {
+      "name": "@google-cloud/storage",
+      "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run."
+    },
+    {
+      "name": "mssql",
+      "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either."
+    },
+    {
+      "name": "argon2",
+      "notes": "argon2 is a native addon, so use bcryptjs or a WebAssembly hash on Workers."
+    },
+    {
+      "name": "@electric-sql/pglite",
+      "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support."
+    },
+    {
+      "name": "socket.io",
+      "notes": "On Workers the browser build of engine.io-parser reads a Blob with FileReader, which Workers do not have."
     }
   ]
 }
