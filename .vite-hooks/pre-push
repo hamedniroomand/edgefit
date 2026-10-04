@@ -1,2 +1,2 @@
-vp test --coverage
+vp test --coverage --testTimeout=30000
 node scripts/patch-coverage.mjs

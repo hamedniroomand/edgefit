@@ -6,6 +6,7 @@ import type { Loader, Message, Metafile, Plugin } from 'esbuild';
 
 import { toResolveError } from './errors.ts';
 import { importWrappers } from './import-wrappers.ts';
+import { acceptMissingRequires } from './missing-requires.ts';
 import { acceptMissingPeers, importKey, moduleName, optionalPeers } from './optional-peers.ts';
 import { runtimeExternals } from './runtime-externals.ts';
 import { tsconfigRawFor } from './tsconfig.ts';
@@ -27,6 +28,7 @@ export interface GraphModule {
   externals: string[];
   /** The externals that are optional peer dependencies which are not installed. */
   missingPeers: string[];
+  missingRequires?: string[];
 }
 
 export interface ModuleGraph {
@@ -87,7 +89,11 @@ function isBuildFailure(error: unknown): error is { errors: Message[] } {
   );
 }
 
-async function bundleMetafile(options: ResolveOptions, accepted: Set<string>): Promise<Metafile> {
+async function bundleMetafile(
+  options: ResolveOptions,
+  accepted: Set<string>,
+  missingRequires: Set<string>,
+): Promise<Metafile> {
   const define: Record<string, string> = {};
   if (options.nodeEnv !== undefined) {
     define['process.env.NODE_ENV'] = JSON.stringify(options.nodeEnv);
@@ -114,13 +120,17 @@ async function bundleMetafile(options: ResolveOptions, accepted: Set<string>): P
         ...(options.plugins ?? []),
         runtimeExternals,
         importWrappers,
-        optionalPeers(accepted),
+        optionalPeers(new Set([...accepted, ...missingRequires])),
       ],
     });
     return result.metafile;
   } catch (error) {
-    if (isBuildFailure(error) && acceptMissingPeers(options.root, error.errors, accepted)) {
-      return bundleMetafile(options, accepted);
+    if (
+      isBuildFailure(error) &&
+      (acceptMissingPeers(options.root, error.errors, accepted) ||
+        acceptMissingRequires(options.root, error.errors, missingRequires))
+    ) {
+      return bundleMetafile(options, accepted, missingRequires);
     }
     throw isBuildFailure(error) ? toResolveError(error.errors) : error;
   }
@@ -140,7 +150,8 @@ export async function resolveGraph(requested: ResolveOptions): Promise<ModuleGra
   // esbuild reports importers by real path, so the root must be a real path too.
   const options = { ...requested, root: realpathSync(requested.root) };
   const accepted = new Set<string>();
-  const metafile = await bundleMetafile(options, accepted);
+  const missingRequires = new Set<string>();
+  const metafile = await bundleMetafile(options, accepted, missingRequires);
   const modules = new Map<string, GraphModule>();
   for (const [file, input] of Object.entries(metafile.inputs)) {
     if (file.startsWith(disabledPrefix)) {
@@ -162,6 +173,9 @@ export async function resolveGraph(requested: ResolveOptions): Promise<ModuleGra
       externals,
       missingPeers: externals.filter(item =>
         accepted.has(importKey(path.resolve(options.root, file), item)),
+      ),
+      missingRequires: externals.filter(item =>
+        missingRequires.has(importKey(path.resolve(options.root, file), item)),
       ),
     });
   }
