@@ -6,6 +6,7 @@ import type { Loader, Message, Metafile, Plugin } from 'esbuild';
 
 import { toResolveError } from './errors.ts';
 import { importWrappers } from './import-wrappers.ts';
+import { mainOnly } from './main-only.ts';
 import { acceptMissingRequires } from './missing-requires.ts';
 import { acceptMissingPeers, importKey, moduleName, optionalPeers } from './optional-peers.ts';
 import { runtimeExternals } from './runtime-externals.ts';
@@ -120,6 +121,7 @@ async function bundleMetafile(
         ...(options.plugins ?? []),
         runtimeExternals,
         importWrappers,
+        mainOnly(new Set(options.entries.map(entry => path.resolve(options.root, entry)))),
         optionalPeers(new Set([...accepted, ...missingRequires])),
       ],
     });
