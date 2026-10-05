@@ -3,7 +3,7 @@ import type { MemberExpression, Node } from 'oxc-parser';
 import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef } from '@/types.ts';
 
-import { staticKey, strip, unwrap } from './ast.ts';
+import { destructuredNames, staticKey, strip, unwrap } from './ast.ts';
 import { parameterReads } from './local-functions.ts';
 import type { LocalFunction, ParameterRead } from './local-functions.ts';
 
@@ -120,7 +120,13 @@ export function escapes(node: Node, parent: Node, outer: readonly Node[] = []): 
   const passesOn =
     unwrap(parent) === node ||
     (parent.type === 'SequenceExpression' && parent.expressions.at(-1) === node);
-  if (passesOn && grand !== undefined) {
+  // `({ a } = value)` reads the names here. The value then goes where the assignment goes.
+  const namedAssignment =
+    parent.type === 'AssignmentExpression' &&
+    parent.operator === '=' &&
+    parent.right === node &&
+    destructuredNames(parent.left) !== undefined;
+  if ((passesOn || namedAssignment) && grand !== undefined) {
     return escapes(parent, grand, rest);
   }
   if (parent.type === 'CallExpression') {

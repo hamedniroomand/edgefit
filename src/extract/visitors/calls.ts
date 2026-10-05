@@ -61,6 +61,34 @@ function recordWasmBytes(node: NodeOf<'CallExpression'>, context: VisitContext):
 
 const computedModuleReason = 'the module name is computed at runtime';
 
+// The code of the error that a load of a missing module throws, when the name has no `node:` prefix.
+const missingFileCodes = { import: 'ERR_MODULE_NOT_FOUND', require: 'MODULE_NOT_FOUND' } as const;
+
+/**
+ * Runs `record` as caught where a `catch` stops the error of a missing `specifier`. The code
+ * after the load then runs only when the module is there.
+ */
+function recordMissing(
+  specifier: string,
+  kind: keyof typeof missingFileCodes,
+  context: VisitContext,
+  record: () => void,
+): void {
+  const code = specifier.startsWith('node:')
+    ? 'ERR_UNKNOWN_BUILTIN_MODULE'
+    : missingFileCodes[kind];
+  const { guards } = context.collector;
+  if (!guards.missingCode(code)) {
+    record();
+    return;
+  }
+  guards.caught(record);
+  const module = builtinName(specifier);
+  if (module !== undefined) {
+    guards.loaded(moduleRef(module).module);
+  }
+}
+
 function visitRequire(node: NodeOf<'CallExpression'>, context: VisitContext): void {
   const [argument] = node.arguments;
   if (argument === undefined) {
@@ -81,11 +109,13 @@ function visitRequire(node: NodeOf<'CallExpression'>, context: VisitContext): vo
     context.visit(argument);
     return;
   }
-  context.collector.native(specifier, argument.start);
-  const module = builtinName(specifier);
-  if (module !== undefined) {
-    context.useRef(moduleRef(module), argument.start);
-  }
+  recordMissing(specifier, 'require', context, () => {
+    context.collector.native(specifier, argument.start);
+    const module = builtinName(specifier);
+    if (module !== undefined) {
+      context.useRef(moduleRef(module), argument.start);
+    }
+  });
 }
 
 /** `util.inherits(Child, Parent)` makes `Parent` the parent class of `Child`. */
@@ -184,10 +214,13 @@ function recordImport(specifier: string, offset: number, context: VisitContext):
       context.useRef(moduleRef(module), offset);
     }
   };
+  const run = (): void => {
+    recordMissing(specifier, 'import', context, record);
+  };
   if (context.parent()?.type === 'AwaitExpression') {
-    record();
+    run();
   } else {
-    context.collector.guards.deferred(record);
+    context.collector.guards.deferred(run);
   }
 }
 

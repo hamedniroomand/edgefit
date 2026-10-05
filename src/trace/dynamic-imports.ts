@@ -1,31 +1,17 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, staticKey, staticString, strip, unwrap } from '@/extract/ast.ts';
+import {
+  childNodes,
+  destructuredNames,
+  staticKey,
+  staticString,
+  strip,
+  unwrap,
+} from '@/extract/ast.ts';
 import { isInteropHelper } from '@/extract/refs.ts';
 
 /** The export names that a module asks of a file with `import()`, or `all` when it may use any. */
 export type DynamicImports = Map<string, Set<string> | 'all'>;
-
-/** The local names of `const { a, b: c = 1 } = …`, by the name they take, when every one is a plain name. */
-export function destructuredImports(pattern: Node): Map<string, string> | undefined {
-  if (pattern.type !== 'ObjectPattern') {
-    return undefined;
-  }
-  const taken = new Map<string, string>();
-  for (const property of pattern.properties) {
-    if (property.type === 'RestElement') {
-      return undefined;
-    }
-    const key = staticKey(property.key, property.computed);
-    const value =
-      property.value.type === 'AssignmentPattern' ? property.value.left : property.value;
-    if (key === undefined || value.type !== 'Identifier') {
-      return undefined;
-    }
-    taken.set(value.name, key);
-  }
-  return taken;
-}
 
 export type LoadKind = 'import' | 'require';
 
@@ -65,16 +51,13 @@ function loadOf(node: Node, kind: LoadKind): { specifier: string; node: Node } |
   return specifier === undefined ? undefined : { specifier, node: call };
 }
 
-/** The load that a declarator holds: `const x = await import('literal')` or `= require('literal')`. */
-function loadOfDeclarator(
-  declarator: Node,
-  kind: LoadKind,
-): { specifier: string; node: Node } | undefined {
-  if (declarator.type !== 'VariableDeclarator' || declarator.init === null) {
-    return undefined;
-  }
-  // Parentheses and casts around the call change nothing; `await` itself ends the search.
-  let init: Node = declarator.init;
+/**
+ * The `await import('literal')` or `require('literal')` that `value` is.
+ * Parentheses and casts around the call change nothing. `await` itself ends the search.
+ * `import()` gives a promise, so its result is read after `await`. A `require` result is read as it is.
+ */
+function loadValue(value: Node, kind: LoadKind): { specifier: string; node: Node } | undefined {
+  let init: Node = value;
   for (
     let inner = unwrap(init);
     inner !== undefined && init.type !== 'AwaitExpression';
@@ -83,21 +66,45 @@ function loadOfDeclarator(
     init = inner;
   }
   const awaited = init.type === 'AwaitExpression';
-  // `import()` gives a promise, so its result is read after `await`. A `require` result is read as it is.
   if (kind === 'import' && !awaited) {
     return undefined;
   }
   return loadOf(init.type === 'AwaitExpression' ? init.argument : init, kind);
 }
 
-/** The load that a declarator holds when it destructures plain names from it: `const { a } = await import('literal')` or `= require('literal')`. */
-export function destructuredLoad(
+/** The load that a declarator holds: `const x = await import('literal')` or `= require('literal')`. */
+function loadOfDeclarator(
   declarator: Node,
   kind: LoadKind,
+): { specifier: string; node: Node } | undefined {
+  if (declarator.type !== 'VariableDeclarator' || declarator.init === null) {
+    return undefined;
+  }
+  return loadValue(declarator.init, kind);
+}
+
+/** `const { a } = …` or `({ a } = …)`, when the right side is the load. */
+function destructureTarget(node: Node): { pattern: Node; value: Node } | undefined {
+  if (node.type === 'VariableDeclarator' && node.init !== null) {
+    return { pattern: node.id, value: node.init };
+  }
+  if (node.type === 'AssignmentExpression' && node.operator === '=') {
+    return { pattern: node.left, value: node.right };
+  }
+  return undefined;
+}
+
+/** The load that a declarator or an assignment destructures by plain name: `const { a } = await import('literal')` or `({ a } = require('literal'))`. */
+export function destructuredLoad(
+  node: Node,
+  kind: LoadKind,
 ): { specifier: string; node: Node; names: Map<string, string> } | undefined {
-  const load = loadOfDeclarator(declarator, kind);
-  const names =
-    declarator.type === 'VariableDeclarator' ? destructuredImports(declarator.id) : undefined;
+  const target = destructureTarget(node);
+  if (target === undefined) {
+    return undefined;
+  }
+  const load = loadValue(target.value, kind);
+  const names = destructuredNames(target.pattern);
   return load === undefined || names === undefined ? undefined : { ...load, names };
 }
 
@@ -164,6 +171,18 @@ function namespaceLoad(
 }
 
 /**
+ * The node that `loadsOf` reads a destructured load from. An assignment counts only as a
+ * statement by itself, as `({ a } = require('x'));`. Elsewhere, the code around it gets the
+ * whole module, as in `const m = ({ a } = require('x'))`.
+ */
+function loadTarget(node: Node): Node | undefined {
+  if (node.type === 'ExpressionStatement') {
+    return strip(node.expression);
+  }
+  return node.type === 'AssignmentExpression' ? undefined : node;
+}
+
+/**
  * What each file that a module loads with `import('literal')` or `require('literal')` is asked
  * for. A result that is destructured by name asks for those names. Any other use asks for all of
  * the file.
@@ -174,7 +193,8 @@ export function loadsOf(body: readonly Node[], kind: LoadKind): DynamicImports {
   const loads: { specifier: string; node: Node }[] = [];
   const pending = [...body];
   for (let node = pending.pop(); node !== undefined; node = pending.pop()) {
-    const destructured = destructuredLoad(node, kind);
+    const target = loadTarget(node);
+    const destructured = target === undefined ? undefined : destructuredLoad(target, kind);
     const found = destructured ?? namespaceLoad(node, kind, body);
     if (found !== undefined) {
       understood.add(found.node);

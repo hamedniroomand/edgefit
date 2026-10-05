@@ -142,7 +142,7 @@ try {
 
 Usages in the `try` block are guarded, for the APIs the target lacks and for the APIs that exist and throw, because the `catch` takes the error of both. A check does not do the second. A promise that nothing awaits is not guarded, because a rejection does not reach the `catch`. The data does not say which API gives a promise, so edgefit reads the name: a path with `promises` in it. These are not guarded:
 
-- a `try` with no `catch`, or a `catch` that throws again, even only on some errors
+- a `try` with no `catch`, or a `catch` that throws again, even only on some errors. A `catch` that throws again only when `error.code` is not the code of a missing module guards the load of that module. On a target that lacks the whole module, it also guards the members of the module that the rest of the block reads, because the load throws before they run. On a target that has the module, a missing member stays a finding, because its error is not the one that the `catch` stops. Node.js gives `ERR_UNKNOWN_BUILTIN_MODULE` for a name with the `node:` prefix. Without the prefix, it gives `MODULE_NOT_FOUND` for `require()` and `ERR_MODULE_NOT_FOUND` for `import()`. Another API in the same block stays unguarded
 - the `catch` and `finally` blocks themselves
 - a function defined in the block, which may run after the block has ended, and a class body
 - an `import()` that nothing awaits, since its error does not reach the block. `await import(…)` does

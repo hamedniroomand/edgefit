@@ -72,7 +72,7 @@ export function usagesOf(
 ): string[] {
   return extractUsages(file, source, { globals, nodeEnv: 'production', ...options }).map(
     usage =>
-      `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${polyfillTag(usage)}${runtimeTags(usage)}`,
+      `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${usage.afterLoad === true ? ' [after load]' : ''}${polyfillTag(usage)}${runtimeTags(usage)}`,
   );
 }
 

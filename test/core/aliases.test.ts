@@ -134,6 +134,16 @@ describe('a Node.js module that a file loads with import() by name', () => {
     expect(usages['src/internal.mjs']).toEqual(['api node:crypto', 'api node:util']);
   });
 
+  it('follows a destructuring assignment of the import', async () => {
+    const usages = await scanned({
+      'src/internal.mjs': both,
+      'src/index.mjs':
+        "export async function load() {\n  let crypto;\n  ({ crypto } = await import('./internal.mjs'));\n  return crypto.createHash('md5');\n}\n",
+    });
+    expect(usages['src/index.mjs']).toContain('api node:crypto.createHash');
+    expect(usages['src/internal.mjs']).not.toContain('dynamic node:crypto');
+  });
+
   it('asks the file only for the names that it destructures', async () => {
     const usages = await scanned({
       'src/internal.mjs': `${both}export function unused() { return process.binding('x'); }\n`,

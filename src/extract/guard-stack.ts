@@ -1,9 +1,5 @@
-import type { Node } from 'oxc-parser';
-
 import type { ApiRef, RuntimeCondition } from '@/types.ts';
 
-import { childNodes, isFunction } from './ast.ts';
-import type { NodeOf } from './ast.ts';
 import { normalizeRef } from './refs.ts';
 
 /** An API that is known to exist inside the code a check protects. */
@@ -51,27 +47,15 @@ function isCovered(guard: ApiGuard, ref: ApiRef): boolean {
   );
 }
 
-/** Whether code throws, in the code itself rather than in a function it defines. */
-function throws(node: Node): boolean {
-  return (
-    node.type === 'ThrowStatement' ||
-    (!isFunction(node) && childNodes(node).some(child => throws(child)))
-  );
-}
-
-/**
- * Whether a `catch` stops an error that reaches it: it does not throw again, so what follows
- * the `try` runs either way.
- */
-export function catches(node: NodeOf<'TryStatement'>): boolean {
-  return node.handler !== null && !throws(node.handler.body);
-}
-
 /** The guards in force at the point being visited. */
 export class GuardStack {
   readonly #guards: Guard[] = [];
   /** How many enclosing `try` blocks in this function catch what they run. */
   #caught = 0;
+  /** Missing-module error codes that an enclosing `catch` does not throw again. */
+  #missing: ReadonlySet<string> = new Set();
+  /** The modules that a load in an enclosing `try` block read, where the `catch` stops the error of a missing module. */
+  #loaded: readonly string[] = [];
 
   /** Runs `body` with `guards` added, and removes them afterwards. */
   public readonly within = (guards: readonly Guard[], body: () => void): void => {
@@ -96,6 +80,38 @@ export class GuardStack {
     }
   };
 
+  /** Runs `body` where a `catch` stops a missing module with one of `codes`, and not every error. */
+  public readonly withinMissing = (codes: ReadonlySet<string>, body: () => void): void => {
+    const previous = this.#missing;
+    const loaded = this.#loaded;
+    const next = new Set(previous);
+    for (const code of codes) {
+      next.add(code);
+    }
+    this.#missing = next;
+    try {
+      body();
+    } finally {
+      this.#missing = previous;
+      this.#loaded = loaded;
+    }
+  };
+
+  /** Whether a `catch` around this point stops a missing module with `code`. */
+  public readonly missingCode = (code: string): boolean => this.#missing.has(code);
+
+  /**
+   * Marks `module` as loaded for the rest of the `try` block. When the module is missing, the load
+   * throws, so the code after it does not run. A member that is missing from a module that is
+   * there throws another error, which the `catch` does not stop.
+   */
+  public readonly loaded = (module: string): void => {
+    this.#loaded = [...this.#loaded, module];
+  };
+
+  /** Whether `ref` is read after a load of its module that a `catch` stops when the module is missing. */
+  public readonly afterLoad = (ref: ApiRef): boolean => this.#loaded.includes(ref.module);
+
   /** Runs `body` inside a `try` block whose `catch` stops the error. */
   public readonly caught = (body: () => void): void => {
     this.#caught += 1;
@@ -112,11 +128,17 @@ export class GuardStack {
    */
   public readonly deferred = (body: () => void): void => {
     const caught = this.#caught;
+    const missing = this.#missing;
+    const loaded = this.#loaded;
     this.#caught = 0;
+    this.#missing = new Set();
+    this.#loaded = [];
     try {
       body();
     } finally {
       this.#caught = caught;
+      this.#missing = missing;
+      this.#loaded = loaded;
     }
   };
 

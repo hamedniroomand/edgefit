@@ -33,3 +33,24 @@ describe('destructuring a Node.js module', () => {
     );
   });
 });
+
+describe('a destructuring assignment of a Node.js module', () => {
+  it('reads the names, as a declaration does', () => {
+    const required = usagesOf("let watch;\n({ watch } = require('node:fs'));");
+    expect(required).toContain('api node:fs.watch');
+    expect(required).not.toContain('dynamic node:fs');
+    const imported = usagesOf(
+      "let DatabaseSync;\n({ DatabaseSync } = await import('node:sqlite'));",
+    );
+    expect(imported).toContain('api node:sqlite.DatabaseSync');
+    expect(imported).not.toContain('dynamic node:sqlite');
+  });
+
+  it('reads a name from a const that holds the module specifier', () => {
+    const source =
+      "let DatabaseSync;\nconst nodeSqlite = 'node:sqlite';\n({ DatabaseSync } = await import(nodeSqlite));";
+    const usages = usagesOf(source);
+    expect(usages).toContain('api node:sqlite.DatabaseSync');
+    expect(usages).not.toContain('dynamic node:sqlite');
+  });
+});

@@ -75,6 +75,7 @@ export class UsageCollector {
     const guarded = this.guards.covers(api);
     // A rejected promise that nothing awaits is not an error of the `try`.
     const caught = this.guards.isCaught() && (awaited || !isPromiseApi(api));
+    const afterLoad = api.path.length > 0 && this.guards.afterLoad(api);
     this.offsets.push(offset);
     this.usages.push({
       kind: 'api',
@@ -83,6 +84,7 @@ export class UsageCollector {
       location: this.location(offset),
       ...(guarded ? { guarded: true as const } : {}),
       ...(caught ? { caught: true as const } : {}),
+      ...(afterLoad ? { afterLoad: true as const } : {}),
       ...this.#runtimes(),
     });
   }

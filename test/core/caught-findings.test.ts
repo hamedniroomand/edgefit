@@ -41,3 +41,30 @@ describe('a use that a catch stops', () => {
     expect(findings).toHaveLength(1);
   });
 });
+
+describe('a member read after a load that a catch stops when the module is missing', () => {
+  const sqlite = (results: Parameters<typeof stubTarget>[0]): FindingOptions => ({
+    target: stubTarget(results),
+    levels: defaultLevels,
+    ignore: [],
+  });
+  const member = makeUsage({ module: 'sqlite', path: ['DatabaseSync'] }, { afterLoad: true });
+  const missing = { status: 'unsupported', absent: true } as const;
+
+  it('is guarded when the target lacks the whole module', () => {
+    const { findings, guarded } = collectFindings(
+      [module(member)],
+      sqlite({ sqlite: missing, 'sqlite.DatabaseSync': missing }),
+    );
+    expect(findings).toEqual([]);
+    expect(guarded.map(finding => finding.api)).toEqual(['node:sqlite.DatabaseSync']);
+  });
+
+  it('is a finding when the target has the module but lacks the member', () => {
+    const { findings } = collectFindings(
+      [module(member)],
+      sqlite({ 'sqlite.DatabaseSync': missing }),
+    );
+    expect(findings.map(finding => finding.api)).toEqual(['node:sqlite.DatabaseSync']);
+  });
+});
