@@ -8,6 +8,7 @@ import {
   collectKnown,
 } from '@/extract/key-bindings.ts';
 import { factoryModule } from '@/extract/main-only.ts';
+import { bindPresentLoop } from '@/extract/present-keys.ts';
 import { createScope, declare } from '@/extract/scope.ts';
 
 import { visitStatements } from './guards.ts';
@@ -113,6 +114,7 @@ export const visitFor: Visitor<NodeOf<'ForStatement' | 'ForInStatement' | 'ForOf
   }
   if (node.type === 'ForOfStatement') {
     bindLoopKeys(node, scope);
+    bindPresentLoop(node, scope);
   }
   context.inScope(scope, () => {
     context.visitChildren(node);

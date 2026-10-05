@@ -2,21 +2,13 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef } from '@/types.ts';
 
-import {
-  invokers,
-  isEquality,
-  isInequality,
-  isSymbolKey,
-  staticKey,
-  stringLiteral,
-  strip,
-  unwrap,
-} from './ast.ts';
+import { invokers, isSymbolKey, staticKey, strip, unwrap } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
+import { isFallbackRead } from './fallback-reads.ts';
 import { keysOf } from './known-values.ts';
 import { memberRef } from './refs.ts';
-import { declaringScope, isTracked, lookupSymbol } from './scope.ts';
+import { declaringScope, isTracked, lookupPresent, lookupSymbol } from './scope.ts';
 import type { Scope } from './scope.ts';
 
 export type ChainResult =
@@ -151,91 +143,6 @@ export function isTestedChain(parent: Node, outer: readonly Node[]): boolean {
   return false;
 }
 
-const isNull = (node: Node): boolean => node.type === 'Literal' && node.value === null;
-const isUndefined = (node: Node): boolean =>
-  node.type === 'Identifier' && node.name === 'undefined';
-
-/** Whether a test is true when `name` holds nothing: `!x`, `x == null`, or `typeof x !== 'function'`. */
-function testsMissing(test: Node, name: string): boolean {
-  const isName = (node: Node): boolean => node.type === 'Identifier' && node.name === name;
-  const inner = strip(test);
-  if (inner.type === 'UnaryExpression') {
-    return inner.operator === '!' && isName(strip(inner.argument));
-  }
-  if (inner.type !== 'BinaryExpression') {
-    return false;
-  }
-  const [left, right] = [strip(inner.left), strip(inner.right)];
-  if (
-    left.type === 'UnaryExpression' &&
-    left.operator === 'typeof' &&
-    isName(strip(left.argument))
-  ) {
-    const text = stringLiteral(right);
-    return isInequality(inner.operator) ? text === 'function' : text === 'undefined';
-  }
-  const [other] = isName(left) ? [right] : isName(right) ? [left] : [];
-  // `undefined === null` is false, so only a loose comparison with `null` finds a missing member.
-  return (
-    other !== undefined &&
-    isEquality(inner.operator) &&
-    (isUndefined(other) || (inner.operator === '==' && isNull(other)))
-  );
-}
-
-/** Whether a branch sets `name`: `x = fallback;` or a block that holds it. */
-function setsName(branch: Node, name: string): boolean {
-  const statements = branch.type === 'BlockStatement' ? branch.body : [branch];
-  return statements.some(statement => {
-    const write =
-      statement.type === 'ExpressionStatement' ? strip(statement.expression) : undefined;
-    return (
-      write?.type === 'AssignmentExpression' &&
-      write.operator === '=' &&
-      write.left.type === 'Identifier' &&
-      write.left.name === name
-    );
-  });
-}
-
-/** The name that `let x = value` or `x = value` sets, when it is the only thing its statement does. */
-function assignedName(node: Node, parent: Node, statement: Node | undefined): string | undefined {
-  if (parent.type === 'AssignmentExpression') {
-    return parent.operator === '=' && parent.right === node && parent.left.type === 'Identifier'
-      ? parent.left.name
-      : undefined;
-  }
-  return parent.type === 'VariableDeclarator' &&
-    parent.init === node &&
-    parent.id.type === 'Identifier' &&
-    statement?.type === 'VariableDeclaration' &&
-    statement.declarations.length === 1
-    ? parent.id.name
-    : undefined;
-}
-
-/**
- * Whether `node` is the value of `x = obj[key];` or `let x = obj[key];` and the next statement is
- * `if (typeof x !== 'function') x = fallback;`. This is `obj[key] || fallback` in two statements:
- * a missing member gives `undefined` and the fallback replaces it.
- */
-function isFallbackRead(node: Node, parent: Node, outer: readonly Node[]): boolean {
-  const [statement, container] = outer;
-  const name = assignedName(node, parent, statement);
-  const body =
-    container?.type === 'BlockStatement' || container?.type === 'Program'
-      ? (container.body as readonly Node[])
-      : undefined;
-  const next = statement === undefined ? undefined : body?.[body.indexOf(statement) + 1];
-  return (
-    name !== undefined &&
-    next?.type === 'IfStatement' &&
-    next.alternate === null &&
-    testsMissing(next.test, name) &&
-    setsName(next.consequent, name)
-  );
-}
-
 const logicalChecks = new Set(['||', '??']);
 
 /** Whether the value of `node` is an API, or the last one of a chain of `||` and `??` that holds an API. */
@@ -280,4 +187,25 @@ export function isCheckedOperand(
     value = ancestor;
   }
   return true;
+}
+
+/**
+ * Whether `obj[name]` reads a key that an `in` test on `obj` proved present. As for `||`, a read
+ * that is called in place or read further is not covered: a present member that throws still fails.
+ */
+export function isPresentRead(access: Node, parent: Node | undefined, scope: Scope): boolean {
+  if (access.type !== 'MemberExpression' || !access.computed) return false;
+  const key = strip(access.property);
+  const object = strip(access.object);
+  if (key.type !== 'Identifier' || object.type !== 'Identifier') return false;
+  const used =
+    (parent?.type === 'CallExpression' && strip(parent.callee) === access) ||
+    (parent?.type === 'MemberExpression' && strip(parent.object) === access);
+  const entry = lookupPresent(scope, key.name);
+  return (
+    !used &&
+    entry !== undefined &&
+    entry.object === object.name &&
+    entry.scope === declaringScope(scope, object.name)
+  );
 }

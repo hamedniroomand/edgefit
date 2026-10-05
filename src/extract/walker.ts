@@ -3,7 +3,13 @@ import type { Node } from 'oxc-parser';
 import type { ApiRef } from '@/types.ts';
 
 import { childNodes, isTypeOnly } from './ast.ts';
-import { computedKey, followChain, isCheckedOperand, isTestedChain } from './chain.ts';
+import {
+  computedKey,
+  followChain,
+  isCheckedOperand,
+  isPresentRead,
+  isTestedChain,
+} from './chain.ts';
 import type { VisitContext } from './context.ts';
 import {
   displayRef,
@@ -163,7 +169,9 @@ export class Walker implements VisitContext {
     const { member, memberParent } = chain;
     const global = isGlobalRoot(chain.ref) && memberParent !== undefined;
     const written = global && isMemberWrite(member, memberParent);
-    const checked = global && isCheckedOperand(member, memberParent, this.#outer(member), this);
+    const checked =
+      isPresentRead(member, memberParent, this.scope) ||
+      (global && isCheckedOperand(member, memberParent, this.#outer(member), this));
     const tested = memberParent !== undefined && isOnlyTested(member, memberParent, chain.ref);
     if (chain.keys !== undefined) {
       const through = computedKey(member, this.scope);

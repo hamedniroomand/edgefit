@@ -4,6 +4,7 @@ import { staticKey, strip } from './ast.ts';
 import type { FunctionNode, NodeOf } from './ast.ts';
 import { collectVarDeclarators } from './declarations.ts';
 import { elementsOf, keysOf, unionKeys, valueOf } from './known-values.ts';
+import { bindFilteredList } from './present-keys.ts';
 import type { Scope } from './scope.ts';
 import { collectWrites } from './writes.ts';
 import type { Writes } from './writes.ts';
@@ -90,6 +91,9 @@ export function collectKnown(
 ): void {
   let writes: Writes | undefined;
   for (const [{ id, init }, constant] of declarators(statements, params)) {
+    if (constant && id.type === 'Identifier' && init !== null && scope.names.has(id.name)) {
+      bindFilteredList(id.name, init, scope);
+    }
     if (
       id.type !== 'Identifier' ||
       init === null ||
