@@ -67,6 +67,15 @@ describe('a name that does not hold a known set of strings', () => {
       `${keys}function f(i) { let key = keys[i]; key = other; console[key](); }`,
     ],
     ['a let with an unknown value', 'function f() { let key = other; console[key](); }'],
+    [
+      'a let written in a nested function',
+      `${keys}function f(i) { let key = keys[i]; const g = () => { key = 'trace'; }; console[key](); }`,
+    ],
+    ['a var with the name of a parameter', "function f(key) { console[key](); var key = 'log'; }"],
+    [
+      'a var with the name of a function',
+      "function f() { console[key](); var key = 'log'; function key() {} }",
+    ],
     ['a for-in', `${keys}for (const key in keys) console[key]();`],
     ['a for-of with a pattern', `${keys}for (const [key] of keys) console[key]();`],
     ['a for-of over an unknown list', 'for (const key of list) console[key]();'],

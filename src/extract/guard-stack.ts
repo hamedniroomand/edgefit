@@ -1,5 +1,6 @@
 import type { ApiRef, RuntimeCondition } from '@/types.ts';
 
+import type { ComputedKey } from './chain.ts';
 import { normalizeRef } from './refs.ts';
 
 /** An API that is known to exist inside the code a check protects. */
@@ -9,7 +10,7 @@ export interface ApiGuard {
   /** The local name the check started from, so reassigning it can end the guard. */
   root: string | undefined;
   /** The name a computed read uses as its key: the guard covers only `obj[key]` with that name. */
-  key?: string;
+  key?: ComputedKey;
   active: boolean;
 }
 
@@ -146,7 +147,7 @@ export class GuardStack {
 
   public readonly drop = (name: string): void => {
     for (const guard of this.#guards) {
-      if (guard.kind === 'api' && (guard.root === name || guard.key === name)) {
+      if (guard.kind === 'api' && (guard.root === name || guard.key?.name === name)) {
         guard.active = false;
       }
     }
@@ -156,12 +157,13 @@ export class GuardStack {
   public readonly isCaught = (): boolean => this.#caught > 0;
 
   /** Whether `ref` is only used where it exists, or where a `catch` stops the error of its absence. */
-  public readonly covers = (ref: ApiRef, key?: string): boolean =>
+  public readonly covers = (ref: ApiRef, key?: ComputedKey): boolean =>
     this.isCaught() ||
     this.#guards.some(
       guard =>
         guard.kind === 'api' &&
-        (guard.key === undefined || guard.key === key) &&
+        (guard.key === undefined ||
+          (guard.key.name === key?.name && guard.key.scope === key.scope)) &&
         isCovered(guard, ref),
     );
 

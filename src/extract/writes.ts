@@ -2,7 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import { childNodes, rootName } from './ast.ts';
 import type { NodeOf } from './ast.ts';
-import { patternNames } from './declarations.ts';
+import { functionTypes, patternNames } from './declarations.ts';
 
 /** Each value written to a name, or `null` when one write has a value that is not known. */
 export type Writes = ReadonlyMap<string, readonly Node[] | null>;
@@ -57,9 +57,9 @@ const writers: { [TType in Node['type']]?: (node: NodeOf<TType>, add: Add) => vo
 };
 
 /**
- * Every value written to each name in `nodes`, nested functions included: each `=` and each
- * declaration with a value. A name that a nearer declaration shadows counts too, so the result
- * can only hold more values than the name does.
+ * Every value written to each name in `nodes`: each `=` and each declaration with a value. A write
+ * inside a nested function can run at any time, so it makes the name unknown. A name that a
+ * nearer declaration shadows counts too, so the result can only hold more values than the name does.
  * ponytail: a method call that changes an object, such as `list.push(x)`, is not a write.
  */
 export function collectWrites(nodes: readonly Node[]): Writes {
@@ -74,12 +74,21 @@ export function collectWrites(nodes: readonly Node[]): Writes {
       values?.push(value);
     }
   };
+  const unknown: Add = name => {
+    add(name, null);
+  };
   // Children go on the stack in reverse, so the values come out in source order.
-  const pending = [...nodes].reverse();
-  for (let node = pending.pop(); node !== undefined; node = pending.pop()) {
+  const pending: (readonly [Node, boolean])[] = nodes.map(node => [node, false] as const).reverse();
+  for (let entry = pending.pop(); entry !== undefined; entry = pending.pop()) {
+    const [node, nested] = entry;
     const writer = writers[node.type] as ((node: Node, add: Add) => void) | undefined;
-    writer?.(node, add);
-    pending.push(...childNodes(node).reverse());
+    writer?.(node, nested ? unknown : add);
+    const inner = nested || functionTypes.has(node.type);
+    pending.push(
+      ...childNodes(node)
+        .map(child => [child, inner] as const)
+        .reverse(),
+    );
   }
   return writes;
 }

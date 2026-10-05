@@ -14,13 +14,14 @@ type FunctionNode = NodeOf<
 
 export const visitProgram: Visitor<NodeOf<'Program'>> = (node, context) => {
   declare(context.scope, collectBlockNames(node.body));
-  collectKnown(node.body, context.scope, true);
+  collectKnown(node.body, context.scope, []);
   visitStatements(node.body, context);
 };
 
 export const visitFunction: Visitor<FunctionNode> = (node, context) => {
   const scope = createScope(context.scope);
-  const names = node.params.flatMap(param => patternNames(param));
+  const params = node.params.flatMap(param => patternNames(param));
+  const names = [...params];
   if (node.type === 'FunctionExpression' && node.id !== null) {
     names.push(node.id.name);
   }
@@ -42,7 +43,7 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
       }
       if (body?.type === 'BlockStatement') {
         // The body shares the function's scope instead of opening a block scope.
-        collectKnown(body.body, scope, true);
+        collectKnown(body.body, scope, params);
         context.withAncestor(body, () => {
           visitStatements(body.body, context);
         });
@@ -70,7 +71,7 @@ export const visitClass: Visitor<NodeOf<'ClassDeclaration' | 'ClassExpression'>>
 export const visitBlock: Visitor<NodeOf<'BlockStatement' | 'StaticBlock'>> = (node, context) => {
   const scope = createScope(context.scope);
   declare(scope, collectLexicalNames(node.body));
-  collectKnown(node.body, scope, false);
+  collectKnown(node.body, scope);
   context.inScope(scope, () => {
     visitStatements(node.body, context);
   });
@@ -86,7 +87,6 @@ export const visitSwitch: Visitor<NodeOf<'SwitchStatement'>> = (node, context) =
   collectKnown(
     node.cases.flatMap(switchCase => switchCase.consequent),
     scope,
-    false,
   );
   context.inScope(scope, () => {
     context.visitAll(node.cases);

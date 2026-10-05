@@ -20,10 +20,21 @@ const iterators = new Set([
   'some',
 ]);
 
-/** The declarators a block declares in its own scope, with whether each is a `const`. */
+function functionName(statement: Node): string[] {
+  const declaration =
+    statement.type === 'ExportNamedDeclaration' ? statement.declaration : statement;
+  return declaration?.type === 'FunctionDeclaration' && declaration.id !== null
+    ? [declaration.id.name]
+    : [];
+}
+
+/**
+ * The declarators a block declares in its own scope, with whether each is a `const`. `params`
+ * is the parameter list of a function body, where each `var` of the body belongs too.
+ */
 function declarators(
   statements: readonly Node[],
-  hoists: boolean,
+  params: readonly string[] | undefined,
 ): (readonly [NodeOf<'VariableDeclarator'>, boolean])[] {
   const lexical = statements.flatMap(statement => {
     const declaration =
@@ -34,7 +45,14 @@ function declarators(
         )
       : [];
   });
-  const hoisted = hoists ? statements.flatMap(statement => collectVarDeclarators(statement)) : [];
+  if (params === undefined) {
+    return lexical;
+  }
+  // A parameter or a function with the same name holds another value before the `var` line runs.
+  const taken = new Set([...params, ...statements.flatMap(statement => functionName(statement))]);
+  const hoisted = statements
+    .flatMap(statement => collectVarDeclarators(statement))
+    .filter(({ id }) => id.type !== 'Identifier' || !taken.has(id.name));
   return [...lexical, ...hoisted.map(declarator => [declarator, false] as const)];
 }
 
@@ -63,11 +81,15 @@ function bindName(
  * Remembers the names a block declares that can only hold known values, before the block runs,
  * so a function can read a `const` that the file declares after it. A `let` or a `var` counts
  * when each value written to it is known: `if (!console[m]) m = 'log'` adds `log` to `m`.
- * `hoists` is true for the body of a function or a file, where each `var` of the body belongs.
+ * `params` is given for the body of a function or a file, where each `var` of the body belongs.
  */
-export function collectKnown(statements: readonly Node[], scope: Scope, hoists: boolean): void {
+export function collectKnown(
+  statements: readonly Node[],
+  scope: Scope,
+  params?: readonly string[],
+): void {
   let writes: Writes | undefined;
-  for (const [{ id, init }, constant] of declarators(statements, hoists)) {
+  for (const [{ id, init }, constant] of declarators(statements, params)) {
     if (
       id.type !== 'Identifier' ||
       init === null ||

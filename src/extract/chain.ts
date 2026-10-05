@@ -7,7 +7,7 @@ import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import { keysOf } from './known-values.ts';
 import { memberRef } from './refs.ts';
-import { isTracked, lookupSymbol } from './scope.ts';
+import { declaringScope, isTracked, lookupSymbol } from './scope.ts';
 import type { Scope } from './scope.ts';
 
 const invokers = new Set(['apply', 'bind', 'call']);
@@ -40,11 +40,15 @@ export function computedKeys(access: Node, scope: Scope): readonly string[] | un
     : undefined;
 }
 
-/** The name that holds the key of `obj[key]`. */
-export function computedKeyName(access: Node): string | undefined {
+/** The name that holds the key of `obj[key]`, with the scope that declares it. */
+export type ComputedKey = { name: string; scope: Scope };
+
+export function computedKey(access: Node, scope: Scope): ComputedKey | undefined {
   const property =
     access.type === 'MemberExpression' && access.computed ? strip(access.property) : undefined;
-  return property?.type === 'Identifier' ? property.name : undefined;
+  return property?.type === 'Identifier'
+    ? { name: property.name, scope: declaringScope(scope, property.name) }
+    : undefined;
 }
 
 function isSymbol(key: Node, scope: Scope): boolean {

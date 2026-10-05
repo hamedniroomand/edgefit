@@ -32,6 +32,14 @@ describe('a check of a computed key', () => {
     ).toEqual(['api console.log', 'api console.warn']);
   });
 
+  it('does not guard a read through another name that is the same word', () => {
+    expect(
+      members(
+        "let k = ['log', 'warn'][i];\nif (typeof console[k] === 'function') {\n  ['warn', 'error'].forEach(k => console[k]());\n}",
+      ),
+    ).toEqual(['api console.warn', 'api console.error']);
+  });
+
   it('stops the guard when the key is written', () => {
     expect(
       members(loop("if (typeof console[key] === 'function') { key = 'trace'; console[key](); }")),
@@ -54,6 +62,11 @@ describe('a fallback for a missing member', () => {
       'api console.warn [guarded]',
       'api console.trace',
     ]);
+  });
+
+  it('guards nothing when a nested function writes the key', () => {
+    const source = `${keys}function f(i) {\n  let method = keys[i];\n  const reset = () => { method = 'trace'; };\n  if (!console[method]) method = 'log';\n  reset();\n  console[method]();\n}`;
+    expect(usagesOf(source, 'src/input.js', globals)).toContain('dynamic console[<expression>]');
   });
 
   it('does not guard the fallback when it is in the list', () => {

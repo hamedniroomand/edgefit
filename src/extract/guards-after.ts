@@ -4,7 +4,7 @@ import { strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { foldedString } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
-import { computedKeyName } from './chain.ts';
+import { computedKey } from './chain.ts';
 import type { ApiGuard, Guard } from './guard-stack.ts';
 import { guardsWhen } from './guards.ts';
 import { createScope, lookupKeys } from './scope.ts';
@@ -64,18 +64,18 @@ function fallbackStrings(branch: Node, name: string, scope: Scope): string[] | u
  */
 function fallbackGuards(node: NodeOf<'IfStatement'>, context: BindingContext): ApiGuard[] {
   const member = testedMember(node.test);
-  const key = member === undefined ? undefined : computedKeyName(member);
-  const keys = key === undefined ? undefined : lookupKeys(context.scope, key);
+  const key = member === undefined ? undefined : computedKey(member, context.scope);
+  const keys = key === undefined ? undefined : lookupKeys(context.scope, key.name);
   const fallbacks =
     key === undefined || node.alternate !== null
       ? undefined
-      : fallbackStrings(node.consequent, key, context.scope);
+      : fallbackStrings(node.consequent, key.name, context.scope);
   if (key === undefined || keys === undefined || fallbacks === undefined) {
     return [];
   }
   const scope = createScope(context.scope);
   scope.keys.set(
-    key,
+    key.name,
     keys.filter(name => !fallbacks.includes(name)),
   );
   const guards = guardsWhen(node.test, false, { ...context, scope }).filter(
