@@ -26,6 +26,18 @@ export function flattenMatrix(tree) {
   return apis;
 }
 
+/** Whether the Node baseline has the API, walking its dotted name the way `inDump` does in `src/data/compat-index.ts`. */
+const inBaseline = (baseline, api) =>
+  api
+    .split('.')
+    .reduce(
+      (node, segment) =>
+        node !== null && typeof node === 'object' && Object.hasOwn(node, segment)
+          ? node[segment]
+          : undefined,
+      baseline,
+    ) !== undefined;
+
 /**
  * The APIs to probe. By default only those already curated; `discover` adds every API in the
  * matrix baseline, and `drift` adds a lookup of each API the runtime's data marks missing, to see
@@ -56,7 +68,11 @@ export function buildSpec(
     }
   }
   const lookups = drift
-    ? [...missingApis(readMatrix(runtime), baseline, overrides), ...webMissingApis(runtime)]
+    ? [
+        ...missingApis(readMatrix(runtime), baseline, overrides),
+        // edgefit reads the Web API data only for an API that the baseline lacks.
+        ...webMissingApis(runtime).filter(api => !inBaseline(baseline, api)),
+      ]
     : [];
   return {
     apis: [

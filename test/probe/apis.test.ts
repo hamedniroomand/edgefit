@@ -36,3 +36,21 @@ describe('buildSpec drift', () => {
     expect(entry?.lookup).toBeUndefined();
   });
 });
+
+describe('buildSpec drift against the Node baseline', () => {
+  const lookups = (runtime: 'bun' | 'deno' | 'workerd'): string[] =>
+    buildSpec(runtime, { drift: true })
+      .apis.filter(entry => entry.lookup === true)
+      .map(entry => entry.api);
+
+  it('leaves out a Web API that the baseline has, as edgefit never reads the data for it', () => {
+    // The Web API data lists `URL` as missing on every target, and Node has it.
+    expect(lookups('bun')).not.toContain('*globals*.URL');
+    expect(lookups('workerd')).not.toContain('*globals*.performance.mark');
+  });
+
+  it('keeps a Web API that the baseline lacks', () => {
+    // Node has no `caches`, so the data decides it and the probe asks whether it exists now.
+    expect(lookups('bun')).toContain('*globals*.caches');
+  });
+});
