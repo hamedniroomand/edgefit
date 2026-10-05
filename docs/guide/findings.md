@@ -221,6 +221,8 @@ if (reading) reader = new FileReader();
 
 A `let` or `var` that is set again is not followed, because the check may no longer hold: an `=`, a `++`, a loop over it, or a second `var` with a value in the same function. A write in a nested function or block that declares its own variable with the same name does not count.
 
+A truthy `process.domain` guards the `domain` module, because only that module sets the value. Node.js sets it to `null` first, so `typeof process.domain` and `'domain' in process` do not guard the module.
+
 Helpers can call other helpers. A helper imported from another file, one with parameters, and one that does more than return a check are not followed. See [Limitations](/guide/limitations).
 
 ## Clean runs

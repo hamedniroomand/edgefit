@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import type { Runtime } from '@/types.ts';
+import type { ApiRef, Runtime } from '@/types.ts';
 
 import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
@@ -8,7 +8,7 @@ import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import { heldCheck } from './checks.ts';
 import { constantOf } from './constants.ts';
-import type { Guard } from './guard-stack.ts';
+import type { ApiGuard, Guard } from './guard-stack.ts';
 import { memberRef, normalizeRef } from './refs.ts';
 import {
   agentRuntime,
@@ -32,7 +32,12 @@ function rootName(node: Node): string | undefined {
   return inner.type === 'Identifier' ? inner.name : undefined;
 }
 
-function guardFor(node: Node, context: BindingContext, key?: string): Guard[] {
+/** A value that only a module sets, so a truthy value shows that the module exists. */
+const setByModule: Record<string, ApiRef> = {
+  'process.domain': { module: 'domain', path: [] },
+};
+
+function guardFor(node: Node, context: BindingContext, key?: string): ApiGuard[] {
   const binding = resolveBinding(node, context);
   if (!isTracked(binding)) {
     return [];
@@ -41,6 +46,17 @@ function guardFor(node: Node, context: BindingContext, key?: string): Guard[] {
   const ref = normalizeRef(key === undefined ? binding.ref : memberRef(binding.ref, key));
   const local = name !== undefined && lookup(context.scope, name) !== undefined;
   return [{ kind: 'api', ref, root: local ? name : undefined, active: true }];
+}
+
+/**
+ * The module that a truthy value shows. Only a truthy read counts: Node.js sets `process.domain`
+ * to `null` before the module loads, so `typeof` and `in` checks pass without it.
+ */
+function moduleGuards(node: Node, context: BindingContext): Guard[] {
+  return guardFor(node, context).flatMap(guard => {
+    const module = setByModule[[guard.ref.module, ...guard.ref.path].join('.')];
+    return module === undefined ? [] : [{ ...guard, ref: module }];
+  });
 }
 
 function absentGuard(node: Node, context: BindingContext, key?: string): Guard[] {
@@ -234,6 +250,7 @@ export function guardsWhen(test: Node, truth: boolean, context: BindingContext):
   return [
     ...checkGuards(node, truth, context),
     ...presence(node, truth, context),
+    ...(truth ? moduleGuards(node, context) : []),
     ...optionalObject(node, truth, context),
   ];
 }
