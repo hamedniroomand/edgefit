@@ -41,7 +41,10 @@ describe('a computed key that holds one of a known set of strings', () => {
       "const Method = { a: 'log', ...more };\nconst m = Method[k];\nconsole[m]('x');",
     ],
     ['an empty object', "const Method = {};\nconst m = Method[k];\nconsole[m]('x');"],
-    ['a let', "const Method = { a: 'log' };\nlet m = Method[k];\nconsole[m]('x');"],
+    [
+      'a let written with an unknown value',
+      "const Method = { a: 'log' };\nlet m = Method[k];\nm = other;\nconsole[m]('x');",
+    ],
     ['a parameter', 'function f(m) {\n  console[m]("x");\n}'],
     [
       'a name that a nearer declaration replaces',
@@ -49,5 +52,13 @@ describe('a computed key that holds one of a known set of strings', () => {
     ],
   ])('stays unknown for %s', (_name, source) => {
     expect(usages(source)).toContain('dynamic console[<expression>]');
+  });
+});
+
+describe('a computed key from a let', () => {
+  it('is each value of a let that is not written again', () => {
+    expect(usages("const Method = { a: 'log' };\nlet m = Method[k];\nconsole[m]('x');")).toEqual([
+      'api console.log',
+    ]);
   });
 });

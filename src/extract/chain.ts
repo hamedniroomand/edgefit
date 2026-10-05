@@ -5,8 +5,9 @@ import type { ApiRef } from '@/types.ts';
 import { isSymbolKey, staticKey, strip, unwrap } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
+import { keysOf } from './known-values.ts';
 import { memberRef } from './refs.ts';
-import { isTracked, lookupKeys, lookupSymbol } from './scope.ts';
+import { isTracked, lookupSymbol } from './scope.ts';
 import type { Scope } from './scope.ts';
 
 const invokers = new Set(['apply', 'bind', 'call']);
@@ -32,11 +33,18 @@ export type ChainResult =
       memberParent: Node | undefined;
     };
 
-/** The strings that the computed key of `access` may be, when it is a `const` that holds one of a known set. */
-function knownKeys(access: Node, scope: Scope): readonly string[] | undefined {
+/** The strings that the computed key of `access` may be, when it is a known set. */
+export function computedKeys(access: Node, scope: Scope): readonly string[] | undefined {
+  return access.type === 'MemberExpression' && access.computed
+    ? keysOf(access.property, scope)
+    : undefined;
+}
+
+/** The name that holds the key of `obj[key]`. */
+export function computedKeyName(access: Node): string | undefined {
   const property =
     access.type === 'MemberExpression' && access.computed ? strip(access.property) : undefined;
-  return property?.type === 'Identifier' ? lookupKeys(scope, property.name) : undefined;
+  return property?.type === 'Identifier' ? property.name : undefined;
 }
 
 function isSymbol(key: Node, scope: Scope): boolean {
@@ -61,7 +69,7 @@ export function followChain(
   let parent = stack[position - 1];
   while (node !== undefined && parent !== undefined) {
     if (parent.type === 'MemberExpression' && parent.object === node) {
-      const names = knownKeys(parent, scope);
+      const names = computedKeys(parent, scope);
       // A name that holds one string is that string.
       const key =
         staticKey(parent.property, parent.computed) ?? (names?.length === 1 ? names[0] : undefined);
