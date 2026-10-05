@@ -6,6 +6,7 @@ import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
+import { heldCheck } from './checks.ts';
 import { constantOf } from './constants.ts';
 import type { Guard } from './guard-stack.ts';
 import { memberRef, normalizeRef } from './refs.ts';
@@ -19,7 +20,7 @@ import {
   mainModuleMatches,
   runtimeMarker,
 } from './runtimes.ts';
-import { isTracked, lookup, lookupCheck } from './scope.ts';
+import { isTracked, lookup } from './scope.ts';
 
 const jumps = new Set(['ReturnStatement', 'ThrowStatement', 'ContinueStatement', 'BreakStatement']);
 
@@ -157,7 +158,7 @@ function checkGuards(node: Node, truth: boolean, context: BindingContext): Guard
     const callee = strip(node.callee);
     name = callee.type === 'Identifier' ? callee.name : undefined;
   }
-  const check = name === undefined ? undefined : lookupCheck(context.scope, name);
+  const check = name === undefined ? undefined : heldCheck(context.scope, name);
   if (check === undefined || check.call !== (node.type === 'CallExpression') || check.busy) {
     return [];
   }

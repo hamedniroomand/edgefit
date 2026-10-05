@@ -127,6 +127,50 @@ describe('usages behind a helper: where it is declared', () => {
   });
 });
 
+describe('usages behind a var or let that holds the check', () => {
+  it('follows when the name is not written again', () => {
+    expect(
+      usagesOf(`${fs}var hasWatch = typeof fs.watch === 'function';\nif (hasWatch) fs.watch('.');`),
+    ).toEqual(guardedWatch);
+    expect(
+      usagesOf(
+        `${fs}let hasWatch = typeof fs.watch !== 'undefined';\nif (hasWatch) fs.watch('.');`,
+      ),
+    ).toEqual(guardedWatch);
+    expect(
+      usagesOf(
+        "var reading = typeof FileReader !== 'undefined';\nfunction read() { if (reading) new FileReader(); }",
+        'src/input.ts',
+        new Set(['FileReader']),
+      ),
+    ).toEqual(['api FileReader [guarded]']);
+  });
+
+  it('follows when a nested function declares the same name again', () => {
+    expect(
+      usagesOf(
+        "var n = typeof FileReader !== 'undefined';\nfunction a(n) { n = 1; }\nfunction b() { var n = 2; }\nif (n) new FileReader();",
+        'src/input.ts',
+        new Set(['FileReader']),
+      ),
+    ).toEqual(['api FileReader [guarded]']);
+  });
+
+  it.each([
+    ['an assignment', 'hasWatch = false;'],
+    ['an assignment in a function', 'function off() { hasWatch = false; }'],
+    ['a declaration in a block', 'if (flag) { var hasWatch = true; }'],
+    ['a loop target', 'for (hasWatch of flags) {}'],
+    ['an update', 'hasWatch++;'],
+  ])('does not follow when %s writes the name again', (_, write) => {
+    expect(
+      usagesOf(
+        `${fs}var hasWatch = typeof fs.watch === 'function';\n${write}\nif (hasWatch) fs.watch('.');`,
+      ),
+    ).toEqual(plainWatch);
+  });
+});
+
 describe('usages behind something that is not a helper', () => {
   it('does not follow a helper that does more than return a check', () => {
     expect(
