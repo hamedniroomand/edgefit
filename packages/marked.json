@@ -2,8 +2,8 @@
   "version": 2,
   "package": "marked",
   "resolved": "18.0.14",
-  "checkedAt": "2026-10-04T22:01:21.036Z",
-  "edgefit": "0.12.1",
+  "checkedAt": "2026-10-05T14:31:02.566Z",
+  "edgefit": "0.13.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

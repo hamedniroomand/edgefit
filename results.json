@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-04T22:12:13.833Z",
-  "edgefit": "0.12.1",
+  "generatedAt": "2026-10-05T14:38:40.178Z",
+  "edgefit": "0.13.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -581,7 +581,7 @@
     {
       "name": "graphql-yoga",
       "file": "graphql-yoga",
-      "resolved": "5.24.1",
+      "resolved": "5.24.2",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -786,7 +786,7 @@
     {
       "name": "nodemailer",
       "file": "nodemailer",
-      "resolved": "10.0.14",
+      "resolved": "10.0.15",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1266,7 +1266,7 @@
     {
       "name": "mssql",
       "file": "mssql",
-      "resolved": "12.7.2",
+      "resolved": "12.7.4",
       "summary": {
         "workerd": "fail",
         "bun": "pass",

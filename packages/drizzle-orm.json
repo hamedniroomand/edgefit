@@ -2,8 +2,8 @@
   "version": 2,
   "package": "drizzle-orm",
   "resolved": "0.45.3",
-  "checkedAt": "2026-10-04T22:03:29.930Z",
-  "edgefit": "0.12.1",
+  "checkedAt": "2026-10-05T14:32:28.675Z",
+  "edgefit": "0.13.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

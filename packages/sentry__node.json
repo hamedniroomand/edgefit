@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.4.0",
-  "checkedAt": "2026-10-04T22:11:46.531Z",
-  "edgefit": "0.12.1",
+  "checkedAt": "2026-10-05T14:38:00.977Z",
+  "edgefit": "0.13.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -64,7 +64,7 @@
         "workerd": {
           "status": "fail",
           "errors": 8,
-          "warnings": 8,
+          "warnings": 7,
           "exports": [
             {
               "name": "eveInstrumentation",
@@ -161,7 +161,7 @@
         "bun": {
           "status": "warn",
           "errors": 0,
-          "warnings": 5,
+          "warnings": 4,
           "exports": [
             {
               "name": "eveInstrumentation",
@@ -216,7 +216,7 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 4
+          "warnings": 3
         }
       }
     },
@@ -248,12 +248,12 @@
         "bun": {
           "status": "fail",
           "errors": 1,
-          "warnings": 9
+          "warnings": 8
         },
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 4
+          "warnings": 3
         },
         "workerd": {
           "status": "unchecked",
@@ -270,12 +270,12 @@
         "bun": {
           "status": "fail",
           "errors": 1,
-          "warnings": 9
+          "warnings": 8
         },
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 4
+          "warnings": 3
         },
         "workerd": {
           "status": "unchecked",
@@ -292,12 +292,12 @@
         "bun": {
           "status": "fail",
           "errors": 1,
-          "warnings": 9
+          "warnings": 8
         },
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 4
+          "warnings": 3
         },
         "workerd": {
           "status": "unchecked",
@@ -314,12 +314,12 @@
         "bun": {
           "status": "fail",
           "errors": 1,
-          "warnings": 9
+          "warnings": 8
         },
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 4
+          "warnings": 3
         },
         "workerd": {
           "status": "unchecked",
