@@ -48,6 +48,13 @@ describe('the exports that reach a usage', () => {
     expect(tagsOf(code)).toEqual({ 'node:fs.watch': ['a'], 'node:fs.watchFile': ['b'] });
   });
 
+  it('names the export that uses a name destructured from a require', () => {
+    const code: Source = {
+      code: "const { Console } = require('node:console');\nexports.a = function () {\n  return new Console({});\n};\nexports.b = function () {\n  return 1;\n};",
+    };
+    expect(tagsOf(code)).toEqual({ 'node:console.Console': ['a'] });
+  });
+
   it('names both exports of a usage that two of three exports reach', () => {
     const code = lib(
       "function helper() {\n  return fs.watch('.');\n}\nexport function a() {\n  return helper();\n}\nexport function b() {\n  return helper();\n}\nexport function c() {\n  return 1;\n}\n",

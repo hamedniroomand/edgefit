@@ -60,7 +60,7 @@ describe('the members of a module that a filtered catch guards', () => {
   it('guards the members read after the load in the same block', () => {
     const assigned = filtered(
       'ERR_UNKNOWN_BUILTIN_MODULE',
-      "({ DatabaseSync } = await import('node:sqlite'));",
+      "({ DatabaseSync } = await import('node:sqlite'));\n  DatabaseSync;",
     );
     expect(usagesOf(`let DatabaseSync;\n${assigned}`)).toEqual([
       'api node:sqlite [guarded]',
@@ -68,7 +68,7 @@ describe('the members of a module that a filtered catch guards', () => {
     ]);
     const declared = filtered(
       'ERR_UNKNOWN_BUILTIN_MODULE',
-      "const { DatabaseSync } = require('node:sqlite');",
+      "const { DatabaseSync } = require('node:sqlite');\n  DatabaseSync;",
     );
     expect(usagesOf(declared)).toEqual([
       'api node:sqlite [guarded]',
@@ -92,10 +92,8 @@ describe('the members of a module that a filtered catch guards', () => {
       'api node:fs.watch',
     ]);
     const after = filtered('ERR_UNKNOWN_BUILTIN_MODULE', "const m = await import('node:sqlite');");
-    expect(usagesOf(`${after}\nconst { DatabaseSync } = require('node:sqlite');`)).toEqual([
-      'api node:sqlite [guarded]',
-      'api node:sqlite',
-      'api node:sqlite.DatabaseSync',
-    ]);
+    expect(
+      usagesOf(`${after}\nconst { DatabaseSync } = require('node:sqlite');\nDatabaseSync;`),
+    ).toEqual(['api node:sqlite [guarded]', 'api node:sqlite', 'api node:sqlite.DatabaseSync']);
   });
 });

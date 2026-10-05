@@ -55,9 +55,10 @@ function bindProperty(property: DestructuredProperty, ref: ApiRef, context: Visi
     return;
   }
   const member = memberRef(ref, key);
-  // `const { process } = globalThis` only reads a property that may not exist, and code that does
-  // this usually checks the value before it uses it. What counts is where the name is used.
-  const recorded = !isGlobalRoot(ref);
+  // `const { Console } = require('node:console')` and `const { process } = globalThis` only read a
+  // property that may not exist, which gives `undefined` and throws nothing until the name is used.
+  // What counts is where the name is used. A platform that stubs the module throws at the read.
+  const recorded = !isGlobalRoot(ref) && context.collector.lazyNodeImports;
   if (recorded) {
     context.collector.api(member, property.key.start);
   }

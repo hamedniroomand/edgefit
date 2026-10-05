@@ -28,19 +28,22 @@ describe('destructuring a Node.js module', () => {
   });
 
   it('visits a pattern that is not an object pattern', () => {
-    expect(usagesOf("const { readFile: [first] } = require('fs');")).toContain(
-      'api node:fs.readFile',
-    );
+    expect(usagesOf("const { readFile: [first] } = require('fs');")).toEqual(['api node:fs']);
+    expect(
+      usagesOf("const { readFile: [first] } = require('fs');", 'src/input.ts', undefined, {
+        lazyNodeImports: true,
+      }),
+    ).toContain('api node:fs.readFile');
   });
 });
 
 describe('a destructuring assignment of a Node.js module', () => {
   it('reads the names, as a declaration does', () => {
-    const required = usagesOf("let watch;\n({ watch } = require('node:fs'));");
+    const required = usagesOf("let watch;\n({ watch } = require('node:fs'));\nwatch('.');");
     expect(required).toContain('api node:fs.watch');
     expect(required).not.toContain('dynamic node:fs');
     const imported = usagesOf(
-      "let DatabaseSync;\n({ DatabaseSync } = await import('node:sqlite'));",
+      "let DatabaseSync;\n({ DatabaseSync } = await import('node:sqlite'));\nDatabaseSync;",
     );
     expect(imported).toContain('api node:sqlite.DatabaseSync');
     expect(imported).not.toContain('dynamic node:sqlite');
@@ -48,7 +51,7 @@ describe('a destructuring assignment of a Node.js module', () => {
 
   it('reads a name from a const that holds the module specifier', () => {
     const source =
-      "let DatabaseSync;\nconst nodeSqlite = 'node:sqlite';\n({ DatabaseSync } = await import(nodeSqlite));";
+      "let DatabaseSync;\nconst nodeSqlite = 'node:sqlite';\n({ DatabaseSync } = await import(nodeSqlite));\nDatabaseSync;";
     const usages = usagesOf(source);
     expect(usages).toContain('api node:sqlite.DatabaseSync');
     expect(usages).not.toContain('dynamic node:sqlite');
