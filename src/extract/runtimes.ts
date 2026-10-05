@@ -42,6 +42,25 @@ export function isUnbound(node: Node, name: string, context: BindingContext): bo
   );
 }
 
+/** The name of the global that `node` reads, or that `key` names on the global object: `FileList` or `globalThis.FileList`. */
+export function globalName(node: Node, context: BindingContext, key?: string): string | undefined {
+  const inner = strip(node);
+  if (key !== undefined) {
+    return isGlobalObject(inner, context) ? key : undefined;
+  }
+  if (inner.type === 'Identifier') {
+    return lookup(context.scope, inner.name) === undefined && !globalAliases.has(inner.name)
+      ? inner.name
+      : undefined;
+  }
+  if (inner.type !== 'MemberExpression') {
+    return undefined;
+  }
+  return isGlobalObject(strip(inner.object), context)
+    ? staticKey(inner.property, inner.computed)
+    : undefined;
+}
+
 function isGlobalObject(node: Node, context: BindingContext): boolean {
   return [...globalAliases].some(name => isUnbound(node, name, context));
 }

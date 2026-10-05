@@ -1,7 +1,7 @@
 import type { Node } from 'oxc-parser';
 
 import { displayApi } from '@/data/builtins.ts';
-import type { ApiRef, Location, RuntimeCondition, Usage } from '@/types.ts';
+import type { ApiRef, GlobalCondition, Location, RuntimeCondition, Usage } from '@/types.ts';
 
 import type { ComputedKey } from './chain.ts';
 import { GuardStack } from './guard-stack.ts';
@@ -88,6 +88,7 @@ export class UsageCollector {
       ...(caught ? { caught: true as const } : {}),
       ...(afterLoad ? { afterLoad: true as const } : {}),
       ...this.#runtimes(),
+      ...this.#globals(),
     });
   }
 
@@ -106,6 +107,7 @@ export class UsageCollector {
       // A `try` that catches the error of a missing addon guards the import.
       ...(this.guards.isCaught() ? { guarded: true as const } : {}),
       ...this.#runtimes(),
+      ...this.#globals(),
     });
   }
 
@@ -132,12 +134,18 @@ export class UsageCollector {
       ...(supplied ? { supplied: true as const } : {}),
       ...this.#polyfill(),
       ...this.#runtimes(),
+      ...this.#globals(),
     });
   }
 
   #polyfill(): { polyfill?: ApiRef } {
     const polyfill = this.guards.polyfill();
     return polyfill === undefined ? {} : { polyfill };
+  }
+
+  #globals(): { globals?: GlobalCondition[] } {
+    const globals = this.guards.globals();
+    return globals.length === 0 ? {} : { globals };
   }
 
   #runtimes(): { runtimes?: RuntimeCondition[] } {

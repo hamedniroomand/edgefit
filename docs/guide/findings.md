@@ -184,6 +184,23 @@ These checks name a runtime:
 
 The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
 
+### Checks for a global
+
+A check for a global decides which branch runs when the target data says if the target has the global. The code that does not run is guarded, and it is not a finding:
+
+```js
+if (!globalThis.FileList) throw new Error('not supported'); // Throws on Workers, which lack `FileList`
+const reader = new FileReader(); // Guarded on Workers
+```
+
+```js
+if (!global.crypto) {
+  require('crypto'); // Guarded on every target that has `crypto`
+}
+```
+
+The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, an `else` branch and a guard clause. A global that the data does not name decides nothing. On a target where the code can run, it stays a finding.
+
 ### Code a package ships and the target does not run
 
 A bundle can hold code that a target never runs, and that no check in the code shows. Next.js's Edge bundle holds the code for Cache Components, which Next turns off on the Edge runtime, and a timing call that only `next dev` makes. edgefit keeps a reviewed list of such cases in `data/unreached.json`: the package, the releases it was read in, the file, the APIs, the target, why the code does not run and where that is stated. A finding in a listed file is guarded and shows the reason:

@@ -2,7 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef, Runtime } from '@/types.ts';
 
-import { absentGuard, guardFor } from './api-guards.ts';
+import { absentGuard, globalGuard, guardFor } from './api-guards.ts';
 import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import type { BindingContext } from './bindings.ts';
@@ -96,7 +96,9 @@ function presence(node: Node, present: boolean, context: BindingContext, key?: s
   const runtime =
     key === undefined ? runtimeMarker(node, context) : memberRuntime(node, key, context);
   const api = present ? guardFor(node, context, key) : absentGuard(node, context, key);
-  return [...api, ...runtimeGuard(runtime, present)];
+  // A runtime marker such as `Deno` already says which runtime this is.
+  const global = runtime === undefined ? globalGuard(node, present, context, key) : [];
+  return [...api, ...runtimeGuard(runtime, present), ...global];
 }
 
 function typeofGuard(
