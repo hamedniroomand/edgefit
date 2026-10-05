@@ -131,6 +131,15 @@ export function isSymbolKey(node: Node): boolean {
   return inner.type === 'MemberExpression' && isSymbolGlobal(inner.object);
 }
 
+/** The name at the start of `a.b.c`, or `a` itself. */
+export function rootName(node: Node): string | undefined {
+  const inner = strip(node);
+  if (inner.type === 'MemberExpression') {
+    return rootName(inner.object);
+  }
+  return inner.type === 'Identifier' ? inner.name : undefined;
+}
+
 /** The operand of a wrapper that passes its value through unchanged, such as `(x)`, `x!` or `await x`. */
 export function unwrap(node: Node): Node | undefined {
   if (transparentNodes.has(node.type) && 'expression' in node) {

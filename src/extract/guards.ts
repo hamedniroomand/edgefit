@@ -2,14 +2,14 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef, Runtime } from '@/types.ts';
 
+import { absentGuard, guardFor } from './api-guards.ts';
 import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
-import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
+import { computedKeyName, computedKeys } from './chain.ts';
 import { heldCheck } from './checks.ts';
 import { constantOf } from './constants.ts';
-import type { ApiGuard, Guard } from './guard-stack.ts';
-import { memberRef, normalizeRef } from './refs.ts';
+import type { Guard } from './guard-stack.ts';
 import {
   agentRuntime,
   isUnbound,
@@ -20,33 +20,11 @@ import {
   mainModuleMatches,
   runtimeMarker,
 } from './runtimes.ts';
-import { isTracked, lookup } from './scope.ts';
-
-const jumps = new Set(['ReturnStatement', 'ThrowStatement', 'ContinueStatement', 'BreakStatement']);
-
-function rootName(node: Node): string | undefined {
-  const inner = strip(node);
-  if (inner.type === 'MemberExpression') {
-    return rootName(inner.object);
-  }
-  return inner.type === 'Identifier' ? inner.name : undefined;
-}
 
 /** A value that only a module sets, so a truthy value shows that the module exists. */
 const setByModule: Record<string, ApiRef> = {
   'process.domain': { module: 'domain', path: [] },
 };
-
-function guardFor(node: Node, context: BindingContext, key?: string): ApiGuard[] {
-  const binding = resolveBinding(node, context);
-  if (!isTracked(binding)) {
-    return [];
-  }
-  const name = rootName(node);
-  const ref = normalizeRef(key === undefined ? binding.ref : memberRef(binding.ref, key));
-  const local = name !== undefined && lookup(context.scope, name) !== undefined;
-  return [{ kind: 'api', ref, root: local ? name : undefined, active: true }];
-}
 
 /**
  * The module that a set value shows. Only a set value counts: Node.js sets `process.domain` to
@@ -60,19 +38,6 @@ function moduleGuards(guards: readonly Guard[]): Guard[] {
     const module = setByModule[[guard.ref.module, ...guard.ref.path].join('.')];
     return module === undefined ? [] : [{ ...guard, ref: module }];
   });
-}
-
-function absentGuard(node: Node, context: BindingContext, key?: string): Guard[] {
-  const binding = resolveBinding(node, context);
-  if (!isTracked(binding)) {
-    return [];
-  }
-  return [
-    {
-      kind: 'absent',
-      ref: normalizeRef(key === undefined ? binding.ref : memberRef(binding.ref, key)),
-    },
-  ];
 }
 
 /** `a?.b` is truthy only when `a` exists too, so the object is known as well as the member. */
@@ -96,10 +61,38 @@ function runtimeGuard(runtime: Runtime | undefined, present: boolean): Guard[] {
 }
 
 /**
+ * What a check of `obj[key]` says when `key` may be one of several strings: each member, but only
+ * for a read through the same `key`, since the check does not say which one it was. A failed
+ * check says nothing, since it does not say which member is missing.
+ */
+function keyedPresence(
+  node: NodeOf<'MemberExpression'>,
+  names: readonly string[],
+  present: boolean,
+  context: BindingContext,
+): Guard[] {
+  const key = computedKeyName(node);
+  if (key === undefined || !present) {
+    return [];
+  }
+  const guards = names.flatMap(name => guardFor(node.object, context, name));
+  for (const guard of guards) {
+    guard.key = key;
+  }
+  return guards;
+}
+
+/**
  * What is known when `node` exists (`present`) or does not. The marker of a runtime says
  * which runtime this is either way; any other API only says something when it exists.
  */
 function presence(node: Node, present: boolean, context: BindingContext, key?: string): Guard[] {
+  const names = key === undefined ? computedKeys(node, context.scope) : undefined;
+  if (names !== undefined && node.type === 'MemberExpression') {
+    return names.length === 1
+      ? presence(node.object, present, context, names[0])
+      : keyedPresence(node, names, present, context);
+  }
   const runtime =
     key === undefined ? runtimeMarker(node, context) : memberRuntime(node, key, context);
   const api = present ? guardFor(node, context, key) : absentGuard(node, context, key);
@@ -261,22 +254,4 @@ export function guardsWhen(test: Node, truth: boolean, context: BindingContext):
     ...(truth ? moduleGuards(known) : []),
     ...optionalObject(node, truth, context),
   ];
-}
-
-/** Whether a branch always leaves the code around it, so what follows only runs without it. */
-export function leaves(statement: Node): boolean {
-  if (jumps.has(statement.type)) {
-    return true;
-  }
-  return statement.type === 'BlockStatement' && statement.body.some(inner => jumps.has(inner.type));
-}
-
-/** Guards for the statements after an `if` where one branch always leaves. */
-export function guardsAfter(node: NodeOf<'IfStatement'>, context: BindingContext): Guard[] {
-  const consequent = leaves(node.consequent);
-  const alternate = node.alternate !== null && leaves(node.alternate);
-  if (consequent === alternate) {
-    return [];
-  }
-  return guardsWhen(node.test, alternate, context);
 }

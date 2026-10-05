@@ -63,7 +63,8 @@ export class UsageCollector {
     return { file: this.#file, line: low + 1, column: offset - (this.#lineStarts[low] ?? 0) + 1 };
   }
 
-  public api(ref: ApiRef, offset: number, awaited = false): void {
+  /** `key` is the name that holds the key of a computed read, which a check of the same read guards. */
+  public api(ref: ApiRef, offset: number, awaited = false, key?: string): void {
     if (this.guards.dead()) {
       return;
     }
@@ -72,7 +73,7 @@ export class UsageCollector {
       return;
     }
     const api = normalizeRef(ref);
-    const guarded = this.guards.covers(api);
+    const guarded = this.guards.covers(api, key);
     // A rejected promise that nothing awaits is not an error of the `try`.
     const caught = this.guards.isCaught() && (awaited || !isPromiseApi(api));
     const afterLoad = api.path.length > 0 && this.guards.afterLoad(api);

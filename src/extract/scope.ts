@@ -13,6 +13,16 @@ export type Binding =
   | 'require'
   | null;
 
+/** A value that is known when it is read: a string, or an object or array of such values. */
+export type KnownValue = string | KnownObject;
+
+export type KnownObject = {
+  /** The value of each key that is known. */
+  entries: ReadonlyMap<string, KnownValue>;
+  /** Every value, when each one is known, so a read with any key gives one of them. */
+  values: readonly KnownValue[] | undefined;
+};
+
 /** A name that stands for a check, so testing it is the same as testing what it holds. */
 export interface Check {
   /** The expression the check evaluates: a `const`'s value, or what a helper returns. */
@@ -32,10 +42,10 @@ export interface Scope {
   checks: Map<string, Check>;
   /** `const` names bound to a plain string, which can stand in for a literal specifier. */
   strings: Map<string, string>;
-  /** `const` names bound to one of a known set of strings: a plain string, or a member of an object of strings. */
+  /** Names that can only hold one of a known set of strings. */
   keys: Map<string, readonly string[]>;
-  /** `const` names bound to an object literal whose values are all plain strings. */
-  stringObjects: Map<string, readonly string[]>;
+  /** Names that can only hold a known object or array. */
+  objects: Map<string, KnownObject>;
   /** `const` names bound to a symbol, which can never name an API. */
   symbols: Set<string>;
   /** Names bound to a WebAssembly module by `import mod from './x.wasm'`. */
@@ -51,7 +61,7 @@ export function createScope(parent?: Scope): Scope {
     checks: new Map(),
     strings: new Map(),
     keys: new Map(),
-    stringObjects: new Map(),
+    objects: new Map(),
     symbols: new Set(),
     wasmImports: new Set(),
     modules: new Set(),
@@ -71,31 +81,25 @@ export function lookupString(scope: Scope | undefined, name: string): string | u
   return scope.names.has(name) ? undefined : lookupString(scope.parent, name);
 }
 
-function lookupSet(
-  scope: Scope | undefined,
-  name: string,
-  field: 'keys' | 'stringObjects',
-): readonly string[] | undefined {
+/** The strings a name may hold, unless a nearer declaration of the name shadows it. */
+export function lookupKeys(scope: Scope | undefined, name: string): readonly string[] | undefined {
   if (scope === undefined) {
     return undefined;
   }
   return (
-    scope[field].get(name) ??
-    (scope.names.has(name) ? undefined : lookupSet(scope.parent, name, field))
+    scope.keys.get(name) ?? (scope.names.has(name) ? undefined : lookupKeys(scope.parent, name))
   );
 }
 
-/** The strings a `const` may hold, unless a nearer declaration of the name shadows it. */
-export function lookupKeys(scope: Scope | undefined, name: string): readonly string[] | undefined {
-  return lookupSet(scope, name, 'keys');
-}
-
-/** The values of a `const` object literal of plain strings, unless a nearer declaration shadows it. */
-export function lookupStringObject(
-  scope: Scope | undefined,
-  name: string,
-): readonly string[] | undefined {
-  return lookupSet(scope, name, 'stringObjects');
+/** The known object a name holds, unless a nearer declaration of the name shadows it. */
+export function lookupObject(scope: Scope | undefined, name: string): KnownObject | undefined {
+  if (scope === undefined) {
+    return undefined;
+  }
+  return (
+    scope.objects.get(name) ??
+    (scope.names.has(name) ? undefined : lookupObject(scope.parent, name))
+  );
 }
 
 /** Whether the name is an imported WebAssembly module, unless a nearer declaration shadows it. */

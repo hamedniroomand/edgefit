@@ -8,6 +8,8 @@ export interface ApiGuard {
   ref: ApiRef;
   /** The local name the check started from, so reassigning it can end the guard. */
   root: string | undefined;
+  /** The name a computed read uses as its key: the guard covers only `obj[key]` with that name. */
+  key?: string;
   active: boolean;
 }
 
@@ -144,7 +146,7 @@ export class GuardStack {
 
   public readonly drop = (name: string): void => {
     for (const guard of this.#guards) {
-      if (guard.kind === 'api' && guard.root === name) {
+      if (guard.kind === 'api' && (guard.root === name || guard.key === name)) {
         guard.active = false;
       }
     }
@@ -154,8 +156,14 @@ export class GuardStack {
   public readonly isCaught = (): boolean => this.#caught > 0;
 
   /** Whether `ref` is only used where it exists, or where a `catch` stops the error of its absence. */
-  public readonly covers = (ref: ApiRef): boolean =>
-    this.isCaught() || this.#guards.some(guard => guard.kind === 'api' && isCovered(guard, ref));
+  public readonly covers = (ref: ApiRef, key?: string): boolean =>
+    this.isCaught() ||
+    this.#guards.some(
+      guard =>
+        guard.kind === 'api' &&
+        (guard.key === undefined || guard.key === key) &&
+        isCovered(guard, ref),
+    );
 
   /** Whether a check says `ref` is missing at this point. */
   public readonly absent = (ref: ApiRef): boolean =>

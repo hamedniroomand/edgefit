@@ -1,6 +1,7 @@
 import type { Node } from 'oxc-parser';
 
 import { childNodes } from './ast.ts';
+import type { NodeOf } from './ast.ts';
 
 const functionTypes = new Set([
   'FunctionDeclaration',
@@ -41,29 +42,30 @@ function isStatementLike(node: Node): boolean {
   );
 }
 
-/** `var` names hoisted to the enclosing function, without entering nested functions or classes. */
-export function collectVarNames(node: Node | null | undefined, names: string[]): string[] {
+/** `var` declarators hoisted to the enclosing function, without entering nested functions or classes. */
+export function collectVarDeclarators(
+  node: Node | null | undefined,
+  declarators: NodeOf<'VariableDeclarator'>[] = [],
+): NodeOf<'VariableDeclarator'>[] {
   if (node === null || node === undefined) {
-    return names;
+    return declarators;
   }
   if (node.type === 'VariableDeclaration') {
     if (node.kind === 'var') {
-      for (const declarator of node.declarations) {
-        patternNames(declarator.id, names);
-      }
+      declarators.push(...node.declarations);
     }
-    return names;
+    return declarators;
   }
   if (node.type === 'ExportNamedDeclaration') {
-    return collectVarNames(node.declaration, names);
+    return collectVarDeclarators(node.declaration, declarators);
   }
   if (functionTypes.has(node.type) || node.type.startsWith('Class') || !isStatementLike(node)) {
-    return names;
+    return declarators;
   }
   for (const child of childNodes(node)) {
-    collectVarNames(child, names);
+    collectVarDeclarators(child, declarators);
   }
-  return names;
+  return declarators;
 }
 
 function declaredName(declaration: Node): string[] {
@@ -101,9 +103,8 @@ export function collectLexicalNames(statements: readonly Node[], names: string[]
 }
 
 export function collectBlockNames(statements: readonly Node[]): string[] {
-  const names: string[] = [];
-  for (const statement of statements) {
-    collectVarNames(statement, names);
-  }
+  const names = statements
+    .flatMap(statement => collectVarDeclarators(statement))
+    .flatMap(declarator => patternNames(declarator.id));
   return collectLexicalNames(statements, names);
 }

@@ -1,6 +1,7 @@
 import type { NodeOf } from '@/extract/ast.ts';
 import type { Visitor } from '@/extract/context.ts';
 import { collectBlockNames, collectLexicalNames, patternNames } from '@/extract/declarations.ts';
+import { bindCallbackKeys, bindLoopKeys, collectKnown } from '@/extract/key-bindings.ts';
 import { factoryModule } from '@/extract/main-only.ts';
 import { createScope, declare } from '@/extract/scope.ts';
 
@@ -13,6 +14,7 @@ type FunctionNode = NodeOf<
 
 export const visitProgram: Visitor<NodeOf<'Program'>> = (node, context) => {
   declare(context.scope, collectBlockNames(node.body));
+  collectKnown(node.body, context.scope, true);
   visitStatements(node.body, context);
 };
 
@@ -27,6 +29,7 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
     names.push(...collectBlockNames(body.body));
   }
   declare(scope, names);
+  bindCallbackKeys(node, context.parent(), scope, context.scope);
   const module = factoryModule(node, context.parent(), context.functions);
   if (module !== undefined) {
     scope.modules.add(module);
@@ -39,6 +42,7 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
       }
       if (body?.type === 'BlockStatement') {
         // The body shares the function's scope instead of opening a block scope.
+        collectKnown(body.body, scope, true);
         context.withAncestor(body, () => {
           visitStatements(body.body, context);
         });
@@ -66,6 +70,7 @@ export const visitClass: Visitor<NodeOf<'ClassDeclaration' | 'ClassExpression'>>
 export const visitBlock: Visitor<NodeOf<'BlockStatement' | 'StaticBlock'>> = (node, context) => {
   const scope = createScope(context.scope);
   declare(scope, collectLexicalNames(node.body));
+  collectKnown(node.body, scope, false);
   context.inScope(scope, () => {
     visitStatements(node.body, context);
   });
@@ -77,6 +82,11 @@ export const visitSwitch: Visitor<NodeOf<'SwitchStatement'>> = (node, context) =
   declare(
     scope,
     node.cases.flatMap(switchCase => collectLexicalNames(switchCase.consequent)),
+  );
+  collectKnown(
+    node.cases.flatMap(switchCase => switchCase.consequent),
+    scope,
+    false,
   );
   context.inScope(scope, () => {
     context.visitAll(node.cases);
@@ -94,6 +104,9 @@ export const visitFor: Visitor<NodeOf<'ForStatement' | 'ForInStatement' | 'ForOf
       scope,
       head.declarations.flatMap(declarator => patternNames(declarator.id)),
     );
+  }
+  if (node.type === 'ForOfStatement') {
+    bindLoopKeys(node, scope);
   }
   context.inScope(scope, () => {
     context.visitChildren(node);

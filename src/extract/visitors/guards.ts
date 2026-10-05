@@ -5,7 +5,8 @@ import { resolveBinding } from '@/extract/bindings.ts';
 import { catches, missingModuleCatch } from '@/extract/catches.ts';
 import { collectChecks } from '@/extract/checks.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
-import { guardsAfter, guardsWhen } from '@/extract/guards.ts';
+import { guardsAfter } from '@/extract/guards-after.ts';
+import { guardsWhen } from '@/extract/guards.ts';
 import { isTracked } from '@/extract/scope.ts';
 
 export const visitIf: Visitor<NodeOf<'IfStatement'>> = (node, context) => {
