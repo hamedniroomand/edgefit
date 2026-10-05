@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.13.1
+
+### Patch Changes
+
+- [#249](https://github.com/hamedniroomand/edgefit/pull/249) [`e7c2c74`](https://github.com/hamedniroomand/edgefit/commit/e7c2c742ece3dd2323bc4a588039d0c05f22dcea) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read a computed key that is a parameter of a function of the file, when every call passes a known string, and a member of each object of a known list. Treat `x = obj[key]` followed by `if (typeof x !== 'function') x = fallback` as a check, like `obj[key] || fallback`. This clears the `unknown console[<expression>]` warning for `@opentelemetry/api`.
+
+- [#246](https://github.com/hamedniroomand/edgefit/pull/246) [`521ff6a`](https://github.com/hamedniroomand/edgefit/commit/521ff6a3df456bf7f3f5e5a9b6102844f8482b60) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Do not report a computed access of a global as unknown when the code writes it, as in `globalThis[key] = value`, or reads it with a fallback, as in `globalThis[key] || Fallback`. Neither form needs an API that the target lacks.
+
+- [#244](https://github.com/hamedniroomand/edgefit/pull/244) [`77a965e`](https://github.com/hamedniroomand/edgefit/commit/77a965ef911fd5d48de53e8ec38e1c50238023c3) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Treat a check for a global as a known branch on a target whose data says if it has the global. Code that only runs when a global is missing, or after a guard clause for a global the target lacks, is guarded and does not fail the check.
+
+- [#250](https://github.com/hamedniroomand/edgefit/pull/250) [`3d52a66`](https://github.com/hamedniroomand/edgefit/commit/3d52a66daf589c06dbe1edf74544ce21a2f96692) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read a computed key that is a string `const` which another file of the graph exports, also through a re-export of the name. A package that keeps its keys in a separate file, such as `effect`, no longer gets `unknown globalThis[<expression>]` for a read.
+
+- [#248](https://github.com/hamedniroomand/edgefit/pull/248) [`31a32ea`](https://github.com/hamedniroomand/edgefit/commit/31a32ea0f75529297dd5f64786af536eff5a8cd3) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Leave a module out of the graph when only a `require()` behind `require.main === module` loads it, in a file that is not an entry. A package that keeps its CLI in a separate file no longer gets findings from that file.
+
+- [#247](https://github.com/hamedniroomand/edgefit/pull/247) [`6f7719e`](https://github.com/hamedniroomand/edgefit/commit/6f7719e1df784f396ef96abb67e5f4f4a8d4ba96) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read the `__toModule` helper of esbuild before 0.14 like `__toESM`. A package built with an old esbuild no longer gets an `unknown` warning for a module that it loads through this helper.
+
 ## 0.13.0
 
 ### Minor Changes
