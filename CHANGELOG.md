@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.13.0
+
+### Minor Changes
+
+- [#227](https://github.com/hamedniroomand/edgefit/pull/227) [`6e1c38b`](https://github.com/hamedniroomand/edgefit/commit/6e1c38b9f33513a7c10d440604c74c060b6e6c6c) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Keep a resolve error with the target whose module graph failed, and check the other targets. Before, one target that could not resolve a module, such as `workerd` for `@node-rs/argon2` whose `browser` field selects a file that imports a module that is not installed, stopped the whole run, and Bun and Deno got no result. `check()` now returns `failed` for that target, `edgefit check` prints the other reports and then the error, `compare` shows a column for it, and the exit code is 2. `edgefit package` shows the cell of that target as not checked or as an error, and the other targets keep their result. When every target fails, the first error is still thrown.
+
+### Patch Changes
+
+- [#242](https://github.com/hamedniroomand/edgefit/pull/242) [`9bf3d56`](https://github.com/hamedniroomand/edgefit/commit/9bf3d56a2354f5b665f79874a631a86ae7713899) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Follow a Node.js module into a function that the code calls at once, as in `(function (stream) { stream.write('x'); })(process.stderr)`. A parameter, or a member of it, that a class extends counts as a parent class. So does the second argument of a helper of the file that sets `Child.prototype` from `parent.prototype`, as CoffeeScript writes `extend(Child, parent)`. A `.call`, `.apply` or `.bind` of a parameter is a use of the parameter itself.
+
+- [#239](https://github.com/hamedniroomand/edgefit/pull/239) [`cd6d354`](https://github.com/hamedniroomand/edgefit/commit/cd6d3541f51a63f4164df34198ef3452f99f924c) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read a computed key from a list of strings: a `for...of` name, the parameter of a `forEach` callback, an element of an array or of an object, a `.map` that joins a string, and a `const` that the file declares later. A `let` or a `var` holds each value written to it. A `typeof` check and an `if (!obj[key])` fallback guard the same read.
+
+- [#233](https://github.com/hamedniroomand/edgefit/pull/233) [`762bfcf`](https://github.com/hamedniroomand/edgefit/commit/762bfcf59f305eab885d5f2015786f3121b3fa31) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read JSONC and TOML config files with confbox. An invalid `tsconfig.json` gives no compiler options.
+
+- [#236](https://github.com/hamedniroomand/edgefit/pull/236) [`400b711`](https://github.com/hamedniroomand/edgefit/commit/400b711063f0cc83fc07616e0b8dc64dc3b4202c) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Treat a `var` or `let` that holds a guard expression like a `const` when its block does not set the name again, so patterns such as `var ok = typeof FileReader !== 'undefined'` guard later uses.
+
+- [#241](https://github.com/hamedniroomand/edgefit/pull/241) [`b208a08`](https://github.com/hamedniroomand/edgefit/commit/b208a08359af7c010f5e73653873ceeb9d030385) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - A check of a computed key guards only a read through the name that the same scope declares. A key that a nested function writes, and a `var` with the name of a parameter or of a function, stay unknown.
+
+- [#230](https://github.com/hamedniroomand/edgefit/pull/230) [`19f1d26`](https://github.com/hamedniroomand/edgefit/commit/19f1d260d52b96476e7b5f64b31866d6910fbbf4) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Report a missing module loaded by `require()` inside a function as `unknown`. Keep top-level missing loads as resolve errors. Apply the rule to project and package checks.
+
+- [#235](https://github.com/hamedniroomand/edgefit/pull/235) [`01e1f5b`](https://github.com/hamedniroomand/edgefit/commit/01e1f5ba9bac3ed2470bbfb6b044b2dd278eb2bf) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Read a destructuring assignment from `import()` or `require()` as a load of those names. A `catch` that throws again only when `error.code` is not the code of a missing module guards the load of that module. On a target that lacks the whole module, it also guards the members that the rest of the `try` block reads.
+
+- [#243](https://github.com/hamedniroomand/edgefit/pull/243) [`aff8915`](https://github.com/hamedniroomand/edgefit/commit/aff8915312258386e4dad333cd63dc9c2124061b) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Cover `nodemailer` 10.0.15 in the list of code that a package ships and a target does not run. The `node:child_process.spawn` finding of the sendmail transport is guarded on workerd for this release, as it is for 10.0.13 and 10.0.14.
+
+- [#236](https://github.com/hamedniroomand/edgefit/pull/236) [`400b711`](https://github.com/hamedniroomand/edgefit/commit/400b711063f0cc83fc07616e0b8dc64dc3b4202c) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Guard the `domain` module behind a truthy read of `process.domain`, or a comparison that rules out `null`, because only that module sets the value, so code such as `asap` that loads `domain` only when `process.domain` is set gives no `unknown node:domain` warning.
+
+- [#232](https://github.com/hamedniroomand/edgefit/pull/232) [`44a3bff`](https://github.com/hamedniroomand/edgefit/commit/44a3bff72d8232c228864ec346f3423923ebbc3b) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Leave out CLI code behind `require.main === module` in imported CommonJS files. Keep CLI code when the file is a project entry.
+
+- [#234](https://github.com/hamedniroomand/edgefit/pull/234) [`e90b8a6`](https://github.com/hamedniroomand/edgefit/commit/e90b8a6666fd5e6ca72504fa2c1de4408f190c68) Thanks [@hamedniroomand](https://github.com/hamedniroomand)! - Follow a re-export of a Node.js module. `export { promises as fsp } from 'node:fs'` is `node:fs.promises` under `fsp`. `export * as fs from 'node:fs'` is the module under `fs`.
+
 ## 0.12.1
 
 ### Patch Changes
