@@ -73,6 +73,8 @@ Symbol keys such as `x[Symbol.iterator]` are never reported, since a symbol cann
 
 A key that is a parameter of a function of the file is each string that the calls pass, when the function is only called by name, every call passes the argument, and edgefit knows each argument. An argument can be a string, a name that holds known strings, or a member of each object of a known list, as in `map[i].name`. A function that is exported, passed on, or called with an unknown value keeps the key as `unknown`.
 
+A key that is an imported name is the string that the imported file exports as a `const`: `export const key = 'text'`, a join of such strings, or `export { key }`. A re-export of the name (`export { key } from`, or an import that is exported again) is followed. `export let`, `export * from` and a string that the file builds from its own imports keep the key as `unknown`.
+
 By default the `unknown` warnings are folded into one line per package, because there are often many and they rarely need action:
 
 ```

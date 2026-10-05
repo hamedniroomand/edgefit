@@ -6,7 +6,7 @@ import type { NodeOf } from '@/extract/ast.ts';
 import { fileMembers } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { displayRef, isGlobalRoot, moduleRef } from '@/extract/refs.ts';
-import { assign, isTracked, lookup } from '@/extract/scope.ts';
+import { assign, isTracked, lookup, lookupString } from '@/extract/scope.ts';
 import type { Binding } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
@@ -30,6 +30,10 @@ export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context)
   if (module === undefined) {
     const isWasm = wasmSource.test(node.source.value);
     for (const specifier of used) {
+      const text = context.collector.importedStrings.get(specifier.local.name);
+      if (text !== undefined) {
+        context.scope.strings.set(specifier.local.name, text);
+      }
       const alias = context.collector.importedModules.get(specifier.local.name);
       const members =
         specifier.type === 'ImportNamespaceSpecifier'
@@ -77,12 +81,26 @@ export function exportLocal(local: Node, exported: string, context: VisitContext
   }
 }
 
+/** `export const name = 'text'` makes the string available to the files that import the name. */
+function exportStrings(declaration: Node, context: VisitContext): void {
+  if (declaration.type !== 'VariableDeclaration' || declaration.kind !== 'const') {
+    return;
+  }
+  for (const { id } of declaration.declarations) {
+    const text = id.type === 'Identifier' ? lookupString(context.scope, id.name) : undefined;
+    if (id.type === 'Identifier' && text !== undefined) {
+      context.collector.strings.set(id.name, text);
+    }
+  }
+}
+
 export const visitExportNamed: Visitor<NodeOf<'ExportNamedDeclaration'>> = (node, context) => {
   if (node.exportKind === 'type') {
     return;
   }
   if (node.declaration !== null) {
     context.visit(node.declaration);
+    exportStrings(node.declaration, context);
     return;
   }
   const module = node.source === null ? undefined : builtinName(node.source.value);
@@ -94,7 +112,15 @@ export const visitExportNamed: Visitor<NodeOf<'ExportNamedDeclaration'>> = (node
       continue;
     }
     if (module === undefined) {
-      exportLocal(specifier.local, staticKey(specifier.exported, false) ?? 'default', context);
+      const exported = staticKey(specifier.exported, false) ?? 'default';
+      const text =
+        specifier.local.type === 'Identifier' && node.source === null
+          ? lookupString(context.scope, specifier.local.name)
+          : undefined;
+      if (text !== undefined) {
+        context.collector.strings.set(exported, text);
+      }
+      exportLocal(specifier.local, exported, context);
     } else {
       const ref = namedRef(module, specifier.local);
       const exported = staticKey(specifier.exported, false) ?? 'default';
