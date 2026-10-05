@@ -2,8 +2,8 @@
   "version": 2,
   "package": "bcryptjs",
   "resolved": "3.0.3",
-  "checkedAt": "2026-10-05T14:31:01.567Z",
-  "edgefit": "0.13.0",
+  "checkedAt": "2026-10-05T17:23:29.211Z",
+  "edgefit": "0.13.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@clickhouse/client",
   "resolved": "1.23.1",
-  "checkedAt": "2026-10-05T14:38:03.424Z",
-  "edgefit": "0.13.0",
+  "checkedAt": "2026-10-05T17:33:42.996Z",
+  "edgefit": "0.13.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.4.0",
-  "checkedAt": "2026-10-05T14:38:00.977Z",
-  "edgefit": "0.13.0",
+  "checkedAt": "2026-10-05T17:33:39.565Z",
+  "edgefit": "0.13.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -161,7 +161,7 @@
         "bun": {
           "status": "warn",
           "errors": 0,
-          "warnings": 4,
+          "warnings": 3,
           "exports": [
             {
               "name": "eveInstrumentation",

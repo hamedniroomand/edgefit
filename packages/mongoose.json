@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "mongoose",
-  "resolved": "9.10.4",
-  "checkedAt": "2026-10-05T14:31:23.279Z",
-  "edgefit": "0.13.0",
+  "resolved": "9.11.0",
+  "checkedAt": "2026-10-05T17:23:56.702Z",
+  "edgefit": "0.13.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

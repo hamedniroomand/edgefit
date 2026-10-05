@@ -2,8 +2,8 @@
   "version": 2,
   "package": "rxjs",
   "resolved": "7.8.2",
-  "checkedAt": "2026-10-05T14:32:02.470Z",
-  "edgefit": "0.13.0",
+  "checkedAt": "2026-10-05T17:23:48.992Z",
+  "edgefit": "0.13.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

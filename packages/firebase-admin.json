@@ -2,8 +2,8 @@
   "version": 2,
   "package": "firebase-admin",
   "resolved": "14.5.0",
-  "checkedAt": "2026-10-05T14:33:13.631Z",
-  "edgefit": "0.13.0",
+  "checkedAt": "2026-10-05T17:25:44.591Z",
+  "edgefit": "0.13.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -28,10 +28,6 @@
     "deno": "pass"
   },
   "worst": {
-    "bun": {
-      "subpath": "./firestore",
-      "status": "warn"
-    },
     "deno": {
       "subpath": "./firestore",
       "status": "fail"
@@ -253,9 +249,9 @@
           "warnings": 0
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
           "status": "fail",

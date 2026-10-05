@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-05T14:38:40.178Z",
-  "edgefit": "0.13.0",
+  "generatedAt": "2026-10-05T17:34:11.954Z",
+  "edgefit": "0.13.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -498,7 +498,7 @@
     {
       "name": "marked",
       "file": "marked",
-      "resolved": "18.0.14",
+      "resolved": "18.1.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -676,7 +676,7 @@
     {
       "name": "mongoose",
       "file": "mongoose",
-      "resolved": "9.10.4",
+      "resolved": "9.11.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1240,10 +1240,6 @@
       },
       "subpaths": 18,
       "worst": {
-        "bun": {
-          "subpath": "./firestore",
-          "status": "warn"
-        },
         "deno": {
           "subpath": "./firestore",
           "status": "fail"

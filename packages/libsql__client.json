@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@libsql/client",
   "resolved": "0.18.0",
-  "checkedAt": "2026-10-05T14:32:23.054Z",
-  "edgefit": "0.13.0",
+  "checkedAt": "2026-10-05T17:24:59.382Z",
+  "edgefit": "0.13.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

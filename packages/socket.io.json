@@ -2,8 +2,8 @@
   "version": 2,
   "package": "socket.io",
   "resolved": "4.8.4",
-  "checkedAt": "2026-10-05T14:34:09.787Z",
-  "edgefit": "0.13.0",
+  "checkedAt": "2026-10-05T17:27:15.319Z",
+  "edgefit": "0.13.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
