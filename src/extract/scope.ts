@@ -23,6 +23,8 @@ export interface Check {
   scope: Scope;
   /** Set while the check is being read, so a helper that calls itself stops there. */
   busy: boolean;
+  /** For a `let` or `var`: the block that declares it, where a write ends the check. */
+  region: readonly Node[] | undefined;
 }
 
 export interface Scope {

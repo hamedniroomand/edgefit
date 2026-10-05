@@ -202,20 +202,26 @@ Some code keeps a Node.js module in a lookup table and reads it later, as `follo
 
 ### Production builds
 
-Every bundler replaces `process.env.NODE_ENV` with a constant for a production build and drops the code that the constant rules out. edgefit does the same on `workerd`, `netlify-edge` and `vercel-edge`, with `production` as the constant. Bun and Deno set no value, so on those targets both branches are checked. A comparison of `process.env.NODE_ENV` with a string decides which branch runs, in an `if`, `?:`, `&&`, `||`, an `else` branch, a guard clause, and a helper or `const` that holds the check. The branch that does not run is not checked, and an `import` or `require` in it is not followed. This is how React's development build, with its `MessageChannel`, stays out of a report.
+Every bundler replaces `process.env.NODE_ENV` with a constant for a production build and drops the code that the constant rules out. edgefit does the same on `workerd`, `netlify-edge` and `vercel-edge`, with `production` as the constant. Bun and Deno set no value, so on those targets both branches are checked. A comparison of `process.env.NODE_ENV` with a string decides which branch runs, in an `if`, `?:`, `&&`, `||`, an `else` branch, a guard clause, and a helper, a `const`, or a `let` or `var` that is not set again and holds the check. The branch that does not run is not checked, and an `import` or `require` in it is not followed. This is how React's development build, with its `MessageChannel`, stays out of a report.
 
 To check the development build, set `env: { NODE_ENV: 'development' }` in the [config](/guide/configuration#environment).
 
 ### Helpers
 
-A check kept in a helper is understood when the helper is in the same file, has no parameters, is not `async`, and does nothing but return the check. So is a `const` that holds one:
+A check kept in a helper is understood when the helper is in the same file, has no parameters, is not `async`, and does nothing but return the check. So is a `const` that holds one, and a `let` or `var` that its block does not set again:
 
 ```js
 const isDeno = typeof Deno !== 'undefined';
+var reading = typeof FileReader !== 'undefined';
 const hasWatch = () => typeof fs.watch === 'function';
 
 if (hasWatch() && !isDeno) fs.watch(dir, onChange);
+if (reading) reader = new FileReader();
 ```
+
+edgefit does not follow a `let` or `var` that its block sets again, because the check may no longer hold. A write is an `=`, a `++`, a loop over the name, a second `var` with a value, or a function declaration with the same name. A write in a nested function or block that declares its own variable with the same name does not count. For a `var` in a nested block, only the writes in that block count. See [Limitations](/guide/limitations).
+
+A `process.domain` that is truthy, or that a comparison with `null` rules out, guards the `domain` module, because only that module sets the value. Node.js sets it to `null` first, so `typeof process.domain`, `'domain' in process` and `process.domain !== undefined` do not guard the module.
 
 Helpers can call other helpers. A helper imported from another file, one with parameters, and one that does more than return a check are not followed. See [Limitations](/guide/limitations).
 

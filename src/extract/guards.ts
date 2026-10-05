@@ -1,13 +1,14 @@
 import type { Node } from 'oxc-parser';
 
-import type { Runtime } from '@/types.ts';
+import type { ApiRef, Runtime } from '@/types.ts';
 
 import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
+import { heldCheck } from './checks.ts';
 import { constantOf } from './constants.ts';
-import type { Guard } from './guard-stack.ts';
+import type { ApiGuard, Guard } from './guard-stack.ts';
 import { memberRef, normalizeRef } from './refs.ts';
 import {
   agentRuntime,
@@ -19,7 +20,7 @@ import {
   mainModuleMatches,
   runtimeMarker,
 } from './runtimes.ts';
-import { isTracked, lookup, lookupCheck } from './scope.ts';
+import { isTracked, lookup } from './scope.ts';
 
 const jumps = new Set(['ReturnStatement', 'ThrowStatement', 'ContinueStatement', 'BreakStatement']);
 
@@ -31,7 +32,12 @@ function rootName(node: Node): string | undefined {
   return inner.type === 'Identifier' ? inner.name : undefined;
 }
 
-function guardFor(node: Node, context: BindingContext, key?: string): Guard[] {
+/** A value that only a module sets, so a truthy value shows that the module exists. */
+const setByModule: Record<string, ApiRef> = {
+  'process.domain': { module: 'domain', path: [] },
+};
+
+function guardFor(node: Node, context: BindingContext, key?: string): ApiGuard[] {
   const binding = resolveBinding(node, context);
   if (!isTracked(binding)) {
     return [];
@@ -40,6 +46,20 @@ function guardFor(node: Node, context: BindingContext, key?: string): Guard[] {
   const ref = normalizeRef(key === undefined ? binding.ref : memberRef(binding.ref, key));
   const local = name !== undefined && lookup(context.scope, name) !== undefined;
   return [{ kind: 'api', ref, root: local ? name : undefined, active: true }];
+}
+
+/**
+ * The module that a set value shows. Only a set value counts: Node.js sets `process.domain` to
+ * `null` before the module loads, so `typeof`, `in` and `!== undefined` checks pass without it.
+ */
+function moduleGuards(guards: readonly Guard[]): Guard[] {
+  return guards.flatMap(guard => {
+    if (guard.kind !== 'api') {
+      return [];
+    }
+    const module = setByModule[[guard.ref.module, ...guard.ref.path].join('.')];
+    return module === undefined ? [] : [{ ...guard, ref: module }];
+  });
 }
 
 function absentGuard(node: Node, context: BindingContext, key?: string): Guard[] {
@@ -145,7 +165,11 @@ function comparisonGuard(
   if (!left && !isNullish(node.right)) {
     return undefined;
   }
-  return presence(left ? node.right : node.left, !equal, context);
+  const known = presence(left ? node.right : node.left, !equal, context);
+  // `!= null`, `!= undefined` and `!== null` rule out `null`; `!== undefined` does not.
+  const loose = node.operator === '==' || node.operator === '!=';
+  const rulesOutNull = loose || strip(left ? node.left : node.right).type === 'Literal';
+  return !equal && rulesOutNull ? [...known, ...moduleGuards(known)] : known;
 }
 
 /** What a call of a helper, or a read of a `const`, tells: the facts of the check it holds. */
@@ -157,7 +181,7 @@ function checkGuards(node: Node, truth: boolean, context: BindingContext): Guard
     const callee = strip(node.callee);
     name = callee.type === 'Identifier' ? callee.name : undefined;
   }
-  const check = name === undefined ? undefined : lookupCheck(context.scope, name);
+  const check = name === undefined ? undefined : heldCheck(context.scope, name);
   if (check === undefined || check.call !== (node.type === 'CallExpression') || check.busy) {
     return [];
   }
@@ -230,9 +254,11 @@ export function guardsWhen(test: Node, truth: boolean, context: BindingContext):
       return guards;
     }
   }
+  const known = presence(node, truth, context);
   return [
     ...checkGuards(node, truth, context),
-    ...presence(node, truth, context),
+    ...known,
+    ...(truth ? moduleGuards(known) : []),
     ...optionalObject(node, truth, context),
   ];
 }

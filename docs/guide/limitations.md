@@ -25,6 +25,7 @@ if (isDeno()) {
 ```
 
 - **Helpers from another file.** A helper is followed only when it is in the same file, has no parameters and only returns the check. One that is imported, takes an argument or does more is not.
+- **Variables that are set again.** A `let` or `var` that holds a check is followed only when its block does not set it again. A `var` in a nested block is checked only against the writes in that block, so a function in the block that runs after a write outside it is not seen.
 - **Other ways to name a runtime.** Only `typeof Deno`, `typeof Bun`, `process.versions.deno`, `process.versions.bun` and `navigator.userAgent` compared with `Cloudflare-Workers`, `Bun` or `Deno` are read. A regular expression, a feature check that happens to tell runtimes apart, and a check on Node are not.
 - **Checks that leave the runtime open.** `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'` says the code runs on one of two runtimes, and edgefit does not follow that.
 - **`try` blocks around an API that exists.** A `catch` stops the error of an API that is missing, so those are guarded. `fs.watch` on Workers exists and throws, or does nothing, and edgefit cannot tell whether the `catch` copes, so it stays a finding.
