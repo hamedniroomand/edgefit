@@ -3,8 +3,9 @@ import type { Node } from 'oxc-parser';
 import { rootName } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
-import type { AbsentGuard, ApiGuard } from './guard-stack.ts';
+import type { AbsentGuard, ApiGuard, GlobalGuard } from './guard-stack.ts';
 import { memberRef, normalizeRef } from './refs.ts';
+import { globalName } from './runtimes.ts';
 import { isTracked, lookup } from './scope.ts';
 
 /** The guard that says `node`, or its member `key`, exists. */
@@ -31,4 +32,15 @@ export function absentGuard(node: Node, context: BindingContext, key?: string): 
       ref: normalizeRef(key === undefined ? binding.ref : memberRef(binding.ref, key)),
     },
   ];
+}
+
+/** The guard that says the global `node`, or its member `key`, is there or is not. */
+export function globalGuard(
+  node: Node,
+  present: boolean,
+  context: BindingContext,
+  key?: string,
+): GlobalGuard[] {
+  const name = globalName(node, context, key);
+  return name === undefined ? [] : [{ kind: 'global', condition: { name, present } }];
 }

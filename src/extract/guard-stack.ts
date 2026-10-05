@@ -1,4 +1,4 @@
-import type { ApiRef, RuntimeCondition } from '@/types.ts';
+import type { ApiRef, GlobalCondition, RuntimeCondition } from '@/types.ts';
 
 import type { ComputedKey } from './chain.ts';
 import { normalizeRef } from './refs.ts';
@@ -20,6 +20,12 @@ export interface RuntimeGuard {
   condition: RuntimeCondition;
 }
 
+/** A global is known to be there (`present`) or not inside the code a check protects. */
+export type GlobalGuard = {
+  kind: 'global';
+  condition: GlobalCondition;
+};
+
 /** The code never runs, because a bundler removes it: `process.env.NODE_ENV` is a constant. */
 export interface DeadGuard {
   kind: 'dead';
@@ -38,7 +44,7 @@ export interface PolyfillGuard {
   ref: ApiRef;
 }
 
-export type Guard = ApiGuard | RuntimeGuard | DeadGuard | AbsentGuard | PolyfillGuard;
+export type Guard = ApiGuard | RuntimeGuard | GlobalGuard | DeadGuard | AbsentGuard | PolyfillGuard;
 
 /** Whether `ref` is `guard.ref` or something below it. */
 function isCovered(guard: ApiGuard, ref: ApiRef): boolean {
@@ -194,4 +200,8 @@ export class GuardStack {
   /** What is known of the runtime at this point. */
   public readonly runtimes = (): RuntimeCondition[] =>
     this.#guards.flatMap(guard => (guard.kind === 'runtime' ? [guard.condition] : []));
+
+  /** What is known of the globals at this point. */
+  public readonly globals = (): GlobalCondition[] =>
+    this.#guards.flatMap(guard => (guard.kind === 'global' ? [guard.condition] : []));
 }

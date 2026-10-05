@@ -14,6 +14,12 @@ export interface RuntimeCondition {
   present: boolean;
 }
 
+/** Code that only runs when the global `name` is (`present`) or is not (`!present`) there. */
+export type GlobalCondition = {
+  name: string;
+  present: boolean;
+};
+
 /** A reference to a runtime API, such as `fs.watch` or the `process.binding` global. */
 export interface ApiRef {
   /** The built-in module without the `node:` prefix (`fs`, `fs/promises`), or `*globals*` for globals. */
@@ -66,6 +72,8 @@ export interface Usage {
   guarded?: true;
   /** Set when the code sits behind runtime checks, such as `typeof Deno !== 'undefined'`. All must hold. */
   runtimes?: RuntimeCondition[];
+  /** Set when the code sits behind checks for a global, such as `if (!globalThis.FileList) throw`. All must hold. */
+  globals?: GlobalCondition[];
   /** Set when the value is stored in this global only if the global is missing. */
   polyfill?: ApiRef;
 }

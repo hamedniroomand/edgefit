@@ -232,6 +232,12 @@
       "status": "supported",
       "note": "the Web API data lists it as missing, but it exists on Bun",
       "source": "src/jsc/bindings/webcore/streams/JSReadableStream.cpp"
+    },
+    "*globals*.FileList": {
+      "status": "unsupported",
+      "note": "Bun has no FileList global",
+      "source": "src/jsc/bindings/ZigGlobalObject.lut.txt",
+      "absent": true
     }
   }
 }

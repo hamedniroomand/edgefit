@@ -16,6 +16,12 @@ import type {
 
 import { classify } from './classify.ts';
 import type { Classification } from './classify.ts';
+import {
+  isAfterMissingModule,
+  isOtherGlobal,
+  isOtherRuntime,
+  isShadowedPolyfill,
+} from './target-branches.ts';
 
 /** Re-exported so the check reads the shipped suggestions through the same module that applies them. */
 export { loadSuggestions } from '@/data/suggestions.ts';
@@ -29,31 +35,6 @@ export const defaultLevels: Record<Category, Level> = {
   web: 'warning',
   unknown: 'warning',
 };
-
-/** Whether a load of the module that a `catch` stops fails on `target`, so the code after it does not run. */
-const isAfterMissingModule = (usage: Usage, target: Target): boolean =>
-  usage.afterLoad === true &&
-  usage.api !== undefined &&
-  target.lookup({ module: usage.api.module, path: [] }).absent === true;
-
-/** Whether the runtime checks around a usage rule out the target's runtime, so the code never runs on it. */
-function isOtherRuntime(usage: Usage, target: Target): boolean {
-  return (
-    usage.runtimes?.some(({ runtime, present }) => target.runtimes.includes(runtime) !== present) ??
-    false
-  );
-}
-
-/** Whether a module is only stored in a global that the target already has, so the store never runs. */
-function isShadowedPolyfill(usage: Usage, target: Target): boolean {
-  const [name] = usage.polyfill?.path ?? [];
-  return (
-    usage.polyfill !== undefined &&
-    name !== undefined &&
-    target.hasGlobal(name) &&
-    target.lookup(usage.polyfill).status === 'supported'
-  );
-}
 
 export interface ModuleUsages {
   file: string;
@@ -186,6 +167,7 @@ function toFinding(
       (classification.absent || (usage.kind === 'api' && classification.category === 'unknown'))) ||
     isAfterMissingModule(usage, options.target) ||
     isOtherRuntime(usage, options.target) ||
+    isOtherGlobal(usage, options.target) ||
     isShadowedPolyfill(usage, options.target) ||
     unreached !== undefined;
   const suggestion = guarded ? undefined : suggest(module, usage, classification, options);

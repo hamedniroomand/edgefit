@@ -55,6 +55,12 @@ function runtimeTags(usage: Usage): string {
     .join('');
 }
 
+function globalTags(usage: Usage): string {
+  return (usage.globals ?? [])
+    .map(({ name, present }) => ` [${present ? 'has' : 'no'} ${name}]`)
+    .join('');
+}
+
 function polyfillTag(usage: Usage): string {
   return usage.polyfill === undefined ? '' : ` [polyfill ${usage.polyfill.path.join('.')}]`;
 }
@@ -74,6 +80,14 @@ export function usagesOf(
     usage =>
       `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${usage.afterLoad === true ? ' [after load]' : ''}${polyfillTag(usage)}${runtimeTags(usage)}`,
   );
+}
+
+/** The global conditions of each usage, as `has X` or `no X`, with the others left out. */
+export function globalsOf(source: string): string[] {
+  return extractUsages('src/input.ts', source, {
+    globals: defaultGlobals,
+    nodeEnv: 'production',
+  }).map(usage => `${usage.display}${globalTags(usage)}`);
 }
 
 export interface CapturedIo extends CliIo {

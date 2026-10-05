@@ -566,6 +566,12 @@
       "note": "the WASI constructor throws ERR_METHOD_NOT_IMPLEMENTED",
       "source": "wasi.ts"
     },
+    "*globals*.FileList": {
+      "status": "unsupported",
+      "note": "workerd has no FileList global",
+      "source": "../workerd/api/global-scope.c++",
+      "absent": true
+    },
     "*globals*.ErrorEvent": {
       "status": "supported",
       "note": "the Web API data lists it as missing, but it exists on workerd",
