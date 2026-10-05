@@ -106,22 +106,35 @@ function mappedValue(node: NodeOf<'CallExpression'>, scope: Scope): KnownObject 
   };
 }
 
-/** The values a member read may give: one for each key it may have. */
+/** The objects an expression may be: a known object, or each element of a read of a list of objects. */
+function objectsOf(node: Node, scope: Scope): readonly KnownObject[] | undefined {
+  const inner = strip(node);
+  const values =
+    inner.type === 'MemberExpression' ? memberValues(inner, scope) : [valueOf(inner, scope)];
+  return values?.every(value => typeof value === 'object') === true
+    ? (values as KnownObject[])
+    : undefined;
+}
+
+/** The values a member read may give: one for each key it may have, in each object it may read. */
 function memberValues(
   node: NodeOf<'MemberExpression'>,
   scope: Scope,
 ): readonly KnownValue[] | undefined {
-  const object = objectOf(node.object, scope);
+  const objects = objectsOf(node.object, scope);
   const key = staticKey(node.property, node.computed);
   const keys = key === undefined && node.computed ? keysOf(node.property, scope) : undefined;
-  if (object === undefined || (key === undefined && !node.computed)) {
+  if (objects === undefined || (key === undefined && !node.computed)) {
     return undefined;
   }
-  if (key === undefined && keys === undefined) {
-    return object.values;
-  }
-  const values = (key === undefined ? (keys ?? []) : [key]).map(name => object.entries.get(name));
-  return values.every(value => value !== undefined) ? values : undefined;
+  const found = objects.map(object => {
+    if (key === undefined && keys === undefined) {
+      return object.values;
+    }
+    const values = (key === undefined ? (keys ?? []) : [key]).map(name => object.entries.get(name));
+    return values.every(value => value !== undefined) ? values : undefined;
+  });
+  return found.every(values => values !== undefined) ? found.flat() : undefined;
 }
 
 const readers: {

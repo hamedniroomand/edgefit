@@ -1,7 +1,12 @@
 import type { NodeOf } from '@/extract/ast.ts';
 import type { Visitor } from '@/extract/context.ts';
 import { collectBlockNames, collectLexicalNames, patternNames } from '@/extract/declarations.ts';
-import { bindCallbackKeys, bindLoopKeys, collectKnown } from '@/extract/key-bindings.ts';
+import {
+  bindCallbackKeys,
+  bindLoopKeys,
+  bindParameterKeys,
+  collectKnown,
+} from '@/extract/key-bindings.ts';
 import { factoryModule } from '@/extract/main-only.ts';
 import { createScope, declare } from '@/extract/scope.ts';
 
@@ -31,6 +36,7 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
   }
   declare(scope, names);
   bindCallbackKeys(node, context.parent(), scope, context.scope);
+  bindParameterKeys(node, context.callKeys.get(node), scope);
   const module = factoryModule(node, context.parent(), context.functions);
   if (module !== undefined) {
     scope.modules.add(module);

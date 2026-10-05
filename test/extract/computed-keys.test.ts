@@ -62,3 +62,22 @@ describe('a computed key from a let', () => {
     ]);
   });
 });
+
+describe('a computed key that is a member of each object of a list', () => {
+  it('is the member of each object of a list', () => {
+    const list = "const map = [{ n: 'a', c: 'log' }, { n: 'b', c: 'warn' }];\n";
+    expect(usages(`${list}for (let i = 0; i < map.length; i++) console[map[i].c]('x');`)).toEqual([
+      'api console',
+      'api console.log',
+      'api console.warn',
+    ]);
+  });
+
+  it('is unknown when an object of the list lacks the member', () => {
+    const list = "const map = [{ n: 'a', c: 'log' }, { n: 'b' }];\n";
+    expect(usages(`${list}for (let i = 0; i < map.length; i++) console[map[i].c]('x');`)).toEqual([
+      'api console',
+      'dynamic console[<expression>]',
+    ]);
+  });
+});
