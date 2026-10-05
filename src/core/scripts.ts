@@ -9,6 +9,7 @@ import type { ApiRef, Usage } from '@/types.ts';
 
 import { dropFollowed, followAliases } from './aliases.ts';
 import { NativePackages } from './native-packages.ts';
+import { followStrings } from './string-imports.ts';
 import { uncheckedImports } from './unchecked-imports.ts';
 
 export function toPosix(file: string): string {
@@ -82,6 +83,7 @@ function extractOne(
   module: GraphModule,
   source: string,
   importedModules?: ReadonlyMap<string, ApiRef>,
+  importedStrings?: ReadonlyMap<string, string>,
 ): ExtractedModule {
   return extractModule(toPosix(file), source, {
     globals,
@@ -93,7 +95,23 @@ function extractOne(
     nodeEnv: options.nodeEnv,
     nativeSpecifiers: native.specifiers(file, module),
     importedModules,
+    importedStrings,
   });
+}
+
+function uncheckedOf(
+  file: string,
+  source: string,
+  module: GraphModule,
+  options: ScanOptions,
+): Usage[] {
+  return uncheckedImports(
+    toPosix(file),
+    source,
+    module.externals,
+    peers(module, options),
+    module.missingRequires,
+  );
 }
 
 /**
@@ -126,26 +144,24 @@ export function extractScripts(
   native.findBy(
     first.filter(({ found }) => found.usages.some(isComputedRequire)).map(({ file }) => file),
   );
-  const aliases = options.trace
-    ? followAliases(graph, new Map(first.map(({ file, found }) => [file, found])))
-    : undefined;
+  const firstFound = new Map(first.map(({ file, found }) => [file, found]));
+  const aliases = options.trace ? followAliases(graph, firstFound) : undefined;
+  const strings = options.trace ? followStrings(graph, firstFound) : undefined;
   return first.map(({ file, module, source, found, natives }) => {
     const seeds = aliases?.seeds.get(file);
-    const again = seeds !== undefined || native.specifiers(file, module).size !== natives;
-    const second = again ? extractOne(context, file, module, source, seeds) : found;
+    const texts = strings?.get(file);
+    const again =
+      seeds !== undefined ||
+      texts !== undefined ||
+      native.specifiers(file, module).size !== natives;
+    const second = again ? extractOne(context, file, module, source, seeds, texts) : found;
     return {
       file,
       found: withoutLoaderRequires(
         dropFollowed(second, aliases?.followed.get(file)),
         native.covers(file),
       ),
-      unchecked: uncheckedImports(
-        toPosix(file),
-        source,
-        module.externals,
-        peers(module, options),
-        module.missingRequires,
-      ),
+      unchecked: uncheckedOf(file, source, module, options),
     };
   });
 }

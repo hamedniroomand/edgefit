@@ -29,6 +29,8 @@ export interface ExtractOptions {
   nativeSpecifiers?: ReadonlyMap<string, string>;
   /** Imported local names that another module of the graph exports as a Node.js module. */
   importedModules?: ReadonlyMap<string, ApiRef>;
+  /** Imported local names that another module of the graph exports as a plain string. */
+  importedStrings?: ReadonlyMap<string, string>;
 }
 
 export interface ExtractedModule {
@@ -39,6 +41,8 @@ export interface ExtractedModule {
   shape: ModuleShape | undefined;
   /** The exports that are a Node.js module, by exported name, with where the export is written. */
   aliases: ReadonlyMap<string, { ref: ApiRef; offset: number }>;
+  /** The exports that are a plain string, by exported name. */
+  strings: ReadonlyMap<string, string>;
 }
 
 function languageFor(file: string): ParserOptions['lang'] {
@@ -78,8 +82,8 @@ export function parse(file: string, source: string): ParseResult {
 }
 
 function finish(collector: UsageCollector, shape?: ModuleShape): ExtractedModule {
-  const { usages, offsets, aliases } = collector;
-  return { usages, offsets, aliases, shape };
+  const { usages, offsets, aliases, strings } = collector;
+  return { usages, offsets, aliases, strings, shape };
 }
 
 /** Parses a file and returns every runtime API use in it, and where each one is. */
@@ -94,6 +98,7 @@ export function extractModule(
     options.lazyNodeImports === true,
     options.nativeSpecifiers,
     options.importedModules,
+    options.importedStrings,
   );
   const result = parse(file, source);
   const [error] = result.errors;

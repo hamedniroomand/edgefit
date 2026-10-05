@@ -27,6 +27,10 @@ export class UsageCollector {
   public readonly lazyNodeImports: boolean;
   /** What the module exports that is a Node.js module of its own, by exported name. */
   public readonly aliases = new Map<string, { ref: ApiRef; offset: number }>();
+  /** What the module exports that is a plain string, by exported name. */
+  public readonly strings = new Map<string, string>();
+  /** Imported local names that another module of the graph exports as a plain string. */
+  public readonly importedStrings: ReadonlyMap<string, string>;
   /** Imported local names that another module of the graph exports as a Node.js module. */
   public readonly importedModules: ReadonlyMap<string, ApiRef>;
   /** Specifiers that resolve to a native addon. */
@@ -40,8 +44,10 @@ export class UsageCollector {
     lazyNodeImports = false,
     nativeSpecifiers: ReadonlyMap<string, string> = new Map(),
     importedModules: ReadonlyMap<string, ApiRef> = new Map(),
+    importedStrings: ReadonlyMap<string, string> = new Map(),
   ) {
     this.importedModules = importedModules;
+    this.importedStrings = importedStrings;
     this.#file = file;
     this.#nativeSpecifiers = nativeSpecifiers;
     this.lazyNodeImports = lazyNodeImports;
