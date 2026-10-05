@@ -69,7 +69,7 @@ edgefit could not determine what is used. Typical causes:
 
 A `require()` or `import()` of a name that the user of the code gives, such as a parameter, is not an `unknown` finding. It is a note, because the code does not choose the module. See [packages](/guide/packages#modules-that-the-user-names). An `unknown` finding is only reported when the access could reach something unsupported. Computed access on a module that is fully supported on the target is not reported.
 
-Symbol keys such as `x[Symbol.iterator]` are never reported, since a symbol cannot name an API. The global object on its own (`globalThis`, `self`) is not reported either, and neither is `globalThis['crypto']`, which is read like `globalThis.crypto`.
+Symbol keys such as `x[Symbol.iterator]` are never reported, since a symbol cannot name an API. The global object on its own (`globalThis`, `self`) is not reported either, and neither is `globalThis['crypto']`, which is read like `globalThis.crypto`. A computed write to the global object, as in `globalThis[key] = value`, is not reported, because it does not read an API. A computed read with a fallback, as in `globalThis[key] || Fallback` or `globalThis[key] ?? Fallback`, is not reported either, because the code works when the global is missing.
 
 By default the `unknown` warnings are folded into one line per package, because there are often many and they rarely need action:
 

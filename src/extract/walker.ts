@@ -34,6 +34,9 @@ function isCheck(node: Node, parent: Node | undefined, outer: readonly Node[]): 
   );
 }
 
+const apiGuard = (ref: ApiRef) =>
+  ({ kind: 'api', ref: normalizeRef(ref), root: undefined, active: true }) as const;
+
 export class Walker implements VisitContext {
   public readonly imported: boolean;
   public readonly mainOnlyNodes = new Set<Node>();
@@ -154,14 +157,20 @@ export class Walker implements VisitContext {
     if (!isGlobalRoot(chain.ref)) {
       this.collector.api(chain.ref, chain.offset);
     }
-    const tested =
-      chain.memberParent !== undefined && isOnlyTested(chain.member, chain.memberParent, chain.ref);
+    const { member, memberParent } = chain;
+    const global = isGlobalRoot(chain.ref) && memberParent !== undefined;
+    const written = global && isMemberWrite(member, memberParent);
+    const checked = global && isCheckedOperand(member, memberParent, this.#outer(member), this);
+    const tested = memberParent !== undefined && isOnlyTested(member, memberParent, chain.ref);
     if (chain.keys !== undefined) {
-      const through = computedKey(chain.member, this.scope);
-      for (const key of tested ? [] : chain.keys) {
-        this.collector.api(memberRef(chain.ref, key), chain.propertyOffset, false, through);
+      const through = computedKey(member, this.scope);
+      for (const key of tested || written ? [] : chain.keys) {
+        const ref = memberRef(chain.ref, key);
+        this.collector.guards.within(checked ? [apiGuard(ref)] : [], () => {
+          this.collector.api(ref, chain.propertyOffset, false, through);
+        });
       }
-    } else if (!tested) {
+    } else if (!(tested || written || checked)) {
       this.collector.dynamic(
         chain.ref,
         `${displayRef(chain.ref)}[<expression>]`,
@@ -176,8 +185,7 @@ export class Walker implements VisitContext {
     if (!isCheckedOperand(node, parent, this.#outer(node), this)) {
       return false;
     }
-    const guard = { kind: 'api', ref: normalizeRef(ref), root: undefined, active: true } as const;
-    this.collector.guards.within([guard], () => {
+    this.collector.guards.within([apiGuard(ref)], () => {
       this.collector.api(ref, offset);
     });
     return true;
