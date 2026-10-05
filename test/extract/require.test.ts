@@ -11,10 +11,10 @@ describe('extracting CommonJS requires', () => {
   });
 
   it('follows nested destructuring', () => {
-    const source = "const { promises: { watch: pw }, readFile } = require('fs');\npw('.');";
+    const source =
+      "const { promises: { watch: pw }, readFile } = require('fs');\npw('.');\nreadFile('a');";
     expect(usagesOf(source, 'lib/index.js')).toEqual([
       'api node:fs',
-      'api node:fs.promises',
       'api node:fs.promises.watch',
       'api node:fs.readFile',
     ]);

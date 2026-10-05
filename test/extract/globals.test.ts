@@ -161,7 +161,9 @@ describe('destructuring from the global object', () => {
   });
 
   it('still counts a member of a module when it is destructured', () => {
-    expect(usagesOf("import fs from 'fs';\nconst { watch } = fs;")).toContain('api node:fs.watch');
+    expect(usagesOf("import fs from 'fs';\nconst { watch } = fs;\nwatch('.');")).toContain(
+      'api node:fs.watch',
+    );
   });
 
   it('guards a use after a check, including void 0', () => {
