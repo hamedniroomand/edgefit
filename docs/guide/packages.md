@@ -22,7 +22,7 @@ A package that has no `.` entry, such as `firebase`, can name the subpath that s
 
 ## What a pass means
 
-A static check found no API that the target lacks or stubs, in the code that a public entry point of the package runs when it loads, or that every export of it reaches. A finding that only some exports reach is listed under them. It was checked against [pinned data](/guide/status), for the resolved version on the check date.
+A static check found no API that the target lacks or stubs, in the code that a public entry point of the package runs when it loads, or that every export of it reaches. A finding that only some exports reach is listed under them. Code that runs only when the project sets an option of the package's API counts when the project sets it, so run `edgefit check` on your app. It was checked against [pinned data](/guide/status), for the resolved version on the check date.
 
 In the table, the main entry mark is the result of the main entry only. The second mark is the worst subpath, when it is worse than the main entry. A third mark is the worst export, when it is worse than the result of the target.
 

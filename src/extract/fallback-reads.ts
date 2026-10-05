@@ -6,9 +6,8 @@ const isNull = (node: Node): boolean => node.type === 'Literal' && node.value ==
 const isUndefined = (node: Node): boolean =>
   node.type === 'Identifier' && node.name === 'undefined';
 
-/** Whether a test is true when `name` holds nothing: `!x`, `x == null`, or `typeof x !== 'function'`. */
-function testsMissing(test: Node, name: string): boolean {
-  const isName = (node: Node): boolean => node.type === 'Identifier' && node.name === name;
+/** Whether a test is true when the value holds nothing: `!x`, `x == null`, or `typeof x !== 'function'`. */
+function testsMissing(test: Node, isName: (node: Node) => boolean): boolean {
   const inner = strip(test);
   if (inner.type === 'UnaryExpression') {
     return inner.operator === '!' && isName(strip(inner.argument));
@@ -31,6 +30,37 @@ function testsMissing(test: Node, name: string): boolean {
     other !== undefined &&
     isEquality(inner.operator) &&
     (isUndefined(other) || (inner.operator === '==' && isNull(other)))
+  );
+}
+
+/**
+ * Whether a test is true only when the value is there: `x`, `x !== undefined`, `x != null`, or
+ * `typeof x !== 'undefined'`, also as one side of `&&`. A test of an absent value says nothing.
+ */
+export function testsPresent(test: Node, isName: (node: Node) => boolean): boolean {
+  const inner = strip(test);
+  if (inner.type === 'LogicalExpression') {
+    return (
+      inner.operator === '&&' &&
+      (testsPresent(inner.left, isName) || testsPresent(inner.right, isName))
+    );
+  }
+  if (inner.type !== 'BinaryExpression') {
+    return isName(inner);
+  }
+  const [left, right] = [strip(inner.left), strip(inner.right)];
+  if (
+    left.type === 'UnaryExpression' &&
+    left.operator === 'typeof' &&
+    isName(strip(left.argument))
+  ) {
+    return isInequality(inner.operator) && stringLiteral(right) === 'undefined';
+  }
+  const [other] = isName(left) ? [right] : isName(right) ? [left] : [];
+  return (
+    other !== undefined &&
+    isInequality(inner.operator) &&
+    (isUndefined(other) || (inner.operator === '!=' && isNull(other)))
   );
 }
 
@@ -82,7 +112,7 @@ export function isFallbackRead(node: Node, parent: Node, outer: readonly Node[])
     name !== undefined &&
     next?.type === 'IfStatement' &&
     next.alternate === null &&
-    testsMissing(next.test, name) &&
+    testsMissing(next.test, node => node.type === 'Identifier' && node.name === name) &&
     setsName(next.consequent, name)
   );
 }

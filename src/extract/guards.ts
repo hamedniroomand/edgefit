@@ -2,7 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef, Runtime } from '@/types.ts';
 
-import { absentGuard, globalGuard, guardFor } from './api-guards.ts';
+import { absentGuard, globalGuard, guardFor, optionGuards } from './api-guards.ts';
 import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import type { BindingContext } from './bindings.ts';
@@ -241,7 +241,7 @@ export function guardsWhen(test: Node, truth: boolean, context: BindingContext):
       const key = stringLiteral(node.left);
       return key === undefined ? [] : presence(node.right, truth, context, key);
     }
-    return comparisonGuard(node, truth, context) ?? [];
+    return comparisonGuard(node, truth, context) ?? optionGuards(node, truth, context.scope);
   }
   if (node.type === 'CallExpression') {
     const guards = callGuards(node, truth, context);
@@ -255,5 +255,6 @@ export function guardsWhen(test: Node, truth: boolean, context: BindingContext):
     ...known,
     ...(truth ? moduleGuards(known) : []),
     ...optionalObject(node, truth, context),
+    ...optionGuards(node, truth, context.scope),
   ];
 }

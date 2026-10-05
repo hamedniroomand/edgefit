@@ -5,7 +5,7 @@ import { collectShape } from '@/trace/shape.ts';
 import type { ModuleShape } from '@/trace/shape.ts';
 import type { ApiRef, Usage } from '@/types.ts';
 
-import { findAssigned } from './assigned.ts';
+import { findAssigned, findAssignedOptions } from './assigned.ts';
 import { findFunctions } from './call-keys.ts';
 import { findImportWrappers } from './import-wrappers.ts';
 import { findSuppliedLoads } from './supplied-loads.ts';
@@ -40,6 +40,8 @@ export interface ExtractedModule {
   /** Set when `shape` was asked for and the file could be parsed. */
   shape: ModuleShape | undefined;
   /** The exports that are a Node.js module, by exported name, with where the export is written. */
+  /** The names of the options this file sets to a value that is not `false`, `0`, `null`, `undefined` or `''`. */
+  optionsSet: readonly string[];
   aliases: ReadonlyMap<string, { ref: ApiRef; offset: number }>;
   /** The exports that are a plain string, by exported name. */
   strings: ReadonlyMap<string, string>;
@@ -81,9 +83,13 @@ export function parse(file: string, source: string): ParseResult {
   return retry.errors.length === 0 ? retry : result;
 }
 
-function finish(collector: UsageCollector, shape?: ModuleShape): ExtractedModule {
+function finish(
+  collector: UsageCollector,
+  shape?: ModuleShape,
+  optionsSet: readonly string[] = [],
+): ExtractedModule {
   const { usages, offsets, aliases, strings } = collector;
-  return { usages, offsets, aliases, strings, shape };
+  return { usages, offsets, aliases, strings, optionsSet, shape };
 }
 
 /** Parses a file and returns every runtime API use in it, and where each one is. */
@@ -132,10 +138,9 @@ export function extractModule(
   );
   walker.visit(result.program as Node);
   collector.omitMainFunctions(body, functions, walker.mainOnlyNodes);
-  return finish(
-    collector,
-    options.shape === true ? collectShape(body, result.module.hasModuleSyntax, dropped) : undefined,
-  );
+  const shape =
+    options.shape === true ? collectShape(body, result.module.hasModuleSyntax, dropped) : undefined;
+  return finish(collector, shape, findAssignedOptions(body));
 }
 
 /** Parses a file and returns every runtime API use in it. */

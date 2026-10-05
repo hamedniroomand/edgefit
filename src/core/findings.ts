@@ -145,6 +145,27 @@ function unreachedFor(
   });
 }
 
+/** Whether the code only runs if the API exists, or on another runtime, or with an option the project does not set. */
+function isGuarded(
+  usage: Usage,
+  classification: Classification,
+  target: Target,
+  unreached: boolean,
+): boolean {
+  return (
+    // A `catch` that does not throw again takes the throw of an API that exists and fails.
+    (usage.caught === true && classification.category === 'unsupported') ||
+    (usage.guarded === true &&
+      (classification.absent || (usage.kind === 'api' && classification.category === 'unknown'))) ||
+    isAfterMissingModule(usage, target) ||
+    isOtherRuntime(usage, target) ||
+    isOtherGlobal(usage, target) ||
+    isShadowedPolyfill(usage, target) ||
+    usage.options !== undefined ||
+    unreached
+  );
+}
+
 function toFinding(
   module: ModuleUsages,
   usage: Usage,
@@ -160,16 +181,7 @@ function toFinding(
   }
   const target: TargetKey = options.target.info.key;
   const unreached = unreachedFor(module, usage, options);
-  const guarded =
-    // A `catch` that does not throw again takes the throw of an API that exists and fails.
-    (usage.caught === true && classification.category === 'unsupported') ||
-    (usage.guarded === true &&
-      (classification.absent || (usage.kind === 'api' && classification.category === 'unknown'))) ||
-    isAfterMissingModule(usage, options.target) ||
-    isOtherRuntime(usage, options.target) ||
-    isOtherGlobal(usage, options.target) ||
-    isShadowedPolyfill(usage, options.target) ||
-    unreached !== undefined;
+  const guarded = isGuarded(usage, classification, options.target, unreached !== undefined);
   const suggestion = guarded ? undefined : suggest(module, usage, classification, options);
   return {
     category: classification.category,
@@ -188,6 +200,7 @@ function toFinding(
     // One that exists and throws still fails.
     // Code that only runs on another runtime is never reached, whatever it uses.
     ...(guarded ? { guarded: true as const } : {}),
+    ...(usage.options === undefined ? {} : { options: usage.options }),
     ...(unreached === undefined
       ? {}
       : { unreached: { reason: unreached.reason, source: unreached.source } }),

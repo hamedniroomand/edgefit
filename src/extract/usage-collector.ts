@@ -95,6 +95,7 @@ export class UsageCollector {
       ...(afterLoad ? { afterLoad: true as const } : {}),
       ...this.#runtimes(),
       ...this.#globals(),
+      ...this.#options(),
     });
   }
 
@@ -114,6 +115,7 @@ export class UsageCollector {
       ...(this.guards.isCaught() ? { guarded: true as const } : {}),
       ...this.#runtimes(),
       ...this.#globals(),
+      ...this.#options(),
     });
   }
 
@@ -141,6 +143,7 @@ export class UsageCollector {
       ...this.#polyfill(),
       ...this.#runtimes(),
       ...this.#globals(),
+      ...this.#options(),
     });
   }
 
@@ -152,6 +155,11 @@ export class UsageCollector {
   #globals(): { globals?: GlobalCondition[] } {
     const globals = this.guards.globals();
     return globals.length === 0 ? {} : { globals };
+  }
+
+  #options(): { options?: string[] } {
+    const options = this.guards.options();
+    return options.length === 0 ? {} : { options };
   }
 
   #runtimes(): { runtimes?: RuntimeCondition[] } {

@@ -1,8 +1,9 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, strip } from './ast.ts';
+import { childNodes, isFunction, staticKey, strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { patternNames } from './declarations.ts';
+import { testsPresent } from './fallback-reads.ts';
 
 const bindable = new Set(['Identifier', 'MemberExpression', 'CallExpression', 'ImportExpression']);
 
@@ -111,4 +112,79 @@ export function findAssigned(body: readonly Node[]): Map<string, Node> {
     }
   }
   return assigned;
+}
+
+/** Whether a value can be set, as the value of an option is: not `false`, `0`, `null`, `undefined` or `''`. */
+function isSetValue(node: Node): boolean {
+  const value = strip(node);
+  if (value.type === 'Literal') {
+    return Boolean(value.value) || value.value === true;
+  }
+  return !(value.type === 'Identifier' && value.name === 'undefined');
+}
+
+/** `x.name` or `x['name']` on a plain name, as one string, so the same member compares equal. */
+function memberKey(node: Node): string | undefined {
+  const member = strip(node);
+  const object = member.type === 'MemberExpression' ? strip(member.object) : undefined;
+  const name =
+    member.type === 'MemberExpression' ? staticKey(member.property, member.computed) : undefined;
+  return object?.type === 'Identifier' && name !== undefined ? `${object.name}.${name}` : undefined;
+}
+
+type Walk = { node: Node; nested: boolean; tests: readonly Node[] };
+
+/**
+ * The names of the options that this file sets: a property of an object literal, or a member that
+ * is assigned (`x.http2 = true`), whose value is not `false`, `0`, `null`, `undefined` or `''`. A
+ * value that is not a literal counts as set, since it can be anything.
+ *
+ * Only a direct property counts, because the guard of an option reads a direct member of a
+ * parameter (`options.http2`). A property of an object that is itself the value of a property does
+ * not, at any depth, until a function starts: `{ http2: { type: 'boolean' } }` inside the `properties`
+ * of a schema is a description, and `other({ server: { http2: true } })` is read as `options.server.http2`,
+ * which no guard covers, so its finding stays.
+ *
+ * An assignment in the true branch of a test that shows the member present does not count either:
+ * it runs only when something else set the option, as a validator does that coerces a value and
+ * writes it back. That other site counts by itself. A test of an absent member (`!x.name`) or a
+ * default (`x.name ??= v`) still sets the option.
+ */
+export function findAssignedOptions(body: readonly Node[]): string[] {
+  const found = new Set<string>();
+  const pending: Walk[] = body.map(node => ({ node, nested: false, tests: [] }));
+  for (let item = pending.pop(); item !== undefined; item = pending.pop()) {
+    const { node, nested, tests } = item;
+    let name: string | undefined;
+    let value: Node | undefined;
+    if (node.type === 'Property' && node.kind === 'init' && !node.method && !nested) {
+      name = staticKey(node.key, node.computed);
+      value = node.value;
+    } else if (
+      node.type === 'AssignmentExpression' &&
+      ['=', '||=', '??='].includes(node.operator) &&
+      node.left.type === 'MemberExpression'
+    ) {
+      name = staticKey(node.left.property, node.left.computed);
+      const key = memberKey(node.left);
+      const guarded =
+        node.operator === '=' &&
+        tests.some(test => testsPresent(test, side => memberKey(side) === key));
+      value = guarded ? undefined : node.right;
+    }
+    if (name !== undefined && value !== undefined && isSetValue(value)) found.add(name);
+    const reset = isFunction(node);
+    for (const child of childNodes(node)) {
+      pending.push({
+        node: child,
+        nested: !reset && (nested || node.type === 'Property'),
+        tests: reset
+          ? []
+          : node.type === 'IfStatement' && child === node.consequent
+            ? [...tests, node.test]
+            : tests,
+      });
+    }
+  }
+  return [...found].toSorted();
 }

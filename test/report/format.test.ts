@@ -279,3 +279,19 @@ describe('pnpm store paths', () => {
     expect(formatJson(resultOf([at(store, 'chokidar')]))).toContain('.pnpm/chokidar@4.0.3');
   });
 });
+
+describe('guarded findings that need an option', () => {
+  it('name the option that the code needs, with --verbose and in the JSON report', () => {
+    const listed = makeFinding('node:http2.createServer', { guarded: true, options: ['http2'] });
+    const text = formatText(resultOf([], 0, [listed]), { color: false, verbose: true });
+    expect(text).toContain('runs only when the option `http2` is set');
+    expect(formatJson(resultOf([], 0, [listed]))).toContain('"options"');
+  });
+
+  it('name two options with "and"', () => {
+    const two = makeFinding('node:http2.createServer', { guarded: true, options: ['a', 'b'] });
+    expect(formatText(resultOf([], 0, [two]), { color: false, verbose: true })).toContain(
+      'runs only when the options `a` and `b` are set',
+    );
+  });
+});
