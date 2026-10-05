@@ -119,3 +119,15 @@ describe('what a CommonJS module asks of a module it requires through tslib', ()
     expect(read(`${tslib}const _dep = tslib_1.__toESM(require('./dep.js'));`)).toEqual(all);
   });
 });
+
+describe('what a CommonJS module asks of a module it requires through the helper of older esbuild', () => {
+  const toModule = 'var __toModule = (m) => __reExport(__markAsModule({}), m);\n';
+
+  it('reads __toModule', () => {
+    expect(read(`${toModule}const _dep = __toModule(require('./dep.js'));`)).toEqual(used);
+  });
+
+  it('asks for everything when __toModule is not defined', () => {
+    expect(read(`const _dep = __toModule(require('./dep.js'));`)).toEqual(all);
+  });
+});

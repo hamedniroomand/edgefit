@@ -28,6 +28,7 @@ const interopHelpers = new Set([
   '__importDefault',
   '__importStar',
   '__toESM',
+  '__toModule',
   '_interopDefault',
   '_interopDefaultCompat',
   '_interopNamespace',
