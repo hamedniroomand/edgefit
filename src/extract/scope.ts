@@ -48,6 +48,8 @@ export interface Scope {
   strings: Map<string, string>;
   /** Names that can only hold one of a known set of strings. */
   keys: Map<string, readonly string[]>;
+  /** Parameters of the function that the scope belongs to, by name. */
+  parameters: Set<string>;
   /** `const` lists made by `.filter(name => name in obj)`, see `bindFilteredList`. */
   filtered: Map<string, Filtered>;
   /** Names that hold a key which an `in` test proved `obj` has, see `bindPresentLoop`. */
@@ -69,6 +71,7 @@ export function createScope(parent?: Scope): Scope {
     checks: new Map(),
     strings: new Map(),
     keys: new Map(),
+    parameters: new Set(),
     filtered: new Map(),
     present: new Map(),
     objects: new Map(),
@@ -89,6 +92,17 @@ export function lookupString(scope: Scope | undefined, name: string): string | u
     return value;
   }
   return scope.names.has(name) ? undefined : lookupString(scope.parent, name);
+}
+
+/** Whether the nearest declaration of `name` is a plain parameter of a function. */
+export function isParameter(scope: Scope | undefined, name: string): boolean {
+  if (scope === undefined) {
+    return false;
+  }
+  if (scope.parameters.has(name)) {
+    return true;
+  }
+  return scope.names.has(name) ? false : isParameter(scope.parent, name);
 }
 
 /** The list a `const` holds that was filtered by an `in` test, unless a nearer declaration of the name shadows it. */

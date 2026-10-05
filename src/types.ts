@@ -74,6 +74,8 @@ export interface Usage {
   runtimes?: RuntimeCondition[];
   /** Set when the code sits behind checks for a global, such as `if (!globalThis.FileList) throw`. All must hold. */
   globals?: GlobalCondition[];
+  /** Set when the code sits behind a test of an option that its function gets, such as `if (options.http2)`. All must hold. */
+  options?: string[];
   /** Set when the value is stored in this global only if the global is missing. */
   polyfill?: ApiRef;
 }
@@ -119,6 +121,8 @@ export interface Finding {
   exports?: string[];
   /** Set when the code only runs if the API exists, or on another runtime. Guarded findings never fail a check. */
   guarded?: true;
+  /** Set on a guarded finding in code that runs only when the project sets these options of the package's API. */
+  options?: string[];
   /** Set on a guarded finding that edgefit's data says is not reached on the target, with why. */
   unreached?: { reason: string; source: string };
   /**

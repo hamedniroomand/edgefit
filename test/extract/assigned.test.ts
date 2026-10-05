@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
+import { findAssignedOptions } from '@/extract/assigned.ts';
+import { parse } from '@/extract/index.ts';
 import { usagesOf } from '~/helpers.ts';
 
 const guarded = `let c: any
@@ -132,5 +134,88 @@ describe('a fallback that a catch assigns', () => {
     const source =
       "let http2;\ntry {\n  http2 = require('node:http2');\n} catch {\n  http2 = other;\n}\nhttp2.connect('x');";
     expect(usagesOf(source, 'lib/index.ts')).not.toContain('api node:http2.connect');
+  });
+});
+
+describe('the options that a file sets', () => {
+  const optionsOf = (source: string): string[] =>
+    findAssignedOptions(parse('lib/input.js', source).program.body as never);
+
+  it.each([
+    ['an object property', 'f({ http2: true });'],
+    ['a string key', "f({ 'http2': 1 });"],
+    ['a value that is not a literal', 'f({ http2: flag });'],
+    ['a shorthand property', 'f({ http2 });'],
+    ['a member assignment', 'options.http2 = true;'],
+    ['a member assignment with ||=', 'options.http2 ||= true;'],
+    ['a member assignment with ??=', 'options.http2 ??= 1;'],
+    ['a literal in Object.assign', 'Object.assign(opts, { http2: true });'],
+    ['a literal in a function in a property', 'f({ start() { g({ http2: true }); } });'],
+  ])('reads %s', (_label, code) => {
+    expect(optionsOf(code)).toEqual(['http2']);
+  });
+
+  it.each([
+    ['false', 'f({ http2: false });'],
+    ['zero', 'f({ http2: 0 });'],
+    ['null', 'f({ http2: null });'],
+    ['undefined', 'f({ http2: undefined });'],
+    ['an empty string', "f({ http2: '' });"],
+    ['a method', 'f({ http2() {} });'],
+    ['a computed key', 'f({ [key]: true });'],
+    ['an assignment of false', 'options.http2 = false;'],
+    ['a compound assignment', 'options.http2 += 1;'],
+  ])('does not read %s', (_label, code) => {
+    expect(optionsOf(code)).toEqual([]);
+  });
+});
+
+describe('the nested properties of an object', () => {
+  const optionsOf = (source: string): string[] =>
+    findAssignedOptions(parse('lib/input.js', source).program.body as never);
+
+  it.each([
+    ['a nested property', 'f({ server: { http2: true } });', ['server']],
+    [
+      'a property of a schema',
+      "f({ properties: { http2: { type: 'boolean' } } });",
+      ['properties'],
+    ],
+    ['a property in an array in a property', 'f({ list: [{ http2: true }] });', ['list']],
+  ])('only reads the direct property for %s', (_label, code, names) => {
+    expect(optionsOf(code)).toEqual(names);
+  });
+});
+
+describe('an assignment under a test of the same member', () => {
+  const optionsOf = (source: string): string[] =>
+    findAssignedOptions(parse('lib/input.js', source).program.body as never);
+
+  it.each([
+    ['a test against undefined', 'if (data.http2 !== undefined) { data["http2"] = coerced; }'],
+    ['a loose test against null', 'if (data.http2 != null) data.http2 = coerced;'],
+    ['the member as the test', 'if (data.http2) { data.http2 = coerced; }'],
+    ['a typeof test', "if (typeof data.http2 !== 'undefined') { data.http2 = coerced; }"],
+    ['a test inside &&', 'if (ok && data.http2 !== undefined) { data.http2 = coerced; }'],
+    ['a nested block', 'if (data.http2 !== undefined) { if (x) { data.http2 = coerced; } }'],
+  ])('does not count under %s', (_label, code) => {
+    expect(optionsOf(code)).toEqual([]);
+  });
+
+  it.each([
+    ['a test of an absent member', 'if (!data.http2) data.http2 = 1;'],
+    ['a test against undefined for absence', 'if (data.http2 === undefined) data.http2 = 1;'],
+    ['a test for null', 'if (data.http2 == null) data.http2 = 1;'],
+    ['the else branch', 'if (data.http2 !== undefined) { x(); } else { data.http2 = 1; }'],
+    ['a test of another member', 'if (data.other !== undefined) data.http2 = coerced;'],
+    ['a test of another object', 'if (other.http2 !== undefined) data.http2 = coerced;'],
+    ['a default assignment', 'data.http2 ??= 1;'],
+    [
+      'a function under the if',
+      'if (data.http2 !== undefined) { run(() => { data.http2 = coerced; }); }',
+    ],
+    ['an || test', 'if (ok || data.http2 !== undefined) data.http2 = coerced;'],
+  ])('counts under %s', (_label, code) => {
+    expect(optionsOf(code)).toEqual(['http2']);
   });
 });

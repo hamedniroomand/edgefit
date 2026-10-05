@@ -44,7 +44,20 @@ export interface PolyfillGuard {
   ref: ApiRef;
 }
 
-export type Guard = ApiGuard | RuntimeGuard | GlobalGuard | DeadGuard | AbsentGuard | PolyfillGuard;
+/** The code runs only when an option that its function gets is set: `if (options.http2)`. */
+export interface OptionGuard {
+  kind: 'option';
+  name: string;
+}
+
+export type Guard =
+  | ApiGuard
+  | RuntimeGuard
+  | GlobalGuard
+  | DeadGuard
+  | AbsentGuard
+  | PolyfillGuard
+  | OptionGuard;
 
 /** Whether `ref` is `guard.ref` or something below it. */
 function isCovered(guard: ApiGuard, ref: ApiRef): boolean {
@@ -196,6 +209,11 @@ export class GuardStack {
   /** Whether the code runs only when the file is the CommonJS entry module. */
   public readonly mainOnly = (): boolean =>
     this.#guards.some(guard => guard.kind === 'dead' && guard.main === true);
+
+  /** The options that the code at this point runs only with. */
+  public readonly options = (): string[] => [
+    ...new Set(this.#guards.flatMap(guard => (guard.kind === 'option' ? [guard.name] : []))),
+  ];
 
   /** What is known of the runtime at this point. */
   public readonly runtimes = (): RuntimeCondition[] =>

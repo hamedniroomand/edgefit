@@ -36,6 +36,10 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
     names.push(...collectBlockNames(body.body));
   }
   declare(scope, names);
+  for (const param of node.params) {
+    const plain = param.type === 'AssignmentPattern' ? param.left : param;
+    if (plain.type === 'Identifier') scope.parameters.add(plain.name);
+  }
   bindCallbackKeys(node, context.parent(), scope, context.scope);
   bindParameterKeys(node, context.callKeys.get(node), scope);
   const module = factoryModule(node, context.parent(), context.functions);

@@ -53,6 +53,14 @@ function formatHeader(report: TargetReport, paint: Paint): string[] {
   return lines;
 }
 
+/** `runs only when the option `a` is set`, or `the options `a` and `b` are set` for more than one. */
+function optionLine(options: readonly string[]): string {
+  const names = options.map(name => `\`${name}\``);
+  return names.length === 1
+    ? `runs only when the option ${names[0]} is set`
+    : `runs only when the options ${names.slice(0, -1).join(', ')} and ${names.at(-1)} are set`;
+}
+
 export function formatFinding(finding: Finding, paint: Paint): string[] {
   let level = finding.level === 'error' ? paint('red', 'error  ') : paint('yellow', 'warning');
   if (finding.guarded === true) {
@@ -69,6 +77,9 @@ export function formatFinding(finding: Finding, paint: Paint): string[] {
   ];
   if (finding.chain.length > 1) {
     lines.push(paint('dim', `${indent}via ${chainLine(finding)}`));
+  }
+  if (finding.options !== undefined) {
+    lines.push(paint('dim', `${indent}${optionLine(finding.options)}`));
   }
   const fix = fixLine(finding);
   if (fix !== undefined) {
