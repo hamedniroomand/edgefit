@@ -30,6 +30,12 @@ export const defaultLevels: Record<Category, Level> = {
   unknown: 'warning',
 };
 
+/** Whether a load of the module that a `catch` stops fails on `target`, so the code after it does not run. */
+const isAfterMissingModule = (usage: Usage, target: Target): boolean =>
+  usage.afterLoad === true &&
+  usage.api !== undefined &&
+  target.lookup({ module: usage.api.module, path: [] }).absent === true;
+
 /** Whether the runtime checks around a usage rule out the target's runtime, so the code never runs on it. */
 function isOtherRuntime(usage: Usage, target: Target): boolean {
   return (
@@ -178,6 +184,7 @@ function toFinding(
     (usage.caught === true && classification.category === 'unsupported') ||
     (usage.guarded === true &&
       (classification.absent || (usage.kind === 'api' && classification.category === 'unknown'))) ||
+    isAfterMissingModule(usage, options.target) ||
     isOtherRuntime(usage, options.target) ||
     isShadowedPolyfill(usage, options.target) ||
     unreached !== undefined;

@@ -61,12 +61,12 @@ describe('an export that is computed when the module loads', () => {
 
 const dep = cjs(`${used}${dead}`);
 
-describe('a require inside a function', () => {
-  const lazy = (code: string): Source =>
-    cjs(`${used}exports.lazy = function () {\n  ${code}\n};`, {
-      'require-call:./dep.js': 'dep.js',
-    });
+const lazy = (code: string): Source =>
+  cjs(`${used}exports.lazy = function () {\n  ${code}\n};`, {
+    'require-call:./dep.js': 'dep.js',
+  });
 
+describe('a require inside a function', () => {
   it('asks for its module only when the function is used', () => {
     const lib = lazy("const dep = require('./dep.js');\n  return dep.used();");
     const found = reached({ 'index.js': use('used'), 'lib.js': lib, 'dep.js': dep });
@@ -98,6 +98,20 @@ describe('a require inside a function', () => {
       'dep.js': dep,
       'other.js': cjs(''),
     });
+    expect(found['dep.js']).toEqual(['node:fs.watch', 'node:fs.watchFile']);
+  });
+});
+
+describe('a destructuring assignment of a require inside a function', () => {
+  it('asks for the names that an assignment destructures', () => {
+    const lib = lazy("let dead;\n  ({ dead } = require('./dep.js'));\n  return dead();");
+    const found = reached({ 'index.js': use('lazy'), 'lib.js': lib, 'dep.js': dep });
+    expect(found['dep.js']).toEqual(['node:fs.watchFile']);
+  });
+
+  it('asks for all of the module when the assignment value is used', () => {
+    const lib = lazy("let dead;\n  const all = ({ dead } = require('./dep.js'));\n  return all;");
+    const found = reached({ 'index.js': use('lazy'), 'lib.js': lib, 'dep.js': dep });
     expect(found['dep.js']).toEqual(['node:fs.watch', 'node:fs.watchFile']);
   });
 });

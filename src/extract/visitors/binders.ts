@@ -75,8 +75,8 @@ export function bindDestructured(
   }
 }
 
-/** `const { crypto } = await import('./file')` or `require('./file')` binds the names that another file exports as a Node.js module. */
-export function bindLoadedNames(node: NodeOf<'VariableDeclarator'>, context: VisitContext): void {
+/** `const { crypto } = await import('./file')`, or `({ crypto } = await import('./file'))`, binds the names that another file exports as a Node.js module. */
+export function bindLoadedNames(node: Node, context: VisitContext): void {
   for (const kind of ['import', 'require'] as const) {
     const found = destructuredLoad(node, kind);
     for (const [local, name] of found?.names ?? []) {

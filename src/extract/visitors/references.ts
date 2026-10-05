@@ -6,7 +6,7 @@ import { globalRef, normalizeRef } from '@/extract/refs.ts';
 import { isTracked, lookup } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
-import { bindAssigned } from './declarators.ts';
+import { bindAssigned, bindDestructuredAssignment } from './declarators.ts';
 import { commonJsExportName, exportLocal, isWholeExports } from './modules.ts';
 
 export const visitIdentifier: Visitor<NodeOf<'Identifier'>> = (node, context) => {
@@ -98,6 +98,8 @@ export const visitAssignment: Visitor<NodeOf<'AssignmentExpression'>> = (node, c
     if (bindAssigned(node, context)) {
       return;
     }
+  } else if (bindDestructuredAssignment(node, context)) {
+    return;
   } else {
     context.visitPattern(node.left);
   }

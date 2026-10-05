@@ -55,6 +55,11 @@ export interface Usage {
   supplied?: true;
   /** Set when a `try` with a `catch` that does not throw again stops the error of this use, and no check guards it. */
   caught?: true;
+  /**
+   * Set when the code runs only after a load of this API's module, in a `try` whose `catch` stops
+   * the error of a missing module. It guards the use only on a target that lacks the whole module.
+   */
+  afterLoad?: true;
   /** The exports of the checked package that reach this usage, when only some of them do. Set with `byExport`. */
   exports?: string[];
   /** Set when the code only runs if the API exists, for example inside `if (x.y)`. */

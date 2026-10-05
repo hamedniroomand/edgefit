@@ -81,6 +81,27 @@ export function staticString(node: Node | null | undefined): string | undefined 
   return undefined;
 }
 
+/** The local names of `{ a, b: c = 1 }`, by the name they take, when every one is a plain name. */
+export function destructuredNames(pattern: Node): Map<string, string> | undefined {
+  if (pattern.type !== 'ObjectPattern') {
+    return undefined;
+  }
+  const taken = new Map<string, string>();
+  for (const property of pattern.properties) {
+    if (property.type === 'RestElement') {
+      return undefined;
+    }
+    const key = staticKey(property.key, property.computed);
+    const value =
+      property.value.type === 'AssignmentPattern' ? property.value.left : property.value;
+    if (key === undefined || value.type !== 'Identifier') {
+      return undefined;
+    }
+    taken.set(value.name, key);
+  }
+  return taken;
+}
+
 export function staticKey(node: Node, computed: boolean): string | undefined {
   if (!computed) {
     return node.type === 'Identifier' ? node.name : staticString(node);

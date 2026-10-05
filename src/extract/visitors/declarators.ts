@@ -126,6 +126,27 @@ export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, con
 };
 
 /**
+ * `({ watch } = require('node:fs'))` binds each name to the member it reads, as
+ * `const { watch } = require('node:fs')` does. A load of another file only binds the names.
+ */
+export function bindDestructuredAssignment(
+  node: NodeOf<'AssignmentExpression'>,
+  context: VisitContext,
+): boolean {
+  if (node.operator !== '=') {
+    return false;
+  }
+  bindLoadedNames(node, context);
+  const binding = resolveBinding(node.right, context);
+  if (!isBound(binding) || binding === 'require' || node.left.type !== 'ObjectPattern') {
+    return false;
+  }
+  context.visit(node.right);
+  bindDestructured(node.left, binding.ref, context);
+  return true;
+}
+
+/**
  * The one write to a name that `let c;` bound to a module, as in `let c; c = require('fs')`.
  * It is followed unless its value is used by the code around it, as in `use((c = require('fs')))`.
  * The declaration read the value in its own scope, so a name that this scope shadows unbinds `c`.

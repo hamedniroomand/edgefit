@@ -2,9 +2,9 @@ import type { Node } from 'oxc-parser';
 
 import type { NodeOf } from '@/extract/ast.ts';
 import { resolveBinding } from '@/extract/bindings.ts';
+import { catches, missingModuleCatch } from '@/extract/catches.ts';
 import { collectChecks } from '@/extract/checks.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
-import { catches } from '@/extract/guard-stack.ts';
 import { guardsAfter, guardsWhen } from '@/extract/guards.ts';
 import { isTracked } from '@/extract/scope.ts';
 
@@ -57,12 +57,17 @@ export function visitOptionalCallee(
  * `try` block counts as guarded for what is absent. The `catch` and `finally` blocks do not.
  */
 export const visitTry: Visitor<NodeOf<'TryStatement'>> = (node, context) => {
+  const codes = missingModuleCatch(node);
   if (catches(node)) {
     context.collector.guards.caught(() => {
       context.visit(node.block);
     });
-  } else {
+  } else if (codes === undefined) {
     context.visit(node.block);
+  } else {
+    context.collector.guards.withinMissing(codes, () => {
+      context.visit(node.block);
+    });
   }
   context.visit(node.handler);
   context.visit(node.finalizer);
