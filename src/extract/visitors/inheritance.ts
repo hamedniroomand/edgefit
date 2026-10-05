@@ -2,7 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import { resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext } from '@/extract/context.ts';
-import { displayRef, memberRef } from '@/extract/refs.ts';
+import { displayRef, extendedReason, memberRef } from '@/extract/refs.ts';
 import { isTracked } from '@/extract/scope.ts';
 
 /**
@@ -22,7 +22,7 @@ export function visitParentClass(parent: Node, context: VisitContext): void {
   context.collector.dynamic(
     memberRef(binding.ref, 'prototype'),
     displayRef(binding.ref),
-    'extended by a class, so its instance members may be used elsewhere',
+    extendedReason,
     parent.start,
   );
 }

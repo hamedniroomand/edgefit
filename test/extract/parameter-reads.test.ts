@@ -74,6 +74,71 @@ describe('a function that uses its parameter in another way', () => {
   });
 });
 
+describe('a module passed to a function that is called at once', () => {
+  it('counts the members that the function reads on the parameter', () => {
+    const usages = usagesOf(
+      `${log}(function (stream) {\n  stream.write('x');\n})(process.stderr);`,
+    );
+    expect(usages).toContain('api node:process.stderr.write');
+    expect(usages.filter(usage => usage.startsWith('dynamic'))).toEqual([]);
+  });
+
+  it('keeps the unknown when the parameter is passed to another function', () => {
+    const source = [
+      "const events = require('events');",
+      '(function (superClass) { other(Parser, superClass); })(events);',
+    ].join('\n');
+    expect(usagesOf(source)).toContain('dynamic node:events');
+  });
+
+  it('keeps the unknown when the parameter is assigned again', () => {
+    const usages = usagesOf(
+      `${log}(function (stream) {\n  stream = null;\n  stream.write('x');\n})(process.stderr);`,
+    );
+    expect(usages).toContain(unknown);
+  });
+});
+
+describe('a parameter that is a parent class', () => {
+  const events = "const events = require('events');\n";
+
+  it('counts a member of the parameter that a class extends', () => {
+    const usages = usagesOf(
+      `${events}module.exports = (function (mod) {\n  return class A extends mod.EventEmitter {};\n})(events);`,
+    );
+    expect(usages).toContain('api node:events.EventEmitter');
+    expect(usages).toContain('dynamic node:events.EventEmitter');
+    expect(usages).not.toContain('dynamic node:events');
+  });
+
+  it('reads a call, apply or bind of the parameter as the parameter itself', () => {
+    const source = [
+      "const { EventEmitter } = require('events');",
+      'function extend(child, parent) {',
+      '  function ctor() {}',
+      '  ctor.prototype = parent.prototype;',
+      '  child.prototype = new ctor();',
+      '}',
+      'module.exports = (function (Parent) {',
+      '  function Child() { Parent.call(this); }',
+      '  extend(Child, Parent);',
+      '  return Child;',
+      '})(EventEmitter);',
+    ].join('\n');
+    const usages = usagesOf(source);
+    expect(usages).toContain('dynamic node:events.EventEmitter');
+    expect(usages).not.toContain('api node:events.EventEmitter.call');
+  });
+});
+
+describe('an arrow that is called at once', () => {
+  it('counts the members that the arrow reads on the parameter', () => {
+    const usages = usagesOf(`${log}(stream => stream.write('x'))(process.stderr);`);
+    expect(usages).toContain('api node:process.stderr.write');
+    expect(usages.filter(usage => usage.startsWith('dynamic'))).toEqual([]);
+  });
+});
+
 describe('an object of modules that is passed to a function of the same file', () => {
   const wrap = "import http from 'node:http';\nimport https from 'node:https';\n";
 

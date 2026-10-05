@@ -1,12 +1,21 @@
 import type { ArrowFunctionExpression, Function as FunctionNode, Node } from 'oxc-parser';
 
-import { childNodes, staticKey, strip, unwrap } from './ast.ts';
+import { childNodes, invokers, staticKey, strip, unwrap } from './ast.ts';
 import { patternNames } from './declarations.ts';
 
 export type LocalFunction = FunctionNode | ArrowFunctionExpression;
 
-/** A member read on a parameter. `key` is the first key for an object parameter, `undefined` when it is not a string. */
-export type ParameterRead = { key: string | undefined; path: string[]; offset: number };
+/**
+ * A member read on a parameter. `key` is the first key for an object parameter, `undefined` when it
+ * is not a string. `extended` is set when the member is the parent class of a class. An empty
+ * `path` is a use of the parameter itself, such as `param.call(this)`.
+ */
+export type ParameterRead = {
+  key: string | undefined;
+  path: string[];
+  offset: number;
+  extended: boolean;
+};
 
 function isFunction(node: Node): node is LocalFunction {
   return (
@@ -92,15 +101,82 @@ function isWritten(node: Node, parent: Node | undefined): boolean {
   );
 }
 
-/** The read that starts at an identifier, or `undefined` when the name is used another way. */
+/** Whether `node` is `<name>.prototype`. */
+function isPrototypeOf(node: Node, name: string): boolean {
+  return (
+    node.type === 'MemberExpression' &&
+    node.object.type === 'Identifier' &&
+    node.object.name === name &&
+    keyOf(node) === 'prototype'
+  );
+}
+
+/** Whether `node`, or a node below it, passes `test`. */
+function someNode(node: Node, test: (item: Node) => boolean): boolean {
+  return test(node) || childNodes(node).some(child => someNode(child, test));
+}
+
+/**
+ * Whether a helper sets `child.prototype` and reads `parent.prototype`, as `extend(child, parent)`
+ * does. The other uses of `parent` in the helper are not followed, because the helper that
+ * CoffeeScript writes also loops over `parent` and passes it to `hasOwnProperty.call`.
+ */
+function isExtendHelper(helper: LocalFunction): boolean {
+  const [child, parent] = helper.params;
+  const { body } = helper;
+  if (child?.type !== 'Identifier' || parent?.type !== 'Identifier' || body === null) {
+    return false;
+  }
+  return (
+    someNode(
+      body,
+      node => node.type === 'AssignmentExpression' && isPrototypeOf(node.left, child.name),
+    ) && someNode(body, node => isPrototypeOf(node, parent.name))
+  );
+}
+
+/**
+ * Whether `node` is the parent class in `class extends node` or in `extend(Child, node)`. The
+ * `extend` function must be a function of the file that sets `child.prototype` and reads
+ * `parent.prototype`, as the helper that CoffeeScript writes does, whatever its name. A helper that
+ * only copies members, such as `Object.assign`, does not count.
+ */
+export function isParentClass(
+  node: Node,
+  parent: Node | undefined,
+  functions: ReadonlyMap<string, LocalFunction>,
+): boolean {
+  if (parent?.type === 'ClassDeclaration' || parent?.type === 'ClassExpression') {
+    return parent.superClass === node;
+  }
+  if (
+    parent?.type !== 'CallExpression' ||
+    parent.arguments[1] !== node ||
+    parent.arguments[0]?.type === 'SpreadElement'
+  ) {
+    return false;
+  }
+  const callee = strip(parent.callee);
+  const helper = callee.type === 'Identifier' ? functions.get(callee.name) : undefined;
+  return helper !== undefined && isExtendHelper(helper);
+}
+
+/**
+ * The read that starts at an identifier, or `undefined` when the name is used another way. A
+ * `.call`, `.apply` or `.bind` ends the chain as a use of the function before it. A chain that is
+ * the parent class of a class is a read with `extended` set.
+ */
 function readFrom(
   identifier: Node,
   ancestors: readonly Node[],
   keyed: boolean,
+  functions: ReadonlyMap<string, LocalFunction>,
 ): ParameterRead | undefined {
   const keys: string[] = [];
+  const minimum = keyed ? 1 : 0;
   let first: string | undefined;
-  let offset = 0;
+  let offset = identifier.start;
+  let invoked = false;
   let current = identifier;
   let parent: Node | undefined;
   for (let position = ancestors.length - 1; position >= 0; position -= 1) {
@@ -109,6 +185,12 @@ function readFrom(
       current = parent;
     } else if (parent?.type === 'MemberExpression' && parent.object === current) {
       const key = keyOf(parent);
+      if (key !== undefined && invokers.has(key) && keys.length >= minimum) {
+        invoked = true;
+        current = parent;
+        parent = ancestors[position - 1];
+        break;
+      }
       if (keyed && keys.length === 0) {
         first = key;
       } else if (key === undefined) {
@@ -122,22 +204,25 @@ function readFrom(
     }
     parent = undefined;
   }
-  const reads = keys.length > (keyed ? 1 : 0);
+  const extended = isParentClass(current, parent, functions);
+  const reads = invoked || extended ? keys.length >= minimum : keys.length > minimum;
   return reads && !isWritten(current, parent)
-    ? { key: first, path: keyed ? keys.slice(1) : keys, offset }
+    ? { key: first, path: keyed ? keys.slice(1) : keys, offset, extended }
     : undefined;
 }
 
 /**
  * The member reads that a function makes on one of its parameters, when every use of the
  * parameter is such a read: `param.a.b`. For an object parameter (`keyed`), a read is `param[key].a`
- * or `param.key.a`. A parameter that is stored, passed on, returned, set, or read with a computed key
- * that is not a string gives `undefined`.
+ * or `param.key.a`. A parameter, or a member of it, that is the parent class of a class gives a read
+ * with `extended` set. A parameter that is stored, passed on, returned, set, or read with a computed
+ * key that is not a string gives `undefined`.
  */
 export function parameterReads(
   fn: LocalFunction,
   index: number,
   keyed: boolean,
+  functions: ReadonlyMap<string, LocalFunction>,
 ): ParameterRead[] | undefined {
   const param = fn.params[index];
   if (param?.type !== 'Identifier' || fn.body === null) {
@@ -154,7 +239,7 @@ export function parameterReads(
       return false;
     }
     if (isReference) {
-      const read = readFrom(node, ancestors, keyed);
+      const read = readFrom(node, ancestors, keyed, functions);
       if (read === undefined) {
         return false;
       }

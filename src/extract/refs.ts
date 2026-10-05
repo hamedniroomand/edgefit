@@ -4,10 +4,24 @@ import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef } from '@/types.ts';
 
 import { destructuredNames, staticKey, strip, unwrap } from './ast.ts';
-import { parameterReads } from './local-functions.ts';
+import { isParentClass, parameterReads } from './local-functions.ts';
 import type { LocalFunction, ParameterRead } from './local-functions.ts';
 
+function calledFunction(
+  callee: Node,
+  functions: ReadonlyMap<string, LocalFunction>,
+): LocalFunction | undefined {
+  if (callee.type === 'Identifier') {
+    return functions.get(callee.name);
+  }
+  return callee.type === 'FunctionExpression' || callee.type === 'ArrowFunctionExpression'
+    ? callee
+    : undefined;
+}
+
 export const globalAliases = new Set(['global', 'globalThis', 'self']);
+
+export const extendedReason = 'extended by a class, so its instance members may be used elsewhere';
 
 // Helpers that wrap `require()` results in Babel, TypeScript, esbuild and Rollup output.
 const interopHelpers = new Set([
@@ -245,7 +259,9 @@ export function isPromiseApi(ref: ApiRef): boolean {
 /**
  * The member reads that the function of the file makes on the parameter that a value is passed to.
  * The value is an argument, or the value of a property of an object literal that is an argument.
- * `parent` is the parent of `node`, and `outer` holds the ancestors above it, nearest first.
+ * A value that is the parent class in `extend(Child, value)`, through a helper of the file, is one
+ * read with `extended` set. `parent` is the parent of `node`, and `outer` holds the ancestors above
+ * it, nearest first.
  */
 export function findParameterReads(
   node: Node,
@@ -259,17 +275,20 @@ export function findParameterReads(
     parent.value === node &&
     grand?.type === 'ObjectExpression' &&
     great?.type === 'CallExpression';
+  if (!inObject && isParentClass(node, parent, functions)) {
+    return [{ key: undefined, path: [], offset: node.start, extended: true }];
+  }
   const call = inObject ? great : parent;
   const argument = inObject ? grand : node;
   const key = inObject ? staticKey(parent.key, parent.computed) : undefined;
   const callee = call.type === 'CallExpression' ? strip(call.callee) : undefined;
-  const fn = callee?.type === 'Identifier' ? functions.get(callee.name) : undefined;
+  const fn = callee === undefined ? undefined : calledFunction(callee, functions);
   const index =
     call.type === 'CallExpression' ? call.arguments.findIndex(item => item === argument) : -1;
   if (fn === undefined || index < 0 || (inObject && key === undefined)) {
     return undefined;
   }
-  return parameterReads(fn, index, inObject)?.filter(
+  return parameterReads(fn, index, inObject, functions)?.filter(
     read => !inObject || read.key === undefined || read.key === key,
   );
 }

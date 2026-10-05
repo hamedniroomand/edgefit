@@ -45,6 +45,9 @@ const transparentNodes = new Set([
   'TSTypeAssertion',
 ]);
 
+/** Members that call a function: `fn.call(...)` uses `fn` itself, so `call` is not part of the API. */
+export const invokers = new Set(['apply', 'bind', 'call']);
+
 export function isTypeOnly(node: Node): boolean {
   if (node.type.startsWith('TS') && !runtimeTsNodes.has(node.type)) {
     return true;
