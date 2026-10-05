@@ -14,7 +14,6 @@ describe('collectWrites', () => {
   it.each([
     ['a declaration', "let m = 'a';", ["'a'"]],
     ['each assignment', "let m = 'a';\nm = 'b';\nm ||= 'c';", ["'a'", "'b'", "'c'"]],
-    ['a write in a nested function', "let m = 'a';\nfunction f() { m = 'b'; }", ["'a'", "'b'"]],
   ])('records the value of %s', (_name, source, values) => {
     expect(writtenTo(source, 'm')).toEqual(values);
   });
@@ -27,6 +26,7 @@ describe('collectWrites', () => {
     ['a destructuring assignment', "let m = 'a';\n[m] = list;"],
     ['a destructuring declaration', 'var { m } = object;'],
     ['a loop head', "let m = 'a';\nfor (m of list) {}"],
+    ['a write in a nested function', "let m = 'a';\nfunction f() { m = 'b'; }"],
     ['a declaration in a loop head', 'for (const m in object) {}'],
     ['a write after one with an unknown value', "let m = 'a';\nm += 'b';\nm = 'c';"],
   ])('marks the value unknown after %s', (_name, source) => {

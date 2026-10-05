@@ -3,6 +3,7 @@ import type { Node } from 'oxc-parser';
 import { displayApi } from '@/data/builtins.ts';
 import type { ApiRef, Location, RuntimeCondition, Usage } from '@/types.ts';
 
+import type { ComputedKey } from './chain.ts';
 import { GuardStack } from './guard-stack.ts';
 import type { LocalFunction } from './local-functions.ts';
 import { omitMainFunctions } from './main-only.ts';
@@ -64,7 +65,7 @@ export class UsageCollector {
   }
 
   /** `key` is the name that holds the key of a computed read, which a check of the same read guards. */
-  public api(ref: ApiRef, offset: number, awaited = false, key?: string): void {
+  public api(ref: ApiRef, offset: number, awaited = false, key?: ComputedKey): void {
     if (this.guards.dead()) {
       return;
     }

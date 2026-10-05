@@ -3,7 +3,7 @@ import type { Node } from 'oxc-parser';
 import type { ApiRef } from '@/types.ts';
 
 import { childNodes, isTypeOnly } from './ast.ts';
-import { computedKeyName, followChain, isCheckedOperand, isTestedChain } from './chain.ts';
+import { computedKey, followChain, isCheckedOperand, isTestedChain } from './chain.ts';
 import type { VisitContext } from './context.ts';
 import {
   displayRef,
@@ -156,7 +156,7 @@ export class Walker implements VisitContext {
     const tested =
       chain.memberParent !== undefined && isOnlyTested(chain.member, chain.memberParent, chain.ref);
     if (chain.keys !== undefined) {
-      const through = computedKeyName(chain.member);
+      const through = computedKey(chain.member, this.scope);
       for (const key of tested ? [] : chain.keys) {
         this.collector.api(memberRef(chain.ref, key), chain.propertyOffset, false, through);
       }

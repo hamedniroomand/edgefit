@@ -3,7 +3,7 @@ import type { Node } from 'oxc-parser';
 import { childNodes } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 
-const functionTypes = new Set([
+export const functionTypes = new Set([
   'FunctionDeclaration',
   'FunctionExpression',
   'ArrowFunctionExpression',

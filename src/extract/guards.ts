@@ -6,7 +6,7 @@ import { absentGuard, guardFor } from './api-guards.ts';
 import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import type { BindingContext } from './bindings.ts';
-import { computedKeyName, computedKeys } from './chain.ts';
+import { computedKey, computedKeys } from './chain.ts';
 import { heldCheck } from './checks.ts';
 import { constantOf } from './constants.ts';
 import type { Guard } from './guard-stack.ts';
@@ -71,7 +71,7 @@ function keyedPresence(
   present: boolean,
   context: BindingContext,
 ): Guard[] {
-  const key = computedKeyName(node);
+  const key = computedKey(node, context.scope);
   if (key === undefined || !present) {
     return [];
   }

@@ -91,6 +91,13 @@ export function lookupKeys(scope: Scope | undefined, name: string): readonly str
   );
 }
 
+/** The scope that declares `name`, so a nearer declaration of the same word is another name. */
+export function declaringScope(scope: Scope, name: string): Scope {
+  return scope.parent === undefined || scope.names.has(name)
+    ? scope
+    : declaringScope(scope.parent, name);
+}
+
 /** The known object a name holds, unless a nearer declaration of the name shadows it. */
 export function lookupObject(scope: Scope | undefined, name: string): KnownObject | undefined {
   if (scope === undefined) {
