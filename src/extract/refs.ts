@@ -7,7 +7,21 @@ import { destructuredNames, staticKey, strip, unwrap } from './ast.ts';
 import { parameterReads } from './local-functions.ts';
 import type { LocalFunction, ParameterRead } from './local-functions.ts';
 
+function calledFunction(
+  callee: Node,
+  functions: ReadonlyMap<string, LocalFunction>,
+): LocalFunction | undefined {
+  if (callee.type === 'Identifier') {
+    return functions.get(callee.name);
+  }
+  return callee.type === 'FunctionExpression' || callee.type === 'ArrowFunctionExpression'
+    ? callee
+    : undefined;
+}
+
 export const globalAliases = new Set(['global', 'globalThis', 'self']);
+
+export const extendedReason = 'extended by a class, so its instance members may be used elsewhere';
 
 // Helpers that wrap `require()` results in Babel, TypeScript, esbuild and Rollup output.
 const interopHelpers = new Set([
@@ -263,13 +277,13 @@ export function findParameterReads(
   const argument = inObject ? grand : node;
   const key = inObject ? staticKey(parent.key, parent.computed) : undefined;
   const callee = call.type === 'CallExpression' ? strip(call.callee) : undefined;
-  const fn = callee?.type === 'Identifier' ? functions.get(callee.name) : undefined;
+  const fn = callee === undefined ? undefined : calledFunction(callee, functions);
   const index =
     call.type === 'CallExpression' ? call.arguments.findIndex(item => item === argument) : -1;
   if (fn === undefined || index < 0 || (inObject && key === undefined)) {
     return undefined;
   }
-  return parameterReads(fn, index, inObject)?.filter(
+  return parameterReads(fn, index, inObject, functions)?.filter(
     read => !inObject || read.key === undefined || read.key === key,
   );
 }

@@ -23,39 +23,39 @@ describe('a class that extends a Node.js class', () => {
 
 const reason = 'extended by a class, so its instance members may be used elsewhere';
 
-describe('a class whose data lacks an instance member', () => {
-  const tree = {
-    '*self*': 'object',
-    default: { '*self*': 'function', prototype: { emit: 'function' } },
-  };
-  const index = new CompatIndex(
+const tree = {
+  '*self*': 'object',
+  default: { '*self*': 'function', prototype: { emit: 'function' } },
+};
+const index = new CompatIndex(
+  {
+    baseline: { events: tree },
+    runtime: { events: tree },
+    source: { provider: 'test', version: '1' },
+  },
+  [
     {
-      baseline: { events: tree },
-      runtime: { events: tree },
+      target: 'workerd',
+      module: 'events',
+      path: ['prototype', 'emit'],
+      status: 'unsupported',
       source: { provider: 'test', version: '1' },
     },
-    [
-      {
-        target: 'workerd',
-        module: 'events',
-        path: ['prototype', 'emit'],
-        status: 'unsupported',
-        source: { provider: 'test', version: '1' },
-      },
-    ],
+  ],
+);
+const target: Target = {
+  ...stubTarget(),
+  lookup: api => index.lookup(api),
+  hasProblemsBelow: api => index.hasProblemsBelow(api),
+};
+
+function details(source: string): (string | undefined)[] {
+  return extractUsages('src/input.ts', source, { globals: new Set(), nodeEnv: 'production' }).map(
+    usage => classify(usage, target)?.detail,
   );
-  const target: Target = {
-    ...stubTarget(),
-    lookup: api => index.lookup(api),
-    hasProblemsBelow: api => index.hasProblemsBelow(api),
-  };
+}
 
-  function details(source: string): (string | undefined)[] {
-    return extractUsages('src/input.ts', source, { globals: new Set(), nodeEnv: 'production' }).map(
-      usage => classify(usage, target)?.detail,
-    );
-  }
-
+describe('a class whose data lacks an instance member', () => {
   it('still warns for a class that extends the parent', () => {
     expect(details("import E from 'events';\nclass A extends E {}")).toContain(
       `cannot be checked statically: ${reason}`,
@@ -65,5 +65,56 @@ describe('a class whose data lacks an instance member', () => {
   it('still warns for util.inherits', () => {
     const source = "import E from 'events';\nimport { inherits } from 'util';\ninherits(A, E);";
     expect(details(source)).toContain(`cannot be checked statically: ${reason}`);
+  });
+});
+
+const passed = 'passed on as a value, so its members may be used elsewhere';
+
+describe('a parameter of a function that is called at once and is a parent class', () => {
+  const events = "const events = require('events');\n";
+
+  it('warns as a parent class for a class that extends the parameter', () => {
+    const source = `${events}module.exports = (function (Base) {\n  return class A extends Base {};\n})(events);`;
+    const found = details(source);
+    expect(found).toContain(`cannot be checked statically: ${reason}`);
+    expect(found).not.toContain(`cannot be checked statically: ${passed}`);
+  });
+
+  it('warns as a parent class for the extend helper of CoffeeScript', () => {
+    const source = [
+      'var extend = function (child, parent) {',
+      '  function ctor() {}',
+      '  ctor.prototype = parent.prototype;',
+      '  child.prototype = new ctor();',
+      '};',
+      `${events}exports.A = (function (superClass) {`,
+      '  extend(A, superClass);',
+      '  function A() {}',
+      '  return A;',
+      '})(events);',
+    ].join('\n');
+    const found = details(source);
+    expect(found).toContain(`cannot be checked statically: ${reason}`);
+    expect(found).not.toContain(`cannot be checked statically: ${passed}`);
+  });
+
+  it('keeps the value passed on for an extend with no parent parameter', () => {
+    const source = `function extend(child) {\n  child.prototype = {};\n}\n${events}(function (src) { extend(config, src); })(events);`;
+    expect(details(source)).toContain(`cannot be checked statically: ${passed}`);
+  });
+
+  it('keeps the value passed on for an extend that does not read the parent prototype', () => {
+    const source = `function extend(child, parent) {\n  child.prototype = {};\n}\n${events}(function (src) { extend(config, src); })(events);`;
+    expect(details(source)).toContain(`cannot be checked statically: ${passed}`);
+  });
+
+  it('keeps the value passed on for an extend of the file that only copies members', () => {
+    const source = `function extend(target, source) {\n  Object.assign(target, source);\n}\n${events}(function (src) { extend(config, src); })(events);`;
+    expect(details(source)).toContain(`cannot be checked statically: ${passed}`);
+  });
+
+  it('keeps the value passed on for an extend that is not a function of the file', () => {
+    const source = `const { extend } = require('lodash');\n${events}(function (src) { extend(config, src); })(events);`;
+    expect(details(source)).toContain(`cannot be checked statically: ${passed}`);
   });
 });

@@ -8,6 +8,7 @@ import type { VisitContext } from './context.ts';
 import {
   displayRef,
   escapes,
+  extendedReason,
   findParameterReads,
   isFeatureCheck,
   isAwaitedCall,
@@ -189,7 +190,12 @@ export class Walker implements VisitContext {
   readonly #followIntoFunction = (ref: ApiRef, node: Node, parent: Node): boolean => {
     const reads = findParameterReads(node, parent, this.#outer(node), this.functions);
     for (const read of reads ?? []) {
-      this.collector.api({ ...ref, path: [...ref.path, ...read.path] }, read.offset);
+      const member = { ...ref, path: [...ref.path, ...read.path] };
+      if (read.extended === true) {
+        this.collector.dynamic(member, displayRef(ref), extendedReason, read.offset);
+      } else {
+        this.collector.api(member, read.offset);
+      }
     }
     return reads !== undefined;
   };
