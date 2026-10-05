@@ -50,6 +50,7 @@ A `require` can be wrapped in a helper that compiled code adds. These helpers pa
 - `_interop_require_default` and `_interop_require_wildcard`, as functions or as `@swc/helpers` members (`_interop_require_default._(require('dep'))`)
 - `_export_star`, `__exportStar` and `__reExport`
 - `__importDefault`, `__importStar` and `__exportStar`, as `tsc` defines them or as members of `tslib`
+- `__toESM` and `__toModule`, as esbuild defines them
 
 Any other wrapper asks for all of the module.
 

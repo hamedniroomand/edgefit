@@ -31,3 +31,25 @@ describe('a call through a sequence expression', () => {
     expect(lib(`${fs}use((0, ns.readFile));`)).toContain('dynamic node:fs.readFile');
   });
 });
+
+describe('the __toModule helper of esbuild before 0.14', () => {
+  const util = "var import_util = __toModule(require('util'));\n";
+
+  it('counts the module and the members that the code reads from it', () => {
+    expect(lib(`${util}import_util.inspect({});`)).toEqual([
+      'api node:util',
+      'api node:util.inspect',
+    ]);
+    expect(lib(`${util}import_util.default.inspect({});`)).toEqual([
+      'api node:util',
+      'api node:util.inspect',
+    ]);
+  });
+
+  it('leaves a call of a helper that is not known as unknown', () => {
+    expect(lib("var import_util = __toSomething(require('util'));")).toEqual([
+      'api node:util',
+      'dynamic node:util',
+    ]);
+  });
+});

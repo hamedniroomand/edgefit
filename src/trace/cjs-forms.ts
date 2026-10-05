@@ -15,6 +15,7 @@ export const interopWrappers = new Set([
   '_interop_require_default',
   '_interop_require_wildcard',
   '__toESM',
+  '__toModule',
   '__importDefault',
   '__importStar',
 ]);
