@@ -65,6 +65,7 @@ edgefit could not determine what is used. Typical causes:
 - a module the compatibility data does not cover
 - a `jsr:` import on Deno
 - an import of an optional peer dependency that is not installed. Edgefit does not install peers, so what the peer provides is not checked
+- a `require('module')` inside a function when the module is not installed. The finding names the module and the call location. A top-level load of a missing module still stops the check
 
 A `require()` or `import()` of a name that the user of the code gives, such as a parameter, is not an `unknown` finding. It is a note, because the code does not choose the module. See [packages](/guide/packages#modules-that-the-user-names). An `unknown` finding is only reported when the access could reach something unsupported. Computed access on a module that is fully supported on the target is not reported.
 

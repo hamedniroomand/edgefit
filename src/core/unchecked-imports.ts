@@ -1,4 +1,5 @@
 import { UsageCollector } from '@/extract/usage-collector.ts';
+import { lazyRequires } from '@/resolve/missing-requires.ts';
 import { moduleName } from '@/resolve/optional-peers.ts';
 import { jsrSpecifier } from '@/targets/deno/import-map.ts';
 import type { Usage } from '@/types.ts';
@@ -20,6 +21,7 @@ export function uncheckedImports(
   source: string,
   externals: readonly string[],
   missingPeers: readonly string[] = [],
+  missingRequires: readonly string[] = [],
 ): Usage[] {
   const collector = new UsageCollector(file, source);
   for (const specifier of externals) {
@@ -33,6 +35,15 @@ export function uncheckedImports(
   for (const specifier of missingPeers) {
     const reason = `optional peer dependency ${moduleName(specifier)} is not installed, so what it provides is not checked`;
     collector.dynamic(undefined, specifier, reason, importOffset(source, specifier, specifier));
+  }
+  if (missingRequires.length > 0) {
+    const loads = lazyRequires(file, source);
+    for (const specifier of new Set(missingRequires)) {
+      const reason = `module ${moduleName(specifier)} is not installed, so what it provides is not checked`;
+      for (const offset of loads.get(specifier) ?? []) {
+        collector.dynamic(undefined, specifier, reason, offset);
+      }
+    }
   }
   return collector.usages;
 }

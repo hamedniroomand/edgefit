@@ -139,7 +139,13 @@ export function extractScripts(
         dropFollowed(second, aliases?.followed.get(file)),
         native.covers(file),
       ),
-      unchecked: uncheckedImports(toPosix(file), source, module.externals, peers(module, options)),
+      unchecked: uncheckedImports(
+        toPosix(file),
+        source,
+        module.externals,
+        peers(module, options),
+        module.missingRequires,
+      ),
     };
   });
 }
