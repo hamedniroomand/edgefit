@@ -118,3 +118,32 @@ describe('a parameter of a function that is called at once and is a parent class
     expect(details(source)).toContain(`cannot be checked statically: ${passed}`);
   });
 });
+
+describe('an extend helper of the file with another name or called with the module', () => {
+  const helper = [
+    'var __extends = function (child, parent) {',
+    '  function ctor() {}',
+    '  ctor.prototype = parent.prototype;',
+    '  child.prototype = new ctor();',
+    '};',
+    "const events = require('events');",
+  ].join('\n');
+
+  it('warns as a parent class for a helper with another name', () => {
+    const source = `${helper}\n(function (superClass) {\n  __extends(A, superClass);\n})(events);`;
+    const found = details(source);
+    expect(found).toContain(`cannot be checked statically: ${reason}`);
+    expect(found).not.toContain(`cannot be checked statically: ${passed}`);
+  });
+
+  it('warns as a parent class for a helper called with the module itself', () => {
+    const found = details(`${helper}\nfunction A() {}\n__extends(A, events);`);
+    expect(found).toContain(`cannot be checked statically: ${reason}`);
+    expect(found).not.toContain(`cannot be checked statically: ${passed}`);
+  });
+
+  it('does not count the module after a spread, whose position is not known', () => {
+    const found = details(`${helper}\n__extends(...pair, events);`);
+    expect(found).not.toContain(`cannot be checked statically: ${reason}`);
+  });
+});

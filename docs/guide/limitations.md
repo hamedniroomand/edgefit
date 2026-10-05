@@ -108,7 +108,7 @@ Mapping findings to packages needs sourcemaps. Without them, edgefit reads the `
 
 ## Static members of a parent class
 
-A class that extends a Node.js class, or that is set up with `util.inherits`, counts as a use of that class and its instance members. This includes a parameter of a function that the code calls at once with the module, when the parameter is the parent class of `class extends`, or of an `extend(Child, parent)` function of the same file that sets `Child.prototype` and reads `parent.prototype`, as CoffeeScript writes. An `extend` that only copies members, such as with `Object.assign`, passes the module on. The rest of the module is not reported as `unknown`. edgefit does not check a static member that you call through the subclass. Call it on the parent class, for example `EventEmitter.init()`, to have it checked.
+A class that extends a Node.js class, or that is set up with `util.inherits`, counts as a use of that class and its instance members. A helper of the same file that sets `Child.prototype` and reads `parent.prototype`, such as the `extend(Child, parent)` that CoffeeScript writes, counts the same way, whatever its name. So does a parameter of a function that the code calls at once with the module, when the parameter or a member of it is the parent class. A helper that only copies members, such as with `Object.assign`, passes the module on. A `.call`, `.apply` or `.bind` of the parameter is a use of the parameter itself. The rest of the module is not reported as `unknown`. edgefit does not check a static member that you call through the subclass. Call it on the parent class, for example `EventEmitter.init()`, to have it checked.
 
 ## Deno: `jsr:` packages
 

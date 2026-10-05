@@ -99,6 +99,38 @@ describe('a module passed to a function that is called at once', () => {
   });
 });
 
+describe('a parameter that is a parent class', () => {
+  const events = "const events = require('events');\n";
+
+  it('counts a member of the parameter that a class extends', () => {
+    const usages = usagesOf(
+      `${events}module.exports = (function (mod) {\n  return class A extends mod.EventEmitter {};\n})(events);`,
+    );
+    expect(usages).toContain('api node:events.EventEmitter');
+    expect(usages).toContain('dynamic node:events.EventEmitter');
+    expect(usages).not.toContain('dynamic node:events');
+  });
+
+  it('reads a call, apply or bind of the parameter as the parameter itself', () => {
+    const source = [
+      "const { EventEmitter } = require('events');",
+      'function extend(child, parent) {',
+      '  function ctor() {}',
+      '  ctor.prototype = parent.prototype;',
+      '  child.prototype = new ctor();',
+      '}',
+      'module.exports = (function (Parent) {',
+      '  function Child() { Parent.call(this); }',
+      '  extend(Child, Parent);',
+      '  return Child;',
+      '})(EventEmitter);',
+    ].join('\n');
+    const usages = usagesOf(source);
+    expect(usages).toContain('dynamic node:events.EventEmitter');
+    expect(usages).not.toContain('api node:events.EventEmitter.call');
+  });
+});
+
 describe('an arrow that is called at once', () => {
   it('counts the members that the arrow reads on the parameter', () => {
     const usages = usagesOf(`${log}(stream => stream.write('x'))(process.stderr);`);

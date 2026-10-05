@@ -185,16 +185,19 @@ export class Walker implements VisitContext {
 
   /**
    * A value passed to a function of the file that only reads members of that parameter is a use
-   * of those members. The same goes for a value in an object literal that is passed that way.
+   * of those members. The same goes for a value in an object literal that is passed that way. A
+   * member that a class extends is a use of the class and of its instance members.
    */
   readonly #followIntoFunction = (ref: ApiRef, node: Node, parent: Node): boolean => {
     const reads = findParameterReads(node, parent, this.#outer(node), this.functions);
     for (const read of reads ?? []) {
       const member = { ...ref, path: [...ref.path, ...read.path] };
-      if (read.extended === true) {
-        this.collector.dynamic(member, displayRef(ref), extendedReason, read.offset);
-      } else {
+      if (read.path.length > 0) {
         this.collector.api(member, read.offset);
+      }
+      if (read.extended) {
+        const instances = memberRef(member, 'prototype');
+        this.collector.dynamic(instances, displayRef(member), extendedReason, read.offset);
       }
     }
     return reads !== undefined;

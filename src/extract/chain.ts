@@ -2,15 +2,13 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef } from '@/types.ts';
 
-import { isSymbolKey, staticKey, strip, unwrap } from './ast.ts';
+import { invokers, isSymbolKey, staticKey, strip, unwrap } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import { keysOf } from './known-values.ts';
 import { memberRef } from './refs.ts';
 import { declaringScope, isTracked, lookupSymbol } from './scope.ts';
 import type { Scope } from './scope.ts';
-
-const invokers = new Set(['apply', 'bind', 'call']);
 
 export type ChainResult =
   | {
