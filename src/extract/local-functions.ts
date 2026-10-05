@@ -50,11 +50,26 @@ export function declared(node: Node): { names: string[]; fn?: LocalFunction } {
   return { names: [] };
 }
 
-/**
- * The functions of a file that a plain name stands for: `function f() {}` or `const f = () => {}`.
- * A name that anything else in the file declares, as a parameter or a variable, is left out.
- */
-export function findLocalFunctions(body: readonly Node[]): Map<string, LocalFunction> {
+/** How many times the file declares each name, as a variable, function, parameter, class or catch. */
+export function declarationCounts(body: readonly Node[]): Map<string, number> {
+  const { counts } = walkDeclarations(body);
+  const pending = [...body];
+  for (let node = pending.pop(); node !== undefined; node = pending.pop()) {
+    // `declared` gives the name of a function declaration but not its parameters.
+    for (const name of node.type === 'FunctionDeclaration'
+      ? node.params.flatMap(param => patternNames(param))
+      : []) {
+      counts.set(name, (counts.get(name) ?? 0) + 1);
+    }
+    pending.push(...childNodes(node));
+  }
+  return counts;
+}
+
+function walkDeclarations(body: readonly Node[]): {
+  counts: Map<string, number>;
+  functions: Map<string, LocalFunction>;
+} {
   const counts = new Map<string, number>();
   const functions = new Map<string, LocalFunction>();
   const pending = [...body];
@@ -69,6 +84,15 @@ export function findLocalFunctions(body: readonly Node[]): Map<string, LocalFunc
     }
     pending.push(...childNodes(node));
   }
+  return { counts, functions };
+}
+
+/**
+ * The functions of a file that a plain name stands for: `function f() {}` or `const f = () => {}`.
+ * A name that anything else in the file declares, as a parameter or a variable, is left out.
+ */
+export function findLocalFunctions(body: readonly Node[]): Map<string, LocalFunction> {
+  const { counts, functions } = walkDeclarations(body);
   for (const [name, count] of counts) {
     if (count > 1) {
       functions.delete(name);

@@ -151,3 +151,20 @@ export function bindCallbackKeys(
     bindElements(scope, first.name, callee.object, fn.body, outer);
   }
 }
+
+/** A parameter holds each string that the calls of its function pass, and each value its body writes to it. */
+export function bindParameterKeys(
+  fn: FunctionNode,
+  passed: ReadonlyMap<number, readonly string[]> | undefined,
+  scope: Scope,
+): void {
+  const writes = passed === undefined || fn.body === null ? undefined : collectWrites([fn.body]);
+  for (const [index, keys] of passed ?? []) {
+    const param = fn.params[index];
+    const written = param?.type === 'Identifier' ? writes?.get(param.name) : null;
+    if (param?.type === 'Identifier' && written !== null) {
+      const all = unionKeys([keys, ...(written ?? []).map(value => keysOf(value, scope))]);
+      if (all !== undefined) scope.keys.set(param.name, all);
+    }
+  }
+}

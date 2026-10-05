@@ -6,8 +6,8 @@ import type { ModuleShape } from '@/trace/shape.ts';
 import type { ApiRef, Usage } from '@/types.ts';
 
 import { findAssigned } from './assigned.ts';
+import { findFunctions } from './call-keys.ts';
 import { findImportWrappers } from './import-wrappers.ts';
-import { findLocalFunctions } from './local-functions.ts';
 import { findSuppliedLoads } from './supplied-loads.ts';
 import { typeOnlyImports } from './type-only-imports.ts';
 import { UsageCollector } from './usage-collector.ts';
@@ -112,7 +112,7 @@ export function extractModule(
     options.keepUnusedImports === true || !isTypeScript(file)
       ? new Set<string>()
       : typeOnlyImports(body);
-  const functions = findLocalFunctions(body);
+  const { functions, callKeys } = findFunctions(body);
   const walker = new Walker(
     collector,
     options.globals,
@@ -122,6 +122,7 @@ export function extractModule(
     findImportWrappers(body),
     functions,
     findSuppliedLoads(body, functions),
+    callKeys,
     options.imported,
   );
   walker.visit(result.program as Node);

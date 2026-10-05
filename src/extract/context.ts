@@ -3,6 +3,7 @@ import type { Node } from 'oxc-parser';
 import type { ApiRef } from '@/types.ts';
 
 import type { BindingContext } from './bindings.ts';
+import type { CallKeys } from './call-keys.ts';
 import type { LocalFunction } from './local-functions.ts';
 import type { Scope } from './scope.ts';
 import type { UsageCollector } from './usage-collector.ts';
@@ -17,6 +18,8 @@ export interface VisitContext extends BindingContext {
   readonly supplied: ReadonlySet<Node>;
   /** The functions that a plain name of the file stands for, see `findLocalFunctions`. */
   readonly functions: ReadonlyMap<string, LocalFunction>;
+  /** The strings that each parameter of a local function holds, from `findCallKeys`. */
+  readonly callKeys: CallKeys;
   visit: (node: Node | null | undefined) => void;
   visitAll: (nodes: readonly (Node | null)[]) => void;
   visitChildren: (node: Node) => void;
