@@ -26,8 +26,8 @@ function returnedValue(fn: FunctionNode): Node | undefined {
  * `const isDeno = typeof Deno !== 'undefined'`, or
  * `function hasWatch() { return typeof fs.watch === 'function'; }`.
  * ponytail: a helper with parameters is not followed; substituting them needs the call's arguments.
- * ponytail: a `var` in a nested block is checked for writes in that block only, so a closure in the
- * block can miss a write outside it. Upgrade: scan the enclosing function body for a `var`.
+ * ponytail: the scan of a `var` in a nested block covers writes in that block only, so a closure in
+ * the block can miss a write outside it. Upgrade: scan the enclosing function body for a `var`.
  */
 export function collectChecks(statements: readonly Node[], scope: Scope): void {
   for (const statement of statements) {

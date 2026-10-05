@@ -49,11 +49,14 @@ function guardFor(node: Node, context: BindingContext, key?: string): ApiGuard[]
 }
 
 /**
- * The module that a truthy value shows. Only a truthy read counts: Node.js sets `process.domain`
- * to `null` before the module loads, so `typeof` and `in` checks pass without it.
+ * The module that a set value shows. Only a set value counts: Node.js sets `process.domain` to
+ * `null` before the module loads, so `typeof`, `in` and `!== undefined` checks pass without it.
  */
-function moduleGuards(node: Node, context: BindingContext): Guard[] {
-  return guardFor(node, context).flatMap(guard => {
+function moduleGuards(guards: readonly Guard[]): Guard[] {
+  return guards.flatMap(guard => {
+    if (guard.kind !== 'api') {
+      return [];
+    }
     const module = setByModule[[guard.ref.module, ...guard.ref.path].join('.')];
     return module === undefined ? [] : [{ ...guard, ref: module }];
   });
@@ -162,7 +165,11 @@ function comparisonGuard(
   if (!left && !isNullish(node.right)) {
     return undefined;
   }
-  return presence(left ? node.right : node.left, !equal, context);
+  const known = presence(left ? node.right : node.left, !equal, context);
+  // `!= null`, `!= undefined` and `!== null` rule out `null`; `!== undefined` does not.
+  const loose = node.operator === '==' || node.operator === '!=';
+  const rulesOutNull = loose || strip(left ? node.left : node.right).type === 'Literal';
+  return !equal && rulesOutNull ? [...known, ...moduleGuards(known)] : known;
 }
 
 /** What a call of a helper, or a read of a `const`, tells: the facts of the check it holds. */
@@ -247,10 +254,11 @@ export function guardsWhen(test: Node, truth: boolean, context: BindingContext):
       return guards;
     }
   }
+  const known = presence(node, truth, context);
   return [
     ...checkGuards(node, truth, context),
-    ...presence(node, truth, context),
-    ...(truth ? moduleGuards(node, context) : []),
+    ...known,
+    ...(truth ? moduleGuards(known) : []),
     ...optionalObject(node, truth, context),
   ];
 }

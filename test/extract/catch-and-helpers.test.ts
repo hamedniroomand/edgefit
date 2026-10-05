@@ -184,10 +184,19 @@ describe('usages behind a value that only a module sets', () => {
   });
 
   it.each([
+    ['a loose null check', "if (process.domain != null) require('domain');"],
+    ['a strict null check', "if (process.domain !== null) require('domain');"],
+    ['a loose undefined check', "if (process.domain != undefined) require('domain');"],
+    ['the else of a null check', "if (process.domain == null) {} else require('domain');"],
+  ])('guards the domain module behind %s', (_, source) => {
+    expect(usagesOf(source)).toContain('api node:domain [guarded]');
+  });
+
+  it.each([
     ['no check', "require('domain');"],
     ['a typeof check', "if (typeof process.domain !== 'undefined') require('domain');"],
     ['an in check', "if ('domain' in process) require('domain');"],
-    ['a null check', "if (process.domain != null) require('domain');"],
+    ['a strict undefined check', "if (process.domain !== undefined) require('domain');"],
     ['a falsy read', "if (!process.domain) require('domain');"],
   ])('does not guard the domain module behind %s', (_, source) => {
     expect(usagesOf(source)).toContain('api node:domain');

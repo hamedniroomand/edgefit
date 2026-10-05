@@ -17,6 +17,8 @@ describe('names that a block sets again', () => {
     ['a var in a nested block', 'var a = 1; if (x) { var a = 2; }'],
     ['a loop target', 'var a = 1; for (a of xs) {}'],
     ['a var loop head', 'var a = 1; for (var a in xs) {}'],
+    ['a function declaration', 'var a = 1; function a() {}'],
+    ['a function declaration with a parameter of its name', 'var a = 1; function a(a) {}'],
   ])('counts %s', (_, source) => {
     expect(setAgain(source)).toEqual(['a']);
   });
@@ -32,6 +34,7 @@ describe('names that a block sets again', () => {
     ['a let loop head', 'var a = 1; for (let a = 0; a < 2; a++) {}'],
     ['a const loop head', 'var a = 1; for (const a of xs) {}'],
     ['an arrow parameter', 'var a = 1; const f = a => (a = 2);'],
+    ['a default export of a function with no name', 'var a = 1; export default function () {}'],
   ])('does not count %s', (_, source) => {
     expect(setAgain(source)).toEqual([]);
   });

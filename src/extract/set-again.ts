@@ -13,10 +13,16 @@ function headNames(head: Node | null, lexical: boolean): string[] {
     : [];
 }
 
-/** The names that `node` sets to a value: a declaration with a value, `=`, `++`, or a loop target. */
+/**
+ * The names that `node` sets to a value in the scope around it: a declaration with a value, a
+ * function declaration, `=`, `++`, or a loop target.
+ */
 function setNames(node: Node): string[] {
   if (node.type === 'VariableDeclarator') {
     return node.init === null ? [] : patternNames(node.id);
+  }
+  if (node.type === 'FunctionDeclaration') {
+    return node.id === null ? [] : [node.id.name];
   }
   if (node.type === 'AssignmentExpression') {
     return patternNames(node.left);
@@ -63,10 +69,10 @@ function ownNames(node: Node): string[] {
 
 /**
  * The names that `statements` set to a value more than once. The value of a `let` or `var` counts
- * as one. A write inside a nested function or block that declares the name itself is to another
+ * as one. A write inside a nested function or block that declares the name itself goes to another
  * variable, so it does not count.
- * ponytail: a block is scanned the first time one of its checks is read, so a nested block can be
- * scanned once for each block around it. Upgrade: count the writes of every scope in one pass.
+ * ponytail: the first read of a check in a block scans the block, so a nested block gets one scan
+ * for each block around it. Upgrade: count the writes of every scope in one pass.
  */
 export function namesSetAgain(statements: readonly Node[]): ReadonlySet<string> {
   const cached = found.get(statements);
@@ -76,13 +82,13 @@ export function namesSetAgain(statements: readonly Node[]): ReadonlySet<string> 
   const counts = new Map<string, number>();
   const pending: Pending[] = statements.map(node => ({ node, hidden: new Set<string>() }));
   for (let item = pending.pop(); item !== undefined; item = pending.pop()) {
-    const own = ownNames(item.node);
-    const hidden = own.length === 0 ? item.hidden : new Set([...item.hidden, ...own]);
     for (const name of setNames(item.node)) {
-      if (!hidden.has(name)) {
+      if (!item.hidden.has(name)) {
         counts.set(name, (counts.get(name) ?? 0) + 1);
       }
     }
+    const own = ownNames(item.node);
+    const hidden = own.length === 0 ? item.hidden : new Set([...item.hidden, ...own]);
     for (const child of childNodes(item.node)) {
       pending.push({ node: child, hidden });
     }
