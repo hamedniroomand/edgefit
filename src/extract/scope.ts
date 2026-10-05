@@ -37,6 +37,10 @@ export interface Check {
   region: readonly Node[] | undefined;
 }
 
+/** The object of an `in` test, and the scope that declares its name. */
+export type Present = { object: string; scope: Scope };
+export type Filtered = Present & { index: number };
+
 export interface Scope {
   names: Map<string, Binding>;
   checks: Map<string, Check>;
@@ -44,6 +48,10 @@ export interface Scope {
   strings: Map<string, string>;
   /** Names that can only hold one of a known set of strings. */
   keys: Map<string, readonly string[]>;
+  /** `const` lists made by `.filter(name => name in obj)`, see `bindFilteredList`. */
+  filtered: Map<string, Filtered>;
+  /** Names that hold a key which an `in` test proved `obj` has, see `bindPresentLoop`. */
+  present: Map<string, Present>;
   /** Names that can only hold a known object or array. */
   objects: Map<string, KnownObject>;
   /** `const` names bound to a symbol, which can never name an API. */
@@ -61,6 +69,8 @@ export function createScope(parent?: Scope): Scope {
     checks: new Map(),
     strings: new Map(),
     keys: new Map(),
+    filtered: new Map(),
+    present: new Map(),
     objects: new Map(),
     symbols: new Set(),
     wasmImports: new Set(),
@@ -79,6 +89,28 @@ export function lookupString(scope: Scope | undefined, name: string): string | u
     return value;
   }
   return scope.names.has(name) ? undefined : lookupString(scope.parent, name);
+}
+
+/** The list a `const` holds that was filtered by an `in` test, unless a nearer declaration of the name shadows it. */
+export function lookupFiltered(scope: Scope | undefined, name: string): Filtered | undefined {
+  if (scope === undefined) {
+    return undefined;
+  }
+  return (
+    scope.filtered.get(name) ??
+    (scope.names.has(name) ? undefined : lookupFiltered(scope.parent, name))
+  );
+}
+
+/** The `in` test that proved a name is a key of an object, unless a nearer declaration shadows the name. */
+export function lookupPresent(scope: Scope | undefined, name: string): Present | undefined {
+  if (scope === undefined) {
+    return undefined;
+  }
+  return (
+    scope.present.get(name) ??
+    (scope.names.has(name) ? undefined : lookupPresent(scope.parent, name))
+  );
 }
 
 /** The strings a name may hold, unless a nearer declaration of the name shadows it. */
