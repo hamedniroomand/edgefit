@@ -41,10 +41,6 @@
       "name": "drizzle-orm"
     },
     {
-      "name": "@prisma/client",
-      "notes": "Needs a generated client; run `edgefit check` on a project after `prisma generate`."
-    },
-    {
       "name": "mysql2"
     },
     {
@@ -123,7 +119,8 @@
       "name": "cookie"
     },
     {
-      "name": "jsdom"
+      "name": "jsdom",
+      "notes": "jsdom runs scripts with node:vm and starts workers with node:worker_threads, which workerd does not implement; use cheerio or linkedom on Workers."
     },
     {
       "name": "cheerio"
@@ -164,7 +161,8 @@
       "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin."
     },
     {
-      "name": "@sentry/node"
+      "name": "@sentry/node",
+      "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement, and its ./import hook calls node:module.register, which Bun mocks; use @sentry/cloudflare or @sentry/bun."
     },
     {
       "name": "mongodb"
@@ -317,7 +315,7 @@
     },
     {
       "name": "firebase-admin",
-      "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run."
+      "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process, and on Deno the Firestore client reads http2 status constants that Deno lacks."
     },
     {
       "name": "@google-cloud/storage",
@@ -333,7 +331,7 @@
     },
     {
       "name": "@electric-sql/pglite",
-      "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support."
+      "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support, and its multi-tab worker uses navigator.locks, which Bun does not have."
     },
     {
       "name": "socket.io",
