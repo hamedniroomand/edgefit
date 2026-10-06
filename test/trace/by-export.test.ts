@@ -100,7 +100,7 @@ describe('the exports that reach a usage in a required file', () => {
       code: "exports.a = function () {\n  const run = require('./mock');\n  return run();\n};\nexports.b = function () {\n  return 1;\n};",
       imports: { 'require-call:./mock': 'mock.js' },
     };
-    const mock = { code: `${runsConsole}module.exports = function () {\n  return c;\n};` };
+    const mock = { code: `${runsConsole}module.exports = make(function () {\n  return c;\n});` };
     expect(tagsOf(code, { 'mock.js': mock }, 'mock.js')).toEqual({
       'node:console.Console': ['a'],
     });
@@ -109,7 +109,7 @@ describe('the exports that reach a usage in a required file', () => {
 
 describe('the files that a module loads for every export', () => {
   it('leaves a usage that a required file runs when it loads', () => {
-    const mock = { code: `${runsConsole}module.exports = function () {\n  return c;\n};` };
+    const mock = { code: `${runsConsole}module.exports = make(function () {\n  return c;\n});` };
     expect(tagsOf(twoRequires, { 'mock.js': mock, 'other.js': other }, 'mock.js')).toEqual({
       'node:console.Console': undefined,
     });
@@ -132,6 +132,27 @@ describe('the files that a module loads for every export', () => {
       'setup.js': { code: "import { Console } from 'node:console';\nnew Console({});" },
     };
     expect(tagsOf(code, others, 'setup.js')).toEqual({ 'node:console.Console': ['a'] });
+  });
+});
+
+describe('a package whose entry reads its own exports', () => {
+  it('names the export that reaches a class through a class that module.exports is set to', () => {
+    const code: Source = {
+      code: "const MockAgent = require('./mock-agent');\nmodule.exports.fetch = function fetch() {\n  return wrap(module.exports.fetch);\n};\nmodule.exports.MockAgent = MockAgent;",
+      imports: { 'require-call:./mock-agent': 'mock-agent.js' },
+    };
+    const others = {
+      'mock-agent.js': {
+        code: "const kSet = Symbol('set');\nconst Formatter = require('./formatter');\nclass MockAgent {\n  [kSet]() {\n    return 1;\n  }\n  assert() {\n    return new Formatter();\n  }\n}\nmodule.exports = MockAgent;",
+        imports: { 'require-call:./formatter': 'formatter.js' },
+      },
+      'formatter.js': {
+        code: "const { Console } = require('node:console');\nmodule.exports = class Formatter {\n  constructor() {\n    this.logger = new Console({});\n  }\n};",
+      },
+    };
+    expect(tagsOf(code, others, 'formatter.js')).toEqual({
+      'node:console.Console': ['MockAgent'],
+    });
   });
 });
 
