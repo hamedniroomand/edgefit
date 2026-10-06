@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "chokidar": "4.0.3",
+    "chokidar": "5.0.0",
     "cross-spawn": "7.0.6"
   }
 }
