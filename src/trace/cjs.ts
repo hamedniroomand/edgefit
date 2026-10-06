@@ -23,6 +23,8 @@ import {
 } from './cjs-forms.ts';
 import type { Call, Helpers, ObjectLiteral, RequireUse } from './cjs-forms.ts';
 import { readableNestedBindings } from './cjs-nested.ts';
+import { addWriteInto, exportWrittenInto, resolveOwnReads } from './cjs-own-exports.ts';
+import type { WriteInto } from './cjs-own-exports.ts';
 
 class CommonJsReader {
   readonly #builder = new ShapeBuilder();
@@ -33,6 +35,8 @@ class CommonJsReader {
   readonly #bound = new Set<Node>();
   readonly #writer: ExportWriter;
   readonly #body: readonly Node[];
+  /** The statements that write into an export, filed once the exports are known. */
+  readonly #writesInto: WriteInto[] = [];
 
   public constructor(body: readonly Node[]) {
     this.#body = body;
@@ -89,6 +93,12 @@ class CommonJsReader {
   #finish(): void {
     const { shape } = this.#builder;
     const settled = this.#writer.settle();
+    for (const write of this.#writesInto) {
+      addWriteInto(this.#builder, write);
+    }
+    // resolveOwnReads needs moduleExports, so it runs after settle(); a resolved read never counts
+    // as a use for settle().
+    resolveOwnReads(shape);
     shape.units.sort((left, right) => left.start - right.start);
     // A module that is required in a way that is not read asks for all of it.
     const unread = new Set(
@@ -135,7 +145,11 @@ class CommonJsReader {
       return;
     }
     if (node.type === 'ExpressionStatement') {
-      if (!this.#expression(strip(node.expression))) {
+      const expression = strip(node.expression);
+      const name = exportWrittenInto(expression);
+      if (name !== undefined && expression.type === 'AssignmentExpression') {
+        this.#writesInto.push({ node, name, value: expression.right });
+      } else if (!this.#expression(expression)) {
         this.#builder.unit(node);
       }
     } else if (node.type === 'VariableDeclaration') {

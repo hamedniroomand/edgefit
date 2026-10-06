@@ -12,11 +12,12 @@ const harness = entry("import * as m from './lib.js';\nexport { m };", { './lib.
 function tagsOf(
   code: Source,
   others: Record<string, Source> = {},
+  file = 'lib.js',
 ): Record<string, string[] | undefined> {
   const { graph, modules } = build({ 'index.js': harness, 'lib.js': code, ...others });
   const tagged = tagUsagesByExport(graph, modules, reachedUsages(graph, modules));
   return Object.fromEntries(
-    (tagged.get('lib.js') ?? [])
+    (tagged.get(file) ?? [])
       .filter(usage => usage.display.includes('.'))
       .map(usage => [usage.display, usage.exports]),
   );
@@ -60,6 +61,98 @@ describe('the exports that reach a usage', () => {
       "function helper() {\n  return fs.watch('.');\n}\nexport function a() {\n  return helper();\n}\nexport function b() {\n  return helper();\n}\nexport function c() {\n  return 1;\n}\n",
     );
     expect(tagsOf(code)).toEqual({ 'node:fs.watch': ['a', 'b'] });
+  });
+});
+
+const formatter: Source = {
+  code: "const { Console } = require('node:console');\nexports.format = function () {\n  return new Console({});\n};",
+};
+const classMock: Source = {
+  code: "const { format } = require('./formatter');\nclass Mock {\n  run() {\n    return format();\n  }\n}\nmodule.exports = Mock;",
+  imports: { 'require-call:./formatter': 'formatter.js' },
+};
+const twoRequires: Source = {
+  code: "const Mock = require('./mock');\nconst Other = require('./other');\nmodule.exports.Mock = Mock;\nmodule.exports.Other = Other;",
+  imports: { 'require-call:./mock': 'mock.js', 'require-call:./other': 'other.js' },
+};
+const other: Source = { code: 'module.exports = function () {\n  return 1;\n};' };
+const runsConsole = "const { Console } = require('node:console');\nconst c = new Console({});\n";
+
+describe('the exports that reach a usage in a required file', () => {
+  it('names the export that reaches a required file through a class', () => {
+    const others = { 'mock.js': classMock, 'other.js': other, 'formatter.js': formatter };
+    expect(tagsOf(twoRequires, others, 'formatter.js')).toEqual({
+      'node:console.Console': ['Mock'],
+    });
+  });
+
+  it('names both exports that reach the same required file', () => {
+    const code: Source = {
+      code: "exports.a = require('./mock');\nexports.b = require('./mock-b');\nexports.c = function () {\n  return 1;\n};",
+      imports: { 'require-call:./mock': 'mock.js', 'require-call:./mock-b': 'mock-b.js' },
+    };
+    const others = { 'mock.js': classMock, 'mock-b.js': classMock, 'formatter.js': formatter };
+    expect(tagsOf(code, others, 'formatter.js')).toEqual({ 'node:console.Console': ['a', 'b'] });
+  });
+
+  it('names the export whose code requires a file that cannot be traced', () => {
+    const code: Source = {
+      code: "exports.a = function () {\n  const run = require('./mock');\n  return run();\n};\nexports.b = function () {\n  return 1;\n};",
+      imports: { 'require-call:./mock': 'mock.js' },
+    };
+    const mock = { code: `${runsConsole}module.exports = make(function () {\n  return c;\n});` };
+    expect(tagsOf(code, { 'mock.js': mock }, 'mock.js')).toEqual({
+      'node:console.Console': ['a'],
+    });
+  });
+});
+
+describe('the files that a module loads for every export', () => {
+  it('leaves a usage that a required file runs when it loads', () => {
+    const mock = { code: `${runsConsole}module.exports = make(function () {\n  return c;\n});` };
+    expect(tagsOf(twoRequires, { 'mock.js': mock, 'other.js': other }, 'mock.js')).toEqual({
+      'node:console.Console': undefined,
+    });
+  });
+
+  it('leaves a usage that a required file that can be traced runs when it loads', () => {
+    const mock = { code: `${runsConsole}exports.run = function () {\n  return c;\n};` };
+    expect(tagsOf(twoRequires, { 'mock.js': mock, 'other.js': other }, 'mock.js')).toEqual({
+      'node:console.Console': undefined,
+    });
+  });
+
+  it('names the export whose file imports another file only to run it', () => {
+    const code: Source = {
+      code: "exports.a = function () {\n  const { a } = require('./a');\n  return a();\n};\nexports.b = function () {\n  return 1;\n};",
+      imports: { 'require-call:./a': 'a.js' },
+    };
+    const others = {
+      'a.js': entry("import './setup.js';\nexport function a() {}", { './setup.js': 'setup.js' }),
+      'setup.js': { code: "import { Console } from 'node:console';\nnew Console({});" },
+    };
+    expect(tagsOf(code, others, 'setup.js')).toEqual({ 'node:console.Console': ['a'] });
+  });
+});
+
+describe('a package whose entry reads its own exports', () => {
+  it('names the export that reaches a class through a class that module.exports is set to', () => {
+    const code: Source = {
+      code: "const MockAgent = require('./mock-agent');\nmodule.exports.fetch = function fetch() {\n  return wrap(module.exports.fetch);\n};\nmodule.exports.MockAgent = MockAgent;",
+      imports: { 'require-call:./mock-agent': 'mock-agent.js' },
+    };
+    const others = {
+      'mock-agent.js': {
+        code: "const kSet = Symbol('set');\nconst Formatter = require('./formatter');\nclass MockAgent {\n  [kSet]() {\n    return 1;\n  }\n  assert() {\n    return new Formatter();\n  }\n}\nmodule.exports = MockAgent;",
+        imports: { 'require-call:./formatter': 'formatter.js' },
+      },
+      'formatter.js': {
+        code: "const { Console } = require('node:console');\nmodule.exports = class Formatter {\n  constructor() {\n    this.logger = new Console({});\n  }\n};",
+      },
+    };
+    expect(tagsOf(code, others, 'formatter.js')).toEqual({
+      'node:console.Console': ['MockAgent'],
+    });
   });
 });
 

@@ -40,6 +40,8 @@ export type ObjectLiteral = NodeOf<'ObjectExpression'>;
 
 /** The key a unit for an export is filed under; it can never be the name of a variable. */
 export const exportKey = (name: string): string => `export:${name}`;
+/** The local name of the function or class that `module.exports` is set to in place. */
+export const moduleExportsKey = 'module:exports';
 
 export function isName(node: Node | null | undefined, name: string | undefined): boolean {
   return node?.type === 'Identifier' && node.name === name;
@@ -227,6 +229,22 @@ export function requireCalls(node: Node, calls: Call[] = []): Call[] {
     requireCalls(child, calls);
   }
   return calls;
+}
+
+/** The specifiers of the `require` calls outside any function. They run when the module loads. */
+export function eagerRequires(body: readonly Node[]): Set<string> {
+  const specifiers = new Set<string>();
+  const pending = [...body];
+  for (let node = pending.pop(); node !== undefined; node = pending.pop()) {
+    if (!isTypeOnly(node) && !isFunction(node)) {
+      const found = requireCall(node);
+      if (found?.call === node) {
+        specifiers.add(found.specifier);
+      }
+      pending.push(...childNodes(node));
+    }
+  }
+  return specifiers;
 }
 
 /** `void 0`, possibly assigned to several exports at once: `exports.a = exports.b = void 0`. */

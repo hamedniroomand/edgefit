@@ -3,6 +3,7 @@ import type { Node } from 'oxc-parser';
 import { childNodes, isTypeOnly, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 
+import { isExportsMember, isModuleExports } from './cjs-forms.ts';
 import type { DynamicImports } from './dynamic-imports.ts';
 
 /**
@@ -54,6 +55,8 @@ export interface ModuleShape {
   requires: DynamicImports;
   /** The specifiers that some `require` loads without binding or destructuring the result directly. */
   unboundRequires: Set<string>;
+  /** The specifiers that a `require` outside any function loads, so the file runs when this module loads. */
+  eagerRequires: Set<string>;
 }
 
 /** Whether the value is a call of `require`, whose result the declared name holds. */
@@ -66,6 +69,17 @@ function isRequireCall(node: Node): boolean {
   );
 }
 
+/** What an assignment, an update or a `delete` writes to. */
+function writeTarget(node: Node): Node | undefined {
+  if (node.type === 'AssignmentExpression') {
+    return node.left;
+  }
+  if (node.type === 'UpdateExpression') {
+    return node.argument;
+  }
+  return node.type === 'UnaryExpression' && node.operator === 'delete' ? node.argument : undefined;
+}
+
 export function mentionsIn(node: Node, names = new Set<string>()): Set<string> {
   if (isTypeOnly(node)) {
     return names;
@@ -73,6 +87,20 @@ export function mentionsIn(node: Node, names = new Set<string>()): Set<string> {
   if (node.type === 'VariableDeclarator' && node.init !== null && isRequireCall(node.init)) {
     // The name that a `require` declares is a use only where the code reads it.
     return mentionsIn(node.init, names);
+  }
+  const written = writeTarget(node);
+  if (written !== undefined && isExportsMember(written)) {
+    // Code that writes the exports changes them after the module loads: they cannot be read.
+    names.add('exports');
+  }
+  if (
+    node.type === 'MemberExpression' &&
+    !node.computed &&
+    node.property.type === 'Identifier' &&
+    isModuleExports(node.object)
+  ) {
+    names.add(`module.exports.${node.property.name}`);
+    return names;
   }
   if (
     node.type === 'MemberExpression' &&
@@ -96,6 +124,17 @@ function hasDecorator(node: Node): boolean {
   return node.type === 'Decorator' || childNodes(node).some(child => hasDecorator(child));
 }
 
+/** A name or a chain of names, such as `kName` or `Symbol.iterator`, which only reads a value. */
+function isPlainKey(node: Node): boolean {
+  return (
+    node.type === 'Identifier' ||
+    (node.type === 'MemberExpression' &&
+      !node.computed &&
+      node.property.type === 'Identifier' &&
+      isPlainKey(node.object))
+  );
+}
+
 /** Whether evaluating the class only defines it, so nothing runs until it is used. */
 export function isLazyClass(node: NodeOf<'ClassDeclaration' | 'ClassExpression'>): boolean {
   const { superClass } = node;
@@ -110,7 +149,7 @@ export function isLazyClass(node: NodeOf<'ClassDeclaration' | 'ClassExpression'>
       member =>
         member.type === 'TSIndexSignature' ||
         (member.type !== 'StaticBlock' &&
-          !member.computed &&
+          (!member.computed || isPlainKey(member.key)) &&
           (member.type === 'MethodDefinition' || !member.static)),
     )
   );
@@ -131,6 +170,7 @@ export class ShapeBuilder {
     dynamicImports: new Map(),
     requires: new Map(),
     unboundRequires: new Set(),
+    eagerRequires: new Set(),
   };
 
   public unit(node: Node, name?: string, mentions?: Set<string>): void {
