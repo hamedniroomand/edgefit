@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@planetscale/database",
   "resolved": "2.0.0",
-  "checkedAt": "2026-10-05T17:33:40.734Z",
-  "edgefit": "0.13.1",
+  "checkedAt": "2026-10-06T08:13:36.537Z",
+  "edgefit": "0.13.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

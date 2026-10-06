@@ -2,8 +2,8 @@
   "version": 2,
   "package": "node-fetch",
   "resolved": "3.3.2",
-  "checkedAt": "2026-10-05T17:26:07.649Z",
-  "edgefit": "0.13.1",
+  "checkedAt": "2026-10-06T08:05:46.041Z",
+  "edgefit": "0.13.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

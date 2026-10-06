@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@langchain/core",
-  "resolved": "1.2.14",
-  "checkedAt": "2026-10-05T17:27:07.774Z",
-  "edgefit": "0.13.1",
+  "resolved": "1.2.16",
+  "checkedAt": "2026-10-06T08:09:41.522Z",
+  "edgefit": "0.13.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "jsdom",
   "resolved": "30.1.2",
-  "checkedAt": "2026-10-05T17:24:55.447Z",
-  "edgefit": "0.13.1",
+  "checkedAt": "2026-10-06T08:06:58.925Z",
+  "edgefit": "0.13.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -24,8 +24,8 @@
   ],
   "summary": {
     "workerd": "fail",
-    "bun": "warn",
-    "deno": "warn"
+    "bun": "pass",
+    "deno": "pass"
   },
   "context": {
     "workerd": {
@@ -51,7 +51,7 @@
         "workerd": {
           "status": "fail",
           "errors": 4,
-          "warnings": 7,
+          "warnings": 6,
           "exports": [
             {
               "name": "JSDOM",
@@ -68,16 +68,17 @@
           ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1
+          "warnings": 0
         }
       }
     }
-  ]
+  ],
+  "notes": "jsdom runs scripts with node:vm and starts workers with node:worker_threads, which workerd does not implement; use cheerio or linkedom on Workers."
 }

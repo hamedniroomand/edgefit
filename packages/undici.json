@@ -2,8 +2,8 @@
   "version": 2,
   "package": "undici",
   "resolved": "8.11.2",
-  "checkedAt": "2026-10-05T17:23:46.966Z",
-  "edgefit": "0.13.1",
+  "checkedAt": "2026-10-06T08:05:40.951Z",
+  "edgefit": "0.13.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -65,5 +65,6 @@
         }
       }
     }
-  ]
+  ],
+  "notes": "undici opens HTTP/2 connections with node:http2.connect by default since version 8, which workerd does not implement; use the global fetch on Workers."
 }

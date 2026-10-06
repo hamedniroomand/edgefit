@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@electric-sql/pglite",
   "resolved": "0.5.8",
-  "checkedAt": "2026-10-05T17:26:08.380Z",
-  "edgefit": "0.13.1",
+  "checkedAt": "2026-10-06T08:06:38.029Z",
+  "edgefit": "0.13.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -198,5 +198,5 @@
       }
     }
   ],
-  "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support."
+  "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support, and its multi-tab worker uses navigator.locks, which Bun does not have."
 }

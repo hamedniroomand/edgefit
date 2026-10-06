@@ -2,8 +2,8 @@
   "version": 2,
   "package": "fastify",
   "resolved": "5.12.5",
-  "checkedAt": "2026-10-05T17:25:15.921Z",
-  "edgefit": "0.13.1",
+  "checkedAt": "2026-10-06T08:06:01.394Z",
+  "edgefit": "0.13.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,7 +23,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
+    "workerd": "pass",
     "bun": "pass",
     "deno": "pass"
   },
@@ -49,8 +49,8 @@
       "specifier": "fastify",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 2,
+          "status": "pass",
+          "errors": 0,
           "warnings": 0
         },
         "bun": {
