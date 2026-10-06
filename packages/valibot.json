@@ -2,7 +2,7 @@
   "version": 2,
   "package": "valibot",
   "resolved": "1.5.0",
-  "checkedAt": "2026-10-06T09:37:29.505Z",
+  "checkedAt": "2026-10-06T11:29:54.854Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

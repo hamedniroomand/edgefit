@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@google/genai",
   "resolved": "2.27.0",
-  "checkedAt": "2026-10-06T09:39:01.018Z",
+  "checkedAt": "2026-10-06T11:31:22.329Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

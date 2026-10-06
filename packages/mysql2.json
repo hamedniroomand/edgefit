@@ -2,7 +2,7 @@
   "version": 2,
   "package": "mysql2",
   "resolved": "3.24.5",
-  "checkedAt": "2026-10-06T09:37:37.352Z",
+  "checkedAt": "2026-10-06T11:30:02.665Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

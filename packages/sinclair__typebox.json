@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@sinclair/typebox",
   "resolved": "0.34.52",
-  "checkedAt": "2026-10-06T09:38:43.174Z",
+  "checkedAt": "2026-10-06T11:31:03.649Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

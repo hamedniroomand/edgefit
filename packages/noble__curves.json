@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@noble/curves",
   "resolved": "2.4.0",
-  "checkedAt": "2026-10-06T09:38:10.204Z",
+  "checkedAt": "2026-10-06T11:30:33.302Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

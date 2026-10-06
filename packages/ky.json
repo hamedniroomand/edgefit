@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ky",
   "resolved": "2.1.0",
-  "checkedAt": "2026-10-06T09:37:51.358Z",
+  "checkedAt": "2026-10-06T11:30:09.626Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

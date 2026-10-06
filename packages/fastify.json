@@ -2,7 +2,7 @@
   "version": 2,
   "package": "fastify",
   "resolved": "5.12.5",
-  "checkedAt": "2026-10-06T09:38:26.586Z",
+  "checkedAt": "2026-10-06T11:30:47.096Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

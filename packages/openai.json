@@ -2,7 +2,7 @@
   "version": 2,
   "package": "openai",
   "resolved": "7.28.0",
-  "checkedAt": "2026-10-06T09:38:19.538Z",
+  "checkedAt": "2026-10-06T11:30:39.759Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

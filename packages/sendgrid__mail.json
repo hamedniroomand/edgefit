@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@sendgrid/mail",
   "resolved": "8.1.6",
-  "checkedAt": "2026-10-06T09:38:03.645Z",
+  "checkedAt": "2026-10-06T11:30:26.219Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

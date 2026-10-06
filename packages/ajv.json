@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ajv",
   "resolved": "8.20.0",
-  "checkedAt": "2026-10-06T09:38:02.477Z",
+  "checkedAt": "2026-10-06T11:30:25.229Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

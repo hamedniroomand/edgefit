@@ -2,7 +2,7 @@
   "version": 2,
   "package": "moment",
   "resolved": "2.31.0",
-  "checkedAt": "2026-10-06T09:45:31.840Z",
+  "checkedAt": "2026-10-06T11:37:11.988Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

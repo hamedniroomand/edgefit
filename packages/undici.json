@@ -2,7 +2,7 @@
   "version": 2,
   "package": "undici",
   "resolved": "8.11.2",
-  "checkedAt": "2026-10-06T09:37:50.537Z",
+  "checkedAt": "2026-10-06T11:30:16.558Z",
   "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
