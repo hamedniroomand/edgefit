@@ -6,11 +6,11 @@ import { sampleApp, sampleAppBuilt } from '~/helpers.ts';
 
 /**
  * A SvelteKit app built for Netlify Edge with `@sveltejs/adapter-netlify` and `edge: true`: the
- * adapter writes `.netlify/edge-functions/manifest.json` and one function, `render.js`, with a
- * sourcemap. The app is built in CI (see `apps/README.md`), so these skip when it is not built.
+ * adapter writes the Frameworks API layout, `.netlify/v1/edge-functions`, with one function,
+ * `sveltekit-render.js`, and its sourcemap. The app is built in CI (see `apps/README.md`), so these skip when it is not built.
  */
 const built = sampleAppBuilt('sveltekit-netlify', '.netlify');
-const entry = '.netlify/edge-functions/render.js';
+const entry = '.netlify/v1/edge-functions/sveltekit-render.js';
 
 async function report(builtPath?: string): Promise<TargetReport | undefined> {
   const result = await check({

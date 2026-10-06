@@ -17,9 +17,9 @@ describe.skipIf(!installed)('a known-bad app', () => {
     expect(
       report?.findings.map(finding => `${finding.level} ${finding.api} ${finding.package?.name}`),
     ).toEqual([
-      'error node:fs.watchFile chokidar',
-      'error node:fs.unwatchFile chokidar',
       'error node:fs.watch chokidar',
+      'error node:fs.unwatchFile chokidar',
+      'error node:fs.watchFile chokidar',
       'error node:child_process.spawn cross-spawn',
       'error node:child_process.spawnSync cross-spawn',
     ]);
@@ -30,9 +30,9 @@ describe.skipIf(!installed)('a known-bad app', () => {
     expect(
       report?.findings.map(finding => `${finding.api} ${finding.suggestion?.text.split(' ').slice(0, 2).join(' ')}`),
     ).toEqual([
-      'node:fs.watchFile chokidar watches',
-      'node:fs.unwatchFile chokidar watches',
       'node:fs.watch chokidar watches',
+      'node:fs.unwatchFile chokidar watches',
+      'node:fs.watchFile chokidar watches',
       'node:child_process.spawn cross-spawn starts',
       'node:child_process.spawnSync cross-spawn starts',
     ]);
@@ -45,8 +45,8 @@ describe.skipIf(!installed)('a known-bad app', () => {
   it('names the package, the file and the import chain', async () => {
     const [report] = (await check({ root: sampleApp('known-bad') })).reports;
     const watch = report?.findings.find(finding => finding.api === 'node:fs.watch');
-    expect(watch?.package).toMatchObject({ name: 'chokidar', version: '4.0.3' });
-    expect(watch?.location.file).toMatch(/chokidar\/esm\/handler\.js$/);
+    expect(watch?.package).toMatchObject({ name: 'chokidar', version: '5.0.0' });
+    expect(watch?.location.file).toMatch(/chokidar\/handler\.js$/);
     expect(watch?.chain).toEqual(['src/index.js', 'chokidar']);
   });
 
