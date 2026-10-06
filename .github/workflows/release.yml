@@ -27,6 +27,8 @@ jobs:
       contents: write
       # Proves to npm that this workflow is the trusted publisher.
       id-token: write
+      # Starts the package table run.
+      actions: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -102,3 +104,8 @@ jobs:
           else
             gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$major" -f sha="$GITHUB_SHA"
           fi
+      - name: Recalculate the package table
+        if: ${{ !contains(github.ref_name, '-') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run package-table.yml --ref "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY"
