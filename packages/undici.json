@@ -2,8 +2,8 @@
   "version": 2,
   "package": "undici",
   "resolved": "8.11.2",
-  "checkedAt": "2026-10-06T08:05:40.951Z",
-  "edgefit": "0.13.2",
+  "checkedAt": "2026-10-06T09:37:50.537Z",
+  "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -50,8 +50,34 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 2,
-          "warnings": 1
+          "errors": 1,
+          "warnings": 1,
+          "exports": [
+            {
+              "name": "MockAgent",
+              "level": "error",
+              "findings": [
+                {
+                  "api": "node:console.Console",
+                  "category": "unsupported",
+                  "level": "error",
+                  "detail": "the Console constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+                }
+              ]
+            },
+            {
+              "name": "SnapshotAgent",
+              "level": "error",
+              "findings": [
+                {
+                  "api": "node:console.Console",
+                  "category": "unsupported",
+                  "level": "error",
+                  "detail": "the Console constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+                }
+              ]
+            }
+          ]
         },
         "bun": {
           "status": "pass",

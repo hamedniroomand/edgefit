@@ -2,8 +2,8 @@
   "version": 2,
   "package": "oauth4webapi",
   "resolved": "3.8.8",
-  "checkedAt": "2026-10-06T08:05:25.967Z",
-  "edgefit": "0.13.2",
+  "checkedAt": "2026-10-06T09:37:30.094Z",
+  "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

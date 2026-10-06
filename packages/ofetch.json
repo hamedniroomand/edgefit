@@ -2,8 +2,8 @@
   "version": 2,
   "package": "ofetch",
   "resolved": "1.5.1",
-  "checkedAt": "2026-10-06T08:08:25.164Z",
-  "edgefit": "0.13.2",
+  "checkedAt": "2026-10-06T09:40:44.524Z",
+  "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

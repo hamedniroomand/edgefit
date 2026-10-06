@@ -2,8 +2,8 @@
   "version": 2,
   "package": "jsonwebtoken",
   "resolved": "9.0.3",
-  "checkedAt": "2026-10-06T08:08:13.166Z",
-  "edgefit": "0.13.2",
+  "checkedAt": "2026-10-06T09:40:30.957Z",
+  "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

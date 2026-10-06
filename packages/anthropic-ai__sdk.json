@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@anthropic-ai/sdk",
   "resolved": "0.131.0",
-  "checkedAt": "2026-10-06T08:06:20.049Z",
-  "edgefit": "0.13.2",
+  "checkedAt": "2026-10-06T09:38:06.521Z",
+  "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

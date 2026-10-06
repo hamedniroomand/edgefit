@@ -2,8 +2,8 @@
   "version": 2,
   "package": "busboy",
   "resolved": "1.6.0",
-  "checkedAt": "2026-10-06T08:13:39.962Z",
-  "edgefit": "0.13.2",
+  "checkedAt": "2026-10-06T09:45:30.387Z",
+  "edgefit": "0.13.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
