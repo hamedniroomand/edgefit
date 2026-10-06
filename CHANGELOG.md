@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.3
+
+### Patch Changes
+
+- [#267](https://github.com/hamedniroomand/edgefit/pull/267) [`f239a4d`](https://github.com/hamedniroomand/edgefit/commit/f239a4d51aaf4c7ecfeac09a518888119b922a18) - Read more CommonJS modules by export. Code that reads `module.exports.name` uses that export, a top-level `module.exports.name.key = value` counts with that export, `module.exports = function` and `= class` are read, and a class method with a computed name such as `[kName]` does not make the class run on load. These modules no longer count in full, so a finding that only some exports reach is listed under them, such as `node:console.Console` of `undici` under `MockAgent`.
+
+- [#267](https://github.com/hamedniroomand/edgefit/pull/267) [`f239a4d`](https://github.com/hamedniroomand/edgefit/commit/f239a4d51aaf4c7ecfeac09a518888119b922a18) - List a finding under the export whose code loads its file, when only that export loads it. A file that an export requires inside a function, and the files that it imports, are no longer counted for the other exports. A file that a module requires at the top level still counts for every export, because it runs when the module loads.
+
 ## 0.13.2
 
 ### Patch Changes
