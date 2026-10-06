@@ -6,6 +6,7 @@ import { patternNames } from '@/extract/declarations.ts';
 
 import { ShapeBuilder, isLazyClass, rootNames } from './builder.ts';
 import type { ModuleShape } from './builder.ts';
+import { eagerRequires } from './cjs-forms.ts';
 import { collectCommonJsShape } from './cjs.ts';
 import { loadsOf } from './dynamic-imports.ts';
 
@@ -163,6 +164,7 @@ export function collectShape(
       ...collectCommonJsShape(body),
       dynamicImports: loadsOf(body, 'import'),
       requires: loadsOf(body, 'require'),
+      eagerRequires: eagerRequires(body),
     };
   }
   const builder = new ShapeBuilder();
@@ -172,6 +174,7 @@ export function collectShape(
   const { shape } = builder;
   shape.dynamicImports = loadsOf(body, 'import');
   shape.requires = loadsOf(body, 'require');
+  shape.eagerRequires = eagerRequires(body);
   shape.units.sort((left, right) => left.start - right.start);
   shape.traceable =
     shape.traceable &&

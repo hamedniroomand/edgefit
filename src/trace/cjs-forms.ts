@@ -229,6 +229,22 @@ export function requireCalls(node: Node, calls: Call[] = []): Call[] {
   return calls;
 }
 
+/** The specifiers of the `require` calls outside any function. They run when the module loads. */
+export function eagerRequires(body: readonly Node[]): Set<string> {
+  const specifiers = new Set<string>();
+  const pending = [...body];
+  for (let node = pending.pop(); node !== undefined; node = pending.pop()) {
+    if (!isTypeOnly(node) && !isFunction(node)) {
+      const found = requireCall(node);
+      if (found?.call === node) {
+        specifiers.add(found.specifier);
+      }
+      pending.push(...childNodes(node));
+    }
+  }
+  return specifiers;
+}
+
 /** `void 0`, possibly assigned to several exports at once: `exports.a = exports.b = void 0`. */
 export function isVoidChain(node: Node): boolean {
   let current = strip(node);

@@ -54,6 +54,8 @@ export interface ModuleShape {
   requires: DynamicImports;
   /** The specifiers that some `require` loads without binding or destructuring the result directly. */
   unboundRequires: Set<string>;
+  /** The specifiers that a `require` outside any function loads, so the file runs when this module loads. */
+  eagerRequires: Set<string>;
 }
 
 /** Whether the value is a call of `require`, whose result the declared name holds. */
@@ -131,6 +133,7 @@ export class ShapeBuilder {
     dynamicImports: new Map(),
     requires: new Map(),
     unboundRequires: new Set(),
+    eagerRequires: new Set(),
   };
 
   public unit(node: Node, name?: string, mentions?: Set<string>): void {
