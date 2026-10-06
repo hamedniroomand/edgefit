@@ -11,6 +11,7 @@ import {
   isModuleExports,
   isName,
   isVoidChain,
+  moduleExportsKey,
   requiredBy,
 } from './cjs-forms.ts';
 import type { Helpers, ObjectLiteral, RequireUse } from './cjs-forms.ts';
@@ -239,6 +240,11 @@ export class ExportWriter {
     }
     if (value.type === 'Identifier') {
       this.#assigned = { name: value.name };
+      return true;
+    }
+    if (isFunction(value) || (value.type === 'ClassExpression' && isLazyClass(value))) {
+      this.#assigned = { name: moduleExportsKey };
+      this.#context.builder.unit(value, moduleExportsKey, mentionsIn(value));
       return true;
     }
     const required = requiredBy(value, this.#context.helpers);

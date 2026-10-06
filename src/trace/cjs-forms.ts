@@ -40,6 +40,8 @@ export type ObjectLiteral = NodeOf<'ObjectExpression'>;
 
 /** The key a unit for an export is filed under; it can never be the name of a variable. */
 export const exportKey = (name: string): string => `export:${name}`;
+/** The local name of the function or class that `module.exports` is set to in place. */
+export const moduleExportsKey = 'module:exports';
 
 export function isName(node: Node | null | undefined, name: string | undefined): boolean {
   return node?.type === 'Identifier' && node.name === name;
