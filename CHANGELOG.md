@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.13.2
+
+### Patch Changes
+
+- [#261](https://github.com/hamedniroomand/edgefit/pull/261) [`3c431ae`](https://github.com/hamedniroomand/edgefit/commit/3c431aee2c89e077b630b8833859f4d87d71a137) - Count a name that a file destructures from a Node.js module, as in `const { Console } = require('node:console')`, where the name is used and not where it is destructured. A name that is never used is not a finding. This moves the finding to the code that uses the name, and to the exports that reach it.
+
+- [#258](https://github.com/hamedniroomand/edgefit/pull/258) [`a3b1daa`](https://github.com/hamedniroomand/edgefit/commit/a3b1daa3cefa51a898aafe110a6c7e7b4467a508) - Guard a finding in code that runs only when the project sets an option of the package, such as `if (options.http2)` in `fastify`. The finding is listed with `--verbose` and does not fail the check, unless a file of the graph sets the option. This clears the `node:http2` errors of `fastify` on workerd.
+
+- [#256](https://github.com/hamedniroomand/edgefit/pull/256) [`4e6e8e1`](https://github.com/hamedniroomand/edgefit/commit/4e6e8e1f212290afed20009b7b14784fb79aa092) - Do not report a computed read as `unknown` when its key comes from a list that a `.filter(name => name in obj)` made, and the loop reads `obj[name]`. This clears the `unknown global[<expression>]` warning for `jsdom` on Bun and Deno.
+
 ## 0.13.1
 
 ### Patch Changes
