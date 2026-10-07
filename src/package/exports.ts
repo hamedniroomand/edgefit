@@ -1,6 +1,16 @@
 import type { Finding } from '@/types.ts';
 
-import type { ExportResult } from './result.ts';
+import type { ExportFinding, ExportResult } from './result.ts';
+
+/** The part of a finding that a package result keeps. */
+export function entryFinding(finding: Finding): ExportFinding {
+  return {
+    api: finding.api,
+    category: finding.category,
+    level: finding.level,
+    detail: finding.detail,
+  };
+}
 
 /** The findings that only some exports reach, by export. Errors come first, then the names in order. */
 export function resultsByExport(findings: readonly Finding[]): ExportResult[] {
@@ -8,12 +18,7 @@ export function resultsByExport(findings: readonly Finding[]): ExportResult[] {
   for (const finding of findings) {
     for (const name of finding.exports ?? []) {
       const found = byName.get(name) ?? { name, level: finding.level, findings: [] };
-      found.findings.push({
-        api: finding.api,
-        category: finding.category,
-        level: finding.level,
-        detail: finding.detail,
-      });
+      found.findings.push(entryFinding(finding));
       if (finding.level === 'error') {
         found.level = 'error';
       }
