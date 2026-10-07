@@ -2,8 +2,8 @@
   "version": 2,
   "package": "better-sqlite3",
   "resolved": "13.0.3",
-  "checkedAt": "2026-10-06T11:31:46.626Z",
-  "edgefit": "0.13.3",
+  "checkedAt": "2026-10-07T17:39:56.003Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -51,7 +51,21 @@
         "workerd": {
           "status": "fail",
           "errors": 1,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "native addon better-sqlite3",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            },
+            {
+              "api": "node:process.report.getReport",
+              "category": "mismatch",
+              "level": "warning",
+              "detail": "returns an empty object, so a report has no header or other field"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -72,7 +86,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "native addon better-sqlite3",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            },
+            {
+              "api": "native addon linux-x64.node",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -93,7 +121,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "native addon better-sqlite3",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            },
+            {
+              "api": "native addon linux-arm64.node",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -114,7 +156,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "native addon better-sqlite3",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            },
+            {
+              "api": "native addon linuxmusl-x64.node",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -135,7 +191,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "native addon better-sqlite3",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            },
+            {
+              "api": "native addon linuxmusl-arm64.node",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -156,7 +226,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "native addon better-sqlite3",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            },
+            {
+              "api": "native addon darwin-x64.node",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -177,7 +261,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "native addon better-sqlite3",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            },
+            {
+              "api": "native addon darwin-arm64.node",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -198,7 +296,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "native addon better-sqlite3",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            },
+            {
+              "api": "native addon win32-x64.node",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -219,7 +331,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "native addon better-sqlite3",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            },
+            {
+              "api": "native addon win32-arm64.node",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -234,5 +360,23 @@
       }
     }
   ],
-  "notes": "Native addon."
+  "notes": "Native addon.",
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "confirmed",
+      "kind": "reach",
+      "runtime": "workerd 1.20260929.1",
+      "error": "TypeError: Cannot read properties of undefined (reading 'glibcVersionRuntime'), at isLinuxMusl (bundle.mjs:744:80)"
+    }
+  }
 }

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "cors",
   "resolved": "2.8.6",
-  "checkedAt": "2026-10-06T11:30:08.835Z",
-  "edgefit": "0.13.3",
+  "checkedAt": "2026-10-07T17:39:14.632Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -65,5 +65,22 @@
         }
       }
     }
-  ]
+  ],
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1"
+    }
+  }
 }

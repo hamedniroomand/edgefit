@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@sentry/node",
-  "resolved": "11.4.0",
-  "checkedAt": "2026-10-06T11:37:07.187Z",
-  "edgefit": "0.13.3",
+  "resolved": "11.5.0",
+  "checkedAt": "2026-10-07T17:46:46.711Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -65,6 +65,98 @@
           "status": "fail",
           "errors": 8,
           "warnings": 7,
+          "findings": [
+            {
+              "api": "node:child_process.execFile",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:readline.createInterface",
+              "category": "mocked",
+              "level": "error",
+              "detail": "readline functions are no-ops and createInterface returns an interface that never emits input"
+            },
+            {
+              "api": "node:worker_threads.Worker",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "the Worker constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:inspector.open",
+              "category": "mocked",
+              "level": "error",
+              "detail": "does nothing and returns a disposable that does nothing"
+            },
+            {
+              "api": "node:perf_hooks.monitorEventLoopDelay",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:process.cpuUsage",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:util.getSystemErrorMap",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws not implemented"
+            },
+            {
+              "api": "node:inspector.url",
+              "category": "mocked",
+              "level": "error",
+              "detail": "always returns undefined"
+            },
+            {
+              "api": "node:fs.promises",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:http",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:worker_threads",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:inspector",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:worker_threads.isMainThread",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:tty.isatty",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "require(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
           "exports": [
             {
               "name": "eveInstrumentation",
@@ -162,6 +254,26 @@
           "status": "warn",
           "errors": 0,
           "warnings": 3,
+          "findings": [
+            {
+              "api": "node:inspector.url",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:inspector.open",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "require(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
           "exports": [
             {
               "name": "eveInstrumentation",
@@ -216,7 +328,27 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3
+          "warnings": 3,
+          "findings": [
+            {
+              "api": "node:fs.promises",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:http",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "require(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         }
       }
     },
@@ -227,12 +359,34 @@
         "workerd": {
           "status": "warn",
           "errors": 0,
-          "warnings": 2
+          "warnings": 2,
+          "findings": [
+            {
+              "api": "node:worker_threads.MessageChannel",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:tty.isatty",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            }
+          ]
         },
         "bun": {
           "status": "fail",
           "errors": 1,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:module.register",
+              "category": "mocked",
+              "level": "error",
+              "detail": "does nothing; use Bun.plugin for loader hooks"
+            }
+          ]
         },
         "deno": {
           "status": "pass",
@@ -248,12 +402,88 @@
         "bun": {
           "status": "fail",
           "errors": 1,
-          "warnings": 8
+          "warnings": 8,
+          "findings": [
+            {
+              "api": "node:module.register",
+              "category": "mocked",
+              "level": "error",
+              "detail": "does nothing; use Bun.plugin for loader hooks"
+            },
+            {
+              "api": "console[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:inspector.url",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:inspector.open",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:inspector.Session",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:zlib",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:worker_threads",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3
+          "warnings": 3,
+          "findings": [
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:zlib.constants",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "workerd": {
           "status": "unchecked",
@@ -270,12 +500,88 @@
         "bun": {
           "status": "fail",
           "errors": 1,
-          "warnings": 8
+          "warnings": 8,
+          "findings": [
+            {
+              "api": "node:module.register",
+              "category": "mocked",
+              "level": "error",
+              "detail": "does nothing; use Bun.plugin for loader hooks"
+            },
+            {
+              "api": "console[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:inspector.url",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:inspector.open",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:inspector.Session",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:zlib",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:worker_threads",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3
+          "warnings": 3,
+          "findings": [
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:zlib.constants",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "workerd": {
           "status": "unchecked",
@@ -292,12 +598,88 @@
         "bun": {
           "status": "fail",
           "errors": 1,
-          "warnings": 8
+          "warnings": 8,
+          "findings": [
+            {
+              "api": "node:module.register",
+              "category": "mocked",
+              "level": "error",
+              "detail": "does nothing; use Bun.plugin for loader hooks"
+            },
+            {
+              "api": "console[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:inspector.url",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:inspector.open",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:inspector.Session",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:zlib",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:worker_threads",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3
+          "warnings": 3,
+          "findings": [
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:zlib.constants",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "workerd": {
           "status": "unchecked",
@@ -314,12 +696,88 @@
         "bun": {
           "status": "fail",
           "errors": 1,
-          "warnings": 8
+          "warnings": 8,
+          "findings": [
+            {
+              "api": "node:module.register",
+              "category": "mocked",
+              "level": "error",
+              "detail": "does nothing; use Bun.plugin for loader hooks"
+            },
+            {
+              "api": "console[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:inspector.url",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:inspector.open",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:inspector.Session",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:zlib",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:worker_threads",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3
+          "warnings": 3,
+          "findings": [
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:zlib.constants",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "workerd": {
           "status": "unchecked",

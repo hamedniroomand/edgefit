@@ -2,8 +2,8 @@
   "version": 2,
   "package": "kysely",
   "resolved": "0.29.6",
-  "checkedAt": "2026-10-06T11:30:58.031Z",
-  "edgefit": "0.13.3",
+  "checkedAt": "2026-10-07T17:40:00.503Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -170,17 +170,41 @@
         "workerd": {
           "status": "warn",
           "errors": 0,
-          "warnings": 1
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "bun": {
           "status": "warn",
           "errors": 0,
-          "warnings": 1
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 1
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         }
       }
     },
@@ -205,5 +229,22 @@
         }
       }
     }
-  ]
+  ],
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1"
+    }
+  }
 }

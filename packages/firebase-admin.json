@@ -2,8 +2,8 @@
   "version": 2,
   "package": "firebase-admin",
   "resolved": "14.5.0",
-  "checkedAt": "2026-10-06T11:32:22.464Z",
-  "edgefit": "0.13.3",
+  "checkedAt": "2026-10-07T17:40:25.098Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -57,7 +57,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -78,7 +92,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -99,7 +127,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -120,7 +162,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -141,7 +197,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -162,7 +232,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -183,7 +267,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -204,7 +302,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -225,7 +337,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -246,7 +372,45 @@
         "workerd": {
           "status": "fail",
           "errors": 6,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:http2.createSecureServer",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:http2.createServer",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:http2.connect",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.execFile",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -256,7 +420,15 @@
         "deno": {
           "status": "fail",
           "errors": 1,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:http2.constants.HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "does not exist on the target"
+            }
+          ]
         }
       }
     },
@@ -267,7 +439,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -288,7 +474,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -309,7 +509,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -330,7 +544,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -351,7 +579,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -372,7 +614,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -393,7 +649,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -414,7 +684,21 @@
         "workerd": {
           "status": "fail",
           "errors": 2,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.exec",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -429,5 +713,17 @@
       }
     }
   ],
-  "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process, and on Deno the Firestore client reads http2 status constants that Deno lacks."
+  "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process, and on Deno the Firestore client reads http2 status constants that Deno lacks.",
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    }
+  }
 }

@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@aws-sdk/client-s3",
-  "resolved": "3.1146.0",
-  "checkedAt": "2026-10-06T11:30:06.785Z",
-  "edgefit": "0.13.3",
+  "resolved": "3.1147.0",
+  "checkedAt": "2026-10-07T17:39:11.805Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -65,5 +65,17 @@
         }
       }
     }
-  ]
+  ],
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1"
+    }
+  }
 }

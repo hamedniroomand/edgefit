@@ -2,8 +2,8 @@
   "version": 2,
   "package": "jsdom",
   "resolved": "30.1.2",
-  "checkedAt": "2026-10-06T11:31:33.724Z",
-  "edgefit": "0.13.3",
+  "checkedAt": "2026-10-07T17:39:48.529Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -52,6 +52,62 @@
           "status": "fail",
           "errors": 3,
           "warnings": 6,
+          "findings": [
+            {
+              "api": "node:vm.runInContext",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "code generation from strings is not allowed; throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:worker_threads.Worker",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "the Worker constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:http2.connect",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:vm.createContext",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:vm.constants.DONT_CONTEXTIFY",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:vm",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:worker_threads.MessageChannel",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:worker_threads.receiveMessageOnPort",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:worker_threads.markAsUncloneable",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            }
+          ],
           "exports": [
             {
               "name": "JSDOM",
@@ -80,5 +136,23 @@
       }
     }
   ],
-  "notes": "jsdom runs scripts with node:vm and starts workers with node:worker_threads, which workerd does not implement; use cheerio or linkedom on Workers."
+  "notes": "jsdom runs scripts with node:vm and starts workers with node:worker_threads, which workerd does not implement; use cheerio or linkedom on Workers.",
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "confirmed",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1",
+      "error": "ENOENT: no such file or directory, readAll '/browser/default-stylesheet.css', at node-internal:internal_fs_sync:369:21"
+    }
+  }
 }

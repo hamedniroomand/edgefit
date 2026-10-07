@@ -2,8 +2,8 @@
   "version": 2,
   "package": "bcrypt",
   "resolved": "6.0.0",
-  "checkedAt": "2026-10-06T11:31:02.335Z",
-  "edgefit": "0.13.3",
+  "checkedAt": "2026-10-07T17:39:30.284Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -51,7 +51,15 @@
         "workerd": {
           "status": "fail",
           "errors": 1,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "native addon bcrypt",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "is a native addon, which this target cannot load"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -66,5 +74,24 @@
       }
     }
   ],
-  "notes": "Native addon; bcryptjs is the pure-JS alternative."
+  "notes": "Native addon; bcryptjs is the pure-JS alternative.",
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1",
+      "error": "Error: No native build was found for platform=linux arch=x64 runtime=node abi= uv= libc=glibc node=22.19.0, at load.resolve.load.path (bundle.mjs:111:13)",
+      "api": "native addon bcrypt"
+    }
+  }
 }

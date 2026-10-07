@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@supabase/supabase-js",
-  "resolved": "2.117.2",
-  "checkedAt": "2026-10-06T11:30:52.854Z",
-  "edgefit": "0.13.3",
+  "resolved": "2.117.3",
+  "checkedAt": "2026-10-07T17:39:55.154Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,8 +23,8 @@
     "deno"
   ],
   "summary": {
-    "workerd": "pass",
-    "bun": "pass",
+    "workerd": "fail",
+    "bun": "fail",
     "deno": "pass"
   },
   "context": {
@@ -49,14 +49,42 @@
       "specifier": "@supabase/supabase-js",
       "results": {
         "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
+          "status": "fail",
+          "errors": 2,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "navigator.locks.request",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "does not exist on the target"
+            },
+            {
+              "api": "URL.createObjectURL",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "exists, but throws: not implemented"
+            },
+            {
+              "api": "Worker",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
         },
         "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "navigator.locks.request",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "does not exist on the target"
+            }
+          ]
         },
         "deno": {
           "status": "pass",

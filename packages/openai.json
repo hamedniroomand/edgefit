@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "openai",
-  "resolved": "7.28.0",
-  "checkedAt": "2026-10-06T11:30:39.759Z",
-  "edgefit": "0.13.3",
+  "resolved": "7.30.0",
+  "checkedAt": "2026-10-07T17:39:41.411Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -842,5 +842,17 @@
         }
       }
     }
-  ]
+  ],
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1"
+    }
+  }
 }

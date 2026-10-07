@@ -2,8 +2,8 @@
   "version": 2,
   "package": "rxjs",
   "resolved": "7.8.2",
-  "checkedAt": "2026-10-06T11:33:10.417Z",
-  "edgefit": "0.13.3",
+  "checkedAt": "2026-10-07T17:42:01.646Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -170,5 +170,22 @@
         }
       }
     }
-  ]
+  ],
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1"
+    }
+  }
 }

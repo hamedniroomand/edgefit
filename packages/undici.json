@@ -2,8 +2,8 @@
   "version": 2,
   "package": "undici",
   "resolved": "8.11.2",
-  "checkedAt": "2026-10-06T11:30:16.558Z",
-  "edgefit": "0.13.3",
+  "checkedAt": "2026-10-07T17:39:05.589Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -52,6 +52,20 @@
           "status": "fail",
           "errors": 1,
           "warnings": 1,
+          "findings": [
+            {
+              "api": "node:http2.connect",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:worker_threads.markAsUncloneable",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            }
+          ],
           "exports": [
             {
               "name": "MockAgent",
@@ -92,5 +106,23 @@
       }
     }
   ],
-  "notes": "undici opens HTTP/2 connections with node:http2.connect by default since version 8, which workerd does not implement; use the global fetch on Workers."
+  "notes": "undici opens HTTP/2 connections with node:http2.connect by default since version 8, which workerd does not implement; use the global fetch on Workers.",
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "confirmed",
+      "kind": "reach",
+      "runtime": "workerd 1.20260929.1",
+      "error": "ERR_OPTION_NOT_IMPLEMENTED: The options.ALPNProtocols option is not implemented, at new TLSSocket (node-internal:internal_tls_wrap:86:15)"
+    }
+  }
 }

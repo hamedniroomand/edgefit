@@ -2,8 +2,8 @@
   "version": 2,
   "package": "chokidar",
   "resolved": "5.0.0",
-  "checkedAt": "2026-10-06T11:30:01.761Z",
-  "edgefit": "0.13.3",
+  "checkedAt": "2026-10-07T17:38:59.747Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -51,7 +51,27 @@
         "workerd": {
           "status": "fail",
           "errors": 3,
-          "warnings": 0
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:fs.watch",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
+            },
+            {
+              "api": "node:fs.unwatchFile",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
+            },
+            {
+              "api": "node:fs.watchFile",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -113,5 +133,24 @@
       }
     }
   ],
-  "notes": "Watches the file system."
+  "notes": "Watches the file system.",
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "reach",
+      "runtime": "workerd 1.20260929.1",
+      "error": "ERR_UNSUPPORTED_OPERATION: The requested operation is unsupported, at watch (node-internal:internal_fs_callback:939:11)",
+      "api": "node:fs.watch"
+    }
+  }
 }

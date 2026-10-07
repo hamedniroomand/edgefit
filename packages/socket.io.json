@@ -2,8 +2,8 @@
   "version": 2,
   "package": "socket.io",
   "resolved": "4.8.4",
-  "checkedAt": "2026-10-06T11:34:09.740Z",
-  "edgefit": "0.13.3",
+  "checkedAt": "2026-10-07T17:42:38.955Z",
+  "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -51,7 +51,15 @@
         "workerd": {
           "status": "warn",
           "errors": 0,
-          "warnings": 1
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "FileReader",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -66,5 +74,17 @@
       }
     }
   ],
-  "notes": "On Workers the browser build of engine.io-parser reads a Blob with FileReader, which Workers do not have."
+  "notes": "On Workers the browser build of engine.io-parser reads a Blob with FileReader, which Workers do not have.",
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    }
+  }
 }
