@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.13.4
+
+### Patch Changes
+
+- [#275](https://github.com/hamedniroomand/edgefit/pull/275) [`28ce3fb`](https://github.com/hamedniroomand/edgefit/commit/28ce3fb02efea8d9606b5432f09a1f74599841d0) - List the findings of each entry and target in `edgefit package --format json`. The new `findings` field holds the findings that `errors` and `warnings` count, with the same fields as the findings under `exports`, so a tool can read what failed and not only how many findings there are.
+
+- [#283](https://github.com/hamedniroomand/edgefit/pull/283) [`f267df7`](https://github.com/hamedniroomand/edgefit/commit/f267df760cb4dc8fce80275592a842f47ecfad7c) - Report `process.report.getReport` on Cloudflare Workers as a `mismatch`. workerd returns an empty object, so code that reads a field of the report, such as `header.glibcVersionRuntime` in `better-sqlite3`, fails on Workers.
+
 ## 0.13.3
 
 ### Patch Changes
