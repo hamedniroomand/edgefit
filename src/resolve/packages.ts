@@ -4,9 +4,13 @@ import path from 'node:path';
 import type { PackageInfo } from '@/types.ts';
 
 /** `node_modules/@scope/name/dist/index.js` as `@scope/name`. */
-function nameFromPath(file: string): string {
+function nameFromPath(file: string): string | undefined {
   const segments = file.split(path.sep);
   const [first = '', second = ''] = segments.slice(segments.lastIndexOf('node_modules') + 1);
+  // A dot folder such as `.cache` or `.vite` is tool output. npm names cannot start with a dot.
+  if (first.startsWith('.')) {
+    return undefined;
+  }
   return first.startsWith('@') ? `${first}/${second}` : first;
 }
 
@@ -29,9 +33,12 @@ export class PackageResolver {
     if (!absolute.split(path.sep).includes('node_modules')) {
       return undefined;
     }
-    return (
-      this.#lookup(path.dirname(absolute)) ?? { name: nameFromPath(absolute), version: undefined }
-    );
+    const owner = this.#lookup(path.dirname(absolute));
+    if (owner) {
+      return owner;
+    }
+    const name = nameFromPath(absolute);
+    return name === undefined ? undefined : { name, version: undefined };
   }
 
   #lookup(directory: string): PackageInfo | undefined {
