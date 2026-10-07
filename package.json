@@ -62,9 +62,10 @@
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@types/node": "^22.20.4",
-    "@vitest/coverage-v8": "5.0.1",
+    "@vitest/coverage-v8": "catalog:",
     "ajv": "^8.20.0",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
   "engines": {
     "node": ">=22.18.0"
