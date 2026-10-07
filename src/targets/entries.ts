@@ -34,6 +34,8 @@ export type EntryDetection = {
    * lends its own. A target whose entries only make sense on its platform is not shared.
    */
   shared: boolean;
+  /** What to do next, for the error shown when nothing is found. The generic advice stays unless every target has its own. */
+  advice?: () => string;
 };
 
 function firstMatch(sources: readonly EntrySource[], guessed: boolean): EntryMatch | undefined {

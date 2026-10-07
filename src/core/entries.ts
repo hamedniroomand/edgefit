@@ -102,12 +102,15 @@ export function entriesFor(
   });
   if (found.every(item => item === undefined)) {
     const searched = targets.flatMap(target => explain(target));
+    const advice = targets.flatMap(target => target.entries.advice?.() ?? []);
+    const generic = targets.every(target => target.entries.advice !== undefined)
+      ? []
+      : ['Pass --entry, or set `entry` in edgefit.config.ts.'];
     throw new EdgefitError(
       'No entry point to scan.',
-      [
-        ...(searched.length > 0 ? ['Searched:', ...searched] : []),
-        'Pass --entry, or set `entry` in edgefit.config.ts.',
-      ].join('\n'),
+      [...(searched.length > 0 ? ['Searched:', ...searched] : []), ...advice, ...generic].join(
+        '\n',
+      ),
     );
   }
   return found;

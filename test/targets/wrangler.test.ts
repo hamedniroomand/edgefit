@@ -39,6 +39,15 @@ describe('reading a wrangler config', () => {
     });
   });
 
+  it('reads the Pages build output folder', () => {
+    expect(
+      readWranglerConfig(write('wrangler.jsonc', '{ "pages_build_output_dir": "dist" }')),
+    ).toMatchObject({ pagesBuildOutputDir: 'dist', main: undefined });
+    expect(
+      readWranglerConfig(write('wrangler.toml', 'pages_build_output_dir = "dist"\n')),
+    ).toMatchObject({ pagesBuildOutputDir: 'dist' });
+  });
+
   it('names the file when the toml is not valid', () => {
     const file = write('wrangler.toml', 'main = [\n');
     expect(() => readWranglerConfig(file)).toThrow(`Could not parse ${file}`);

@@ -8,6 +8,8 @@ import { parseJsonc } from '@/targets/jsonc.ts';
 export interface WranglerConfig {
   file: string;
   main: string | undefined;
+  /** Set by a Cloudflare Pages project, which has no `main`. */
+  pagesBuildOutputDir: string | undefined;
   compatibilityDate: string | undefined;
   compatibilityFlags: string[] | undefined;
 }
@@ -42,11 +44,13 @@ export function findWranglerConfig(root: string): string | undefined {
   );
 }
 
-/** `main` as a path from the root. Wrangler reads it relative to the config it is written in. */
+/** A path of the config as a path from the root. Wrangler reads it relative to the config it is written in. */
+export function pathFrom(root: string, config: WranglerConfig, value: string): string {
+  return path.relative(root, path.resolve(path.dirname(config.file), value));
+}
+
 export function mainFrom(root: string, config: WranglerConfig): string | undefined {
-  return config.main === undefined
-    ? undefined
-    : path.relative(root, path.resolve(path.dirname(config.file), config.main));
+  return config.main === undefined ? undefined : pathFrom(root, config, config.main);
 }
 
 export function readWranglerConfig(file: string): WranglerConfig {
@@ -66,6 +70,8 @@ export function readWranglerConfig(file: string): WranglerConfig {
   return {
     file,
     main: typeof config.main === 'string' ? config.main : undefined,
+    pagesBuildOutputDir:
+      typeof config.pages_build_output_dir === 'string' ? config.pages_build_output_dir : undefined,
     compatibilityDate:
       typeof config.compatibility_date === 'string' ? config.compatibility_date : undefined,
     compatibilityFlags: Array.isArray(flags)
