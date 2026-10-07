@@ -7,7 +7,7 @@ import type { EdgefitConfig, TargetKey } from '@/types.ts';
 
 import { entrySource } from './entry.ts';
 import type { PackageEntry } from './entry.ts';
-import { resultsByExport } from './exports.ts';
+import { entryFinding, resultsByExport } from './exports.ts';
 import { statusOf } from './result.ts';
 import type { EntryStatus, PackageEntryResult, PackageResult } from './result.ts';
 import { neededMessage, undeclaredModules } from './unchecked.ts';
@@ -31,6 +31,7 @@ function entryStatus(report: TargetReport): EntryStatus {
     status: statusOf(errors, warnings),
     errors,
     warnings,
+    ...(staying.length > 0 ? { findings: staying.map(finding => entryFinding(finding)) } : {}),
     ...(exports.length > 0 ? { exports } : {}),
     ...(notes.length > 0 ? { notes } : {}),
   };

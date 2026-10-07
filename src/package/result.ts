@@ -28,6 +28,8 @@ export interface EntryStatus {
   /** The findings that stay count here: the ones in the module body, or that every export reaches. */
   errors: number;
   warnings: number;
+  /** The findings that count in `errors` and `warnings`, in the order the CLI prints them. */
+  findings?: ExportFinding[];
   /** The findings that only some exports reach, by export. They do not change `status`. */
   exports?: ExportResult[];
   /** Why the entry could not be checked. Only with `status: "error"` or `"unchecked"`. */

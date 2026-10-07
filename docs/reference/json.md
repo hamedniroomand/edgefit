@@ -155,6 +155,19 @@ edgefit check --format json
               ]
             }
           ]
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:fs[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            }
+          ]
         }
       }
     }
@@ -162,7 +175,7 @@ edgefit check --format json
 }
 ```
 
-`status` is `pass`, `warn` (warnings only), `fail` (an error), `error` (the entry could not be checked, with a `message`) or `unchecked` (the entry needs a module that the package does not declare, with a `message`). `summary` is the status of the main entry for each target, or of the worst entry for a package without a checked main entry. `worst` names the worst entry of a target, and is only there when it is worse than `summary`. `main` is the subpath that decides `summary` when it was named with `--main`, and is left out otherwise. `exports` lists the findings that only some exports of the entry reach, by export. They do not change `status` or the counts. `worstExport` names the export with the worst findings among all entries of a target, with the status of its worst finding, and is only there when it is worse than `summary`. `resolved` is the installed version, never the requested range.
+`status` is `pass`, `warn` (warnings only), `fail` (an error), `error` (the entry could not be checked, with a `message`) or `unchecked` (the entry needs a module that the package does not declare, with a `message`). `summary` is the status of the main entry for each target, or of the worst entry for a package without a checked main entry. `worst` names the worst entry of a target, and is only there when it is worse than `summary`. `main` is the subpath that decides `summary` when it was named with `--main`, and is left out otherwise. `findings` lists the findings that `errors` and `warnings` count, in the order that `edgefit check` prints them, with the same fields as an export finding. It is left out when there are none. A native addon finding has the category `unsupported` and an `api` that starts with `native addon `. `exports` lists the findings that only some exports of the entry reach, by export. They do not change `status` or the counts. `worstExport` names the export with the worst findings among all entries of a target, with the status of its worst finding, and is only there when it is worse than `summary`. `resolved` is the installed version, never the requested range.
 
 The table's `results.json` lists one row per package with `name`, `file`, `resolved`, `summary`, `worst`, `worstExport`, `subpaths`, `main` when the row names one, and `error` when the package could not be installed or checked.
 

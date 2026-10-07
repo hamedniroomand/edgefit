@@ -119,3 +119,25 @@ describe('a package whose findings sit behind some exports', () => {
     expect(text).toContain('worst export on workerd:');
   }, 30_000);
 });
+
+describe('a package whose findings every export reaches', () => {
+  it('lists the findings that the counts hold, in the order the CLI prints them', async () => {
+    const result = await checkPackage(fixture('packages/staying-findings'), {
+      targets: ['workerd'],
+    });
+    const found = result.entries[0]?.results.workerd;
+    expect(found?.findings?.length).toBe((found?.errors ?? 0) + (found?.warnings ?? 0));
+    expect(found?.findings?.map(item => [item.level, item.api])).toEqual([
+      ['error', 'node:fs.watch'],
+      ['warning', 'node:fs[<expression>]'],
+    ]);
+    expect(Object.keys(found?.findings?.[0] ?? {})).toEqual(['api', 'category', 'level', 'detail']);
+    expect(found?.findings?.[0]?.category).toBe('unsupported');
+    expect(found?.exports?.map(item => item.name)).toEqual(['statAll']);
+  }, 30_000);
+
+  it('leaves the list out when no finding stays', async () => {
+    const result = await checkPackage(fixture('packages/split-exports'), { targets: ['workerd'] });
+    expect(result.entries[0]?.results.workerd?.findings).toBeUndefined();
+  }, 30_000);
+});
