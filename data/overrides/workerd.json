@@ -360,6 +360,11 @@
       "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
       "source": "internal/public_process.ts"
     },
+    "process.report.getReport": {
+      "status": "mismatch",
+      "note": "returns an empty object, so a report has no header or other field",
+      "source": "internal/public_process.ts"
+    },
     "process.report.writeReport": {
       "status": "unsupported",
       "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
