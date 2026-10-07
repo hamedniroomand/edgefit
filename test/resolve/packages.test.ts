@@ -24,6 +24,19 @@ describe('package resolver', () => {
   it('treats files outside node_modules as the project’s own code', () => {
     expect(resolver.packageFor('src/index.ts')).toBeUndefined();
   });
+
+  it('names a package from its path when no manifest is found', () => {
+    expect(resolver.packageFor(path.join('node_modules', 'not-installed', 'index.js'))).toEqual({
+      name: 'not-installed',
+      version: undefined,
+    });
+  });
+
+  it('does not name a package after a dot folder in node_modules', () => {
+    expect(
+      resolver.packageFor(path.join('node_modules', '.cache', 'nuxt', 'x.js')),
+    ).toBeUndefined();
+  });
 });
 
 describe('formatting packages', () => {
