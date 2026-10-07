@@ -33,3 +33,4 @@ dist-ssr
 docs/public/packages/
 
 coverage
+.vitest/
