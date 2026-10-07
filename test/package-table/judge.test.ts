@@ -117,6 +117,7 @@ describe('the match rule', () => {
 
   it.each([
     'Could not locate the bindings file',
+    'Could not find module root given file: "bundle.mjs"',
     'Error loading shared library x.node',
     'process.dlopen is not supported',
   ])('matches a native addon finding on "%s"', message => {

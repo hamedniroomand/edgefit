@@ -47,6 +47,7 @@ export async function bundle(directory) {
         'process.env.NODE_ENV': '"production"',
         __dirname: '"/bundle"',
         __filename: '"/bundle/index.js"',
+        'import.meta.url': '"file:///bundle/index.mjs"',
       },
       plugins: [nodeBuiltins],
       outfile: path.join(directory, 'bundle.mjs'),

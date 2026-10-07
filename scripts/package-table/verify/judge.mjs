@@ -2,8 +2,9 @@
 // findings of a row: no I/O.
 
 const networkCodes = new Set(['ENOTFOUND', 'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'EAI_AGAIN']);
+// The errors of the addon loaders: node-gyp-build, bindings (two messages), a `.node` file, dlopen.
 const addonPattern =
-  /No native build was found|Could not locate the bindings file|\.node\b|dlopen/u;
+  /No native build was found|Could not locate the bindings file|Could not find module root|\.node\b|dlopen/u;
 const artifactPattern = /__dirname|__filename|require is not defined|Dynamic require of/u;
 const codePattern = /ERR_[A-Z_]+/u;
 
