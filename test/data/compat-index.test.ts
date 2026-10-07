@@ -61,6 +61,15 @@ describe('compatibility data lookups', () => {
   });
 });
 
+describe('workerd APIs that return a stub', () => {
+  it('marks process.report.getReport, which returns an empty report', () => {
+    expect(statusOf('process', 'report', 'getReport')).toBe('mismatch');
+    expect(data.lookup({ module: 'process', path: ['report', 'getReport'] }).source).toContain(
+      'public_process.ts',
+    );
+  });
+});
+
 describe('absent overrides', () => {
   it('reports an override that says absent as absent', () => {
     const source = { provider: 'overrides/workerd', version: '1' };
