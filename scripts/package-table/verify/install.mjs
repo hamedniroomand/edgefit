@@ -1,11 +1,24 @@
 // Installs one package at the version of its result, with its install scripts, in its own folder.
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 const timeoutMs = 5 * 60 * 1000;
 
-/** Installs `name@version` in `<work>/<file>/`. Returns the folder, or an error message. */
+/** The peers that the installed package marks optional, which npm does not install. */
+function optionalPeersOf(directory, name) {
+  const manifest = JSON.parse(
+    readFileSync(path.join(directory, 'node_modules', name, 'package.json'), 'utf8'),
+  );
+  return Object.entries(manifest.peerDependenciesMeta ?? {})
+    .filter(([, meta]) => meta?.optional === true)
+    .map(([peer]) => peer);
+}
+
+/**
+ * Installs `name@version` in `<work>/<file>/`. Returns the folder and the optional peers of the
+ * package, or an error message.
+ */
 export function install(work, file, name, version) {
   const directory = path.join(work, file);
   mkdirSync(directory, { recursive: true });
@@ -19,7 +32,7 @@ export function install(work, file, name, version) {
     timeout: timeoutMs,
   });
   if (run.status === 0) {
-    return { directory };
+    return { directory, optionalPeers: optionalPeersOf(directory, name) };
   }
   const detail = run.error?.message ?? run.stderr.trim().split('\n').slice(-2).join(' ');
   return { error: `npm install failed: ${detail || 'no output'}` };

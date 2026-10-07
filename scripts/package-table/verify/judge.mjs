@@ -7,6 +7,8 @@ const addonPattern =
   /No native build was found|Could not locate the bindings file|Could not find module root|\.node\b|dlopen/u;
 const artifactPattern = /__dirname|__filename|require is not defined|Dynamic require of/u;
 const codePattern = /ERR_[A-Z_]+/u;
+// Node and Bun say `Cannot find package 'x'` or `Cannot find module 'x'`, Deno `Could not find package 'x'`.
+const missingPattern = /(?:Cannot find (?:package|module)|Could not find package) '([^']+)'/u;
 
 /** The error and every error in its `cause` chain, outermost first. */
 export function errorChain(error) {
@@ -130,11 +132,32 @@ function judgeFail({ load, reach }, findings) {
   return failed('reach', reach, findings);
 }
 
+/** The package that an error says is not installed: `react` for `react/jsx-runtime`. */
+export function missingPackage(error) {
+  const name = missingPattern.exec(error.message ?? '')?.[1];
+  if (name === undefined) {
+    return undefined;
+  }
+  const parts = name.split('/');
+  return (name.startsWith('@') ? parts.slice(0, 2) : parts.slice(0, 1)).join('/');
+}
+
 /**
  * The outcome of one run on one target. `status` is the status of the row on the target,
  * `findings` its findings there. Only a pass or a fail row can be verified.
  */
-export function judge({ status, run, findings }) {
+export function judge({ status, run, findings, optionalPeers = [] }) {
+  // An optional peer is not installed with the package, so a load that needs it says nothing. A
+  // missing regular dependency means a broken package, and stays a mismatch.
+  const missing = run.load.ok ? undefined : missingPackage(run.load);
+  if (missing !== undefined && optionalPeers.includes(missing)) {
+    return {
+      outcome: 'absent',
+      kind: 'load',
+      reason: 'peer not installed',
+      error: errorText(run.load),
+    };
+  }
   if (status === 'pass') {
     return judgePass(run);
   }
