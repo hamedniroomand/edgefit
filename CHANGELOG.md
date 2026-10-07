@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.0
+
+### Minor Changes
+
+- [#286](https://github.com/hamedniroomand/edgefit/pull/286) [`f05307b`](https://github.com/hamedniroomand/edgefit/commit/f05307b6bd6c04d36b37f5a5c7389dbf277ab53a) - Find the entry of a Cloudflare Pages project from `pages_build_output_dir`: `_worker.js` in the build output, else the `functions/` folder. When there is none, the error says why and how to build.
+
 ## 0.13.4
 
 ### Patch Changes
