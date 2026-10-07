@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-07T18:53:54.652Z",
-  "edgefit": "0.13.4",
+  "generatedAt": "2026-10-07T20:48:45.419Z",
+  "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -847,7 +847,7 @@
     {
       "name": "firebase",
       "file": "firebase",
-      "resolved": "12.19.0",
+      "resolved": "13.0.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",

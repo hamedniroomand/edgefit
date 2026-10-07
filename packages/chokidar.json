@@ -2,8 +2,8 @@
   "version": 2,
   "package": "chokidar",
   "resolved": "5.0.0",
-  "checkedAt": "2026-10-07T18:42:30.003Z",
-  "edgefit": "0.13.4",
+  "checkedAt": "2026-10-07T20:39:39.562Z",
+  "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

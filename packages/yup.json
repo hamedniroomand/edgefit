@@ -2,8 +2,8 @@
   "version": 2,
   "package": "yup",
   "resolved": "1.7.1",
-  "checkedAt": "2026-10-07T18:45:20.578Z",
-  "edgefit": "0.13.4",
+  "checkedAt": "2026-10-07T20:41:49.042Z",
+  "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
