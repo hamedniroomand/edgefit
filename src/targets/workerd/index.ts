@@ -1,15 +1,14 @@
 import path from 'node:path';
 
 import type { LookupResult } from '@/data/dump.ts';
-import { detectEntries } from '@/targets/entries.ts';
-import { fallbackSources } from '@/targets/entry-sources.ts';
 import { loadTargetData } from '@/targets/target-data.ts';
 import type { Target } from '@/targets/target.ts';
 import type { ApiRef, WorkerdOptions } from '@/types.ts';
 
+import { workerdEntries } from './entries.ts';
 import { assumedNotes, checkSettings, settingsNotes } from './settings.ts';
 import type { AssumedSettings, DataSettings, WorkerdSettings } from './settings.ts';
-import { findWranglerConfig, mainFrom, readWranglerConfig } from './wrangler.ts';
+import { findWranglerConfig, readWranglerConfig } from './wrangler.ts';
 import type { WranglerConfig } from './wrangler.ts';
 
 export const workerdConditions = ['workerd', 'worker', 'browser'];
@@ -87,20 +86,7 @@ export function createWorkerdTarget(root: string, options: WorkerdOptions = {}):
     runtimes: ['workerd'],
     resolvePlatform: 'browser',
     nodeEnv: 'production',
-    entries: detectEntries(
-      [
-        {
-          label: `${wranglerFile ?? 'wrangler config'} "main"`,
-          guessed: false,
-          find: () =>
-            [wrangler === undefined ? undefined : mainFrom(root, wrangler)].flatMap(
-              main => main ?? [],
-            ),
-        },
-        ...fallbackSources(root),
-      ],
-      true,
-    ),
+    entries: workerdEntries(root, wrangler),
     globals,
     hasGlobal: name => index.globalNames().includes(name),
     lookup,

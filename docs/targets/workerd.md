@@ -24,6 +24,19 @@ settings compatibility_date 2026-09-29, flags: nodejs_compat (from wrangler.json
 
 Without a wrangler config, edgefit uses the settings the compatibility data was generated with (its date and `nodejs_compat`), and says so in a note in the report and in the JSON `notes`. A wrangler config that has no `compatibility_flags` enables none, as on Workers. One with no `compatibility_date` gets the data's date, with a note. You can override any of this in the [config file](/guide/configuration#cloudflare-workers).
 
+## Cloudflare Pages
+
+A Pages config has `pages_build_output_dir` and no `main`. With no `--entry` or config `entry`, edgefit looks for the code that Pages runs, in this order:
+
+1. `<pages_build_output_dir>/_worker.js`, a file, or a folder with an `index.js`. This is build output, so edgefit checks it as `--built` does. Nitro and Nuxt write it with the `cloudflare_pages` preset. The SvelteKit and Astro Cloudflare adapters write it too.
+2. Every `.js`, `.mjs`, `.ts`, `.tsx` and `.jsx` file in the `functions/` folder. Pages ignores `functions/` when `_worker.js` exists, so edgefit does too.
+
+For a Pages project, edgefit does not guess other files, such as `src/index.ts`, and does not use the entries of other targets. When nothing is found, the error says why:
+
+- The output has no server code: Pages only serves static files.
+- A Nitro build used another preset, such as `node-server`: build with `NITRO_PRESET=cloudflare_pages`, then run `edgefit check` again.
+- The project uses a framework that has no build output yet: build it for Pages first, then run `edgefit check` again. See [framework build output](/guide/built-output).
+
 ## Compatibility date and flags
 
 Workers turns on native Node modules one by one, gated by compatibility flags that become defaults at a given date when `nodejs_compat` is on. For example, `fs` is native from `2025-09-15` with `enable_nodejs_fs_module`, and `child_process` from `2026-03-17`.
