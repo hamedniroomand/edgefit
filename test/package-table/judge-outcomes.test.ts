@@ -1,4 +1,9 @@
-import { errorText, isNetwork, judge } from '@scripts/package-table/verify/judge.mjs';
+import {
+  errorText,
+  isNetwork,
+  judge,
+  missingPackage,
+} from '@scripts/package-table/verify/judge.mjs';
 import type { RowFinding, RunError } from '@scripts/package-table/verify/judge.mjs';
 import { describe, expect, it } from 'vite-plus/test';
 
@@ -112,5 +117,41 @@ describe('the text of an error', () => {
   it('falls back to the name, then to Error, and leaves out a missing frame', () => {
     expect(errorText(error({ name: 'RangeError', message: 'bad' }))).toBe('RangeError: bad');
     expect(errorText(error({}))).toBe('Error: ');
+  });
+});
+
+describe('a load that needs a package that is not installed', () => {
+  const bun = error({
+    code: 'ERR_MODULE_NOT_FOUND',
+    message: "Cannot find package 'react' imported from /tmp/zustand/index.js",
+  });
+  const deno = error({
+    message: "Could not find package 'react' from referrer 'file:///tmp/x.js'",
+  });
+
+  it.each([bun, deno])('is absent when the package is an optional peer', thrown => {
+    const cell = judge({
+      status: 'pass',
+      run: { load: thrown },
+      findings: [],
+      optionalPeers: ['react'],
+    });
+    expect(cell).toMatchObject({ outcome: 'absent', reason: 'peer not installed' });
+  });
+
+  it('is a mismatch when the package is a regular dependency', () => {
+    expect(
+      judge({ status: 'pass', run: { load: bun }, findings: [], optionalPeers: [] }).outcome,
+    ).toBe('mismatch');
+  });
+
+  it('reads the package of a subpath and of a scoped name', () => {
+    expect(missingPackage(error({ message: "Cannot find module 'react/jsx-runtime'" }))).toBe(
+      'react',
+    );
+    expect(missingPackage(error({ message: "Cannot find package '@scope/name/sub'" }))).toBe(
+      '@scope/name',
+    );
+    expect(missingPackage(error({ message: 'boom' }))).toBeUndefined();
   });
 });

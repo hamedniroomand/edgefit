@@ -70,9 +70,13 @@ describe('the entry of a reach run', () => {
 });
 
 describe('the entry for workerd', () => {
-  it('serves the result from a fetch handler', () => {
-    const source = entrySource({ specifier: 'pkg', reach: false, host: 'worker' });
-    expect(source).toContain('Response.json(await verify())');
+  it('loads the package while the Worker starts, and runs the reach in fetch', () => {
+    const source = entrySource({ specifier: 'pkg', reach: true, host: 'worker' });
+    const handler = source.indexOf('export default');
+    expect(source.indexOf('const loaded = await load();')).toBeGreaterThan(-1);
+    expect(source.indexOf('const loaded = await load();')).toBeLessThan(handler);
+    expect(source.slice(handler)).toContain('Response.json(await finish(loaded))');
+    expect(source.slice(handler)).not.toContain('load()');
     expect(source).not.toContain(marker);
   });
 

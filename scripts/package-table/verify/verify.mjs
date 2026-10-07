@@ -52,7 +52,12 @@ async function verifyPackage(plan, file) {
   const { run, failure } = await engine.run(installed.directory);
   return run === undefined
     ? { outcome: 'absent', kind: plan.kind, reason: failure }
-    : judge({ status: plan.status, run, findings: plan.findings });
+    : judge({
+        status: plan.status,
+        run,
+        findings: plan.findings,
+        optionalPeers: installed.optionalPeers,
+      });
 }
 
 const version = engine.version();

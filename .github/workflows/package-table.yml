@@ -50,7 +50,7 @@ jobs:
     name: Verify on ${{ matrix.runtime }}
     needs: check
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 30
     permissions:
       contents: read
     strategy:

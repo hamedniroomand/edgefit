@@ -43,4 +43,11 @@ export function matchOf(
 export function errorText(error: RunError): string;
 export function isArtifact(error: RunError): boolean;
 export function isNetwork(error: RunError): boolean;
-export function judge(input: { status: string; run: Run; findings: readonly RowFinding[] }): Cell;
+export function missingPackage(error: RunError): string | undefined;
+export function judge(input: {
+  status: string;
+  run: Run;
+  findings: readonly RowFinding[];
+  /** The peers that the package marks optional in `peerDependenciesMeta`. */
+  optionalPeers?: readonly string[];
+}): Cell;
