@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ejs",
   "resolved": "7.0.1",
-  "checkedAt": "2026-10-07T17:39:34.282Z",
+  "checkedAt": "2026-10-07T18:43:10.275Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -76,6 +76,11 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1"
     }
   }
 }

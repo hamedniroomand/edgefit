@@ -2,7 +2,7 @@
   "version": 2,
   "package": "mssql",
   "resolved": "12.7.4",
-  "checkedAt": "2026-10-07T17:39:34.804Z",
+  "checkedAt": "2026-10-07T18:43:10.571Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

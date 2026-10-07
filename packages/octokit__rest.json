@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@octokit/rest",
   "resolved": "22.0.1",
-  "checkedAt": "2026-10-07T17:39:17.240Z",
+  "checkedAt": "2026-10-07T18:43:04.910Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

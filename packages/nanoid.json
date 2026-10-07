@@ -2,7 +2,7 @@
   "version": 2,
   "package": "nanoid",
   "resolved": "6.0.2",
-  "checkedAt": "2026-10-07T17:39:03.527Z",
+  "checkedAt": "2026-10-07T18:42:39.232Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

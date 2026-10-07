@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@noble/curves",
   "resolved": "2.4.0",
-  "checkedAt": "2026-10-07T17:39:31.007Z",
+  "checkedAt": "2026-10-07T18:43:06.976Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -22,6 +22,7 @@
     "bun",
     "deno"
   ],
+  "main": "./secp256k1.js",
   "summary": {
     "workerd": "pass",
     "bun": "pass",
@@ -527,5 +528,23 @@
         }
       }
     }
-  ]
+  ],
+  "notes": "The root entry throws on purpose and asks for an import of a submodule, so the row checks secp256k1, the most used one.",
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1"
+    }
+  }
 }

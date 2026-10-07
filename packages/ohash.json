@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ohash",
   "resolved": "2.0.12",
-  "checkedAt": "2026-10-07T17:46:48.867Z",
+  "checkedAt": "2026-10-07T18:50:11.474Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

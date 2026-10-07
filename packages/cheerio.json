@@ -2,7 +2,7 @@
   "version": 2,
   "package": "cheerio",
   "resolved": "1.2.0",
-  "checkedAt": "2026-10-07T17:39:04.757Z",
+  "checkedAt": "2026-10-07T18:42:35.805Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

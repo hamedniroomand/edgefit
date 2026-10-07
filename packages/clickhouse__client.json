@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@clickhouse/client",
   "resolved": "1.24.0",
-  "checkedAt": "2026-10-07T17:46:50.475Z",
+  "checkedAt": "2026-10-07T18:50:12.892Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "openai",
   "resolved": "7.30.0",
-  "checkedAt": "2026-10-07T17:39:41.411Z",
+  "checkedAt": "2026-10-07T18:42:52.361Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -848,6 +848,11 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
     },
     "workerd": {
       "outcome": "verified",

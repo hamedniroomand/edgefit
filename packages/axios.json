@@ -2,7 +2,7 @@
   "version": 2,
   "package": "axios",
   "resolved": "1.20.0",
-  "checkedAt": "2026-10-07T17:39:45.597Z",
+  "checkedAt": "2026-10-07T18:43:26.396Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

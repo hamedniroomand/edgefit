@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@supabase/supabase-js",
   "resolved": "2.117.3",
-  "checkedAt": "2026-10-07T17:39:55.154Z",
+  "checkedAt": "2026-10-07T18:43:01.685Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -144,5 +144,12 @@
         }
       }
     }
-  ]
+  ],
+  "verified": {
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    }
+  }
 }

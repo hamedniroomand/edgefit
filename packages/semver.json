@@ -2,7 +2,7 @@
   "version": 2,
   "package": "semver",
   "resolved": "7.8.5",
-  "checkedAt": "2026-10-07T17:40:34.027Z",
+  "checkedAt": "2026-10-07T18:43:27.934Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

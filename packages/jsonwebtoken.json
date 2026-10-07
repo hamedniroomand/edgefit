@@ -2,7 +2,7 @@
   "version": 2,
   "package": "jsonwebtoken",
   "resolved": "9.0.3",
-  "checkedAt": "2026-10-07T17:41:37.578Z",
+  "checkedAt": "2026-10-07T18:45:06.786Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

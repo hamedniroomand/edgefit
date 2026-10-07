@@ -2,7 +2,7 @@
   "version": 2,
   "package": "uuid",
   "resolved": "14.0.2",
-  "checkedAt": "2026-10-07T17:39:42.418Z",
+  "checkedAt": "2026-10-07T18:42:53.073Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

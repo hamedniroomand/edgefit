@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ioredis",
   "resolved": "6.0.0",
-  "checkedAt": "2026-10-07T17:38:52.443Z",
+  "checkedAt": "2026-10-07T18:43:03.175Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

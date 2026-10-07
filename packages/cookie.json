@@ -2,7 +2,7 @@
   "version": 2,
   "package": "cookie",
   "resolved": "2.0.1",
-  "checkedAt": "2026-10-07T17:39:02.978Z",
+  "checkedAt": "2026-10-07T18:42:41.745Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

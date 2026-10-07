@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-07T17:50:23.599Z",
+  "generatedAt": "2026-10-07T18:53:54.652Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -87,6 +87,7 @@
       },
       "verified": {
         "bun": "verified",
+        "deno": "verified",
         "workerd": "verified"
       }
     },
@@ -317,13 +318,14 @@
       "subpaths": 38,
       "verified": {
         "bun": "verified",
+        "deno": "verified",
         "workerd": "verified"
       }
     },
     {
       "name": "@anthropic-ai/sdk",
       "file": "anthropic-ai__sdk",
-      "resolved": "0.131.0",
+      "resolved": "0.132.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -348,6 +350,7 @@
       "subpaths": 1,
       "verified": {
         "bun": "verified",
+        "deno": "verified",
         "workerd": "verified"
       }
     },
@@ -836,7 +839,10 @@
         "bun": "fail",
         "deno": "pass"
       },
-      "subpaths": 3
+      "subpaths": 3,
+      "verified": {
+        "deno": "verified"
+      }
     },
     {
       "name": "firebase",
@@ -923,6 +929,7 @@
       "subpaths": 1,
       "verified": {
         "bun": "verified",
+        "deno": "verified",
         "workerd": "verified"
       }
     },
@@ -956,6 +963,7 @@
       "notes": "Native addon.",
       "verified": {
         "bun": "verified",
+        "deno": "verified",
         "workerd": "verified"
       }
     },
@@ -1070,7 +1078,8 @@
       },
       "subpaths": 21,
       "verified": {
-        "bun": "verified"
+        "bun": "verified",
+        "deno": "verified"
       }
     },
     {
@@ -1226,7 +1235,14 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 17
+      "subpaths": 17,
+      "main": "./sha2.js",
+      "notes": "The root entry throws on purpose and asks for an import of a submodule, so the row checks sha2, the most used one.",
+      "verified": {
+        "bun": "verified",
+        "deno": "verified",
+        "workerd": "verified"
+      }
     },
     {
       "name": "@noble/curves",
@@ -1237,7 +1253,14 @@
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 23
+      "subpaths": 23,
+      "main": "./secp256k1.js",
+      "notes": "The root entry throws on purpose and asks for an import of a submodule, so the row checks secp256k1, the most used one.",
+      "verified": {
+        "bun": "verified",
+        "deno": "verified",
+        "workerd": "verified"
+      }
     },
     {
       "name": "@google/genai",
@@ -1273,6 +1296,7 @@
       "subpaths": 72,
       "verified": {
         "bun": "verified",
+        "deno": "verified",
         "workerd": "verified"
       }
     },
@@ -1496,7 +1520,8 @@
       "subpaths": 1,
       "verified": {
         "bun": "verified",
-        "deno": "verified"
+        "deno": "verified",
+        "workerd": "verified"
       }
     },
     {
@@ -1716,7 +1741,7 @@
     {
       "name": "@google-cloud/storage",
       "file": "google-cloud__storage",
-      "resolved": "8.2.0",
+      "resolved": "8.3.0",
       "summary": {
         "workerd": "fail",
         "bun": "pass",

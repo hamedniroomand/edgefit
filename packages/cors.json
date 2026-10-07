@@ -2,7 +2,7 @@
   "version": 2,
   "package": "cors",
   "resolved": "2.8.6",
-  "checkedAt": "2026-10-07T17:39:14.632Z",
+  "checkedAt": "2026-10-07T18:42:43.593Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

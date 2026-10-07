@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@langchain/core",
   "resolved": "1.2.17",
-  "checkedAt": "2026-10-07T17:42:32.152Z",
+  "checkedAt": "2026-10-07T18:46:31.122Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -1562,6 +1562,11 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
     },
     "workerd": {
       "outcome": "verified",

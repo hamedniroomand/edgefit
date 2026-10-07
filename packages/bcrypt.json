@@ -2,7 +2,7 @@
   "version": 2,
   "package": "bcrypt",
   "resolved": "6.0.0",
-  "checkedAt": "2026-10-07T17:39:30.284Z",
+  "checkedAt": "2026-10-07T18:44:06.326Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -90,7 +90,7 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "workerd 1.20260929.1",
-      "error": "Error: No native build was found for platform=linux arch=x64 runtime=node abi= uv= libc=glibc node=22.19.0, at load.resolve.load.path (bundle.mjs:111:13)",
+      "error": "Error: No native build was found for platform=linux arch=x64 runtime=node abi= uv= libc=glibc node=22.19.0, at load2.resolve.load2.path (bundle.mjs:111:13)",
       "api": "native addon bcrypt"
     }
   }

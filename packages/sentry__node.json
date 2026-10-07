@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.5.0",
-  "checkedAt": "2026-10-07T17:46:46.711Z",
+  "checkedAt": "2026-10-07T18:50:09.632Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

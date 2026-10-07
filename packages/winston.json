@@ -2,7 +2,7 @@
   "version": 2,
   "package": "winston",
   "resolved": "3.19.0",
-  "checkedAt": "2026-10-07T17:39:16.378Z",
+  "checkedAt": "2026-10-07T18:42:49.007Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

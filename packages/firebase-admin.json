@@ -2,7 +2,7 @@
   "version": 2,
   "package": "firebase-admin",
   "resolved": "14.5.0",
-  "checkedAt": "2026-10-07T17:40:25.098Z",
+  "checkedAt": "2026-10-07T18:44:49.913Z",
   "edgefit": "0.13.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
