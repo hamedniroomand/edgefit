@@ -54,7 +54,14 @@ export default defineConfig({
     vueIndentScriptAndStyle: true,
   },
   lint: {
-    ignorePatterns: ['commitlint.config.js', 'vite.config.ts', 'apps', 'test/fixtures', 'scripts'],
+    ignorePatterns: [
+      'commitlint.config.js',
+      'vite.config.ts',
+      'apps',
+      'test/fixtures',
+      'scripts',
+      'table/verify',
+    ],
     categories: {
       correctness: 'error',
       perf: 'error',

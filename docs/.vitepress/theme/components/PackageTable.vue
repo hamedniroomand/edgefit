@@ -15,6 +15,7 @@
     subpaths: number;
     error?: string;
     notes?: string;
+    verified?: Record<string, 'verified' | 'confirmed'>;
   }
 
   interface Results {
@@ -25,7 +26,16 @@
     packages: Row[];
   }
 
+  interface Verification {
+    outcome: 'verified' | 'confirmed';
+    kind: 'load' | 'reach';
+    runtime: string;
+    error?: string;
+    api?: string;
+  }
+
   interface Detail {
+    verified?: Record<string, Verification>;
     entries: {
       subpath: string;
       results: Record<
@@ -122,8 +132,27 @@
         `worst export ${worstExport.name} of ${worstExport.subpath} ${words[worstExport.status]}`,
       );
     }
+    if (row.verified?.[key] === 'verified') {
+      parts.push('verified: a run on the runtime agreed with this result');
+    }
     return parts.join(', ');
   }
+
+  // One line for each runtime that ran the package.
+  function verifyLine(key: string, cell: Verification): string {
+    if (cell.outcome === 'confirmed') {
+      return `${key}: fails on ${cell.runtime}, but on a different error first: ${cell.error ?? ''}`;
+    }
+    return cell.api === undefined
+      ? `${key}: verified on ${cell.runtime}, the main entry loaded`
+      : `${key}: verified on ${cell.runtime}, the ${cell.kind} threw ${cell.error ?? ''} from ${cell.api}`;
+  }
+
+  const verifyLines = computed(() =>
+    Object.entries(details.value[open.value]?.verified ?? {}).map(([key, cell]) =>
+      verifyLine(key, cell),
+    ),
+  );
 
   // What the check did not cover, with the subpaths that have it.
   const notes = computed(() => {
@@ -204,6 +233,10 @@
         when an export has findings that the first mark does not count. The status filter and the
         sort use the first mark. A package without a main entry shows its worst subpath, unless its
         row names the subpath that stands for it.
+      </p>
+      <p class="ef-packages-legend">
+        ✔ verified: the package ran on that runtime and the run agreed with the row. For a pass, its
+        main entry loaded. For a failure, the run threw the error of the finding.
       </p>
       <div class="ef-packages-controls">
         <input
@@ -303,6 +336,11 @@
                     :class="[`ef-status-${row.worstExport[key].status}`, 'ef-worst']"
                     >{{ symbols[row.worstExport[key].status] }}</span
                   >
+                  <span
+                    v-if="row.verified?.[key] === 'verified'"
+                    class="ef-verified"
+                    >✔</span
+                  >
                 </template>
               </td>
             </tr>
@@ -363,6 +401,12 @@
                   {{ line }}
                 </p>
                 <p
+                  v-for="line in verifyLines"
+                  :key="line"
+                >
+                  {{ line }}
+                </p>
+                <p
                   v-for="note in notes"
                   :key="note"
                 >
@@ -405,6 +449,11 @@
   }
   .ef-worst {
     font-size: 0.75em;
+  }
+  .ef-verified {
+    margin-left: 2px;
+    font-size: 0.75em;
+    color: var(--vp-c-brand-1);
   }
   .ef-status-pass {
     color: var(--vp-c-green-1);

@@ -53,9 +53,28 @@ For shields.io styling, use `https://img.shields.io/endpoint?url=https://edgefit
 
 The results for the popular libraries are in the [package table](/packages/).
 
+## Verified rows
+
+A static result can be wrong in two ways: the data about a runtime can be wrong, or the trace can miss or add a finding. A run on the real runtime is a second, independent check. After each table run, CI installs each package with its install scripts and runs it on Bun, Deno and workerd. A cell that the run agrees with gets a ✔ mark. The mark describes one resolved version. Netlify Edge and Vercel Edge have no local runtime, so they are not run.
+
+A cell can have one of these outcomes:
+
+- **verified**: the run agreed with the row. For a pass, the main entry loaded on the runtime. For a failure, the run threw an error that matches an error finding that fails the row on that target, one that every export reaches. A finding under some exports does not change the status of a row, so a run that throws it is confirmed, not verified. The cell shows the ✔ mark, and the row detail says what ran.
+- **confirmed**: the runtime failed, but on a different error before the finding. The status agrees, but the finding was not reproduced. The row detail shows the error. The cell has no mark.
+- **mismatch**: a failing row ran with no error, or a passing row failed to load. The script or edgefit is wrong. Nothing is published for the cell, and the verify job fails so the problem is seen.
+- no outcome: a row with warnings only, a row that could not be checked, a run that timed out, an install that failed, or a run that failed on the network.
+
+A pass only means that the main entry loads. No run can choose which exports to call for a pass, so a pass claims nothing more. A row with warnings only is not verified, because a run that ends with no error says nothing about an API that edgefit cannot check.
+
+An error matches a finding when the error has the code that the finding names, such as `ERR_UNSUPPORTED_OPERATION`, and its message or stack names the member of the API, such as `watch` for `node:fs.watch`. The run reads the whole `cause` chain of the error. A native addon finding matches the error of the addon loader. On workerd, a load error about `__dirname`, `__filename` or a dynamic `require` comes from the bundle that the run makes, so it is never a match.
+
+A failing row whose finding is in code that loading the package does not run needs a reach script to be verified. The script is `table/verify/<file>.mjs`, where `<file>` is the name of the badge file (`sentry__node` for `@sentry/node`). It imports the package by its name or a subpath, and exports one function, `run`, which calls an export that reaches the finding. When the finding is listed under exports, the script must import one of them, or it is rejected before it runs. The script must throw the error of the finding on the runtime that fails, and finish on the others. A script that opens a resource closes it. A script that needs the network says so in a comment. A row needs no script to be in the table.
+
 ## Adding a package to the table
 
 Open an issue with the package request form, or a pull request that adds one line to `table/packages.json`. CI runs `edgefit package` on the added package, so the pull request shows its result. A package that needs a generate step before it can be imported, such as `@prisma/client`, is not a row. Its users run `edgefit check` on their project.
+
+A new failing row whose finding only an export reaches should come with a reach script, so the row can be verified. The script must call an export that reaches the finding.
 
 ## Optional peer dependencies
 

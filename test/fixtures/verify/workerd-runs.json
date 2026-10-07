@@ -1,0 +1,223 @@
+{
+  "chokidar": {
+    "version": "5.0.0",
+    "findings": [
+      {
+        "api": "node:fs.watch",
+        "category": "unsupported",
+        "level": "error",
+        "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
+      },
+      {
+        "api": "node:fs.unwatchFile",
+        "category": "unsupported",
+        "level": "error",
+        "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
+      },
+      {
+        "api": "node:fs.watchFile",
+        "category": "unsupported",
+        "level": "error",
+        "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
+      }
+    ],
+    "run": {
+      "load": {
+        "ok": true,
+        "exports": 4
+      },
+      "reach": {
+        "ok": false,
+        "name": "Error",
+        "code": "ERR_UNSUPPORTED_OPERATION",
+        "message": "The requested operation is unsupported",
+        "stack": [
+          "Error: The requested operation is unsupported",
+          "    at watch (node-internal:internal_fs_callback:939:11)",
+          "    at createFsWatchInstance (bundle.mjs:309:12)",
+          "    at setFsWatchListener (bundle.mjs:658:19)",
+          "    at NodeFsHandler._watchWithNodeFs (bundle.mjs:788:20)",
+          "    at NodeFsHandler._handleDir (bundle.mjs:979:25)",
+          "    at async NodeFsHandler._addToNodeFs (bundle.mjs:1022:22)",
+          "    at async bundle.mjs:1405:23"
+        ]
+      }
+    }
+  },
+  "bcrypt": {
+    "version": "6.0.0",
+    "findings": [
+      {
+        "api": "native addon bcrypt",
+        "category": "unsupported",
+        "level": "error",
+        "detail": "is a native addon, which this target cannot load"
+      }
+    ],
+    "run": {
+      "load": {
+        "ok": false,
+        "name": "Error",
+        "message": "No native build was found for platform=linux arch=x64 runtime=node abi= uv= libc=glibc node=22.19.0\n    loaded from: /bundle\n",
+        "stack": [
+          "Error: No native build was found for platform=linux arch=x64 runtime=node abi= uv= libc=glibc node=22.19.0",
+          "    loaded from: /bundle",
+          "",
+          "    at load.resolve.load.path (bundle.mjs:111:13)",
+          "    at load (bundle.mjs:79:34)",
+          "    at node_modules/bcrypt/bcrypt.js (bundle.mjs:290:45)",
+          "    at __require2 (bundle.mjs:15:52)",
+          "    at bundle.mjs:464:60"
+        ]
+      }
+    }
+  },
+  "undici": {
+    "version": "8.11.2",
+    "findings": [
+      {
+        "api": "node:http2.connect",
+        "category": "unsupported",
+        "level": "error",
+        "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+      },
+      {
+        "api": "node:worker_threads.markAsUncloneable",
+        "category": "unknown",
+        "level": "warning",
+        "detail": "is not covered by the compatibility data"
+      },
+      {
+        "api": "node:console.Console",
+        "category": "unsupported",
+        "level": "error",
+        "detail": "the Console constructor throws ERR_METHOD_NOT_IMPLEMENTED",
+        "exports": [
+          "MockAgent",
+          "SnapshotAgent"
+        ]
+      }
+    ],
+    "run": {
+      "load": {
+        "ok": true,
+        "exports": 59
+      },
+      "reach": {
+        "ok": false,
+        "name": "TypeError",
+        "message": "fetch failed",
+        "stack": [
+          "TypeError: fetch failed",
+          "    at Object.processResponse (bundle.mjs:22656:20)",
+          "    at bundle.mjs:23041:23",
+          "    at bundle.mjs:27933:11",
+          "    at async run (bundle.mjs:28004:13)",
+          "    at async Object.fetch (bundle.mjs:28027:7)"
+        ],
+        "cause": {
+          "ok": false,
+          "name": "Error",
+          "code": "ERR_OPTION_NOT_IMPLEMENTED",
+          "message": "The options.ALPNProtocols option is not implemented",
+          "stack": [
+            "Error: The options.ALPNProtocols option is not implemented",
+            "    at new TLSSocket (node-internal:internal_tls_wrap:86:15)",
+            "    at Object.connect (node-internal:internal_tls_wrap:473:21)",
+            "    at connect (bundle.mjs:2941:24)",
+            "    at Client.connect2 (bundle.mjs:9521:42)",
+            "    at connect (bundle.mjs:9692:27)",
+            "    at _resume (bundle.mjs:9853:11)",
+            "    at resume (bundle.mjs:9791:7)"
+          ]
+        }
+      }
+    }
+  },
+  "jsdom": {
+    "version": "30.1.2",
+    "findings": [
+      {
+        "api": "node:vm.runInContext",
+        "category": "unsupported",
+        "level": "error",
+        "detail": "code generation from strings is not allowed; throws ERR_METHOD_NOT_IMPLEMENTED"
+      },
+      {
+        "api": "node:worker_threads.Worker",
+        "category": "unsupported",
+        "level": "error",
+        "detail": "the Worker constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+      },
+      {
+        "api": "node:http2.connect",
+        "category": "unsupported",
+        "level": "error",
+        "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+      },
+      {
+        "api": "node:vm.createContext",
+        "category": "unknown",
+        "level": "warning",
+        "detail": "is not covered by the compatibility data"
+      },
+      {
+        "api": "node:vm.constants.DONT_CONTEXTIFY",
+        "category": "unknown",
+        "level": "warning",
+        "detail": "is not covered by the compatibility data"
+      },
+      {
+        "api": "node:vm",
+        "category": "unknown",
+        "level": "warning",
+        "detail": "is not covered by the compatibility data"
+      },
+      {
+        "api": "node:worker_threads.MessageChannel",
+        "category": "unknown",
+        "level": "warning",
+        "detail": "is not covered by the compatibility data"
+      },
+      {
+        "api": "node:worker_threads.receiveMessageOnPort",
+        "category": "unknown",
+        "level": "warning",
+        "detail": "is not covered by the compatibility data"
+      },
+      {
+        "api": "node:worker_threads.markAsUncloneable",
+        "category": "unknown",
+        "level": "warning",
+        "detail": "is not covered by the compatibility data"
+      },
+      {
+        "api": "node:vm.isContext",
+        "category": "unknown",
+        "level": "warning",
+        "detail": "is not covered by the compatibility data",
+        "exports": [
+          "JSDOM"
+        ]
+      }
+    ],
+    "run": {
+      "load": {
+        "ok": false,
+        "name": "Error",
+        "code": "ENOENT",
+        "message": "no such file or directory, readAll '/browser/default-stylesheet.css'",
+        "stack": [
+          "Error: no such file or directory, readAll '/browser/default-stylesheet.css'",
+          "    at node-internal:internal_fs_sync:369:21",
+          "    at Object.readFileSync (node-internal:internal_fs_sync:370:7)",
+          "    at node_modules/jsdom/lib/jsdom/living/css/helpers/computed-style.js (bundle.mjs:134196:33)",
+          "    at __require2 (bundle.mjs:23:53)",
+          "    at node_modules/jsdom/lib/jsdom/living/css/CSSStyleDeclaration-impl.js (bundle.mjs:135792:25)",
+          "    at __require2 (bundle.mjs:23:53)",
+          "    at node_modules/jsdom/lib/generated/idl/CSSStyleDeclaration.js (bundle.mjs:136965:16)"
+        ]
+      }
+    }
+  }
+}
