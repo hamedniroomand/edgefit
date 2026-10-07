@@ -1,6 +1,7 @@
 // Usage: node merge.mjs <edgefit-dist-index> <shards-dir> <out-dir> [previous-dir]
 // Merges every shard's per-package JSON into results.json, writes each package's badge, and
-// lists the packages that got worse since the previous run.
+// lists the packages that got worse since the previous run. With VERIFY_DIR set, it adds the
+// outcome of each verify job that ran the same version.
 import {
   appendFileSync,
   copyFileSync,
@@ -14,6 +15,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { fileNameOf, readList } from './list.mjs';
+import { readVerify, verifiedOf, verifiedRow } from './verify/fields.mjs';
 
 const [dist, shards, out, previousDir] = process.argv.slice(2);
 const previousFile = previousDir === undefined ? undefined : path.join(previousDir, 'results.json');
@@ -23,6 +25,7 @@ const previousRows = new Map(
     : [],
 );
 const stale = [];
+const verifyRuns = readVerify(process.env.VERIFY_DIR);
 const { renderBadge, shieldsEndpoint } = await import(pathToFileURL(path.resolve(dist)).href);
 
 const rank = { pass: 0, unchecked: 0, warn: 1, error: 2, fail: 3 };
@@ -83,6 +86,13 @@ for (const { name } of readList()) {
     continue;
   }
   sample ??= result.error === undefined ? result : sample;
+  const verified =
+    result.error === undefined
+      ? verifiedOf(verifyRuns.get(file) ?? [], result.resolved)
+      : undefined;
+  if (verified !== undefined) {
+    result.verified = verified;
+  }
   writeFileSync(path.join(out, 'packages', `${file}.json`), `${JSON.stringify(result, null, 2)}\n`);
   if (result.error === undefined) {
     writeFileSync(path.join(out, 'badges', `${file}.svg`), renderBadge(result));
@@ -107,6 +117,7 @@ for (const { name } of readList()) {
     ...(result.error === undefined ? worstColumns(result) : {}),
     ...(result.error === undefined ? {} : { error: result.error }),
     ...(result.notes === undefined ? {} : { notes: result.notes }),
+    ...(verified === undefined ? {} : { verified: verifiedRow(verified) }),
   });
 }
 

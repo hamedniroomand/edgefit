@@ -44,9 +44,68 @@ jobs:
           name: shard-${{ matrix.shard }}
           path: shard-out/
 
+  # Runs each package on the real runtime and compares the run with its row. A run that
+  # contradicts its row fails this job, but never stops the publish: the merge leaves that cell out.
+  verify:
+    name: Verify on ${{ matrix.runtime }}
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [bun, deno, workerd]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      # No cache in this job: install scripts of the packages run here and could write to a cache
+      # that the publish job, which can write to the repo, restores.
+      - uses: voidzero-dev/setup-vp@3754dd7dbdb32bd8f6d28b6043de13ad3a75f21f # v1.21.1
+        with:
+          node-version: '24'
+          cache: false
+          run-install: true
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: shard-*
+          path: shards
+      - name: Resolve the pinned version
+        id: version
+        run: echo "value=$(node -e "import('./scripts/probe/data.mjs').then(m => console.log(m.pinnedVersion('${{ matrix.runtime }}')))")" >> "$GITHUB_OUTPUT"
+      - if: matrix.runtime == 'bun'
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: ${{ steps.version.outputs.value }}
+          no-cache: true
+      - if: matrix.runtime == 'deno'
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
+        with:
+          deno-version: ${{ steps.version.outputs.value }}
+          cache: false
+      - if: matrix.runtime == 'workerd'
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir workerd && cd workerd
+          npm init -y > /dev/null
+          npm install workerd@${{ steps.version.outputs.value }}
+      # Packages are installed with their install scripts here, so this job has no secrets.
+      - run: node "$TABLE/verify/verify.mjs" shards verify-out ${{ matrix.runtime }}
+        env:
+          WORKERD_DIR: ${{ runner.temp }}/workerd
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: verify-${{ matrix.runtime }}
+          path: verify-out/
+
   publish:
     name: Merge and publish
-    needs: check
+    # After verify, but not on its success: a missing verify output leaves that runtime's cells out.
+    needs: [check, verify]
+    if: ${{ !cancelled() && needs.check.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -63,7 +122,12 @@ jobs:
       - run: vp pack
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
+          pattern: shard-*
           path: shards
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: verify-*
+          path: verify
       - name: Fetch the previous results
         env:
           GH_TOKEN: ${{ github.token }}
@@ -74,6 +138,8 @@ jobs:
           git -C results remote remove origin 2>/dev/null || true
           git -C results remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
       - name: Merge
+        env:
+          VERIFY_DIR: verify
         run: |
           previous=""
           [ -f results/results.json ] && previous=results
