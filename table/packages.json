@@ -225,10 +225,14 @@
       "name": "tweetnacl"
     },
     {
-      "name": "@noble/hashes"
+      "name": "@noble/hashes",
+      "main": "./sha2.js",
+      "notes": "The root entry throws on purpose and asks for an import of a submodule, so the row checks sha2, the most used one."
     },
     {
-      "name": "@noble/curves"
+      "name": "@noble/curves",
+      "main": "./secp256k1.js",
+      "notes": "The root entry throws on purpose and asks for an import of a submodule, so the row checks secp256k1, the most used one."
     },
     {
       "name": "@google/genai"
