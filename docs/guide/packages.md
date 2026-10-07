@@ -59,7 +59,7 @@ A static result can be wrong in two ways: the data about a runtime can be wrong,
 
 A cell can have one of these outcomes:
 
-- **verified**: the run agreed with the row. For a pass, the main entry loaded on the runtime. For a failure, the run threw an error that matches an error finding of the row on that target. The cell shows the ✔ mark, and the row detail says what ran.
+- **verified**: the run agreed with the row. For a pass, the main entry loaded on the runtime. For a failure, the run threw an error that matches an error finding that fails the row on that target, one that every export reaches. A finding under some exports does not change the status of a row, so a run that throws it is confirmed, not verified. The cell shows the ✔ mark, and the row detail says what ran.
 - **confirmed**: the runtime failed, but on a different error before the finding. The status agrees, but the finding was not reproduced. The row detail shows the error. The cell has no mark.
 - **mismatch**: a failing row ran with no error, or a passing row failed to load. The script or edgefit is wrong. Nothing is published for the cell, and the verify job fails so the problem is seen.
 - no outcome: a row with warnings only, a row that could not be checked, a run that timed out, an install that failed, or a run that failed on the network.

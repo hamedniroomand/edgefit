@@ -54,6 +54,31 @@ describe('a fail row on workerd, with the errors of real runs', () => {
   });
 });
 
+describe('a finding that only some exports reach', () => {
+  it('confirms undici, but does not verify it, when MockAgent throws its Console finding', () => {
+    const console = error({
+      name: 'Error',
+      code: 'ERR_METHOD_NOT_IMPLEMENTED',
+      message: 'The Console method is not implemented',
+      stack: [
+        'Error: The Console method is not implemented',
+        '    at new Console (node:console:22:11)',
+      ],
+    });
+    const cell = judge({
+      status: 'fail',
+      run: { load: { ok: true }, reach: console },
+      findings: row('undici').findings,
+    });
+    expect(cell).toEqual({
+      outcome: 'confirmed',
+      kind: 'reach',
+      error:
+        'reproduced a finding of export MockAgent, SnapshotAgent, not the finding that fails the row: ERR_METHOD_NOT_IMPLEMENTED: The Console method is not implemented, at new Console (node:console:22:11)',
+    });
+  });
+});
+
 describe('the match rule', () => {
   const watch: RowFinding = {
     api: 'node:fs.watch',

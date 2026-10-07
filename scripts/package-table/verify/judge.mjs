@@ -74,11 +74,23 @@ export function isNetwork(error) {
 
 const rootOf = error => errorChain(error).at(-1);
 
-/** The outcome of an error on a fail row: `verified` when it is a finding, else `confirmed`. */
+/**
+ * The outcome of an error on a fail row: `verified` when it is a finding that fails the row, else
+ * `confirmed`. A finding under exports does not change the status of the row, so reproducing it
+ * does not verify the row.
+ */
 function failed(kind, error, findings) {
   const found = matchOf(error, findings);
-  if (found !== undefined) {
+  if (found !== undefined && found.finding.exports === undefined) {
     return { outcome: 'verified', kind, api: found.finding.api, error: errorText(found.error) };
+  }
+  if (found !== undefined) {
+    const names = found.finding.exports.join(', ');
+    return {
+      outcome: 'confirmed',
+      kind,
+      error: `reproduced a finding of export ${names}, not the finding that fails the row: ${errorText(found.error)}`,
+    };
   }
   if (kind === 'reach' && isNetwork(error)) {
     return { outcome: 'absent', kind, reason: 'network', error: errorText(rootOf(error)) };
