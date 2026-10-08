@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.1
+
+### Patch Changes
+
+- [#289](https://github.com/hamedniroomand/edgefit/pull/289) [`b3c34dd`](https://github.com/hamedniroomand/edgefit/commit/b3c34dd6e566276baf0f8dfa03acb09fb1528f20) - Stop naming a package after a dot folder such as `.cache` in a build's `node_modules`. The code in such a folder is now reported as build output.
+
 ## 0.14.0
 
 ### Minor Changes
