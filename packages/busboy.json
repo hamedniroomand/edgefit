@@ -2,7 +2,7 @@
   "version": 2,
   "package": "busboy",
   "resolved": "1.6.0",
-  "checkedAt": "2026-10-07T20:45:30.060Z",
+  "checkedAt": "2026-10-13T12:17:21.083Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

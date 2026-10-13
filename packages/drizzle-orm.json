@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "drizzle-orm",
-  "resolved": "0.45.3",
-  "checkedAt": "2026-10-07T20:42:16.963Z",
+  "resolved": "0.45.4",
+  "checkedAt": "2026-10-13T12:11:58.213Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -1707,6 +1707,129 @@
       }
     },
     {
+      "subpath": "./libsql/driver-core",
+      "specifier": "drizzle-orm/libsql/driver-core",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./libsql/driver",
+      "specifier": "drizzle-orm/libsql/driver",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./libsql",
+      "specifier": "drizzle-orm/libsql",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./libsql/migrator",
+      "specifier": "drizzle-orm/libsql/migrator",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./libsql/session",
+      "specifier": "drizzle-orm/libsql/session",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
       "subpath": "./mysql-core/alias",
       "specifier": "drizzle-orm/mysql-core/alias",
       "results": {
@@ -2252,129 +2375,6 @@
     {
       "subpath": "./mysql2/session",
       "specifier": "drizzle-orm/mysql2/session",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./libsql/driver-core",
-      "specifier": "drizzle-orm/libsql/driver-core",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./libsql/driver",
-      "specifier": "drizzle-orm/libsql/driver",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        }
-      }
-    },
-    {
-      "subpath": "./libsql",
-      "specifier": "drizzle-orm/libsql",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        }
-      }
-    },
-    {
-      "subpath": "./libsql/migrator",
-      "specifier": "drizzle-orm/libsql/migrator",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./libsql/session",
-      "specifier": "drizzle-orm/libsql/session",
       "results": {
         "workerd": {
           "status": "pass",
@@ -6330,6 +6330,186 @@
       }
     },
     {
+      "subpath": "./libsql/http",
+      "specifier": "drizzle-orm/libsql/http",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./libsql/node",
+      "specifier": "drizzle-orm/libsql/node",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./libsql/sqlite3",
+      "specifier": "drizzle-orm/libsql/sqlite3",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./libsql/wasm",
+      "specifier": "drizzle-orm/libsql/wasm",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client-wasm not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client-wasm not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client-wasm not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./libsql/web",
+      "specifier": "drizzle-orm/libsql/web",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./libsql/ws",
+      "specifier": "drizzle-orm/libsql/ws",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @libsql/client not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
       "subpath": "./mysql-core/columns/all",
       "specifier": "drizzle-orm/mysql-core/columns/all",
       "results": {
@@ -7103,186 +7283,6 @@
           "status": "pass",
           "errors": 0,
           "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./libsql/http",
-      "specifier": "drizzle-orm/libsql/http",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        }
-      }
-    },
-    {
-      "subpath": "./libsql/node",
-      "specifier": "drizzle-orm/libsql/node",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        }
-      }
-    },
-    {
-      "subpath": "./libsql/sqlite3",
-      "specifier": "drizzle-orm/libsql/sqlite3",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        }
-      }
-    },
-    {
-      "subpath": "./libsql/wasm",
-      "specifier": "drizzle-orm/libsql/wasm",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client-wasm not installed, checked in your project"
-          ]
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client-wasm not installed, checked in your project"
-          ]
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client-wasm not installed, checked in your project"
-          ]
-        }
-      }
-    },
-    {
-      "subpath": "./libsql/web",
-      "specifier": "drizzle-orm/libsql/web",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        }
-      }
-    },
-    {
-      "subpath": "./libsql/ws",
-      "specifier": "drizzle-orm/libsql/ws",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "notes": [
-            "peer @libsql/client not installed, checked in your project"
-          ]
         }
       }
     },

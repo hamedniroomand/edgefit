@@ -2,7 +2,7 @@
   "version": 2,
   "package": "sharp",
   "resolved": "0.35.5",
-  "checkedAt": "2026-10-07T20:39:50.002Z",
+  "checkedAt": "2026-10-13T12:09:38.307Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

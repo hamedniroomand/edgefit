@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@langchain/core",
   "resolved": "1.2.17",
-  "checkedAt": "2026-10-07T20:43:46.981Z",
+  "checkedAt": "2026-10-13T12:12:06.115Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

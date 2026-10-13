@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@libsql/client",
   "resolved": "0.18.0",
-  "checkedAt": "2026-10-07T20:41:33.920Z",
+  "checkedAt": "2026-10-13T12:10:42.436Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

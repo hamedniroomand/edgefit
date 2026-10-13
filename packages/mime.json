@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "mime",
-  "resolved": "4.1.0",
-  "checkedAt": "2026-10-07T20:43:51.769Z",
+  "resolved": "4.1.1",
+  "checkedAt": "2026-10-13T12:12:09.770Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

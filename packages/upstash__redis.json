@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@upstash/redis",
   "resolved": "1.39.0",
-  "checkedAt": "2026-10-07T20:39:37.850Z",
+  "checkedAt": "2026-10-13T12:09:28.330Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@supabase/supabase-js",
   "resolved": "2.117.3",
-  "checkedAt": "2026-10-07T20:40:39.904Z",
+  "checkedAt": "2026-10-13T12:10:15.576Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

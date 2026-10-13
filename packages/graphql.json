@@ -2,7 +2,7 @@
   "version": 2,
   "package": "graphql",
   "resolved": "17.0.2",
-  "checkedAt": "2026-10-07T20:41:16.833Z",
+  "checkedAt": "2026-10-13T12:10:29.723Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

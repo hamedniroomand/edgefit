@@ -2,7 +2,7 @@
   "version": 2,
   "package": "redis",
   "resolved": "6.3.0",
-  "checkedAt": "2026-10-07T20:40:06.267Z",
+  "checkedAt": "2026-10-13T12:09:51.007Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

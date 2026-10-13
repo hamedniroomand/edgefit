@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ws",
   "resolved": "8.22.0",
-  "checkedAt": "2026-10-07T20:42:20.014Z",
+  "checkedAt": "2026-10-13T12:12:01.267Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "dayjs",
   "resolved": "1.11.23",
-  "checkedAt": "2026-10-07T20:39:38.557Z",
+  "checkedAt": "2026-10-13T12:09:29.278Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

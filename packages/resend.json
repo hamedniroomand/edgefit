@@ -2,7 +2,7 @@
   "version": 2,
   "package": "resend",
   "resolved": "6.32.1",
-  "checkedAt": "2026-10-07T20:42:34.721Z",
+  "checkedAt": "2026-10-13T12:12:15.579Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

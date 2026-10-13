@@ -2,7 +2,7 @@
   "version": 2,
   "package": "mongodb",
   "resolved": "7.7.0",
-  "checkedAt": "2026-10-07T20:42:32.994Z",
+  "checkedAt": "2026-10-13T12:12:13.924Z",
   "edgefit": "0.14.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
