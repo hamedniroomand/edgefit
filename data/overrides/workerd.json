@@ -72,10 +72,59 @@
       "note": "throws Not implemented",
       "source": "internal/internal_tls.ts"
     },
+    "tls.getCiphers": {
+      "status": "unsupported",
+      "note": "throws Not implemented",
+      "source": "internal/internal_tls.ts"
+    },
     "tls.createSecurePair": {
       "status": "unsupported",
       "note": "throws ERR_METHOD_NOT_IMPLEMENTED",
       "source": "tls.ts"
+    },
+    "tls.connect": {
+      "status": "mismatch",
+      "note": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity",
+      "source": "internal/internal_tls_wrap.ts",
+      "options": [
+        "ALPNProtocols",
+        "minDHSize",
+        "pskCallback",
+        {
+          "key": "checkServerIdentity",
+          "gate": {
+            "flag": "throw_on_not_implemented_tls_options",
+            "disableFlag": "no_throw_on_not_implemented_tls_options",
+            "date": "2026-06-16"
+          }
+        },
+        { "key": "enableTrace", "value": true },
+        { "key": "rejectUnauthorized", "value": false }
+      ]
+    },
+    "tls.TLSSocket": {
+      "status": "mismatch",
+      "note": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, isServer, server, requestCert, SNICallback, requestOCSP and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity",
+      "source": "internal/internal_tls_wrap.ts",
+      "options": [
+        "ALPNProtocols",
+        "SNICallback",
+        "pskCallback",
+        {
+          "key": "checkServerIdentity",
+          "gate": {
+            "flag": "throw_on_not_implemented_tls_options",
+            "disableFlag": "no_throw_on_not_implemented_tls_options",
+            "date": "2026-06-16"
+          }
+        },
+        "server",
+        { "key": "enableTrace", "value": true },
+        { "key": "isServer", "value": true },
+        { "key": "requestCert", "value": true },
+        { "key": "requestOCSP", "value": true },
+        { "key": "rejectUnauthorized", "value": false }
+      ]
     },
     "http.setMaxIdleHTTPParsers": {
       "status": "unsupported",

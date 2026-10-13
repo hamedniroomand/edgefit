@@ -142,7 +142,7 @@
     },
     {
       "name": "undici",
-      "notes": "undici opens HTTP/2 connections with node:http2.connect by default since version 8, which workerd does not implement; use the global fetch on Workers."
+      "notes": "undici fails on workerd because node:tls.connect rejects its ALPNProtocols option; use the global fetch on Workers."
     },
     {
       "name": "graphql"

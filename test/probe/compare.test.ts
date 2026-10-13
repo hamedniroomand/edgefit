@@ -1,4 +1,5 @@
 import { compareOutcomes } from '@scripts/probe/compare.mjs';
+import { readOverrides } from '@scripts/probe/data.mjs';
 import { describe, expect, it } from 'vite-plus/test';
 
 const override = (status: string): { status: string; note: string; source: string } => ({
@@ -101,5 +102,13 @@ describe('compareOutcomes of an API that is missing on purpose', () => {
     expect(
       compareOutcomes({ 'a.x': 'missing' }, { 'a.x': override('supported') }, {}),
     ).toHaveLength(1);
+  });
+});
+
+describe('compareOutcomes with the workerd tls.getCiphers override', () => {
+  const overrides = readOverrides('workerd');
+
+  it('accepts tls.getCiphers when a bare call throws Not implemented', () => {
+    expect(compareOutcomes({ 'tls.getCiphers': 'unsupported' }, overrides, {})).toEqual([]);
   });
 });

@@ -48,7 +48,7 @@ On workerd, a Node module that is not native at your compatibility date is also 
 
 ### mismatch
 
-The API exists but differs from Node: a missing property, a different arity, a different type. It may be fine for your use. Check the detail line.
+The API exists but differs from Node: a missing property, a different arity, a different type, or an option that throws. It may be fine for your use. Check the detail line.
 
 Some APIs fail only for some options. When the data names those options, a call is a finding only when it passes one of them in an object literal, or in a local variable that holds an object literal and is not set again. A key that is added later, as in `options.key = value`, is not read. A call of a name imported with `import { name }` gets the finding at the call. See [Options that are not known](/guide/limitations#options-that-are-not-known) for the calls that edgefit cannot read.
 
