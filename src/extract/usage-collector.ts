@@ -219,6 +219,7 @@ export class UsageCollector {
     const options = unique([...(usage.options ?? []), ...this.guards.options()]);
     Object.assign(
       usage,
+      usage.polyfill === undefined ? this.#polyfill() : {},
       runtimes.length === 0 ? {} : { runtimes },
       globals.length === 0 ? {} : { globals },
       options.length === 0 ? {} : { options },

@@ -281,7 +281,7 @@ function downloadSaveAs(blob) {
 }
 ```
 
-A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
+A use in a [polyfill](#polyfills) store, such as `globalThis.fetch ??= myFetch`, also counts as a use behind a check. A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
 
 - one use has no check
 - the file exports the function in any form: `export`, `export default`, `exports.x` or `module.exports`, also inside a check
