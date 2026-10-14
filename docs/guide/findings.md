@@ -180,6 +180,7 @@ The value stays a finding when:
 
 - the target lacks the global, or its data marks the global as mocked or not supported, because the store runs
 - the store has no check, such as `globalThis.fetch = fs.watch('.')`, or it uses `&&=`
+- the global is `undefined` or `NaN`. `undefined` is nullish and has the type `undefined`, so each value test sees it as missing. `NaN` is falsy, so `||=` and `if (!globalThis.NaN)` see it as missing. `globalThis.NaN ??= value` stays guarded, because `NaN` is not `null` or `undefined`
 
 ### Runtime checks
 
@@ -221,6 +222,8 @@ if (!global.crypto) {
 ```
 
 The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. A global that the data does not name decides nothing. On a target where the code can run, it stays a finding.
+
+`undefined` and `NaN` exist on every target, but a value test can see them as missing. `undefined` looks missing to each value test, also to `=== undefined` and `typeof … === 'undefined'`. `NaN` looks missing only to a truthiness test, such as `!globalThis.NaN` or `globalThis.NaN || x`. So the code that such a test runs is not guarded, see [Polyfills](#polyfills). `typeof globalThis.NaN`, `globalThis.NaN === undefined` and `globalThis.NaN ?? x` still decide the branch.
 
 The data of `workerd` says that `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing. The data of `netlify-edge` says that `document`, `HTMLAnchorElement` and `Bun` are missing. So code behind `typeof window !== 'undefined'` is guarded on Workers. Netlify Edge Functions have a `window` global, so there the check decides nothing.
 

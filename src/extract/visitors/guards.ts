@@ -33,7 +33,7 @@ export const visitLogical: Visitor<NodeOf<'LogicalExpression'>> = (node, context
   context.visit(node.left);
   // `a && b` runs b when a is truthy. `a || b` runs b when a is falsy, and `a ?? b` when a is
   // null or undefined, which is falsy too.
-  const guards = guardsWhen(node.left, node.operator === '&&', context);
+  const guards = guardsWhen(node.left, node.operator === '&&', context, node.operator === '??');
   context.collector.guards.within(guards, () => {
     context.visit(node.right);
   });

@@ -85,3 +85,39 @@ describe('a store to a global that nodejs_compat adds', () => {
     expect(apis(report?.guarded)).toContain('Deno.cwd');
   });
 });
+
+describe('a check of a global that exists with a falsy value', () => {
+  it.each([
+    'falsy-or-store.mjs',
+    'falsy-nullish-store.mjs',
+    'falsy-or.mjs',
+    'falsy-nullish.mjs',
+    'falsy-if-store.mjs',
+    'falsy-if.mjs',
+    'falsy-compare.mjs',
+    'falsy-typeof.mjs',
+    'falsy-guard-clause.mjs',
+    'falsy-else.mjs',
+    'falsy-ternary.mjs',
+    'falsy-and.mjs',
+    'falsy-bare.mjs',
+    'falsy-nullish-const.mjs',
+  ])('does not guard the code that runs for the falsy value: %s', async entry => {
+    const report = await run(entry);
+    expect(watches(report?.findings)).toEqual(['node:fs.watch']);
+  });
+
+  it.each([
+    'nan-nullish-store.mjs',
+    'nan-nullish.mjs',
+    'nan-nullish-const.mjs',
+    'nan-nullish-helper.mjs',
+    'nan-nullish-or.mjs',
+    'nan-typeof.mjs',
+    'nan-compare.mjs',
+  ])('guards the code that does not run for NaN: %s', async entry => {
+    const report = await run(entry);
+    expect(watches(report?.findings)).toEqual([]);
+    expect(watches(report?.guarded)).toEqual(['node:fs.watch']);
+  });
+});
