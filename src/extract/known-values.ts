@@ -5,6 +5,7 @@ import type { PassedKey } from '@/types.ts';
 import { staticKey, strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { foldedString } from './bindings.ts';
+import { literalOf, presenceOf } from './presence.ts';
 import { createScope, declare, lookupKeys, lookupObject } from './scope.ts';
 import type { KnownObject, KnownValue, Scope } from './scope.ts';
 
@@ -55,45 +56,23 @@ function arrayValue(node: NodeOf<'ArrayExpression'>, scope: Scope): KnownObject 
  */
 const presentKeys = new WeakMap<KnownObject, PassedKey[]>();
 
-const isPlainLiteral = (node: Node): node is NodeOf<'Literal'> & { value: boolean | number } =>
-  node.type === 'Literal' && (typeof node.value === 'boolean' || typeof node.value === 'number');
-
-/** A literal value: a boolean or a number in the source, `!0` or `!1` as minifiers write them, or a known string. */
-function literalOf(node: Node, value: KnownValue | undefined): PassedKey['value'] {
-  const inner = strip(node);
-  if (isPlainLiteral(inner)) {
-    return inner.value;
-  }
-  const negated =
-    inner.type === 'UnaryExpression' && inner.operator === '!' ? inner.argument : undefined;
-  if (negated?.type === 'Literal' && typeof negated.value === 'number') {
-    return negated.value === 0;
-  }
-  return typeof value === 'string' ? value : undefined;
-}
-
-/** `undefined` or `void 0`: a key with this value is the same as a key that is not passed. */
-function isUndefinedValue(node: Node): boolean {
-  const inner = strip(node);
-  return (
-    (inner.type === 'Identifier' && inner.name === 'undefined') ||
-    (inner.type === 'UnaryExpression' && inner.operator === 'void')
-  );
-}
-
-/** A key that is not known, such as a spread, may replace the value of each key before it. */
+/**
+ * A key that is not known, such as a spread, may replace the value of each key before it. A key
+ * whose value may be `undefined` is left out, the same as a key that is not passed.
+ */
 function notePresent(
   present: Map<string, PassedKey>,
   key: string | undefined,
   node: Node | undefined,
+  scope: Scope,
   known: KnownValue | undefined,
 ): void {
   if (key === undefined) {
     for (const name of present.keys()) present.set(name, { key: name });
-  } else if (node !== undefined && isUndefinedValue(node)) {
+  } else if (node === undefined || presenceOf(node, scope, valueOf) !== 'defined') {
     present.delete(key);
   } else {
-    const literal = node === undefined ? undefined : literalOf(node, known);
+    const literal = literalOf(node, known);
     present.set(key, literal === undefined ? { key } : { key, value: literal });
   }
 }
@@ -107,7 +86,10 @@ function objectValue(node: NodeOf<'ObjectExpression'>, scope: Scope): KnownObjec
     const key =
       property.type === 'Property' ? staticKey(property.key, property.computed) : undefined;
     const value = plain ? valueOf(property.value, scope) : undefined;
-    notePresent(present, key, plain ? property.value : undefined, value);
+    // A method is a function, and a getter or a setter gives a value that is not known.
+    const given =
+      property.type === 'Property' && property.kind === 'init' ? property.value : undefined;
+    notePresent(present, key, given, scope, value);
     if (key === undefined) {
       entries.clear();
     } else if (value === undefined) {

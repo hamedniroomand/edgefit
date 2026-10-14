@@ -211,7 +211,7 @@ export function isPresentRead(access: Node, parent: Node | undefined, scope: Sco
 }
 
 /** The call or `new` that has `node` as its callee. `outer` holds the ancestors above `parent`, nearest first. */
-function callOf(node: Node, parent: Node, outer: readonly Node[]): Node | undefined {
+function callOf(node: Node, parent: Node | undefined, outer: readonly Node[]): Node | undefined {
   const ancestors = [parent, ...outer];
   let value = node;
   let index = 0;
@@ -227,19 +227,26 @@ function callOf(node: Node, parent: Node, outer: readonly Node[]): Node | undefi
     : undefined;
 }
 
-/** The keys that a call of `node` passes in its object arguments, when any is known. */
+/**
+ * The keys that a call of `node` passes in its options: the last argument that is an object literal
+ * or a name that holds one, as in `connect(port, host, options, callback)` or
+ * `new TLSSocket(socket, options)`. A spread argument hides which argument holds the options.
+ */
 export function callPassedKeys(
   node: Node,
-  parent: Node,
+  parent: Node | undefined,
   outer: readonly Node[],
   scope: Scope,
 ): PassedKey[] | undefined {
   const call = callOf(node, parent, outer);
-  if (call?.type !== 'CallExpression' && call?.type !== 'NewExpression') {
+  if (
+    (call?.type !== 'CallExpression' && call?.type !== 'NewExpression') ||
+    call.arguments.some(argument => argument.type === 'SpreadElement')
+  ) {
     return undefined;
   }
-  const keys = call.arguments.flatMap(argument =>
-    argument.type === 'SpreadElement' ? [] : (passedKeysOf(argument, scope) ?? []),
-  );
-  return keys.length > 0 ? keys : undefined;
+  const options = call.arguments
+    .map(argument => passedKeysOf(argument, scope))
+    .findLast(keys => keys !== undefined);
+  return options === undefined || options.length === 0 ? undefined : [...options];
 }

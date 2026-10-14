@@ -248,10 +248,7 @@ export class Walker implements VisitContext {
       }
       return;
     }
-    const keys =
-      parent === undefined
-        ? undefined
-        : callPassedKeys(node, parent, this.#outer(node), this.scope);
+    const keys = callPassedKeys(node, parent, this.#outer(node), this.scope);
     if (recordBare || chain.extended) {
       const usage = this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
       if (usage !== undefined && keys !== undefined) {

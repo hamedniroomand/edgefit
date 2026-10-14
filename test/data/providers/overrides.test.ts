@@ -103,22 +103,22 @@ describe('absent overrides', () => {
   });
 });
 
-describe('override options', () => {
-  const load = (apis: Record<string, unknown>): CompatEntry[] =>
-    overridesProvider('workerd').load(
-      dataDirectoryWith({
-        'source.json': {
-          sources: [
-            { provider: 'overrides/workerd', url, license: 'MIT', versions: { workerd: '1' } },
-          ],
-        },
-        'overrides/workerd.json': { modules: {}, apis },
-      }),
-    );
-  const mismatch = (options: unknown): Record<string, unknown> => ({
-    'tls.connect': { status: 'mismatch', note: 'throws', source: 'tls.ts', options },
-  });
+const load = (apis: Record<string, unknown>): CompatEntry[] =>
+  overridesProvider('workerd').load(
+    dataDirectoryWith({
+      'source.json': {
+        sources: [
+          { provider: 'overrides/workerd', url, license: 'MIT', versions: { workerd: '1' } },
+        ],
+      },
+      'overrides/workerd.json': { modules: {}, apis },
+    }),
+  );
+const mismatch = (options: unknown): Record<string, unknown> => ({
+  'tls.connect': { status: 'mismatch', note: 'throws', source: 'tls.ts', options },
+});
 
+describe('override options', () => {
   it('carries the options to the lookup', () => {
     const options = ['ALPNProtocols', { key: 'rejectUnauthorized', value: false }];
     const tree = { baseline: {}, runtime: {}, source: { provider: 'matrix', version: '1' } };
@@ -133,6 +133,7 @@ describe('override options', () => {
     ['an item without a key', [{ value: false }], 'have an item of a wrong type'],
     ['an item with an object value', [{ key: 'ca', value: {} }], 'have an item of a wrong type'],
     ['a gate without a date', [{ key: 'ca', gate: { flag: 'f' } }], 'have an item of a wrong type'],
+    ['a gate that is a string', [{ key: 'ca', gate: 'f' }], 'have an item of a wrong type'],
   ])('gives a load error for %s', (_name, options, reason) => {
     expect(() => load(mismatch(options))).toThrow(
       `overrides/workerd.json: the options of tls.connect ${reason}`,

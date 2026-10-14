@@ -82,6 +82,8 @@ The Node compatibility matrix records whether an API exists on each runtime. Cur
 When an override names the options that make a call fail, edgefit reads the options that each call passes. edgefit gives no finding for these calls:
 
 - A call that passes an option through a spread, such as `{ ...options }`, or through a variable whose keys edgefit does not know, such as a parameter.
+- A call that passes an option with a value that may be `undefined`, such as a parameter or a member read: `{ ALPNProtocols: protocols }` or `{ ALPNProtocols: options.ALPNProtocols }`.
+- A call whose options are not in its last argument that is an object, or a call with a spread argument such as `connect(...args)`.
 - A call that passes an option with a value that is not a literal, when only one value fails. `rejectUnauthorized: false` is found, and `rejectUnauthorized: verify` is not.
 - A call that passes a value that fails, but is not the value that the data lists. edgefit matches only the listed literal value. For example, when the data lists `enableTrace` with the value `true`, a call with `enableTrace: 1` is not found.
 - A call through `.call` or `.apply`, such as `tls.connect.call(tls, options)`.
