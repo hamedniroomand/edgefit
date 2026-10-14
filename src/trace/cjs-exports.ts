@@ -15,7 +15,13 @@ import {
   requiredBy,
 } from './cjs-forms.ts';
 import type { Helpers, ObjectLiteral, RequireUse } from './cjs-forms.ts';
-import { exportedAs, loadTimeExport, objectExport } from './cjs-values.ts';
+import {
+  exportedAs,
+  isTruthy,
+  isTruthyDescriptor,
+  loadTimeExport,
+  objectExport,
+} from './cjs-values.ts';
 
 /** What the reader of a module gives the reader of its exports. */
 export interface ExportContext {
@@ -93,7 +99,7 @@ export class ExportWriter {
       return false;
     }
     if (name === '__esModule') {
-      this.#context.builder.shape.esModule = true;
+      this.#context.builder.shape.esModule = isTruthyDescriptor(object);
       return true;
     }
     this.#writes += 1;
@@ -164,7 +170,7 @@ export class ExportWriter {
   /** `exports.name = value`. */
   #assignExport(name: string, value: Node): boolean {
     if (name === '__esModule') {
-      this.#context.builder.shape.esModule = true;
+      this.#context.builder.shape.esModule = isTruthy(value);
       return true;
     }
     if (value.type === 'Identifier') {

@@ -1,6 +1,7 @@
 import type { Node } from 'oxc-parser';
 
-import { isFunction, strip } from '@/extract/ast.ts';
+import { isFunction, staticKey, strip } from '@/extract/ast.ts';
+import { constantOf } from '@/extract/constants.ts';
 
 import { isLazyClass, mentionsIn } from './builder.ts';
 import type { ExportSource, ShapeBuilder } from './builder.ts';
@@ -38,4 +39,33 @@ export function objectExport(builder: ShapeBuilder, name: string, object: Object
     }
   }
   builder.export(name, { local: exportKey(name) });
+}
+
+/**
+ * Whether `exports.__esModule` is set to a value that is known to be true, such as `true`, `1` or
+ * `!0`. Any other value, such as `false`, a name, a regular expression or a bigint, is not a mark,
+ * and a later write of such a value clears an earlier mark.
+ */
+export function isTruthy(node: Node): boolean {
+  const constant = constantOf(node);
+  return constant !== undefined && Boolean(constant.value);
+}
+
+/**
+ * Whether the descriptor of `__esModule` is `{ value: … }` with a value that `isTruthy` accepts. The
+ * last `value` key wins, as at runtime, so a spread or a key that is not known after it can replace
+ * it. A getter, or a descriptor with no `value`, is not a mark.
+ */
+export function isTruthyDescriptor(descriptor: ObjectLiteral): boolean {
+  for (const property of descriptor.properties.toReversed()) {
+    const key =
+      property.type === 'Property' ? staticKey(property.key, property.computed) : undefined;
+    if (key === undefined || property.type !== 'Property') {
+      return false;
+    }
+    if (key === 'value') {
+      return isTruthy(property.value);
+    }
+  }
+  return false;
 }
