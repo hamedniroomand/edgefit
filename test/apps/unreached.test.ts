@@ -3,7 +3,8 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vite-plus/test';
 
-import { inRange, loadUnreached } from '@/data/unreached.ts';
+import { loadUnreached } from '@/data/unreached.ts';
+import { inRange } from '@/data/version-range.ts';
 import { sampleApp, sampleAppsInstalled } from '~/helpers.ts';
 
 const installed = sampleAppsInstalled();

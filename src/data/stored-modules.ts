@@ -2,11 +2,11 @@ import {
   checkRangeAndSource,
   fileInPackage,
   hasText,
-  inRange,
   invalidEntry,
   readEntries,
 } from '@/data/unreached.ts';
 import type { EntryBase } from '@/data/unreached.ts';
+import { inRange } from '@/data/version-range.ts';
 
 /** One reviewed case in `data/stored-modules.json`. */
 export type StoredModuleEntry = EntryBase & {

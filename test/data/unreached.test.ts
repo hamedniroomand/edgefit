@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { collectFindings, defaultLevels } from '@/core/findings.ts';
 import type { ModuleUsages } from '@/core/findings.ts';
-import { compareVersions, fileInPackage, findUnreached, loadUnreached } from '@/data/unreached.ts';
+import { fileInPackage, findUnreached, loadUnreached } from '@/data/unreached.ts';
 import type { UnreachedEntry, UnreachedQuery } from '@/data/unreached.ts';
 import { makeUsage, stubTarget } from '~/helpers.ts';
 
@@ -91,12 +91,6 @@ describe('matching an entry', () => {
     const stored = `node_modules/.pnpm/next@16.3.8_react@19/node_modules/next/${entry.file}`;
     expect(fileInPackage(stored, 'next')).toBe(entry.file);
     expect(fileInPackage('src/index.ts', 'next')).toBeUndefined();
-  });
-
-  it('compares versions by number, not by text', () => {
-    expect(compareVersions('16.10.0', '16.9.0')).toBeGreaterThan(0);
-    expect(compareVersions('16.3.8', '16.3.8')).toBe(0);
-    expect(compareVersions('16.3.8', '17.0.0')).toBeLessThan(0);
   });
 });
 
