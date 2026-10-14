@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-14T19:10:29.396Z",
-  "edgefit": "0.15.0",
+  "generatedAt": "2026-10-14T23:27:22.856Z",
+  "edgefit": "0.15.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -301,7 +301,7 @@
     {
       "name": "openai",
       "file": "openai",
-      "resolved": "7.33.0",
+      "resolved": "7.34.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1261,14 +1261,21 @@
       "file": "google__genai",
       "resolved": "2.29.1",
       "summary": {
-        "workerd": "fail",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 6,
+      "worst": {
+        "workerd": {
+          "subpath": "./node",
+          "status": "fail"
+        }
+      },
       "verified": {
         "bun": "verified",
-        "deno": "verified"
+        "deno": "verified",
+        "workerd": "verified"
       }
     },
     {
@@ -1577,7 +1584,7 @@
     {
       "name": "qs",
       "file": "qs",
-      "resolved": "6.16.0",
+      "resolved": "6.16.1",
       "summary": {
         "workerd": "pass",
         "bun": "pass",

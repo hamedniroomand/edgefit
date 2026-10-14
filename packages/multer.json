@@ -2,8 +2,8 @@
   "version": 2,
   "package": "multer",
   "resolved": "2.4.0",
-  "checkedAt": "2026-10-14T19:02:01.701Z",
-  "edgefit": "0.15.0",
+  "checkedAt": "2026-10-14T23:21:50.836Z",
+  "edgefit": "0.15.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

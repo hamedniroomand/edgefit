@@ -2,8 +2,8 @@
   "version": 2,
   "package": "yaml",
   "resolved": "2.9.1",
-  "checkedAt": "2026-10-14T18:59:48.945Z",
-  "edgefit": "0.15.0",
+  "checkedAt": "2026-10-14T23:19:38.933Z",
+  "edgefit": "0.15.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
