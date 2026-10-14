@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "resend",
-  "resolved": "6.32.1",
-  "checkedAt": "2026-10-13T12:12:15.579Z",
-  "edgefit": "0.14.0",
+  "resolved": "6.33.0",
+  "checkedAt": "2026-10-14T19:01:55.780Z",
+  "edgefit": "0.15.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

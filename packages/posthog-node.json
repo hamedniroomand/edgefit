@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "posthog-node",
-  "resolved": "5.55.3",
-  "checkedAt": "2026-10-13T12:10:41.339Z",
-  "edgefit": "0.14.0",
+  "resolved": "5.56.1",
+  "checkedAt": "2026-10-14T19:00:28.257Z",
+  "edgefit": "0.15.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -51,17 +51,26 @@
         "workerd": {
           "status": "pass",
           "errors": 0,
-          "warnings": 0
+          "warnings": 0,
+          "notes": [
+            "peer @opentelemetry/api not installed, checked in your project"
+          ]
         },
         "bun": {
           "status": "pass",
           "errors": 0,
-          "warnings": 0
+          "warnings": 0,
+          "notes": [
+            "peer @opentelemetry/api not installed, checked in your project"
+          ]
         },
         "deno": {
           "status": "pass",
           "errors": 0,
-          "warnings": 0
+          "warnings": 0,
+          "notes": [
+            "peer @opentelemetry/api not installed, checked in your project"
+          ]
         }
       }
     },
@@ -72,17 +81,26 @@
         "workerd": {
           "status": "pass",
           "errors": 0,
-          "warnings": 0
+          "warnings": 0,
+          "notes": [
+            "peer @opentelemetry/api not installed, checked in your project"
+          ]
         },
         "bun": {
           "status": "pass",
           "errors": 0,
-          "warnings": 0
+          "warnings": 0,
+          "notes": [
+            "peer @opentelemetry/api not installed, checked in your project"
+          ]
         },
         "deno": {
           "status": "pass",
           "errors": 0,
-          "warnings": 0
+          "warnings": 0,
+          "notes": [
+            "peer @opentelemetry/api not installed, checked in your project"
+          ]
         }
       }
     },
@@ -148,11 +166,6 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "deno 2.9.7"
-    },
-    "workerd": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "workerd 1.20260929.1"
     }
   }
 }

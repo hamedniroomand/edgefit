@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-13T12:20:42.161Z",
-  "edgefit": "0.14.0",
+  "generatedAt": "2026-10-14T19:10:29.396Z",
+  "edgefit": "0.15.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -238,24 +238,16 @@
     {
       "name": "mysql2",
       "file": "mysql2",
-      "resolved": "3.24.5",
+      "resolved": "3.24.6",
       "summary": {
-        "workerd": "pass",
+        "workerd": "warn",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 3,
-      "worstExport": {
-        "workerd": {
-          "subpath": ".",
-          "name": "createServer",
-          "status": "warn"
-        }
-      },
       "verified": {
         "bun": "verified",
-        "deno": "verified",
-        "workerd": "verified"
+        "deno": "verified"
       }
     },
     {
@@ -309,7 +301,7 @@
     {
       "name": "openai",
       "file": "openai",
-      "resolved": "7.32.0",
+      "resolved": "7.33.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -325,7 +317,7 @@
     {
       "name": "@anthropic-ai/sdk",
       "file": "anthropic-ai__sdk",
-      "resolved": "0.133.0",
+      "resolved": "0.134.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -341,7 +333,7 @@
     {
       "name": "@aws-sdk/client-s3",
       "file": "aws-sdk__client-s3",
-      "resolved": "3.1150.0",
+      "resolved": "3.1152.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -754,28 +746,27 @@
       "file": "got",
       "resolved": "16.1.0",
       "summary": {
-        "workerd": "pass",
+        "workerd": "warn",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
       "verified": {
         "bun": "verified",
-        "deno": "verified",
-        "workerd": "verified"
+        "deno": "verified"
       }
     },
     {
       "name": "undici",
       "file": "undici",
-      "resolved": "8.11.2",
+      "resolved": "8.12.1",
       "summary": {
         "workerd": "fail",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
-      "notes": "undici opens HTTP/2 connections with node:http2.connect by default since version 8, which workerd does not implement; use the global fetch on Workers.",
+      "notes": "undici fails on workerd because node:tls.connect rejects its ALPNProtocols option; use the global fetch on Workers.",
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -801,7 +792,7 @@
     {
       "name": "graphql-yoga",
       "file": "graphql-yoga",
-      "resolved": "5.24.4",
+      "resolved": "5.24.5",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -835,13 +826,15 @@
       "file": "supabase__supabase-js",
       "resolved": "2.117.3",
       "summary": {
-        "workerd": "fail",
-        "bun": "fail",
+        "workerd": "pass",
+        "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 3,
       "verified": {
-        "deno": "verified"
+        "bun": "verified",
+        "deno": "verified",
+        "workerd": "verified"
       }
     },
     {
@@ -1054,7 +1047,7 @@
     {
       "name": "resend",
       "file": "resend",
-      "resolved": "6.32.1",
+      "resolved": "6.33.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1070,16 +1063,17 @@
     {
       "name": "nodemailer",
       "file": "nodemailer",
-      "resolved": "10.1.0",
+      "resolved": "10.1.1",
       "summary": {
-        "workerd": "fail",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 21,
       "verified": {
         "bun": "verified",
-        "deno": "verified"
+        "deno": "verified",
+        "workerd": "verified"
       }
     },
     {
@@ -1265,23 +1259,16 @@
     {
       "name": "@google/genai",
       "file": "google__genai",
-      "resolved": "2.29.0",
+      "resolved": "2.29.1",
       "summary": {
-        "workerd": "pass",
+        "workerd": "fail",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 6,
-      "worst": {
-        "workerd": {
-          "subpath": "./node",
-          "status": "fail"
-        }
-      },
       "verified": {
         "bun": "verified",
-        "deno": "verified",
-        "workerd": "verified"
+        "deno": "verified"
       }
     },
     {
@@ -1399,7 +1386,7 @@
     {
       "name": "posthog-node",
       "file": "posthog-node",
-      "resolved": "5.55.3",
+      "resolved": "5.56.1",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1408,8 +1395,7 @@
       "subpaths": 4,
       "verified": {
         "bun": "verified",
-        "deno": "verified",
-        "workerd": "verified"
+        "deno": "verified"
       }
     },
     {
@@ -1703,7 +1689,7 @@
     {
       "name": "unstorage",
       "file": "unstorage",
-      "resolved": "1.17.5",
+      "resolved": "1.17.6",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1757,7 +1743,7 @@
     {
       "name": "mssql",
       "file": "mssql",
-      "resolved": "12.7.4",
+      "resolved": "12.7.6",
       "summary": {
         "workerd": "fail",
         "bun": "pass",
@@ -1790,7 +1776,7 @@
     {
       "name": "@electric-sql/pglite",
       "file": "electric-sql__pglite",
-      "resolved": "0.5.9",
+      "resolved": "0.5.10",
       "summary": {
         "workerd": "fail",
         "bun": "pass",

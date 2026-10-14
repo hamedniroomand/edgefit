@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@google/genai",
-  "resolved": "2.29.0",
-  "checkedAt": "2026-10-13T12:10:37.475Z",
-  "edgefit": "0.14.0",
+  "resolved": "2.29.1",
+  "checkedAt": "2026-10-14T19:00:22.573Z",
+  "edgefit": "0.15.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,15 +23,9 @@
     "deno"
   ],
   "summary": {
-    "workerd": "pass",
+    "workerd": "fail",
     "bun": "pass",
     "deno": "pass"
-  },
-  "worst": {
-    "workerd": {
-      "subpath": "./node",
-      "status": "fail"
-    }
   },
   "context": {
     "workerd": {
@@ -55,9 +49,17 @@
       "specifier": "@google/genai",
       "results": {
         "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "Deno",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "workerd has no Deno global"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -76,9 +78,17 @@
       "specifier": "@google/genai/web",
       "results": {
         "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "Deno",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "workerd has no Deno global"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -98,9 +108,15 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 2,
+          "errors": 3,
           "warnings": 0,
           "findings": [
+            {
+              "api": "Deno",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "workerd has no Deno global"
+            },
             {
               "api": "node:child_process.exec",
               "category": "unsupported",
@@ -215,11 +231,6 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "deno 2.9.7"
-    },
-    "workerd": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "workerd 1.20260929.1"
     }
   }
 }

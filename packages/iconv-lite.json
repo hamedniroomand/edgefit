@@ -2,8 +2,8 @@
   "version": 2,
   "package": "iconv-lite",
   "resolved": "0.7.3",
-  "checkedAt": "2026-10-13T12:17:23.521Z",
-  "edgefit": "0.14.0",
+  "checkedAt": "2026-10-14T19:06:51.409Z",
+  "edgefit": "0.15.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

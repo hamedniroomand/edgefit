@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "nodemailer",
-  "resolved": "10.1.0",
-  "checkedAt": "2026-10-13T12:10:00.922Z",
-  "edgefit": "0.14.0",
+  "resolved": "10.1.1",
+  "checkedAt": "2026-10-14T18:59:20.597Z",
+  "edgefit": "0.15.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,7 +23,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
+    "workerd": "pass",
     "bun": "pass",
     "deno": "pass"
   },
@@ -49,17 +49,9 @@
       "specifier": "nodemailer",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 1,
-          "warnings": 0,
-          "findings": [
-            {
-              "api": "node:child_process.spawn",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
-            }
-          ]
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -309,17 +301,9 @@
       "specifier": "nodemailer/lib/sendmail-transport",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 1,
-          "warnings": 0,
-          "findings": [
-            {
-              "api": "node:child_process.spawn",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
-            }
-          ]
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
         },
         "bun": {
           "status": "pass",
@@ -512,6 +496,11 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1"
     }
   }
 }

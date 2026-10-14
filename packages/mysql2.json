@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "mysql2",
-  "resolved": "3.24.5",
-  "checkedAt": "2026-10-13T12:09:29.293Z",
-  "edgefit": "0.14.0",
+  "resolved": "3.24.6",
+  "checkedAt": "2026-10-14T18:58:54.134Z",
+  "edgefit": "0.15.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,16 +23,9 @@
     "deno"
   ],
   "summary": {
-    "workerd": "pass",
+    "workerd": "warn",
     "bun": "pass",
     "deno": "pass"
-  },
-  "worstExport": {
-    "workerd": {
-      "subpath": ".",
-      "name": "createServer",
-      "status": "warn"
-    }
   },
   "context": {
     "workerd": {
@@ -56,9 +49,17 @@
       "specifier": "mysql2",
       "results": {
         "workerd": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:tls.connect",
+              "category": "mismatch",
+              "level": "warning",
+              "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
+            }
+          ],
           "exports": [
             {
               "name": "createServer",
@@ -91,9 +92,17 @@
       "specifier": "mysql2/promise",
       "results": {
         "workerd": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:tls.connect",
+              "category": "mismatch",
+              "level": "warning",
+              "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -112,9 +121,17 @@
       "specifier": "mysql2/promise.js",
       "results": {
         "workerd": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:tls.connect",
+              "category": "mismatch",
+              "level": "warning",
+              "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -139,11 +156,6 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "deno 2.9.7"
-    },
-    "workerd": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "workerd 1.20260929.1"
     }
   }
 }
