@@ -85,7 +85,7 @@ export function compare(base: DumpNode | undefined, target: DumpNode | undefined
 export function subtreeHasProblems(
   base: DumpNode | undefined,
   target: DumpNode | undefined,
-  curated: (path: readonly string[]) => boolean = () => false,
+  curated: (path: readonly string[]) => boolean,
   path: readonly string[] = [],
 ): boolean {
   if (compare(base, target).status !== 'supported') {
