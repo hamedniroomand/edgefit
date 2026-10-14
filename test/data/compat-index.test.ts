@@ -4,6 +4,7 @@ import { CompatIndex } from '@/data/compat-index.ts';
 import { findDataDirectory } from '@/data/data-directory.ts';
 import { matrixProvider } from '@/data/providers/matrix.ts';
 import { overridesProvider } from '@/data/providers/overrides.ts';
+import type { CompatEntry } from '@/data/providers/provider.ts';
 
 const dataDirectory = findDataDirectory();
 const data = new CompatIndex(
@@ -61,6 +62,16 @@ describe('compatibility data lookups', () => {
   });
 });
 
+describe('an entry with options below its module', () => {
+  it('counts as a problem only with withOptions', () => {
+    const connect = { module: 'tls', path: ['connect'] };
+    expect(data.hasProblemsBelow(connect)).toBe(false);
+    expect(data.hasProblemsBelow(connect, true)).toBe(true);
+    // tls.createServer and tls.Server are unsupported, so the module still has problems.
+    expect(data.hasProblemsBelow({ module: 'tls', path: [] })).toBe(true);
+  });
+});
+
 describe('workerd APIs that return a stub', () => {
   it('marks process.report.getReport, which returns an empty report', () => {
     expect(statusOf('process', 'report', 'getReport')).toBe('mismatch');
@@ -86,5 +97,40 @@ describe('absent overrides', () => {
     ]);
     expect(withAbsent.lookup({ module: 'fs', path: ['glob'] }).absent).toBe(true);
     expect(withAbsent.lookup({ module: 'fs', path: ['watch'] }).absent).toBeUndefined();
+  });
+});
+
+describe('a curated entry below the queried API', () => {
+  const source = { provider: 'test', version: '1' };
+  // `m.f` is a function in Node but an object on the target, so the tree alone gives a mismatch.
+  const tree = {
+    baseline: { m: { '*self*': 'object', f: 'function', g: 'function' } },
+    runtime: { m: { '*self*': 'object', f: 'object', g: 'function' } },
+    source,
+  };
+  const entry = (path: string[], fields: Partial<CompatEntry>): CompatEntry => ({
+    target: 'workerd',
+    module: 'm',
+    path,
+    status: 'supported',
+    source,
+    ...fields,
+  });
+  const module = { module: 'm', path: [] };
+
+  it('decides its part of the tree', () => {
+    expect(new CompatIndex(tree).hasProblemsBelow(module)).toBe(true);
+    expect(new CompatIndex(tree, [entry(['f'], {})]).hasProblemsBelow(module)).toBe(false);
+    const options = new CompatIndex(tree, [entry(['f'], { status: 'mismatch', options: ['x'] })]);
+    expect(options.hasProblemsBelow(module)).toBe(false);
+    expect(options.hasProblemsBelow(module, true)).toBe(true);
+  });
+
+  it('wins over a fallback entry below it', () => {
+    const fallback = [entry(['h', 'i'], { status: 'unsupported' })];
+    const f = entry(['f'], {});
+    expect(new CompatIndex(tree, [f], fallback).hasProblemsBelow(module)).toBe(true);
+    const h = entry(['h'], {});
+    expect(new CompatIndex(tree, [f, h], fallback).hasProblemsBelow(module)).toBe(false);
   });
 });

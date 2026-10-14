@@ -96,6 +96,7 @@ When an override names the options that make a call fail, edgefit reads the opti
 - A `super(...)` call in a class that extends the API.
 - An imported function that is passed as a value and called later, such as `register(connect)`.
 - A call that passes a variable whose object is changed after it is made. edgefit then reads no keys of that variable. These changes count: a member write such as `options.ALPNProtocols = ['h2']`, `delete options.host`, and `Object.assign`, `Object.defineProperty`, `Object.defineProperties`, `Reflect.set`, `Reflect.defineProperty` or `Reflect.deleteProperty` with the object as the first argument.
+- A computed read, such as `mod[key]`, of a module or an object whose only problem is an API that fails only for some options. The read shows no option, so edgefit gives no `unknown` finding for it.
 
 edgefit does not see a change of the object through another name for it, such as `const o = options; o.host = 'a'`, a destructuring into a member, such as `[options.host] = ['a']`, a change by a function that gets the object, such as `normalize(options)`, or a change through another object that holds it, such as `holder.options.host = 'a'`. Then edgefit still reads the keys of the object literal, so a call can get a finding for a key that the change removed.
 

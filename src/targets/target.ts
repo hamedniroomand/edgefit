@@ -40,5 +40,9 @@ export interface Target {
   /** Whether the target's data names this global, as opposed to a name nothing defines. */
   hasGlobal: (name: string) => boolean;
   lookup: (api: ApiRef) => LookupResult;
+  /**
+   * Whether a dynamic read of this API can reach a problem. An API that fails only for some
+   * options does not count: a read shows no option, as a call whose options are unknown.
+   */
   hasProblemsBelow: (api: ApiRef) => boolean;
 }
