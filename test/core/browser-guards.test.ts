@@ -70,13 +70,17 @@ describe('a read of a global that workerd lacks, through the global object', () 
     expect(apis(report?.findings).sort()).toEqual(['Deno.version', 'document']);
   });
 
-  it.each(['export-named.mjs', 'export-default.mjs', 'export-renamed.mjs'])(
-    'is a finding when the file exports the const that holds it: %s',
-    async entry => {
-      const report = await run(entry);
-      expect(apis(report?.findings)).toEqual(['document']);
-    },
-  );
+  it.each([
+    'export-named.mjs',
+    'export-default.mjs',
+    'export-renamed.mjs',
+    'export-module.cjs',
+    'export-exports-member.cjs',
+    'export-module-member.cjs',
+  ])('is a finding when the file exports the const that holds it: %s', async entry => {
+    const report = await run(entry);
+    expect(apis(report?.findings)).toEqual(['document']);
+  });
 
   it('does not report a bare browser global yet, a known gap', async () => {
     const report = await run('bare-reads.mjs');

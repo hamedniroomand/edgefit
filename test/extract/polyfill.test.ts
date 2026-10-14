@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vite-plus/test';
 
+import { extractUsages } from '@/extract/index.ts';
 import { usagesOf } from '~/helpers.ts';
 
 const crypto = "import crypto from 'node:crypto';\n";
-const stored = ['api node:crypto', 'api node:crypto', 'dynamic node:crypto [polyfill crypto]'];
+const stored = [
+  'api node:crypto',
+  'api node:crypto [polyfill crypto]',
+  'dynamic node:crypto [polyfill crypto]',
+];
 const plain = ['api node:crypto', 'api node:crypto', 'dynamic node:crypto'];
 
 describe('a module stored in a global that is only set when it is missing', () => {
@@ -38,5 +43,37 @@ describe('a module stored in a global that is only set when it is missing', () =
     expect(
       usagesOf(`${crypto}if (!globalThis.crypto) {\n  globalThis.crypto = 1;\n  keep(crypto);\n}`),
     ).toEqual(plain);
+  });
+});
+
+describe('other usages in the value of a store', () => {
+  it('marks a native addon', () => {
+    const usages = extractUsages('lib.cjs', "globalThis.fetch ??= require('./addon.node');", {
+      globals: new Set(['globalThis', 'fetch']),
+      nodeEnv: undefined,
+      nativeSpecifiers: new Map([['./addon.node', 'addon']]),
+    });
+    expect(usages.find(usage => usage.kind === 'native')?.polyfill).toEqual({
+      module: '*globals*',
+      path: ['fetch'],
+    });
+  });
+
+  it('marks the value of a store to process, which is a module ref', () => {
+    expect(usagesOf(`${crypto}globalThis.process ??= crypto.randomUUID();`)).toContain(
+      'api node:crypto.randomUUID [polyfill process]',
+    );
+  });
+
+  it('marks a store through a const alias of the global object', () => {
+    expect(usagesOf(`${crypto}const g = globalThis;\ng.crypto ??= crypto;`)).toContain(
+      'dynamic node:crypto [polyfill crypto]',
+    );
+  });
+
+  it('does not mark a store through a let alias, which the code can write again', () => {
+    expect(usagesOf(`${crypto}let g = globalThis;\ng.crypto ??= crypto;`)).toContain(
+      'dynamic node:crypto',
+    );
   });
 });

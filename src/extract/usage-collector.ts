@@ -140,6 +140,7 @@ export class UsageCollector {
       ...(guarded ? { guarded: true as const } : {}),
       ...(caught ? { caught: true as const } : {}),
       ...(afterLoad ? { afterLoad: true as const } : {}),
+      ...this.#polyfill(),
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
@@ -176,6 +177,7 @@ export class UsageCollector {
       location: this.location(offset),
       // A `try` that catches the error of a missing addon guards the import.
       ...(this.guards.isCaught() ? { guarded: true as const } : {}),
+      ...this.#polyfill(),
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
@@ -219,6 +221,7 @@ export class UsageCollector {
     const options = unique([...(usage.options ?? []), ...this.guards.options()]);
     Object.assign(
       usage,
+      usage.polyfill === undefined ? this.#polyfill() : {},
       runtimes.length === 0 ? {} : { runtimes },
       globals.length === 0 ? {} : { globals },
       options.length === 0 ? {} : { options },
