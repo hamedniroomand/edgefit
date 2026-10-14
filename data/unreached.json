@@ -4,57 +4,57 @@
   "entries": [
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.0" },
+      "versions": { "min": "16.3.8", "max": "16.4.1" },
       "file": "dist/esm/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
       "reason": "Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.0/crates/next-core/src/next_edge/context.rs#L128"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.1/crates/next-core/src/next_edge/context.rs#L128"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.0" },
+      "versions": { "min": "16.3.8", "max": "16.4.1" },
       "file": "dist/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
       "reason": "Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.0/crates/next-core/src/next_edge/context.rs#L128"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.1/crates/next-core/src/next_edge/context.rs#L128"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.0" },
+      "versions": { "min": "16.3.8", "max": "16.4.1" },
       "file": "dist/esm/build/templates/app-route.js",
       "apis": ["node:process.hrtime.bigint"],
       "target": "vercel-edge",
       "reason": "Runs only when routeModule.isDev is true. isDev is set from __NEXT_DEV_SERVER, which only next dev sets, so a deployed build never runs it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.0/packages/next/src/build/templates/app-route.ts#L117"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/build/templates/app-route.ts#L117"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.0" },
+      "versions": { "min": "16.3.8", "max": "16.4.1" },
       "file": "dist/build/templates/app-route.js",
       "apis": ["node:process.hrtime.bigint"],
       "target": "vercel-edge",
       "reason": "Runs only when routeModule.isDev is true. isDev is set from __NEXT_DEV_SERVER, which only next dev sets, so a deployed build never runs it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.0/packages/next/src/build/templates/app-route.ts#L117"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/build/templates/app-route.ts#L117"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.0" },
+      "versions": { "min": "16.3.8", "max": "16.4.1" },
       "file": "dist/esm/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
       "reason": "Runs only inside `if (registry)`, and `registry` is set only when `globalThis.FinalizationRegistry` exists. Vercel edge functions have no FinalizationRegistry, so the branch never runs there.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.0/packages/next/src/server/lib/clone-response.ts#L5"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/server/lib/clone-response.ts#L5"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.0" },
+      "versions": { "min": "16.3.8", "max": "16.4.1" },
       "file": "dist/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
       "reason": "Runs only inside `if (registry)`, and `registry` is set only when `globalThis.FinalizationRegistry` exists. Vercel edge functions have no FinalizationRegistry, so the branch never runs there.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.0/packages/next/src/server/lib/clone-response.ts#L5"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/server/lib/clone-response.ts#L5"
     },
     {
       "package": "postal-mime",
