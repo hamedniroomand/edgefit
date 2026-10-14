@@ -1,5 +1,7 @@
 import type { Node } from 'oxc-parser';
 
+import type { ApiRef, Runtime } from '@/types.ts';
+
 import { isEquality, rootName, strip } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
@@ -8,6 +10,45 @@ import { memberRef, normalizeRef } from './refs.ts';
 import { globalName } from './runtimes.ts';
 import { isParameter, isTracked, lookup } from './scope.ts';
 import type { Scope } from './scope.ts';
+
+/** A value that only a module sets, so a truthy value shows that the module exists. */
+const setByModule: Record<string, ApiRef> = {
+  'process.domain': { module: 'domain', path: [] },
+};
+
+/**
+ * The module that a set value shows. Only a set value counts: Node.js sets `process.domain` to
+ * `null` before the module loads, so `typeof`, `in` and `!== undefined` checks pass without it.
+ */
+export function moduleGuards(guards: readonly Guard[]): Guard[] {
+  return guards.flatMap(guard => {
+    if (guard.kind !== 'api') {
+      return [];
+    }
+    const module = setByModule[[guard.ref.module, ...guard.ref.path].join('.')];
+    return module === undefined ? [] : [{ ...guard, ref: module }];
+  });
+}
+
+/** `a?.b` is truthy only when `a` exists too, so the object is known as well as the member. */
+export function optionalObject(node: Node, truth: boolean, context: BindingContext): Guard[] {
+  return truth && node.type === 'MemberExpression' && node.optional
+    ? guardFor(node.object, context)
+    : [];
+}
+
+export function isNullish(node: Node): boolean {
+  const inner = strip(node);
+  return (
+    (inner.type === 'Identifier' && inner.name === 'undefined') ||
+    (inner.type === 'Literal' && inner.value === null && inner.raw === 'null') ||
+    (inner.type === 'UnaryExpression' && inner.operator === 'void')
+  );
+}
+
+export function runtimeGuard(runtime: Runtime | undefined, present: boolean): Guard[] {
+  return runtime === undefined ? [] : [{ kind: 'runtime', condition: { runtime, present } }];
+}
 
 /** The guard that says `node`, or its member `key`, exists. */
 export function guardFor(node: Node, context: BindingContext, key?: string): ApiGuard[] {
