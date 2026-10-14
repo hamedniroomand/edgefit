@@ -56,19 +56,60 @@ function arrayValue(node: NodeOf<'ArrayExpression'>, scope: Scope): KnownObject 
  */
 const presentKeys = new WeakMap<KnownObject, PassedKey[]>();
 
+/** The object literal that a spread gives, and whether it always gives it: `...{ a }` or `...(x && { a })`. */
+function spreadLiteral(
+  property: Node,
+): { literal: NodeOf<'ObjectExpression'>; always: boolean } | undefined {
+  if (property.type !== 'SpreadElement') {
+    return undefined;
+  }
+  const argument = strip(property.argument);
+  if (argument.type === 'ObjectExpression') {
+    return { literal: argument, always: true };
+  }
+  const right =
+    argument.type === 'LogicalExpression' && argument.operator === '&&'
+      ? strip(argument.right)
+      : undefined;
+  return right?.type === 'ObjectExpression' ? { literal: right, always: false } : undefined;
+}
+
+/** The keys that an object literal writes, or `undefined` when one of them is not known. */
+function writtenKeys(literal: NodeOf<'ObjectExpression'>): string[] | undefined {
+  const keys = literal.properties.map(property =>
+    property.type === 'Property' ? staticKey(property.key, property.computed) : undefined,
+  );
+  return keys.every(key => key !== undefined) ? keys : undefined;
+}
+
 /**
- * A key that is not known, such as a spread, may replace the value of each key before it. A key
- * whose value may be `undefined` is left out, the same as a key that is not passed.
+ * A spread or a computed key that is not known may replace each key before it, maybe with
+ * `undefined`, so those keys are left out. A known object literal replaces only its own keys.
  */
+function noteUnknownKey(present: Map<string, PassedKey>, property: Node, scope: Scope): void {
+  const spread = spreadLiteral(property);
+  const written = spread === undefined ? undefined : writtenKeys(spread.literal);
+  if (spread === undefined || written === undefined) {
+    present.clear();
+    return;
+  }
+  for (const name of written) present.delete(name);
+  if (spread.always) {
+    for (const passed of passedKeysOf(spread.literal, scope) ?? []) present.set(passed.key, passed);
+  }
+}
+
+/** A key whose value may be `undefined` is left out, the same as a key that is not passed. */
 function notePresent(
   present: Map<string, PassedKey>,
+  property: Node,
   key: string | undefined,
   node: Node | undefined,
   scope: Scope,
   known: KnownValue | undefined,
 ): void {
   if (key === undefined) {
-    for (const name of present.keys()) present.set(name, { key: name });
+    noteUnknownKey(present, property, scope);
   } else if (node === undefined || presenceOf(node, scope, valueOf) !== 'defined') {
     present.delete(key);
   } else {
@@ -89,7 +130,7 @@ function objectValue(node: NodeOf<'ObjectExpression'>, scope: Scope): KnownObjec
     // A method is a function, and a getter or a setter gives a value that is not known.
     const given =
       property.type === 'Property' && property.kind === 'init' ? property.value : undefined;
-    notePresent(present, key, given, scope, value);
+    notePresent(present, property, key, given, scope, value);
     if (key === undefined) {
       entries.clear();
     } else if (value === undefined) {

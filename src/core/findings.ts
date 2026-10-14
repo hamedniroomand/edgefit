@@ -283,8 +283,8 @@ export function collectSupported(modules: readonly ModuleUsages[], target: Targe
       const key = `${usage.display}\0${module.package?.name ?? '.'}`;
       if (
         usage.kind === 'api' &&
-        !dependsOnOptions(usage, target) &&
         !supported.has(key) &&
+        !dependsOnOptions(usage, target) &&
         classify(usage, target) === undefined
       ) {
         supported.set(key, {

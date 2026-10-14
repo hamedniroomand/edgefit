@@ -102,3 +102,50 @@ describe('the argument that holds the options', () => {
     expect(keysOf(`${tls}tls.connect(...args, { ALPNProtocols: [] });`)).toEqual([]);
   });
 });
+
+describe('a key before a spread', () => {
+  it('keeps a key when a later spread is a known literal without it, as got writes it', () => {
+    const source = `${tls}const options = {\n  ...connection,\n  ALPNProtocols: given.ALPNProtocols ?? ['h2'],\n  host,\n  ...(check && { checkServerIdentity: check }),\n};\ntls.connect(443, 'a', options);`;
+    expect(keysOf(source)).toEqual(['ALPNProtocols']);
+  });
+
+  it('keeps a key and adds the keys of a later known literal', () => {
+    expect(keysOf(connect("ALPNProtocols: [], ...{ host: 'a' }"))).toEqual([
+      'ALPNProtocols',
+      'host=a',
+    ]);
+  });
+
+  it.each([
+    ['a spread of an unknown value', 'ALPNProtocols: [], ...opts'],
+    [
+      'a literal that sets the key to undefined',
+      'ALPNProtocols: [], ...{ ALPNProtocols: undefined }',
+    ],
+    ['a literal that may set the key', "ALPNProtocols: [], ...(on && { ALPNProtocols: ['x'] })"],
+    ['a computed key that is not known', 'ALPNProtocols: [], [name]: value'],
+    ['a literal that holds a spread of its own', 'ALPNProtocols: [], ...{ ...more }'],
+  ])('drops the key for %s', (_name, options) => {
+    expect(keysOf(connect(options))).toEqual([]);
+  });
+});
+
+describe('a member write after the object is made', () => {
+  const object = "const options = { ALPNProtocols: ['h2'] };\n";
+
+  it.each([
+    ['an assignment', 'options.ALPNProtocols = undefined;\n'],
+    ['a delete', 'delete options.ALPNProtocols;\n'],
+    ['a computed assignment', 'options[name] = value;\n'],
+    [
+      'a write in a nested function',
+      'function reset() {\n  options.ALPNProtocols = undefined;\n}\n',
+    ],
+  ])('reads no keys after %s', (_name, write) => {
+    expect(keysOf(`${tls}${object}${write}tls.connect(options);`)).toEqual([]);
+  });
+
+  it('keeps the keys when nothing writes to a member', () => {
+    expect(keysOf(`${tls}${object}tls.connect(options);`)).toEqual(['ALPNProtocols']);
+  });
+});

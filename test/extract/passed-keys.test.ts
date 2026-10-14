@@ -76,9 +76,9 @@ describe('the literal value of a key', () => {
     expect(passed(`${tls}tls.connect({ ${property} });`)).toEqual([keys]);
   });
 
-  it('forgets a value that a later spread may replace', () => {
+  it('drops a key that a later unknown spread may replace', () => {
     expect(passed(`${tls}tls.connect({ rejectUnauthorized: false, ...options });`)).toEqual([
-      [{ key: 'rejectUnauthorized' }],
+      undefined,
     ]);
   });
 });

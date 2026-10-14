@@ -84,6 +84,7 @@ The Node compatibility matrix records whether an API exists on each runtime. Cur
 When an override names the options that make a call fail, edgefit reads the options that each call passes. edgefit gives no finding for these calls:
 
 - A call that passes an option through a spread, such as `{ ...options }`, or through a variable whose keys edgefit does not know, such as a parameter.
+- A call that passes a key before a spread that can replace it, such as `{ ALPNProtocols: list, ...options }`. A spread of a known object literal, such as `...{ host }` or `...(check && { checkServerIdentity })`, replaces only its own keys, so the keys before it still count.
 - A call that passes an option with a value that may be `undefined`, such as a parameter or a member read: `{ ALPNProtocols: protocols }` or `{ ALPNProtocols: options.ALPNProtocols }`.
 - A call whose options are not in its last argument that is an object, or a call with a spread argument such as `connect(...args)`.
 - A call that passes an option with a value that is not a literal, when only one value fails. `rejectUnauthorized: false` is found, and `rejectUnauthorized: verify` is not.
@@ -91,7 +92,9 @@ When an override names the options that make a call fail, edgefit reads the opti
 - A call through `.call` or `.apply`, such as `tls.connect.call(tls, options)`.
 - A `super(...)` call in a class that extends the API.
 - An imported function that is passed as a value and called later, such as `register(connect)`.
-- A key that is added to the object after the object is made, such as `options.ALPNProtocols = ['h2']`.
+- A call that passes a variable whose object is changed after it is made, such as `options.ALPNProtocols = ['h2']` or `delete options.host`. edgefit then reads no keys of that variable.
+
+edgefit counts a read of a member of a Node.js module as defined, such as `tls.checkServerIdentity`. It does not check that the module has the member, so a call that passes `tls.missing` can get a finding.
 
 ## The data has an age
 
