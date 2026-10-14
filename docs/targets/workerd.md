@@ -58,6 +58,8 @@ A module that is not native at your date and flags is reported as `mocked`, beca
 
 An entry with the status `mismatch` can name the options that make a call fail. Then only a call that passes one of them is a finding, and an option that fails only from a compatibility date follows your date and flags.
 
+The overrides also say that the globals `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing, so code behind a check such as `typeof window !== 'undefined'` is guarded. A call, a construction or a member of one of these globals through the global object, such as `globalThis.document.title`, is a finding when no check protects it.
+
 The full list is in `data/overrides/workerd.json` in the package. Each entry links to the workerd source file it was read from.
 
 ## Export conditions

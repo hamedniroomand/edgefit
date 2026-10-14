@@ -19,7 +19,8 @@ describe('known-good apps', () => {
   it('a Hono app with the logger middleware reports nothing', async () => {
     const report = await reportOf('hono-app');
     expect(report?.findings).toEqual([]);
-    expect(report?.guarded).toEqual([]);
+    // Hono reads `Deno.noColor` only after `typeof Deno?.noColor === 'boolean'`.
+    expect(report?.guarded.map(finding => finding.api)).toEqual(['Deno.noColor']);
   });
 
   it('a Nitro build with jose reports no errors and no warnings', async () => {

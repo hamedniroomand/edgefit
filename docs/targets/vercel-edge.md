@@ -72,6 +72,7 @@ edgefit's [production witness](/contributing/data#production-witness) runs on Ve
 
 ## What is not checked
 
+- **A check of a browser global.** The data does not say if edge functions have `window`, `document`, `HTMLAnchorElement`, `Deno` or `Bun`. So a check such as `typeof window !== 'undefined'` decides nothing on this target, and code behind it is still reported.
 - **A `require` that does not resolve, inside `try`.** esbuild keeps it as a call left for runtime and does not warn, so edgefit records nothing for it. Outside `try`, an unresolved `require` stops the check.
 - **Vercel's limits** on bundle size and execution time.
 

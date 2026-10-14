@@ -164,6 +164,10 @@ export class GuardStack {
     }
   };
 
+  /** The guards in force now, without a guard that a write ended or that covers one computed key. */
+  public readonly snapshot = (): Guard[] =>
+    this.#guards.filter(guard => guard.kind !== 'api' || (guard.active && guard.key === undefined));
+
   public readonly drop = (name: string): void => {
     for (const guard of this.#guards) {
       if (guard.kind === 'api' && (guard.root === name || guard.key?.name === name)) {

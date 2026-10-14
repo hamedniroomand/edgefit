@@ -138,6 +138,7 @@ export function extractModule(
   );
   walker.visit(result.program as Node);
   collector.omitMainFunctions(body, functions, walker.mainOnlyNodes);
+  collector.guardFunctions(body, functions, walker.functionReads);
   const shape =
     options.shape === true ? collectShape(body, result.module.hasModuleSyntax, dropped) : undefined;
   return finish(collector, shape, findAssignedOptions(body));

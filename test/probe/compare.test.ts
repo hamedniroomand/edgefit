@@ -112,3 +112,21 @@ describe('compareOutcomes with the workerd tls.getCiphers override', () => {
     expect(compareOutcomes({ 'tls.getCiphers': 'unsupported' }, overrides, {})).toEqual([]);
   });
 });
+
+describe('compareOutcomes with the workerd overrides', () => {
+  it('accepts the browser globals that workerd does not have, and lists one that it gains', () => {
+    const overrides = readOverrides('workerd');
+    const globals = ['window', 'document', 'HTMLAnchorElement', 'Deno', 'Bun'].map(
+      name => `*globals*.${name}`,
+    );
+    const missing = Object.fromEntries(globals.map(api => [api, 'missing']));
+    expect(compareOutcomes(missing, overrides, {})).toEqual([]);
+    expect(compareOutcomes({ '*globals*.window': 'present' }, overrides, {})).toEqual([
+      {
+        api: '*globals*.window',
+        message: 'override says `unsupported`, probe says `present`',
+        dataSaysPresent: false,
+      },
+    ]);
+  });
+});
