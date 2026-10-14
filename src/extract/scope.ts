@@ -31,8 +31,13 @@ export type KnownObject = {
 
 /** A name that stands for a check, so testing it is the same as testing what it holds. */
 export interface Check {
-  /** The expression the check evaluates: a `const`'s value, or what a helper returns. */
+  /**
+   * The expression the check evaluates: a `const`'s value, or what a helper returns or tests
+   * before it returns `true` or `false`.
+   */
   test: Node;
+  /** True for a helper that returns `false` when `test` is truthy. */
+  negated: boolean;
   /** True for a helper called as `name()`, false for a `const` read as `name`. */
   call: boolean;
   /** Where `test` is read, since it may name things the caller cannot see. */

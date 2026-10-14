@@ -1,12 +1,14 @@
 import type { Node } from 'oxc-parser';
 
-import type { ApiRef, Runtime } from '@/types.ts';
-
 import {
   absentGuard,
   globalGuard,
   guardFor,
+  isNullish,
+  moduleGuards,
+  optionalObject,
   optionGuards,
+  runtimeGuard,
   withoutLooksMissing,
 } from './api-guards.ts';
 import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
@@ -26,45 +28,6 @@ import {
   mainModuleMatches,
   runtimeMarker,
 } from './runtimes.ts';
-
-/** A value that only a module sets, so a truthy value shows that the module exists. */
-const setByModule: Record<string, ApiRef> = {
-  'process.domain': { module: 'domain', path: [] },
-};
-
-/**
- * The module that a set value shows. Only a set value counts: Node.js sets `process.domain` to
- * `null` before the module loads, so `typeof`, `in` and `!== undefined` checks pass without it.
- */
-function moduleGuards(guards: readonly Guard[]): Guard[] {
-  return guards.flatMap(guard => {
-    if (guard.kind !== 'api') {
-      return [];
-    }
-    const module = setByModule[[guard.ref.module, ...guard.ref.path].join('.')];
-    return module === undefined ? [] : [{ ...guard, ref: module }];
-  });
-}
-
-/** `a?.b` is truthy only when `a` exists too, so the object is known as well as the member. */
-function optionalObject(node: Node, truth: boolean, context: BindingContext): Guard[] {
-  return truth && node.type === 'MemberExpression' && node.optional
-    ? guardFor(node.object, context)
-    : [];
-}
-
-function isNullish(node: Node): boolean {
-  const inner = strip(node);
-  return (
-    (inner.type === 'Identifier' && inner.name === 'undefined') ||
-    (inner.type === 'Literal' && inner.value === null && inner.raw === 'null') ||
-    (inner.type === 'UnaryExpression' && inner.operator === 'void')
-  );
-}
-
-function runtimeGuard(runtime: Runtime | undefined, present: boolean): Guard[] {
-  return runtime === undefined ? [] : [{ kind: 'runtime', condition: { runtime, present } }];
-}
 
 /**
  * What a check of `obj[key]` says when `key` may be one of several strings: each member, but only
@@ -198,7 +161,7 @@ function checkGuards(
   try {
     return guardsWhen(
       check.test,
-      truth,
+      check.negated ? !truth : truth,
       {
         imported: context.imported,
         scope: check.scope,
@@ -239,6 +202,21 @@ function callGuards(
 }
 
 /**
+ * Both sides of `a && b` or `a || b` are known only when they all had to hold: `a && b` true,
+ * `a || b` false. A nullish `a || b` has a falsy `a` and a nullish `b`.
+ */
+function logicalGuards(
+  node: NodeOf<'LogicalExpression'>,
+  truth: boolean,
+  context: BindingContext,
+  nullish: boolean,
+): Guard[] {
+  return truth === (node.operator === '&&')
+    ? [...guardsWhen(node.left, truth, context), ...guardsWhen(node.right, truth, context, nullish)]
+    : [];
+}
+
+/**
  * The APIs that must exist, and what is known of the runtime, whenever `test` evaluates to `truth`.
  * With `nullish`, a false `test` means that its value is `null` or `undefined`, as on the left of `??`.
  */
@@ -257,15 +235,7 @@ export function guardsWhen(
     return guardsWhen(node.argument, !truth, context);
   }
   if (node.type === 'LogicalExpression' && node.operator !== '??') {
-    // Both sides are known only when they all had to hold: `a && b` true, `a || b` false.
-    // A nullish `a || b` has a falsy `a` and a nullish `b`.
-    if (truth === (node.operator === '&&')) {
-      return [
-        ...guardsWhen(node.left, truth, context),
-        ...guardsWhen(node.right, truth, context, nullish),
-      ];
-    }
-    return [];
+    return logicalGuards(node, truth, context, nullish);
   }
   if (node.type === 'BinaryExpression') {
     if (node.operator === 'in') {

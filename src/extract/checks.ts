@@ -6,18 +6,53 @@ import { lookupCheck } from './scope.ts';
 import type { Check, Scope } from './scope.ts';
 import { namesSetAgain } from './set-again.ts';
 
-/** The body of a helper that only returns a value, such as `() => typeof Deno !== 'undefined'`. */
-function returnedValue(fn: FunctionNode): Node | undefined {
+type Returned = { test: Node; negated: boolean };
+
+/** The value of `return true;` or `return false;`, alone or as the only statement of a block. */
+function returnedBoolean(statement: Node | null | undefined): boolean | undefined {
+  const only =
+    statement?.type === 'BlockStatement' && statement.body.length === 1
+      ? statement.body[0]
+      : statement;
+  const value =
+    only?.type === 'ReturnStatement' && only.argument !== null ? strip(only.argument) : undefined;
+  return value?.type === 'Literal' && typeof value.value === 'boolean' ? value.value : undefined;
+}
+
+/** `if (c) return true; return false;`, also with an `else`, or with the two values swapped. */
+function ifReturnsBoolean(body: readonly Node[]): Returned | undefined {
+  const [first, second, ...rest] = body;
+  if (first?.type !== 'IfStatement' || rest.length > 0) {
+    return undefined;
+  }
+  const then = returnedBoolean(first.consequent);
+  const otherwise =
+    first.alternate === null
+      ? returnedBoolean(second)
+      : second === undefined
+        ? returnedBoolean(first.alternate)
+        : undefined;
+  return then === undefined || otherwise === undefined || then === otherwise
+    ? undefined
+    : { test: first.test, negated: !then };
+}
+
+/**
+ * What a helper without parameters returns: one value, such as `() => typeof Deno !== 'undefined'`,
+ * or a test that decides a `return true` or a `return false`.
+ */
+function returnedValue(fn: FunctionNode): Returned | undefined {
   if (fn.async || fn.generator || fn.params.length > 0 || fn.body === null) {
     return undefined;
   }
   if (fn.body.type !== 'BlockStatement') {
-    return fn.body;
+    return { test: fn.body, negated: false };
   }
   const [only, ...rest] = fn.body.body;
-  return rest.length === 0 && only?.type === 'ReturnStatement'
-    ? (only.argument ?? undefined)
-    : undefined;
+  if (rest.length === 0 && only?.type === 'ReturnStatement') {
+    return only.argument === null ? undefined : { test: only.argument, negated: false };
+  }
+  return ifReturnsBoolean(fn.body.body);
 }
 
 /**
@@ -34,10 +69,10 @@ export function collectChecks(statements: readonly Node[], scope: Scope): void {
     const declaration =
       statement.type === 'ExportNamedDeclaration' ? statement.declaration : statement;
     if (declaration?.type === 'FunctionDeclaration' && declaration.id !== null) {
-      const test = returnedValue(declaration);
-      if (test !== undefined) {
+      const returned = returnedValue(declaration);
+      if (returned !== undefined) {
         scope.checks.set(declaration.id.name, {
-          test,
+          ...returned,
           call: true,
           scope,
           busy: false,
@@ -52,9 +87,9 @@ export function collectChecks(statements: readonly Node[], scope: Scope): void {
         }
         const value = strip(init);
         const helper = isFunction(value);
-        const test = helper ? returnedValue(value) : init;
-        if (test !== undefined) {
-          scope.checks.set(id.name, { test, call: helper, scope, busy: false, region });
+        const returned = helper ? returnedValue(value) : { test: init, negated: false };
+        if (returned !== undefined) {
+          scope.checks.set(id.name, { ...returned, call: helper, scope, busy: false, region });
         }
       }
     }
