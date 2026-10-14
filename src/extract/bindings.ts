@@ -144,6 +144,17 @@ function isMemberOf(node: Node, object: Node | undefined, key: string): boolean 
   );
 }
 
+type FunctionNode = NodeOf<
+  'FunctionDeclaration' | 'FunctionExpression' | 'ArrowFunctionExpression'
+>;
+
+/** True when `node` is an element of the array `parent`, right after a number. */
+function followsNumber(node: FunctionNode, parent: Node | undefined): boolean {
+  const slots = parent?.type === 'ArrayExpression' ? parent.elements : [];
+  const id = slots[slots.indexOf(node) - 1];
+  return id?.type === 'Literal' && typeof id.value === 'number';
+}
+
 /**
  * Turbopack writes a module of its own for a Node.js built-in that the code loads:
  * `(e, r, o) => { r.exports = e.x("node:fs", () => require("node:fs")) }`. The 1st parameter is
@@ -152,15 +163,10 @@ function isMemberOf(node: Node, object: Node | undefined, key: string): boolean 
  * it through the sourcemap, because the sourcemap can give it the file of the code before it.
  */
 export function isBuiltinFactory(
-  node: NodeOf<'FunctionDeclaration' | 'FunctionExpression' | 'ArrowFunctionExpression'>,
+  node: FunctionNode,
   parent: Node | undefined,
   scope: Scope,
 ): boolean {
-  const slots = parent?.type === 'ArrayExpression' ? parent.elements : [];
-  const id = slots[slots.indexOf(node) - 1];
-  if (id?.type !== 'Literal' || typeof id.value !== 'number') {
-    return false;
-  }
   const [loader, module] = node.params;
   const [statement, ...rest] = node.body?.type === 'BlockStatement' ? node.body.body : [];
   if (statement?.type !== 'ExpressionStatement' || rest.length > 0) {
@@ -174,7 +180,8 @@ export function isBuiltinFactory(
     expression.right.type === 'CallExpression' &&
     expression.right.arguments.length === 2 &&
     isMemberOf(expression.right.callee, loader, 'x') &&
-    wrappedModule(expression.right, scope) !== undefined
+    wrappedModule(expression.right, scope) !== undefined &&
+    followsNumber(node, parent)
   );
 }
 
