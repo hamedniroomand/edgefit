@@ -94,7 +94,7 @@ class Analyzer {
 
 /** Which units of a module are used, given the exports asked of it, and what they ask in turn. */
 export function analyze(shape: ModuleShape, asked: Demand): Analysis {
-  // A CommonJS module without an `__esModule` marker is its own `default` export: all of it.
+  // A CommonJS module without a true `__esModule` mark is its own `default` export: all of it.
   const demand =
     asked !== 'all' && asked.has('default') && shape.commonJs && !shape.esModule ? 'all' : asked;
   const analyzer = new Analyzer(shape);
