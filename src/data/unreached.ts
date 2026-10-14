@@ -1,5 +1,7 @@
 import { findDataDirectory, readDataFile } from '@/data/data-directory.ts';
 import { targetKeys } from '@/data/suggestions.ts';
+import { inRange } from '@/data/version-range.ts';
+import type { VersionRange } from '@/data/version-range.ts';
 import type { TargetKey } from '@/types.ts';
 
 /** One reviewed case in `data/unreached.json`. */
@@ -29,9 +31,6 @@ export type UnreachedQuery = {
 
 const fileVersion = 1;
 const semver = /^\d+\.\d+\.\d+$/u;
-
-/** The releases an entry was read in. A missing `max` has no upper end. */
-export type VersionRange = { min: string; max?: string };
 
 /** The fields that every reviewed entry of a data file has. */
 export type EntryBase = {
@@ -103,32 +102,6 @@ export function loadUnreached(dataDirectory?: string): UnreachedEntry[] {
     cached = entries;
   }
   return entries;
-}
-
-function parts(version: string): number[] {
-  return version.split('.').map(Number);
-}
-
-/**
- * Compares `major.minor.patch` versions. A version with a pre-release suffix is not in a range
- * when it has the same major and minor as an end of the range. Otherwise only its major and
- * minor count.
- */
-export function compareVersions(left: string, right: string): number {
-  const [a, b] = [parts(left), parts(right)];
-  for (const index of [0, 1, 2]) {
-    const order = (a[index] ?? 0) - (b[index] ?? 0);
-    if (order !== 0) {
-      return order;
-    }
-  }
-  return 0;
-}
-
-export function inRange(version: string, { min, max }: VersionRange): boolean {
-  return (
-    compareVersions(version, min) >= 0 && (max === undefined || compareVersions(version, max) <= 0)
-  );
 }
 
 /** The part of a path below `node_modules/<package>/`, or `undefined` when it is not in that package. */

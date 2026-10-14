@@ -1,13 +1,6 @@
 // The checks of one entry of data/unreached.json or data/stored-modules.json against a release.
 
-function compare(left, right) {
-  const [a, b] = [left, right].map(version => version.split('.').map(Number));
-  return a.reduce((order, part, index) => order || part - (b[index] ?? 0), 0);
-}
-
-/** Whether the release is in the range. A range without `max` has no upper end. */
-export const inRange = (version, { min, max }) =>
-  compare(version, min) >= 0 && (max === undefined || compare(version, max) <= 0);
+export { inRange } from '../../src/data/version-range.ts';
 
 /**
  * Whether the file uses the API as the code writes it. A member of a Node.js module may be read

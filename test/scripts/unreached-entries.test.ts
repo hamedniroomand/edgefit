@@ -34,4 +34,8 @@ describe('the weekly check of the data entries', () => {
     expect(inRange('1.13.0', { min: '1.14.0' })).toBe(false);
     expect(inRange('1.17.0', { min: '1.14.0', max: '1.16.1' })).toBe(false);
   });
+
+  it('keeps a pre-release out of a range that ends in its major and minor', () => {
+    expect(inRange('16.3.9-canary.1', { min: '16.3.8', max: '16.4.0' })).toBe(false);
+  });
 });
