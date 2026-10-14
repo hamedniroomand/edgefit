@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.15.1
+
+### Patch Changes
+
+- [#324](https://github.com/hamedniroomand/edgefit/pull/324) [`7d25829`](https://github.com/hamedniroomand/edgefit/commit/7d258298d617355ec308dbe9b6c113739cc51562) - Follow a helper that tests a check in one `if` and returns `true` or `false`, such as `function isDeno() { if ('Deno' in globalThis) { return true; } return false; }`. The two returns must have different values. A helper that returns `false` when the test passes holds the opposite check. A helper with an `else` is followed too.
+
+- [#321](https://github.com/hamedniroomand/edgefit/pull/321) [`5eacfd4`](https://github.com/hamedniroomand/edgefit/commit/5eacfd49a04ea1733a6b218588928e49b74cd8bb) - In built output, edgefit now lists the module that Turbopack writes for a Node.js built-in (`t.exports = e.x("node:…", () => require(…))`) under `build output`. Before this change, edgefit mapped it through the sourcemap, and the sourcemap can give it the file of the code before it. With `next` 16.4.0, a warning about `node:async_hooks` or `node:buffer` in an Edge route showed as a warning about `next`, at a line that does not use the module. Your own loads of a Node.js module through `e.x(…)` stay at your file.
+
 ## 0.15.0
 
 ### Minor Changes
