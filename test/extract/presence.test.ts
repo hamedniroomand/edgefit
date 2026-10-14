@@ -149,46 +149,74 @@ describe('a member write after the object is made', () => {
   });
 });
 
+/** Each case: its name, the options of the call, and the keys that count. */
+const conditionCases: [string, string, string[]][] = [
+  ['a true condition adds the key', "...(true && { ALPNProtocols: ['x'] })", ['ALPNProtocols']],
+  [
+    'a false condition keeps the key before it',
+    "ALPNProtocols: ['h2'], ...(false && { ALPNProtocols: undefined })",
+    ['ALPNProtocols'],
+  ],
+  [
+    'a condition that `!1` makes false keeps the key',
+    "ALPNProtocols: ['h2'], ...(!1 && { ALPNProtocols: undefined })",
+    ['ALPNProtocols'],
+  ],
+  [
+    'a null condition keeps the key before it',
+    "ALPNProtocols: ['h2'], ...(null && { ALPNProtocols: undefined })",
+    ['ALPNProtocols'],
+  ],
+  ['a null condition adds nothing', "...(null && { ALPNProtocols: ['x'] })", []],
+  [
+    'an undefined condition keeps the value before it',
+    'rejectUnauthorized: false, ...(undefined && { rejectUnauthorized: true })',
+    ['rejectUnauthorized=false'],
+  ],
+  [
+    'a void 0 condition keeps the key before it',
+    "ALPNProtocols: ['h2'], ...(void 0 && { ALPNProtocols: undefined })",
+    ['ALPNProtocols'],
+  ],
+  [
+    'an unknown condition with a defined value keeps the key',
+    "ALPNProtocols: ['h2'], ...(on && { ALPNProtocols: ['h1'] })",
+    ['ALPNProtocols'],
+  ],
+  [
+    'an unknown condition with another value keeps the key without the value',
+    'rejectUnauthorized: false, ...(on && { rejectUnauthorized: true })',
+    ['rejectUnauthorized'],
+  ],
+  [
+    'an unknown condition with undefined drops the key',
+    "ALPNProtocols: ['h2'], ...(on && { ALPNProtocols: undefined })",
+    [],
+  ],
+  [
+    'an unknown condition does not add a key that was not there',
+    "...(on && { ALPNProtocols: ['h1'] })",
+    [],
+  ],
+];
+
 describe('a spread on a condition', () => {
-  it.each([
-    ['a true condition adds the key', "...(true && { ALPNProtocols: ['x'] })", ['ALPNProtocols']],
-    [
-      'a false condition keeps the key before it',
-      "ALPNProtocols: ['h2'], ...(false && { ALPNProtocols: undefined })",
-      ['ALPNProtocols'],
-    ],
-    [
-      'a condition that `!1` makes false keeps the key',
-      "ALPNProtocols: ['h2'], ...(!1 && { ALPNProtocols: undefined })",
-      ['ALPNProtocols'],
-    ],
-    [
-      'a null condition keeps the key before it',
-      "ALPNProtocols: ['h2'], ...(null && { ALPNProtocols: undefined })",
-      ['ALPNProtocols'],
-    ],
-    ['a null condition adds nothing', "...(null && { ALPNProtocols: ['x'] })", []],
-    [
-      'an unknown condition with a defined value keeps the key',
-      "ALPNProtocols: ['h2'], ...(on && { ALPNProtocols: ['h1'] })",
-      ['ALPNProtocols'],
-    ],
-    [
-      'an unknown condition with another value keeps the key without the value',
-      'rejectUnauthorized: false, ...(on && { rejectUnauthorized: true })',
-      ['rejectUnauthorized'],
-    ],
-    [
-      'an unknown condition with undefined drops the key',
-      "ALPNProtocols: ['h2'], ...(on && { ALPNProtocols: undefined })",
-      [],
-    ],
-    [
-      'an unknown condition does not add a key that was not there',
-      "...(on && { ALPNProtocols: ['h1'] })",
-      [],
-    ],
-  ])('%s', (_name, options, keys) => {
+  it.each(conditionCases)('%s', (_name, options, keys) => {
     expect(keysOf(connect(options))).toEqual(keys);
+  });
+});
+
+describe('a spread of a falsy value', () => {
+  it.each(['null', 'false', 'undefined', 'void 0', '0', "''"])(
+    'keeps the key before `...%s`, which spreads no keys',
+    value => {
+      expect(keysOf(connect(`rejectUnauthorized: false, ...${value}`))).toEqual([
+        'rejectUnauthorized=false',
+      ]);
+    },
+  );
+
+  it('still drops the key before a spread of an unknown value', () => {
+    expect(keysOf(connect('rejectUnauthorized: false, ...value'))).toEqual([]);
   });
 });

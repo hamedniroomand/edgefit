@@ -103,7 +103,10 @@ export function presenceOf(node: Node, scope: Scope, read: ReadValue): Presence 
 /** Whether a value is known to be truthy or falsy: a literal, `!0` or `!1`, or a known value. */
 function knownTruth(node: Node, scope: Scope, read: ReadValue): boolean | undefined {
   const inner = strip(node);
-  if (inner.type === 'Literal' && inner.value === null) {
+  if (
+    (inner.type === 'Literal' && inner.value === null) ||
+    presenceOf(inner, scope, read) === 'undefined'
+  ) {
     return false;
   }
   const value = read(inner, scope);
@@ -130,6 +133,10 @@ export function spreadLiteral(
   const argument = strip(property.argument);
   if (argument.type === 'ObjectExpression') {
     return { literal: argument, always: true };
+  }
+  // A falsy value such as `null`, `false` or `undefined` spreads no keys.
+  if (knownTruth(argument, scope, read) === false) {
+    return 'none';
   }
   if (argument.type !== 'LogicalExpression' || argument.operator !== '&&') {
     return undefined;
