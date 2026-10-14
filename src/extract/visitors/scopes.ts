@@ -1,4 +1,5 @@
 import type { NodeOf } from '@/extract/ast.ts';
+import { isBuiltinFactory } from '@/extract/bindings.ts';
 import type { Visitor } from '@/extract/context.ts';
 import { collectBlockNames, collectLexicalNames, patternNames } from '@/extract/declarations.ts';
 import {
@@ -46,8 +47,10 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
   if (module !== undefined) {
     scope.modules.add(module);
   }
+  const generated = isBuiltinFactory(node, context.scope);
   // A function may be called after the `try` block around it has ended.
   context.collector.guards.deferred(() => {
+    const first = context.collector.usages.length;
     context.inScope(scope, () => {
       for (const param of node.params) {
         context.visitPattern(param);
@@ -62,6 +65,11 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
         context.visit(body);
       }
     });
+    if (generated) {
+      for (const usage of context.collector.usages.slice(first)) {
+        usage.generated = true;
+      }
+    }
   });
 };
 

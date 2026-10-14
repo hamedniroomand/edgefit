@@ -40,7 +40,7 @@ function usagesByOriginal(
 ): Map<string, Usage[]> {
   const byFile = new Map<string, Usage[]>();
   for (const usage of chunk.usages) {
-    const original = map.original(usage.location);
+    const original = usage.generated === true ? undefined : map.original(usage.location);
     const file = original === undefined ? '' : toPosix(path.relative(root, original.file));
     const mapped =
       original === undefined

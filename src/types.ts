@@ -73,6 +73,12 @@ export interface Usage {
   exports?: string[];
   /** Set when the code only runs if the API exists, for example inside `if (x.y)`. */
   guarded?: true;
+  /**
+   * Set for code that the bundler wrote, such as Turbopack's module for a Node.js built-in. A
+   * sourcemap can give it the file of the code before it, so edgefit does not map it through a
+   * sourcemap.
+   */
+  generated?: true;
   /** Set when the code sits behind runtime checks, such as `typeof Deno !== 'undefined'`. All must hold. */
   runtimes?: RuntimeCondition[];
   /** Set when the code sits behind checks for a global, such as `if (!globalThis.FileList) throw`. All must hold. */
@@ -136,8 +142,8 @@ export interface Finding {
   /** Set on a guarded finding that edgefit's data says is not reached on the target, with why. */
   unreached?: { reason: string; source: string };
   /**
-   * Set when the code is in build output that no sourcemap maps to a file of the project, such as
-   * the code a bundler adds around your modules. It has no owner, and is not your code.
+   * Set when the code is in build output and edgefit gives it no file of the project, such as the
+   * code a bundler adds around your modules. It has no owner, and is not your code.
    */
   buildOutput?: true;
 }

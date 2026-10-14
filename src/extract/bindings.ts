@@ -134,6 +134,43 @@ function wrappedModule(node: NodeOf<'CallExpression'>, scope: Scope): string | u
     : undefined;
 }
 
+function isMemberOf(node: Node, object: Node | undefined, key: string): boolean {
+  return (
+    node.type === 'MemberExpression' &&
+    node.object.type === 'Identifier' &&
+    object?.type === 'Identifier' &&
+    node.object.name === object.name &&
+    staticKey(node.property, node.computed) === key
+  );
+}
+
+/**
+ * Turbopack writes a module of its own for a Node.js built-in that the code loads:
+ * `(e, r, o) => { r.exports = e.x("node:fs", () => require("node:fs")) }`. The 1st parameter is
+ * the loader and the 2nd is the module object. This code has no original file. Do not map it
+ * through the sourcemap, because the sourcemap can give it the file of the code before it.
+ */
+export function isBuiltinFactory(
+  node: NodeOf<'FunctionDeclaration' | 'FunctionExpression' | 'ArrowFunctionExpression'>,
+  scope: Scope,
+): boolean {
+  const [loader, module] = node.params;
+  const [statement, ...rest] = node.body?.type === 'BlockStatement' ? node.body.body : [];
+  if (statement?.type !== 'ExpressionStatement' || rest.length > 0) {
+    return false;
+  }
+  const { expression } = statement;
+  return (
+    expression.type === 'AssignmentExpression' &&
+    expression.operator === '=' &&
+    isMemberOf(expression.left, module, 'exports') &&
+    expression.right.type === 'CallExpression' &&
+    expression.right.arguments.length === 2 &&
+    isMemberOf(expression.right.callee, loader, 'x') &&
+    wrappedModule(expression.right, scope) !== undefined
+  );
+}
+
 /**
  * Turbopack's output for `await import('node:timers')` is
  * `await Promise.resolve().then(() => e.x("node:timers", () => require("node:timers"), !0))`.
