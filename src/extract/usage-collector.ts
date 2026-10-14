@@ -12,6 +12,8 @@ import type {
 
 import type { ComputedKey } from './chain.ts';
 import { GuardStack } from './guard-stack.ts';
+import type { Guard } from './guard-stack.ts';
+import { functionGuards } from './guarded-functions.ts';
 import type { LocalFunction } from './local-functions.ts';
 import { omitMainFunctions } from './main-only.ts';
 import { isPromiseApi, normalizeRef } from './refs.ts';
@@ -25,6 +27,10 @@ export function addPassedKeys(usage: Usage, keys: readonly PassedKey[]): void {
   );
 }
 
+function unique<TItem>(items: readonly TItem[]): TItem[] {
+  return [...new Map(items.map(item => [JSON.stringify(item), item])).values()];
+}
+
 export class UsageCollector {
   public readonly omitMainFunctions = (
     body: readonly Node[],
@@ -32,6 +38,29 @@ export class UsageCollector {
     dead: ReadonlySet<Node>,
   ): void => {
     omitMainFunctions(body, functions, dead, this);
+  };
+
+  /** Adds the guards that hold whenever a local function runs to the usages in its body. */
+  public readonly guardFunctions = (
+    body: readonly Node[],
+    functions: ReadonlyMap<string, LocalFunction>,
+    seen: ReadonlyMap<number, readonly Guard[]>,
+  ): void => {
+    for (const [fn, guards] of functionGuards(body, functions, seen)) {
+      this.guards.within(guards, () => {
+        for (let index = this.offsets.length - 1; index >= 0; index -= 1) {
+          const offset = this.offsets[index] ?? -1;
+          const usage = this.usages[index];
+          if (usage === undefined || offset < fn.start || offset >= fn.end) continue;
+          if (this.guards.dead()) {
+            this.offsets.splice(index, 1);
+            this.usages.splice(index, 1);
+          } else {
+            this.#addGuards(usage);
+          }
+        }
+      });
+    }
   };
 
   public readonly usages: Usage[] = [];
@@ -179,6 +208,21 @@ export class UsageCollector {
       ...this.#globals(),
       ...this.#options(),
     });
+  }
+
+  #addGuards(usage: Usage): void {
+    if (usage.kind === 'api' && usage.api !== undefined && this.guards.covers(usage.api)) {
+      usage.guarded = true;
+    }
+    const runtimes = unique([...(usage.runtimes ?? []), ...this.guards.runtimes()]);
+    const globals = unique([...(usage.globals ?? []), ...this.guards.globals()]);
+    const options = unique([...(usage.options ?? []), ...this.guards.options()]);
+    Object.assign(
+      usage,
+      runtimes.length === 0 ? {} : { runtimes },
+      globals.length === 0 ? {} : { globals },
+      options.length === 0 ? {} : { options },
+    );
   }
 
   #polyfill(): { polyfill?: ApiRef } {

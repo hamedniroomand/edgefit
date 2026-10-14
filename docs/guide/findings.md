@@ -209,6 +209,20 @@ if (!global.crypto) {
 
 The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, an `else` branch and a guard clause. A global that the data does not name decides nothing. On a target where the code can run, it stays a finding.
 
+The data of `workerd` says that `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing. The data of `netlify-edge` says that `document`, `HTMLAnchorElement` and `Bun` are missing. So code behind `typeof window !== 'undefined'` is guarded on Workers. Netlify Edge Functions have a `window` global, so there the check decides nothing.
+
+A global that the target lacks is `undefined` on the global object. So these uses of `globalThis.X`, `self.X` or `global.X` do not fail, and they are guarded on a target that lacks `X`:
+
+- the checks in [Checks for an API](#checks-for-an-api), such as a test in an `if`, `?:`, `!`, `&&`, `||` or `??`, and an optional member (`globalThis.X?.y`)
+- the test of a `while`, `do` or `for` loop
+- `Boolean(globalThis.X)`
+- a comparison with `===`, `!==`, `==` or `!=`
+- the value of a `const` with a plain name that the file does not export in any form, as in `const doc = globalThis.document`. The same list applies to each use of `doc`. Destructuring, as in `const { version } = globalThis.Deno`, throws on a missing global.
+
+Every other use is a finding when no check protects it. Examples are a call, `new`, a member (`globalThis.document.title`, or `doc.title`), `instanceof`, `extends`, a spread, `for…of`, `.call`, `.apply`, `.bind`, a `return`, an export, and an argument of a call other than `Boolean`.
+
+edgefit does not report a browser global that the code uses by its bare name, such as `document.title`. This can hide a real failure. See [Limitations](/guide/limitations).
+
 ### Code a package ships and the target does not run
 
 A bundle can hold code that a target never runs, and that no check in the code shows. Next.js's Edge bundle holds the code for Cache Components, which Next turns off on the Edge runtime, and a timing call that only `next dev` makes. edgefit keeps a reviewed list of such cases in `data/unreached.json`: the package, the releases it was read in, the file, the APIs, the target, why the code does not run and where that is stated. A finding in a listed file is guarded and shows the reason:
@@ -253,6 +267,28 @@ edgefit does not follow a `let` or `var` that its block sets again, because the 
 A `process.domain` that is truthy, or that a comparison with `null` rules out, guards the `domain` module, because only that module sets the value. Node.js sets it to `null` first, so `typeof process.domain`, `'domain' in process` and `process.domain !== undefined` do not guard the module.
 
 Helpers can call other helpers. A helper imported from another file, one with parameters, and one that does more than return a check are not followed. See [Limitations](/guide/limitations).
+
+### Functions that only checked code uses
+
+A check also covers a function in the same file when only checked code uses the function. A use is a call of the function, its name as a value, or its name in JSX, such as `<Download />`. A use in JSX counts as a use with no check. When each use is behind a check, the code in the function gets the checks that all of the uses share:
+
+```js
+const IS_CLIENT = typeof window !== 'undefined';
+const saveAs = IS_CLIENT ? downloadSaveAs : () => {};
+
+function downloadSaveAs(blob) {
+  const url = URL.createObjectURL(blob); // Guarded on Workers, which lack `window`
+}
+```
+
+A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
+
+- one use has no check
+- the file exports the function in any form: `export`, `export default`, `exports.x` or `module.exports`, also inside a check
+- the file sets the name again, or declares the same name again
+- the file calls `eval`
+
+A function that only another function calls gets no check, even when checked code calls that other function. See [Limitations](/guide/limitations).
 
 ## Clean runs
 

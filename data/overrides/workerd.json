@@ -655,6 +655,36 @@
       "status": "unsupported",
       "note": "exists, but throws: not implemented",
       "source": "../workerd/api/url-standard.c++"
+    },
+    "*globals*.window": {
+      "status": "unsupported",
+      "note": "workerd has no window global",
+      "source": "../workerd/api/global-scope.h#L866-L1185",
+      "absent": true
+    },
+    "*globals*.document": {
+      "status": "unsupported",
+      "note": "workerd has no document global",
+      "source": "../workerd/api/global-scope.h#L866-L1185",
+      "absent": true
+    },
+    "*globals*.HTMLAnchorElement": {
+      "status": "unsupported",
+      "note": "workerd has no HTMLAnchorElement global",
+      "source": "../workerd/api/global-scope.h#L866-L1185",
+      "absent": true
+    },
+    "*globals*.Deno": {
+      "status": "unsupported",
+      "note": "workerd has no Deno global",
+      "source": "../workerd/api/global-scope.h#L866-L1185",
+      "absent": true
+    },
+    "*globals*.Bun": {
+      "status": "unsupported",
+      "note": "workerd has no Bun global",
+      "source": "../workerd/api/global-scope.h#L866-L1185",
+      "absent": true
     }
   }
 }

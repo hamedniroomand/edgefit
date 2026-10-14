@@ -9,6 +9,7 @@ import {
   followChain,
   isCheckedOperand,
   isPresentRead,
+  isSafeRead,
   isTestedChain,
 } from './chain.ts';
 import type { VisitContext } from './context.ts';
@@ -48,6 +49,11 @@ const apiGuard = (ref: ApiRef) =>
 export class Walker implements VisitContext {
   public readonly imported: boolean;
   public readonly mainOnlyNodes = new Set<Node>();
+  /** The guards in force at each read of a local function name, by the start of the read. */
+  public readonly functionReads = new Map<
+    number,
+    ReturnType<UsageCollector['guards']['snapshot']>
+  >();
   public readonly collector: UsageCollector;
   public readonly globals: ReadonlySet<string>;
   public readonly nodeEnv: string | undefined;
@@ -95,6 +101,9 @@ export class Walker implements VisitContext {
     }
     if (this.collector.guards.mainOnly()) {
       this.mainOnlyNodes.add(node);
+    }
+    if (node.type === 'Identifier' && this.functions.has(node.name)) {
+      this.functionReads.set(node.start, this.collector.guards.snapshot());
     }
     this.withAncestor(node, () => {
       const visitor = visitorFor(node);
@@ -250,10 +259,14 @@ export class Walker implements VisitContext {
     }
     const keys = callPassedKeys(node, parent, this.#outer(node), this.scope);
     if (recordBare || chain.extended) {
-      const usage = this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
-      if (usage !== undefined && keys !== undefined) {
-        addPassedKeys(usage, keys);
-      }
+      const safe = isSafeRead(chain.ref, node, parent, this.#outer(node), this.#scope);
+      const read = safe ? [apiGuard(chain.ref)] : [];
+      this.collector.guards.within(read, () => {
+        const usage = this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
+        if (usage !== undefined && keys !== undefined) {
+          addPassedKeys(usage, keys);
+        }
+      });
     } else if (keys !== undefined) {
       this.collector.optionCall(chain.ref, chain.offset, keys);
     }

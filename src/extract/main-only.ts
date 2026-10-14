@@ -121,7 +121,7 @@ export function factoryModule(
     : undefined;
 }
 
-function exportedNames(node: Node): string[] {
+export function exportedNames(node: Node): string[] {
   if (node.type !== 'ExportNamedDeclaration' || node.declaration === null) return [];
   return node.declaration.type === 'VariableDeclaration'
     ? node.declaration.declarations.flatMap(declaration => declared(declaration).names)

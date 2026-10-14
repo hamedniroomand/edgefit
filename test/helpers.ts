@@ -87,9 +87,9 @@ export function usagesOf(
 }
 
 /** The global conditions of each usage, as `has X` or `no X`, with the others left out. */
-export function globalsOf(source: string): string[] {
+export function globalsOf(source: string, globals: ReadonlySet<string> = defaultGlobals): string[] {
   return extractUsages('src/input.ts', source, {
-    globals: defaultGlobals,
+    globals,
     nodeEnv: 'production',
   }).map(usage => `${usage.display}${globalTags(usage)}`);
 }

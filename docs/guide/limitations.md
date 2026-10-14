@@ -25,6 +25,8 @@ if (isDeno()) {
 ```
 
 - **Helpers from another file.** A helper is followed only when it is in the same file, has no parameters and only returns the check. One that is imported, takes an argument or does more is not.
+- **Browser globals by their bare name.** edgefit does not report a use such as `document.title` or `window.name`, so it can hide a real failure. It reports only a use through the global object, such as `globalThis.document.title`.
+- **Functions that another function calls.** A function that only another function calls gets no check, even when checked code calls that other function.
 - **Variables that are set again.** A `let` or `var` that holds a check is followed only when its block does not set it again. A `var` in a nested block is checked only against the writes in that block, so a function in the block that runs after a write outside it is not seen.
 - **Other ways to name a runtime.** Only `typeof Deno`, `typeof Bun`, `process.versions.deno`, `process.versions.bun` and `navigator.userAgent` compared with `Cloudflare-Workers`, `Bun` or `Deno` are read. A regular expression, a feature check that happens to tell runtimes apart, and a check on Node are not.
 - **Checks that leave the runtime open.** `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'` says the code runs on one of two runtimes, and edgefit does not follow that.
