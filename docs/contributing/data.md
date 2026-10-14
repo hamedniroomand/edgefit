@@ -47,6 +47,13 @@ The matrix only records whether an API exists. Override files record what happen
 - `note` is the detail line users see. Say what happens, in plain words.
 - `source` is a path relative to the source URL in `source.json`, pinned to the runtime version. It becomes the `see` link in reports.
 - `missingHarmless` (optional, with `supported`) marks an API that is missing on the runtime while the code that uses it works without it, such as `fs.F_OK` on Deno. The runtime probe then does not report the missing API as a stale entry. Say in the `note` why it is harmless.
+- `options` (optional, with `mismatch`) lists the options that make a call fail. With `options`, only a call that passes one of them is a finding. An item is one of these:
+  - A key, such as `"ALPNProtocols"`. Any value except `undefined` matches.
+  - An object with a `key` and a `value`, such as `{ "key": "rejectUnauthorized", "value": false }`. The value is a boolean, a number or a string. edgefit matches only this literal value. When the runtime throws for each truthy value, as workerd does for `enableTrace`, list `true`, and know that other truthy values such as `1` are not found.
+  - An object with a `key` and a `gate`, for an option that fails only while a workerd compatibility flag is on: `{ "key": "checkServerIdentity", "gate": { "flag": "throw_on_not_implemented_tls_options", "disableFlag": "no_throw_on_not_implemented_tls_options", "date": "2026-06-16" } }`. The option then fails from `date` with `nodejs_compat`, or with `flag`, and not with `disableFlag`. Without `disableFlag`, the disable flag is `flag` with `enable_` replaced by `disable_`. Other targets do not read the gate.
+
+  edgefit stops with an error when `options` is not a list, when the list is empty, when an item has a wrong type, or when the status is not `mismatch`.
+
 - `validatesFirst` (optional) marks a stub that checks its arguments before it throws, as workerd's `vm.compileFunction` does. The runtime probe then does not take an argument error for a working implementation.
 
 ### Adding or changing an entry

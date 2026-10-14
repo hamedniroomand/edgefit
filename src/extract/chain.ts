@@ -1,13 +1,13 @@
 import type { Node } from 'oxc-parser';
 
-import type { ApiRef } from '@/types.ts';
+import type { ApiRef, PassedKey } from '@/types.ts';
 
 import { invokers, isSymbolKey, staticKey, strip, unwrap } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import { isFallbackRead } from './fallback-reads.ts';
-import { keysOf } from './known-values.ts';
-import { memberRef } from './refs.ts';
+import { keysOf, passedKeysOf } from './known-values.ts';
+import { memberRef, passesOn } from './refs.ts';
 import { declaringScope, isTracked, lookupPresent, lookupSymbol } from './scope.ts';
 import type { Scope } from './scope.ts';
 
@@ -208,4 +208,38 @@ export function isPresentRead(access: Node, parent: Node | undefined, scope: Sco
     entry.object === object.name &&
     entry.scope === declaringScope(scope, object.name)
   );
+}
+
+/** The call or `new` that has `node` as its callee. `outer` holds the ancestors above `parent`, nearest first. */
+function callOf(node: Node, parent: Node, outer: readonly Node[]): Node | undefined {
+  const ancestors = [parent, ...outer];
+  let value = node;
+  let index = 0;
+  for (let current = ancestors[0]; current !== undefined && passesOn(current, value);) {
+    value = current;
+    index += 1;
+    current = ancestors[index];
+  }
+  const call = ancestors[index];
+  return (call?.type === 'CallExpression' || call?.type === 'NewExpression') &&
+    call.callee === value
+    ? call
+    : undefined;
+}
+
+/** The keys that a call of `node` passes in its object arguments, when any is known. */
+export function callPassedKeys(
+  node: Node,
+  parent: Node,
+  outer: readonly Node[],
+  scope: Scope,
+): PassedKey[] | undefined {
+  const call = callOf(node, parent, outer);
+  if (call?.type !== 'CallExpression' && call?.type !== 'NewExpression') {
+    return undefined;
+  }
+  const keys = call.arguments.flatMap(argument =>
+    argument.type === 'SpreadElement' ? [] : (passedKeysOf(argument, scope) ?? []),
+  );
+  return keys.length > 0 ? keys : undefined;
 }

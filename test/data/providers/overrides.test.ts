@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vite-plus/test';
 
+import { CompatIndex } from '@/data/compat-index.ts';
 import { overridesProvider } from '@/data/providers/overrides.ts';
+import type { CompatEntry } from '@/data/providers/provider.ts';
 
 import { dataDirectoryWith } from './data-fixture.ts';
 
@@ -98,5 +100,56 @@ describe('absent overrides', () => {
       }),
     );
     expect(mocked[0]?.absent).toBeUndefined();
+  });
+});
+
+describe('override options', () => {
+  const load = (apis: Record<string, unknown>): CompatEntry[] =>
+    overridesProvider('workerd').load(
+      dataDirectoryWith({
+        'source.json': {
+          sources: [
+            { provider: 'overrides/workerd', url, license: 'MIT', versions: { workerd: '1' } },
+          ],
+        },
+        'overrides/workerd.json': { modules: {}, apis },
+      }),
+    );
+  const mismatch = (options: unknown): Record<string, unknown> => ({
+    'tls.connect': { status: 'mismatch', note: 'throws', source: 'tls.ts', options },
+  });
+
+  it('carries the options to the lookup', () => {
+    const options = ['ALPNProtocols', { key: 'rejectUnauthorized', value: false }];
+    const tree = { baseline: {}, runtime: {}, source: { provider: 'matrix', version: '1' } };
+    const index = new CompatIndex(tree, load(mismatch(options)));
+    expect(index.lookup({ module: 'tls', path: ['connect'] }).options).toEqual(options);
+  });
+
+  it.each([
+    ['an empty list', [], 'must be a list with one item or more'],
+    ['a string in place of a list', 'ALPNProtocols', 'must be a list with one item or more'],
+    ['a list with a number', ['ALPNProtocols', 1], 'have an item of a wrong type'],
+    ['an item without a key', [{ value: false }], 'have an item of a wrong type'],
+    ['an item with an object value', [{ key: 'ca', value: {} }], 'have an item of a wrong type'],
+    ['a gate without a date', [{ key: 'ca', gate: { flag: 'f' } }], 'have an item of a wrong type'],
+  ])('gives a load error for %s', (_name, options, reason) => {
+    expect(() => load(mismatch(options))).toThrow(
+      `overrides/workerd.json: the options of tls.connect ${reason}`,
+    );
+  });
+
+  it('accepts an item with a key and a gate', () => {
+    const gate = { flag: 'f', date: '2026-01-01', disableFlag: 'no_f' };
+    expect(load(mismatch([{ key: 'ca', gate }]))[0]?.options).toEqual([{ key: 'ca', gate }]);
+  });
+
+  it('gives a load error for options on a status other than mismatch', () => {
+    const apis = {
+      'tls.connect': { status: 'unsupported', note: 'x', source: 'tls.ts', options: ['ca'] },
+    };
+    expect(() => load(apis)).toThrow(
+      'the options of tls.connect are allowed only with the status mismatch, and the status is unsupported',
+    );
   });
 });

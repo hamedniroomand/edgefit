@@ -45,6 +45,9 @@ export interface PackageInfo {
   version: string | undefined;
 }
 
+/** An option key that a call passes, with its value when the value is a literal. */
+export type PassedKey = { key: string; value?: boolean | number | string };
+
 export interface Usage {
   /** `mocked` marks a polyfill the build injected in place of the API, found through sourcemaps. */
   kind: 'api' | 'dynamic' | 'mocked' | 'native';
@@ -78,6 +81,13 @@ export interface Usage {
   options?: string[];
   /** Set when the value is stored in this global only if the global is missing. */
   polyfill?: ApiRef;
+  /** Set for a call of the API: the keys of its object arguments that are known. */
+  passedKeys?: PassedKey[];
+  /**
+   * Set for the call of a name that is recorded at its import. The usage counts only for an API
+   * whose data names the options that fail. The usage at the import counts for the rest.
+   */
+  onlyForOptions?: true;
 }
 
 /** How to get rid of a finding: swap a package, change a setting, or change code or config. */

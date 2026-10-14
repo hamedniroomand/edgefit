@@ -1,5 +1,7 @@
 import type { Node } from 'oxc-parser';
 
+import type { PassedKey } from '@/types.ts';
+
 import { staticKey, strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { foldedString } from './bindings.ts';
@@ -47,14 +49,65 @@ function arrayValue(node: NodeOf<'ArrayExpression'>, scope: Scope): KnownObject 
   return knownObject(values, new Map(entries));
 }
 
+/**
+ * The keys that each object literal has, kept apart from its known values: a key stays when its
+ * value is not known, and a spread after it only makes its value unknown.
+ */
+const presentKeys = new WeakMap<KnownObject, PassedKey[]>();
+
+const isPlainLiteral = (node: Node): node is NodeOf<'Literal'> & { value: boolean | number } =>
+  node.type === 'Literal' && (typeof node.value === 'boolean' || typeof node.value === 'number');
+
+/** A literal value: a boolean or a number in the source, `!0` or `!1` as minifiers write them, or a known string. */
+function literalOf(node: Node, value: KnownValue | undefined): PassedKey['value'] {
+  const inner = strip(node);
+  if (isPlainLiteral(inner)) {
+    return inner.value;
+  }
+  const negated =
+    inner.type === 'UnaryExpression' && inner.operator === '!' ? inner.argument : undefined;
+  if (negated?.type === 'Literal' && typeof negated.value === 'number') {
+    return negated.value === 0;
+  }
+  return typeof value === 'string' ? value : undefined;
+}
+
+/** `undefined` or `void 0`: a key with this value is the same as a key that is not passed. */
+function isUndefinedValue(node: Node): boolean {
+  const inner = strip(node);
+  return (
+    (inner.type === 'Identifier' && inner.name === 'undefined') ||
+    (inner.type === 'UnaryExpression' && inner.operator === 'void')
+  );
+}
+
+/** A key that is not known, such as a spread, may replace the value of each key before it. */
+function notePresent(
+  present: Map<string, PassedKey>,
+  key: string | undefined,
+  node: Node | undefined,
+  known: KnownValue | undefined,
+): void {
+  if (key === undefined) {
+    for (const name of present.keys()) present.set(name, { key: name });
+  } else if (node !== undefined && isUndefinedValue(node)) {
+    present.delete(key);
+  } else {
+    const literal = node === undefined ? undefined : literalOf(node, known);
+    present.set(key, literal === undefined ? { key } : { key, value: literal });
+  }
+}
+
 /** A later property replaces an earlier one, so a key that is not known hides each one before it. */
 function objectValue(node: NodeOf<'ObjectExpression'>, scope: Scope): KnownObject {
   const entries = new Map<string, KnownValue>();
+  const present = new Map<string, PassedKey>();
   const values = node.properties.map(property => {
     const plain = property.type === 'Property' && property.kind === 'init' && !property.method;
     const key =
       property.type === 'Property' ? staticKey(property.key, property.computed) : undefined;
     const value = plain ? valueOf(property.value, scope) : undefined;
+    notePresent(present, key, plain ? property.value : undefined, value);
     if (key === undefined) {
       entries.clear();
     } else if (value === undefined) {
@@ -64,7 +117,15 @@ function objectValue(node: NodeOf<'ObjectExpression'>, scope: Scope): KnownObjec
     }
     return value;
   });
-  return knownObject(values, entries);
+  const object = knownObject(values, entries);
+  presentKeys.set(object, [...present.values()]);
+  return object;
+}
+
+/** The keys an argument passes: those of an object literal, or of a name that holds one. */
+export function passedKeysOf(node: Node, scope: Scope): readonly PassedKey[] | undefined {
+  const value = valueOf(node, scope);
+  return typeof value === 'object' ? presentKeys.get(value) : undefined;
 }
 
 /** `list.map(item => item + 'Array')`: each string of `list`, joined as the callback joins it. */

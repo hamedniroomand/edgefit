@@ -11,6 +11,23 @@ export type Dump = Record<string, DumpNode>;
 
 export type Status = 'supported' | 'unsupported' | 'mocked' | 'mismatch' | 'uncovered';
 
+/** A compatibility flag of workerd that turns on by default from a compatibility date. */
+export type FlagGate = {
+  flag: string;
+  /** With `nodejs_compat`, the flag turns on by default from this compatibility date. */
+  date: string;
+  /** The flag that turns it off. The default is the flag with `enable_` replaced by `disable_`. */
+  disableFlag?: string;
+};
+
+/**
+ * An option that makes a call fail: a key, or a key with the literal value that fails. A `gate`
+ * says that the option fails only while that workerd flag is on.
+ */
+export type OptionMatch =
+  | string
+  | { key: string; value?: boolean | number | string; gate?: FlagGate };
+
 export interface LookupResult {
   status: Status;
   note?: string;
@@ -19,6 +36,8 @@ export interface LookupResult {
   category?: Category;
   /** The API is missing on the target, so a check for it fails. False for one that exists and throws. */
   absent?: true;
+  /** The options that make a call fail. A call that passes none of them is not a finding. */
+  options?: readonly OptionMatch[];
   /** A change to a setting that makes the result go away. The caller adds the target. */
   suggestion?: Omit<Suggestion, 'target'>;
 }

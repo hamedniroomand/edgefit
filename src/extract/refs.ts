@@ -125,6 +125,11 @@ function isThisArgument(node: Node, call: Node): boolean {
   );
 }
 
+/** Whether `node` gives `value` on unchanged: through `(x)`, `x!`, or as the last value of `(0, x)`. */
+export const passesOn = (node: Node, value: Node): boolean =>
+  unwrap(node) === value ||
+  (node.type === 'SequenceExpression' && node.expressions.at(-1) === value);
+
 /**
  * Whether a value flows somewhere edgefit does not follow, such as a call argument or a return.
  * `outer` holds the ancestors above `parent`, nearest first. The last value of a sequence goes where the
@@ -132,16 +137,13 @@ function isThisArgument(node: Node, call: Node): boolean {
  */
 export function escapes(node: Node, parent: Node, outer: readonly Node[] = []): boolean {
   const [grand, ...rest] = outer;
-  const passesOn =
-    unwrap(parent) === node ||
-    (parent.type === 'SequenceExpression' && parent.expressions.at(-1) === node);
   // `({ a } = value)` reads the names here. The value then goes where the assignment goes.
   const namedAssignment =
     parent.type === 'AssignmentExpression' &&
     parent.operator === '=' &&
     parent.right === node &&
     destructuredNames(parent.left) !== undefined;
-  if ((passesOn || namedAssignment) && grand !== undefined) {
+  if ((passesOn(parent, node) || namedAssignment) && grand !== undefined) {
     return escapes(parent, grand, rest);
   }
   if (parent.type === 'CallExpression') {

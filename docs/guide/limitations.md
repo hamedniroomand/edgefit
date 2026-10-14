@@ -75,7 +75,19 @@ The bundler keeps these imports when the `tsconfig.json` sets `verbatimModuleSyn
 
 ## Existing is not the same as working
 
-The Node compatibility matrix records whether an API exists on each runtime. Curated overrides cover the APIs that are known to exist and still throw or do nothing, and a weekly probe checks them against the real runtimes. Still, an API that exists and works only in part can pass, and an API that throws only with certain arguments can pass too. The overrides are read by hand from the runtimes' sources, so they can be wrong or out of date until the probe or a report finds it.
+The Node compatibility matrix records whether an API exists on each runtime. Curated overrides cover the APIs that are known to exist and still throw or do nothing, and a weekly probe checks them against the real runtimes. Still, an API that exists and works only in part can pass, and an API that throws only with certain arguments can pass too, unless an override names the options that fail. The overrides are read by hand from the runtimes' sources, so they can be wrong or out of date until the probe or a report finds it.
+
+## Options that are not known
+
+When an override names the options that make a call fail, edgefit reads the options that each call passes. edgefit gives no finding for these calls:
+
+- A call that passes an option through a spread, such as `{ ...options }`, or through a variable whose keys edgefit does not know, such as a parameter.
+- A call that passes an option with a value that is not a literal, when only one value fails. `rejectUnauthorized: false` is found, and `rejectUnauthorized: verify` is not.
+- A call that passes a value that fails, but is not the value that the data lists. edgefit matches only the listed literal value. For example, when the data lists `enableTrace` with the value `true`, a call with `enableTrace: 1` is not found.
+- A call through `.call` or `.apply`, such as `tls.connect.call(tls, options)`.
+- A `super(...)` call in a class that extends the API.
+- An imported function that is passed as a value and called later, such as `register(connect)`.
+- A key that is added to the object after the object is made, such as `options.ALPNProtocols = ['h2']`.
 
 ## The data has an age
 

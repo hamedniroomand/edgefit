@@ -1,13 +1,29 @@
 import type { Node } from 'oxc-parser';
 
 import { displayApi } from '@/data/builtins.ts';
-import type { ApiRef, GlobalCondition, Location, RuntimeCondition, Usage } from '@/types.ts';
+import type {
+  ApiRef,
+  GlobalCondition,
+  Location,
+  PassedKey,
+  RuntimeCondition,
+  Usage,
+} from '@/types.ts';
 
 import type { ComputedKey } from './chain.ts';
 import { GuardStack } from './guard-stack.ts';
 import type { LocalFunction } from './local-functions.ts';
 import { omitMainFunctions } from './main-only.ts';
 import { isPromiseApi, normalizeRef } from './refs.ts';
+
+/** Adds the keys of a call to its usage. A name imported once may be called more than once. */
+export function addPassedKeys(usage: Usage, keys: readonly PassedKey[]): void {
+  const all = [...(usage.passedKeys ?? []), ...keys];
+  usage.passedKeys = all.filter(
+    (passed, index) =>
+      all.findIndex(other => other.key === passed.key && other.value === passed.value) === index,
+  );
+}
 
 export class UsageCollector {
   public readonly omitMainFunctions = (
@@ -70,22 +86,24 @@ export class UsageCollector {
     return { file: this.#file, line: low + 1, column: offset - (this.#lineStarts[low] ?? 0) + 1 };
   }
 
-  /** `key` is the name that holds the key of a computed read, which a check of the same read guards. */
-  public api(ref: ApiRef, offset: number, awaited = false, key?: ComputedKey): void {
+  /**
+   * `key` is the name that holds the key of a computed read, which a check of the same read guards.
+   * Gives the usage it records, so the keys of a later call can be added to it.
+   */
+  public api(ref: ApiRef, offset: number, awaited = false, key?: ComputedKey): Usage | undefined {
     if (this.guards.dead()) {
-      return;
+      return undefined;
     }
     // A module as a whole is never read in this mode, so it is not a use that can fail.
     if (this.lazyNodeImports && ref.module !== '*globals*' && ref.path.length === 0) {
-      return;
+      return undefined;
     }
     const api = normalizeRef(ref);
     const guarded = this.guards.covers(api, key);
     // A rejected promise that nothing awaits is not an error of the `try`.
     const caught = this.guards.isCaught() && (awaited || !isPromiseApi(api));
     const afterLoad = api.path.length > 0 && this.guards.afterLoad(api);
-    this.offsets.push(offset);
-    this.usages.push({
+    const usage: Usage = {
       kind: 'api',
       api,
       display: displayApi(api.module, api.path),
@@ -96,7 +114,23 @@ export class UsageCollector {
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
-    });
+    };
+    this.offsets.push(offset);
+    this.usages.push(usage);
+    return usage;
+  }
+
+  /**
+   * Records the call of a name that is recorded at its import, such as `connect` of
+   * `import { connect } from 'node:tls'`, when the call passes known keys. The usage counts only for
+   * an API whose data names the options that fail, so the other results stay the same.
+   */
+  public optionCall(ref: ApiRef, offset: number, keys: readonly PassedKey[]): void {
+    const usage = this.api(ref, offset);
+    if (usage !== undefined) {
+      usage.onlyForOptions = true;
+      addPassedKeys(usage, keys);
+    }
   }
 
   /** Records the import of a native addon, if `specifier` resolves to one. */
