@@ -45,7 +45,7 @@ npx edgefit check --target vercel-edge --built .vercel/output
 
 With the `vercel-edge` target, the output is found without `--built` when the source gives no entry: the order is `--entry` or the config, then the middleware and the Edge routes in the source, then `.vercel/output`. `--built` always uses the output.
 
-Next.js 16 builds `middleware.ts` as an Edge function and `proxy.ts` as a Node.js one, so only the first is checked. The Edge bundles ship with sourcemaps, and findings are mapped to `next` and your own files. Code that a bundler adds around your modules, such as Turbopack's `e.x("node:…", () => require(…))` wrappers and its computed `import()` of chunks, has no file in the project. It is listed under `build output`, not `your code`, so a warning about it is not a warning about your code. The same holds for output with no sourcemap at all: its findings point into the output and are owned by `build output`, unless a package can be read from the region markers.
+Next.js 16 builds `middleware.ts` as an Edge function and `proxy.ts` as a Node.js one, so only the first is checked. The Edge bundles ship with sourcemaps, and findings are mapped to `next` and your own files. Code that a bundler adds around your modules, such as the module Turbopack writes for a Node.js built-in (`t.exports = e.x("node:…", () => require(…))`) and its computed `import()` of chunks, has no file in the project. This code is listed under `build output`, not `your code`, so a warning about it is not a warning about your code. The same holds for output with no sourcemap at all: its findings point into the output and are owned by `build output`, unless a package can be read from the region markers. edgefit does not map Turbopack's module through the sourcemap, because the sourcemap can give it the file of the code before it. An `e.x(…)` call in your own module code is not such a module: it loads the module where your code needs it, so it stays at your file, as the next paragraph shows.
 
 Turbopack loads a Node.js built-in as `e.x("node:timers", () => require("node:timers"), !0)`, and `await import('node:timers')` as a `Promise.resolve().then(…)` around it. edgefit reads both as the module, so a read from a Node.js module Vercel lacks is reported in the bundle, at the file of yours that wrote it. A static import of such a module does not build in a route, only in a middleware, so a route has to import it lazily to be built at all. The bundle also holds Next's own runtime code, and [`data/unreached.json`](/guide/findings#code-a-package-ships-and-the-target-does-not-run) says which of its uses do not run on Vercel.
 
@@ -64,7 +64,7 @@ With the `netlify-edge` target, the output is found without `--built`, and it is
 
 ## Turn on sourcemaps
 
-Without sourcemaps, findings point into the build chunks, which is rarely where you want to fix anything. With them, each finding is mapped back to the original file and package, and the chunks it was reached through become its chain:
+Without sourcemaps, findings point into the build chunks, which is rarely where you want to fix anything. With them, each finding is mapped back to the original file and package, and the chunks it was reached through become its chain. Code that the bundler wrote, such as Turbopack's module for a Node.js built-in, is not mapped and stays under `build output` (see [Vercel Build Output API](#vercel-build-output-api)):
 
 ```
 error    unsupported  navigator.locks.request  (workerd)
