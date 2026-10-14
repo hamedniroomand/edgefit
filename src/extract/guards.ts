@@ -161,7 +161,7 @@ function checkGuards(
   try {
     return guardsWhen(
       check.test,
-      truth,
+      check.negated ? !truth : truth,
       {
         imported: context.imported,
         scope: check.scope,

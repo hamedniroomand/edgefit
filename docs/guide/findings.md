@@ -267,7 +267,7 @@ To check the development build, set `env: { NODE_ENV: 'development' }` in the [c
 
 ### Helpers
 
-A check kept in a helper is understood when the helper is in the same file, has no parameters, is not `async`, and does nothing but return the check. So is a `const` that holds one, and a `let` or `var` that its block does not set again:
+A check kept in a helper is understood when the helper is in the same file, has no parameters, is not `async`, and only returns the check or tests it in one `if` (see below). So is a `const` that holds one, and a `let` or `var` that its block does not set again:
 
 ```js
 const isDeno = typeof Deno !== 'undefined';
@@ -278,11 +278,13 @@ if (hasWatch() && !isDeno) fs.watch(dir, onChange);
 if (reading) reader = new FileReader();
 ```
 
+A helper can also test the check in one `if` and return `true` or `false`. The `if` and one `return` after it are its only statements, or the `if` has an `else` (not an `else if`) and is its only statement. The two returns must have different values. So `if (check) { return true; } return false;` holds the check, and `if (check) { return false; } return true;` holds the opposite check.
+
 edgefit does not follow a `let` or `var` that its block sets again, because the check may no longer hold. A write is an `=`, a `++`, a loop over the name, a second `var` with a value, or a function declaration with the same name. A write in a nested function or block that declares its own variable with the same name does not count. For a `var` in a nested block, only the writes in that block count. See [Limitations](/guide/limitations).
 
 A `process.domain` that is truthy, or that a comparison with `null` rules out, guards the `domain` module, because only that module sets the value. Node.js sets it to `null` first, so `typeof process.domain`, `'domain' in process` and `process.domain !== undefined` do not guard the module.
 
-Helpers can call other helpers. A helper imported from another file, one with parameters, and one that does more than return a check are not followed. See [Limitations](/guide/limitations).
+Helpers can call other helpers. edgefit does not follow a helper that is imported from another file or has parameters. It also does not follow a helper with any statement other than those above. See [Limitations](/guide/limitations).
 
 ### Functions that only checked code uses
 
