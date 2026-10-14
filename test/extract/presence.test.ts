@@ -207,7 +207,7 @@ describe('a spread on a condition', () => {
 });
 
 describe('a spread of a falsy value', () => {
-  it.each(['null', 'false', 'undefined', 'void 0', '0', "''"])(
+  it.each(['null', 'false', 'undefined', 'void 0', '0', "''", '-0', '``', '!1'])(
     'keeps the key before `...%s`, which spreads no keys',
     value => {
       expect(keysOf(connect(`rejectUnauthorized: false, ...${value}`))).toEqual([

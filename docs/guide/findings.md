@@ -50,7 +50,7 @@ On workerd, a Node module that is not native at your compatibility date is also 
 
 The API exists but differs from Node: a missing property, a different arity, a different type, or an option that throws. It may be fine for your use. Check the detail line.
 
-Some APIs fail only for some options. When the data names those options, a call is a finding only when it passes one of them in an object literal, or in a local variable that holds an object literal and is not set again. edgefit reads the last argument that is an object, and counts a key only when its value is always defined. When code changes a member of that variable after it is made, as in `options.key = value`, edgefit reads no keys of it. A call of a name imported with `import { name }` gets the finding at the call. See [Options that are not known](/guide/limitations#options-that-are-not-known) for the calls that edgefit cannot read.
+Some APIs fail only for some options. When the data names those options, a call is a finding only when it passes one of them in an object literal, or in a local variable that holds an object literal and is not set again. edgefit reads the last argument that is an object, and counts a key only when its value is always defined. When code changes that object after it is made, as in `options.key = value`, `delete options.key` or `Object.assign(options, more)`, edgefit reads no keys of it. A call of a name imported with `import { name }` gets the finding at the call. See [Options that are not known](/guide/limitations#options-that-are-not-known) for the calls that edgefit cannot read.
 
 ### web
 
