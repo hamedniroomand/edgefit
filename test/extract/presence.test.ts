@@ -102,3 +102,121 @@ describe('the argument that holds the options', () => {
     expect(keysOf(`${tls}tls.connect(...args, { ALPNProtocols: [] });`)).toEqual([]);
   });
 });
+
+describe('a key before a spread', () => {
+  it('keeps a key when a later spread is a known literal without it, as got writes it', () => {
+    const source = `${tls}const options = {\n  ...connection,\n  ALPNProtocols: given.ALPNProtocols ?? ['h2'],\n  host,\n  ...(check && { checkServerIdentity: check }),\n};\ntls.connect(443, 'a', options);`;
+    expect(keysOf(source)).toEqual(['ALPNProtocols']);
+  });
+
+  it('keeps a key and adds the keys of a later known literal', () => {
+    expect(keysOf(connect("ALPNProtocols: [], ...{ host: 'a' }"))).toEqual([
+      'ALPNProtocols',
+      'host=a',
+    ]);
+  });
+
+  it.each([
+    ['a spread of an unknown value', 'ALPNProtocols: [], ...opts'],
+    [
+      'a literal that sets the key to undefined',
+      'ALPNProtocols: [], ...{ ALPNProtocols: undefined }',
+    ],
+    ['a computed key that is not known', 'ALPNProtocols: [], [name]: value'],
+    ['a literal that holds a spread of its own', 'ALPNProtocols: [], ...{ ...more }'],
+  ])('drops the key for %s', (_name, options) => {
+    expect(keysOf(connect(options))).toEqual([]);
+  });
+});
+
+describe('a member write after the object is made', () => {
+  const object = "const options = { ALPNProtocols: ['h2'] };\n";
+
+  it.each([
+    ['an assignment', 'options.ALPNProtocols = undefined;\n'],
+    ['a delete', 'delete options.ALPNProtocols;\n'],
+    ['a computed assignment', 'options[name] = value;\n'],
+    [
+      'a write in a nested function',
+      'function reset() {\n  options.ALPNProtocols = undefined;\n}\n',
+    ],
+  ])('reads no keys after %s', (_name, write) => {
+    expect(keysOf(`${tls}${object}${write}tls.connect(options);`)).toEqual([]);
+  });
+
+  it('keeps the keys when nothing writes to a member', () => {
+    expect(keysOf(`${tls}${object}tls.connect(options);`)).toEqual(['ALPNProtocols']);
+  });
+});
+
+/** Each case: its name, the options of the call, and the keys that count. */
+const conditionCases: [string, string, string[]][] = [
+  ['a true condition adds the key', "...(true && { ALPNProtocols: ['x'] })", ['ALPNProtocols']],
+  [
+    'a false condition keeps the key before it',
+    "ALPNProtocols: ['h2'], ...(false && { ALPNProtocols: undefined })",
+    ['ALPNProtocols'],
+  ],
+  [
+    'a condition that `!1` makes false keeps the key',
+    "ALPNProtocols: ['h2'], ...(!1 && { ALPNProtocols: undefined })",
+    ['ALPNProtocols'],
+  ],
+  [
+    'a null condition keeps the key before it',
+    "ALPNProtocols: ['h2'], ...(null && { ALPNProtocols: undefined })",
+    ['ALPNProtocols'],
+  ],
+  ['a null condition adds nothing', "...(null && { ALPNProtocols: ['x'] })", []],
+  [
+    'an undefined condition keeps the value before it',
+    'rejectUnauthorized: false, ...(undefined && { rejectUnauthorized: true })',
+    ['rejectUnauthorized=false'],
+  ],
+  [
+    'a void 0 condition keeps the key before it',
+    "ALPNProtocols: ['h2'], ...(void 0 && { ALPNProtocols: undefined })",
+    ['ALPNProtocols'],
+  ],
+  [
+    'an unknown condition with a defined value keeps the key',
+    "ALPNProtocols: ['h2'], ...(on && { ALPNProtocols: ['h1'] })",
+    ['ALPNProtocols'],
+  ],
+  [
+    'an unknown condition with another value keeps the key without the value',
+    'rejectUnauthorized: false, ...(on && { rejectUnauthorized: true })',
+    ['rejectUnauthorized'],
+  ],
+  [
+    'an unknown condition with undefined drops the key',
+    "ALPNProtocols: ['h2'], ...(on && { ALPNProtocols: undefined })",
+    [],
+  ],
+  [
+    'an unknown condition does not add a key that was not there',
+    "...(on && { ALPNProtocols: ['h1'] })",
+    [],
+  ],
+];
+
+describe('a spread on a condition', () => {
+  it.each(conditionCases)('%s', (_name, options, keys) => {
+    expect(keysOf(connect(options))).toEqual(keys);
+  });
+});
+
+describe('a spread of a falsy value', () => {
+  it.each(['null', 'false', 'undefined', 'void 0', '0', "''", '-0', '``', '!1'])(
+    'keeps the key before `...%s`, which spreads no keys',
+    value => {
+      expect(keysOf(connect(`rejectUnauthorized: false, ...${value}`))).toEqual([
+        'rejectUnauthorized=false',
+      ]);
+    },
+  );
+
+  it('still drops the key before a spread of an unknown value', () => {
+    expect(keysOf(connect('rejectUnauthorized: false, ...value'))).toEqual([]);
+  });
+});

@@ -5,7 +5,7 @@ import type { PassedKey } from '@/types.ts';
 import { staticKey, strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { foldedString } from './bindings.ts';
-import { literalOf, presenceOf } from './presence.ts';
+import { literalOf, presenceOf, propertyKey, spreadLiterals, writtenKeys } from './presence.ts';
 import { createScope, declare, lookupKeys, lookupObject } from './scope.ts';
 import type { KnownObject, KnownValue, Scope } from './scope.ts';
 
@@ -51,24 +51,60 @@ function arrayValue(node: NodeOf<'ArrayExpression'>, scope: Scope): KnownObject 
 }
 
 /**
- * The keys that each object literal has, kept apart from its known values: a key stays when its
- * value is not known, and a spread after it only makes its value unknown.
+ * The keys that each object literal always passes with a defined value, kept apart from its known
+ * values. A spread or a key that is not known after a key can remove it, see `noteUnknownKey`.
  */
 const presentKeys = new WeakMap<KnownObject, PassedKey[]>();
 
 /**
- * A key that is not known, such as a spread, may replace the value of each key before it. A key
- * whose value may be `undefined` is left out, the same as a key that is not passed.
+ * A spread or a computed key that is not known may replace each key before it, maybe with
+ * `undefined`, so those keys are left out. A spread of known object literals only changes the keys
+ * that they write: a key stays only when each path of the spread leaves it defined.
  */
+function noteUnknownKey(present: Map<string, PassedKey>, property: Node, scope: Scope): void {
+  const spread = spreadLiterals(property, scope, valueOf);
+  if (spread === 'none') {
+    return;
+  }
+  const keySets = spread === undefined ? [] : spread.literals.map(literal => writtenKeys(literal));
+  const written = keySets.filter(keys => keys !== undefined);
+  if (spread === undefined || written.length !== keySets.length) {
+    present.clear();
+    return;
+  }
+  const given = spread.literals.map(
+    literal => new Map((passedKeysOf(literal, scope) ?? []).map(key => [key.key, key])),
+  );
+  for (const name of new Set(written.flat())) {
+    const before = present.get(name);
+    // The value on each path: the literal's own value, or the value before when it does not write the key.
+    const outcomes = given.map((own, index) =>
+      written[index]?.includes(name) === true ? own.get(name) : before,
+    );
+    if (!spread.always) {
+      outcomes.push(before);
+    }
+    const [first] = outcomes;
+    if (first === undefined || outcomes.includes(undefined)) {
+      present.delete(name);
+    } else {
+      const same = outcomes.every(outcome => outcome?.value === first.value);
+      present.set(name, same ? first : { key: name });
+    }
+  }
+}
+
+/** A key whose value may be `undefined` is left out, the same as a key that is not passed. */
 function notePresent(
   present: Map<string, PassedKey>,
+  property: Node,
   key: string | undefined,
   node: Node | undefined,
   scope: Scope,
   known: KnownValue | undefined,
 ): void {
   if (key === undefined) {
-    for (const name of present.keys()) present.set(name, { key: name });
+    noteUnknownKey(present, property, scope);
   } else if (node === undefined || presenceOf(node, scope, valueOf) !== 'defined') {
     present.delete(key);
   } else {
@@ -89,7 +125,11 @@ function objectValue(node: NodeOf<'ObjectExpression'>, scope: Scope): KnownObjec
     // A method is a function, and a getter or a setter gives a value that is not known.
     const given =
       property.type === 'Property' && property.kind === 'init' ? property.value : undefined;
-    notePresent(present, key, given, scope, value);
+    const presentKey = propertyKey(property);
+    // A Symbol key never names an option, so it changes no option.
+    if (presentKey !== null) {
+      notePresent(present, property, presentKey, given, scope, value);
+    }
     if (key === undefined) {
       entries.clear();
     } else if (value === undefined) {

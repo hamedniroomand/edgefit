@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, rootName } from './ast.ts';
+import { childNodes, rootName, staticKey, strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { functionTypes, patternNames } from './declarations.ts';
 
@@ -29,7 +29,31 @@ function addLoopHead(node: NodeOf<'ForInStatement' | 'ForOfStatement'>, add: Add
   }
 }
 
+/** Calls that change the object of their first argument, such as `Object.assign(options, more)`. */
+const objectWriters: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+  ['Object', new Set(['assign', 'defineProperty', 'defineProperties'])],
+  ['Reflect', new Set(['deleteProperty', 'set', 'defineProperty'])],
+]);
+
+function isObjectWriter(callee: Node): boolean {
+  const inner = strip(callee);
+  if (inner.type !== 'MemberExpression' || inner.object.type !== 'Identifier') {
+    return false;
+  }
+  const member = staticKey(inner.property, inner.computed);
+  return member !== undefined && objectWriters.get(inner.object.name)?.has(member) === true;
+}
+
 const writers: { [TType in Node['type']]?: (node: NodeOf<TType>, add: Add) => void } = {
+  CallExpression: (node, add) => {
+    const [target] = node.arguments;
+    const object =
+      target === undefined || target.type === 'SpreadElement' ? undefined : strip(target);
+    const root = object === undefined ? undefined : rootName(object);
+    if (root !== undefined && isObjectWriter(node.callee)) {
+      add(root, null);
+    }
+  },
   AssignmentExpression: (node, add) => {
     if (node.left.type === 'Identifier' && logicalAssignments.has(node.operator)) {
       add(node.left.name, node.right);
@@ -60,6 +84,9 @@ const writers: { [TType in Node['type']]?: (node: NodeOf<TType>, add: Add) => vo
  * Every value written to each name in `nodes`: each `=` and each declaration with a value. A write
  * inside a nested function can run at any time, so it makes the name unknown. A name that a
  * nearer declaration shadows counts too, so the result can only hold more values than the name does.
+ * A change of the object that a name holds, such as `o.x = 1`, `delete o.x` or
+ * `Object.assign(o, more)`, makes the name unknown. A change through another name for the same
+ * object is not seen.
  * ponytail: a method call that changes an object, such as `list.push(x)`, is not a write.
  */
 export function collectWrites(nodes: readonly Node[]): Writes {

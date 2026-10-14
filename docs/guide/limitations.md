@@ -84,14 +84,19 @@ The Node compatibility matrix records whether an API exists on each runtime. Cur
 When an override names the options that make a call fail, edgefit reads the options that each call passes. edgefit gives no finding for these calls:
 
 - A call that passes an option through a spread, such as `{ ...options }`, or through a variable whose keys edgefit does not know, such as a parameter.
-- A call that passes an option with a value that may be `undefined`, such as a parameter or a member read: `{ ALPNProtocols: protocols }` or `{ ALPNProtocols: options.ALPNProtocols }`.
+- A call that passes a key before a spread that can replace it with `undefined`, such as `{ ALPNProtocols: ['h2'], ...options }`. A spread of a known object literal removes only the keys that it holds, and only when it may give `undefined` for them. Examples are `...{ host }`, `...(check && { checkServerIdentity })` and `...(on ? { host } : {})`. A literal with a computed key that is not known, or with a spread of its own, counts as an unknown spread. A spread of a known falsy value, such as `null`, `undefined`, `false`, `0`, `-0`, `''`, an empty template, `!1` or `void 0`, or a condition with such a value, adds and removes no keys.
+- A call that passes an option with a value that may be `undefined`, such as a parameter or a member read: `{ ALPNProtocols: protocols }` or `{ ALPNProtocols: options.ALPNProtocols }`. The exception is a Node.js module or one direct member of it, see below.
 - A call whose options are not in its last argument that is an object, or a call with a spread argument such as `connect(...args)`.
 - A call that passes an option with a value that is not a literal, when only one value fails. `rejectUnauthorized: false` is found, and `rejectUnauthorized: verify` is not.
 - A call that passes a value that fails, but is not the value that the data lists. edgefit matches only the listed literal value. For example, when the data lists `enableTrace` with the value `true`, a call with `enableTrace: 1` is not found.
 - A call through `.call` or `.apply`, such as `tls.connect.call(tls, options)`.
 - A `super(...)` call in a class that extends the API.
 - An imported function that is passed as a value and called later, such as `register(connect)`.
-- A key that is added to the object after the object is made, such as `options.ALPNProtocols = ['h2']`.
+- A call that passes a variable whose object is changed after it is made. edgefit then reads no keys of that variable. These changes count: a member write such as `options.ALPNProtocols = ['h2']`, `delete options.host`, and `Object.assign`, `Object.defineProperty`, `Object.defineProperties`, `Reflect.set`, `Reflect.defineProperty` or `Reflect.deleteProperty` with the object as the first argument.
+
+edgefit does not see a change of the object through another name for it, such as `const o = options; o.host = 'a'`, a destructuring into a member, such as `[options.host] = ['a']`, a change by a function that gets the object, such as `normalize(options)`, or a change through another object that holds it, such as `holder.options.host = 'a'`. Then edgefit still reads the keys of the object literal, so a call can get a finding for a key that the change removed.
+
+edgefit counts a Node.js module, or one direct member of it, as defined, such as `tls.checkServerIdentity`. It does not check that the module has the member, so a call that passes `tls.missing` can get a finding. A deeper read, such as `process.env.KEY`, may be `undefined`, so it does not count.
 
 ## The data has an age
 
