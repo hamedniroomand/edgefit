@@ -147,13 +147,20 @@ function isMemberOf(node: Node, object: Node | undefined, key: string): boolean 
 /**
  * Turbopack writes a module of its own for a Node.js built-in that the code loads:
  * `(e, r, o) => { r.exports = e.x("node:fs", () => require("node:fs")) }`. The 1st parameter is
- * the loader and the 2nd is the module object. This code has no original file. Do not map it
- * through the sourcemap, because the sourcemap can give it the file of the code before it.
+ * the loader and the 2nd is the module object. The function sits in Turbopack's list of modules,
+ * after its number: `[…, 78500, (e, r, o) => {…}, …]`. This code has no original file. Do not map
+ * it through the sourcemap, because the sourcemap can give it the file of the code before it.
  */
 export function isBuiltinFactory(
   node: NodeOf<'FunctionDeclaration' | 'FunctionExpression' | 'ArrowFunctionExpression'>,
+  parent: Node | undefined,
   scope: Scope,
 ): boolean {
+  const slots = parent?.type === 'ArrayExpression' ? parent.elements : [];
+  const id = slots[slots.indexOf(node) - 1];
+  if (id?.type !== 'Literal' || typeof id.value !== 'number') {
+    return false;
+  }
   const [loader, module] = node.params;
   const [statement, ...rest] = node.body?.type === 'BlockStatement' ? node.body.body : [];
   if (statement?.type !== 'ExpressionStatement' || rest.length > 0) {

@@ -47,7 +47,7 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
   if (module !== undefined) {
     scope.modules.add(module);
   }
-  const generated = isBuiltinFactory(node, context.scope);
+  const generated = isBuiltinFactory(node, context.parent(), context.scope);
   // A function may be called after the `try` block around it has ended.
   context.collector.guards.deferred(() => {
     const first = context.collector.usages.length;

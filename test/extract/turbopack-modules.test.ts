@@ -116,6 +116,9 @@ describe("what is not Turbopack's module for a Node.js built-in", () => {
       'a wrapper of another module',
       factory('t.exports = e.x("node:fs", () => require("node:os"))'),
     ],
+    ['a factory that is not in a list', `var m = (e, t) => { ${exportsWrapper} };`],
+    ['a factory with no number before it', `[(e, t) => { ${exportsWrapper} }]`],
+    ['a factory after a name, not a number', `["id", (e, t) => { ${exportsWrapper} }]`],
     [
       'a body that is not a block',
       '[1, (e, t) => (t.exports = e.x("node:fs", () => require("node:fs")))]',
