@@ -2,7 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import type { PassedKey } from '@/types.ts';
 
-import { rootName, strip } from './ast.ts';
+import { rootName, staticKey, strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { isTracked, lookup } from './scope.ts';
 import type { KnownValue, Scope } from './scope.ts';
@@ -98,4 +98,54 @@ export function presenceOf(node: Node, scope: Scope, read: ReadValue): Presence 
   return inner.type === 'Identifier' || inner.type === 'MemberExpression'
     ? readPresence(inner, scope, read)
     : 'unknown';
+}
+
+/** Whether a value is known to be truthy or falsy: a literal, `!0` or `!1`, or a known value. */
+function knownTruth(node: Node, scope: Scope, read: ReadValue): boolean | undefined {
+  const inner = strip(node);
+  if (inner.type === 'Literal' && inner.value === null) {
+    return false;
+  }
+  const value = read(inner, scope);
+  const literal = literalOf(inner, value);
+  if (literal !== undefined) {
+    return Boolean(literal);
+  }
+  // A known value is a string or an object, never `null`.
+  return typeof value === 'object' ? true : undefined;
+}
+
+/**
+ * The object literal that a spread gives, and whether it always gives it: `...{ a }` or
+ * `...(x && { a })`. `'none'` is a spread that gives nothing, as `...(false && { a })`.
+ */
+export function spreadLiteral(
+  property: Node,
+  scope: Scope,
+  read: ReadValue,
+): { literal: NodeOf<'ObjectExpression'>; always: boolean } | 'none' | undefined {
+  if (property.type !== 'SpreadElement') {
+    return undefined;
+  }
+  const argument = strip(property.argument);
+  if (argument.type === 'ObjectExpression') {
+    return { literal: argument, always: true };
+  }
+  if (argument.type !== 'LogicalExpression' || argument.operator !== '&&') {
+    return undefined;
+  }
+  const truth = knownTruth(argument.left, scope, read);
+  const right = strip(argument.right);
+  if (truth === false) {
+    return 'none';
+  }
+  return right.type === 'ObjectExpression' ? { literal: right, always: truth === true } : undefined;
+}
+
+/** The keys that an object literal writes, or `undefined` when one of them is not known. */
+export function writtenKeys(literal: NodeOf<'ObjectExpression'>): string[] | undefined {
+  const keys = literal.properties.map(property =>
+    property.type === 'Property' ? staticKey(property.key, property.computed) : undefined,
+  );
+  return keys.every(key => key !== undefined) ? keys : undefined;
 }

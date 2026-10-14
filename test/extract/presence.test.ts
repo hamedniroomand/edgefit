@@ -122,7 +122,6 @@ describe('a key before a spread', () => {
       'a literal that sets the key to undefined',
       'ALPNProtocols: [], ...{ ALPNProtocols: undefined }',
     ],
-    ['a literal that may set the key', "ALPNProtocols: [], ...(on && { ALPNProtocols: ['x'] })"],
     ['a computed key that is not known', 'ALPNProtocols: [], [name]: value'],
     ['a literal that holds a spread of its own', 'ALPNProtocols: [], ...{ ...more }'],
   ])('drops the key for %s', (_name, options) => {
@@ -147,5 +146,49 @@ describe('a member write after the object is made', () => {
 
   it('keeps the keys when nothing writes to a member', () => {
     expect(keysOf(`${tls}${object}tls.connect(options);`)).toEqual(['ALPNProtocols']);
+  });
+});
+
+describe('a spread on a condition', () => {
+  it.each([
+    ['a true condition adds the key', "...(true && { ALPNProtocols: ['x'] })", ['ALPNProtocols']],
+    [
+      'a false condition keeps the key before it',
+      "ALPNProtocols: ['h2'], ...(false && { ALPNProtocols: undefined })",
+      ['ALPNProtocols'],
+    ],
+    [
+      'a condition that `!1` makes false keeps the key',
+      "ALPNProtocols: ['h2'], ...(!1 && { ALPNProtocols: undefined })",
+      ['ALPNProtocols'],
+    ],
+    [
+      'a null condition keeps the key before it',
+      "ALPNProtocols: ['h2'], ...(null && { ALPNProtocols: undefined })",
+      ['ALPNProtocols'],
+    ],
+    ['a null condition adds nothing', "...(null && { ALPNProtocols: ['x'] })", []],
+    [
+      'an unknown condition with a defined value keeps the key',
+      "ALPNProtocols: ['h2'], ...(on && { ALPNProtocols: ['h1'] })",
+      ['ALPNProtocols'],
+    ],
+    [
+      'an unknown condition with another value keeps the key without the value',
+      'rejectUnauthorized: false, ...(on && { rejectUnauthorized: true })',
+      ['rejectUnauthorized'],
+    ],
+    [
+      'an unknown condition with undefined drops the key',
+      "ALPNProtocols: ['h2'], ...(on && { ALPNProtocols: undefined })",
+      [],
+    ],
+    [
+      'an unknown condition does not add a key that was not there',
+      "...(on && { ALPNProtocols: ['h1'] })",
+      [],
+    ],
+  ])('%s', (_name, options, keys) => {
+    expect(keysOf(connect(options))).toEqual(keys);
   });
 });

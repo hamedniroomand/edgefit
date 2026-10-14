@@ -5,7 +5,7 @@ import type { PassedKey } from '@/types.ts';
 import { staticKey, strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { foldedString } from './bindings.ts';
-import { literalOf, presenceOf } from './presence.ts';
+import { literalOf, presenceOf, spreadLiteral, writtenKeys } from './presence.ts';
 import { createScope, declare, lookupKeys, lookupObject } from './scope.ts';
 import type { KnownObject, KnownValue, Scope } from './scope.ts';
 
@@ -56,46 +56,33 @@ function arrayValue(node: NodeOf<'ArrayExpression'>, scope: Scope): KnownObject 
  */
 const presentKeys = new WeakMap<KnownObject, PassedKey[]>();
 
-/** The object literal that a spread gives, and whether it always gives it: `...{ a }` or `...(x && { a })`. */
-function spreadLiteral(
-  property: Node,
-): { literal: NodeOf<'ObjectExpression'>; always: boolean } | undefined {
-  if (property.type !== 'SpreadElement') {
-    return undefined;
-  }
-  const argument = strip(property.argument);
-  if (argument.type === 'ObjectExpression') {
-    return { literal: argument, always: true };
-  }
-  const right =
-    argument.type === 'LogicalExpression' && argument.operator === '&&'
-      ? strip(argument.right)
-      : undefined;
-  return right?.type === 'ObjectExpression' ? { literal: right, always: false } : undefined;
-}
-
-/** The keys that an object literal writes, or `undefined` when one of them is not known. */
-function writtenKeys(literal: NodeOf<'ObjectExpression'>): string[] | undefined {
-  const keys = literal.properties.map(property =>
-    property.type === 'Property' ? staticKey(property.key, property.computed) : undefined,
-  );
-  return keys.every(key => key !== undefined) ? keys : undefined;
-}
-
 /**
  * A spread or a computed key that is not known may replace each key before it, maybe with
- * `undefined`, so those keys are left out. A known object literal replaces only its own keys.
+ * `undefined`, so those keys are left out. A known object literal replaces only its own keys. A
+ * literal that is spread only on a condition keeps a key that both paths give a defined value.
  */
 function noteUnknownKey(present: Map<string, PassedKey>, property: Node, scope: Scope): void {
-  const spread = spreadLiteral(property);
+  const spread = spreadLiteral(property, scope, valueOf);
+  if (spread === 'none') {
+    return;
+  }
   const written = spread === undefined ? undefined : writtenKeys(spread.literal);
   if (spread === undefined || written === undefined) {
     present.clear();
     return;
   }
-  for (const name of written) present.delete(name);
-  if (spread.always) {
-    for (const passed of passedKeysOf(spread.literal, scope) ?? []) present.set(passed.key, passed);
+  const given = new Map((passedKeysOf(spread.literal, scope) ?? []).map(key => [key.key, key]));
+  for (const name of written) {
+    const own = given.get(name);
+    const before = present.get(name);
+    if (spread.always && own !== undefined) {
+      present.set(name, own);
+    } else if (spread.always || own === undefined || before === undefined) {
+      // The spread may leave the key out or give `undefined`, so the key is not always passed.
+      present.delete(name);
+    } else if (own.value !== before.value) {
+      present.set(name, { key: name });
+    }
   }
 }
 
