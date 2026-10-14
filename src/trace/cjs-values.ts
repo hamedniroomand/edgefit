@@ -52,18 +52,21 @@ export function isTruthy(node: Node): boolean {
 }
 
 /**
- * Whether the descriptor of `__esModule` is `{ value: … }` with a value that `isTruthy` accepts. The
- * last `value` key wins, as at runtime, so a spread or a key that is not known after it can replace
- * it. A getter, or a descriptor with no `value`, is not a mark.
+ * Whether the `field` of a descriptor of `__esModule`, such as `value` or `writable`, holds a value
+ * that `isTruthy` accepts. The last such key wins, as at runtime, so a spread or a key that is not
+ * known after it can replace it. A getter, or a descriptor with no such key, gives false.
  */
-export function isTruthyDescriptor(descriptor: ObjectLiteral): boolean {
+export function isTruthyDescriptor(
+  descriptor: ObjectLiteral,
+  field: 'value' | 'writable',
+): boolean {
   for (const property of descriptor.properties.toReversed()) {
     const key =
       property.type === 'Property' ? staticKey(property.key, property.computed) : undefined;
     if (key === undefined || property.type !== 'Property') {
       return false;
     }
-    if (key === 'value') {
+    if (key === field) {
       return isTruthy(property.value);
     }
   }

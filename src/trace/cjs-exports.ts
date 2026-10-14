@@ -43,6 +43,8 @@ export class ExportWriter {
   /** The variables that were set to an object literal and read as exports. */
   readonly #objects = new Set<string>();
   #unreadable = false;
+  /** Set by `Object.defineProperty` of `__esModule`, unless its `writable` is known to be true. Then a later `=` can only clear the flag. A later `defineProperty` sets the flag again. */
+  #esModuleFixed = false;
 
   public constructor(context: ExportContext) {
     this.#context = context;
@@ -99,7 +101,8 @@ export class ExportWriter {
       return false;
     }
     if (name === '__esModule') {
-      this.#context.builder.shape.esModule = isTruthyDescriptor(object);
+      this.#context.builder.shape.esModule = isTruthyDescriptor(object, 'value');
+      this.#esModuleFixed = !isTruthyDescriptor(object, 'writable');
       return true;
     }
     this.#writes += 1;
@@ -170,7 +173,8 @@ export class ExportWriter {
   /** `exports.name = value`. */
   #assignExport(name: string, value: Node): boolean {
     if (name === '__esModule') {
-      this.#context.builder.shape.esModule = isTruthy(value);
+      const { shape } = this.#context.builder;
+      shape.esModule = isTruthy(value) && (shape.esModule || !this.#esModuleFixed);
       return true;
     }
     if (value.type === 'Identifier') {

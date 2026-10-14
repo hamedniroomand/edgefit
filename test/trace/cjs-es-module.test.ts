@@ -32,6 +32,12 @@ describe('an __esModule marker that is not known to be true', () => {
     "Object.defineProperty(exports, '__esModule', { value: true, ...descriptor });",
     "Object.defineProperty(exports, '__esModule', { value: true, [key]: false });",
     'exports.__esModule = true;\nexports.__esModule = false;',
+    "Object.defineProperty(exports, '__esModule', { value: false });\nexports.__esModule = true;",
+    "Object.defineProperty(exports, '__esModule', { value: false });\nmodule.exports.__esModule = true;",
+    "Object.defineProperty(exports, '__esModule', { value: true });\nexports.__esModule = false;",
+    "Object.defineProperty(exports, '__esModule', { ...descriptor, value: true });\nexports.__esModule = false;",
+    "Object.defineProperty(exports, '__esModule', { value: true, writable: writable });\nexports.__esModule = false;",
+    "exports.__esModule = true;\nObject.defineProperty(exports, '__esModule', { value: true });\nexports.__esModule = false;",
   ])('makes a default import use every export: %s', flag => {
     expect(reachedBy(defaultImport, flag)).toEqual(['node:fs.watch', 'node:fs.statSync']);
   });
@@ -63,4 +69,22 @@ describe('a named import', () => {
       expect(reachedBy("import { a } from './lib.js';\na();", flag)).toEqual(['node:fs.watch']);
     },
   );
+});
+
+describe('a later write after Object.defineProperty', () => {
+  it('keeps the mark when writable is true and the later value is true, as before (a guard)', () => {
+    const flag =
+      "Object.defineProperty(exports, '__esModule', { value: false, writable: true });\nexports.__esModule = true;";
+    expect(reachedBy(defaultImport, flag)).toEqual([]);
+  });
+
+  it('clears the mark on the new module.exports object', () => {
+    const code =
+      "Object.defineProperty(exports, '__esModule', { value: true });\nmodule.exports = { a() { return fs.watch('.'); } };\nmodule.exports.__esModule = false;";
+    const found = reached({
+      'index.js': entry(defaultImport, { './lib.js': 'lib.js' }),
+      'lib.js': cjs(code),
+    })['lib.js'];
+    expect(found).toEqual(['node:fs.watch']);
+  });
 });
