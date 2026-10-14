@@ -115,6 +115,7 @@ export default defineConfig({
   },
   test: {
     isolate: false,
+    globalSetup: ['test/temp-root.ts'],
     projects: [
       {
         extends: true,
