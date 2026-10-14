@@ -109,7 +109,11 @@ function parts(version: string): number[] {
   return version.split('.').map(Number);
 }
 
-/** Compares `major.minor.patch` versions. A pre-release suffix is read as its release. */
+/**
+ * Compares `major.minor.patch` versions. A version with a pre-release suffix is not in a range
+ * when it has the same major and minor as an end of the range. Otherwise only its major and
+ * minor count.
+ */
 export function compareVersions(left: string, right: string): number {
   const [a, b] = [parts(left), parts(right)];
   for (const index of [0, 1, 2]) {
