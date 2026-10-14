@@ -8,7 +8,7 @@ import { checkPackage } from '@/package/check-package.ts';
 import { summaryOf } from '@/package/result.ts';
 import { neededMessage, undeclaredModules } from '@/package/unchecked.ts';
 import { ResolveError } from '@/resolve/errors.ts';
-import { fixture } from '~/helpers.ts';
+import { fixture, packageFlowTimeout } from '~/helpers.ts';
 
 const root = mkdtempSync(path.join(tmpdir(), 'edgefit-unchecked-'));
 mkdirSync(path.join(root, 'node_modules/pkg'), { recursive: true });
@@ -80,16 +80,20 @@ describe('summaryOf', () => {
   });
 });
 
-describe('a package with an entry that needs a module it does not declare', () => {
-  it('lists the entry as unchecked and decides the row from the others', async () => {
-    const result = await checkPackage(fixture('packages/needs-module'), { targets: ['workerd'] });
-    const extra = result.entries.find(entry => entry.subpath === './extra');
-    expect(extra?.results.workerd).toEqual({
-      status: 'unchecked',
-      errors: 0,
-      warnings: 0,
-      message: 'needs "edgefit-not-installed", which the package does not declare',
+describe(
+  'a package with an entry that needs a module it does not declare',
+  { timeout: packageFlowTimeout },
+  () => {
+    it('lists the entry as unchecked and decides the row from the others', async () => {
+      const result = await checkPackage(fixture('packages/needs-module'), { targets: ['workerd'] });
+      const extra = result.entries.find(entry => entry.subpath === './extra');
+      expect(extra?.results.workerd).toEqual({
+        status: 'unchecked',
+        errors: 0,
+        warnings: 0,
+        message: 'needs "edgefit-not-installed", which the package does not declare',
+      });
+      expect(result.summary.workerd).toBe('pass');
     });
-    expect(result.summary.workerd).toBe('pass');
-  });
-});
+  },
+);

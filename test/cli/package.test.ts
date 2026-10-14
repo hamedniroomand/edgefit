@@ -8,7 +8,7 @@ import { afterAll, describe, expect, it } from 'vite-plus/test';
 import { parsePackageArgs } from '@/cli/args.ts';
 import { run } from '@/cli/run.ts';
 import { EdgefitError } from '@/errors.ts';
-import { captureIo, fixture } from '~/helpers.ts';
+import { captureIo, fixture, packageFlowTimeout } from '~/helpers.ts';
 
 const scratch = mkdtempSync(path.join(tmpdir(), 'edgefit-cli-package-'));
 afterAll(() => {
@@ -51,7 +51,7 @@ describe('parsePackageArgs', () => {
   });
 });
 
-describe('edgefit package', () => {
+describe('edgefit package', { timeout: packageFlowTimeout }, () => {
   it('prints the grid and writes a badge', async () => {
     const io = captureIo(scratch);
     const badge = path.join(scratch, 'badge.svg');

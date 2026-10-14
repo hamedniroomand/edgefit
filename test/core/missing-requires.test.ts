@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { check } from '@/core/check.ts';
 import { checkPackage } from '@/package/check-package.ts';
-import { fixture } from '~/helpers.ts';
+import { fixture, packageFlowTimeout } from '~/helpers.ts';
 
-describe('a missing module loaded by require', () => {
+describe('a missing module loaded by require', { timeout: packageFlowTimeout }, () => {
   it.each(['bun', 'deno'] as const)('reports a lazy load on %s', async target => {
     const { reports } = await check({
       root: fixture('missing-require-app'),

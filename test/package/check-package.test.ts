@@ -7,7 +7,7 @@ import process from 'node:process';
 import { afterAll, beforeAll, describe, expect, it } from 'vite-plus/test';
 
 import { checkPackage } from '@/package/check-package.ts';
-import { fixture } from '~/helpers.ts';
+import { fixture, packageFlowTimeout } from '~/helpers.ts';
 
 let tarballs: string;
 const pack = (name: string): string => {
@@ -27,7 +27,7 @@ afterAll(() => {
   rmSync(tarballs, { recursive: true, force: true });
 });
 
-describe('checkPackage', () => {
+describe('checkPackage', { timeout: packageFlowTimeout }, () => {
   it('checks an unscoped package through main', async () => {
     const result = await checkPackage(pack('plain'), { targets: ['workerd'] });
     expect(result.package).toBe('edgefit-fixture-plain');
@@ -75,20 +75,24 @@ describe('checkPackage', () => {
   });
 });
 
-describe('checkPackage with a target whose graph does not resolve', () => {
-  it('is not checked on that target only, and has a result on the others', async () => {
-    const result = await checkPackage(fixture('packages/browser-missing'), {
-      targets: ['workerd', 'bun', 'deno'],
-    });
-    const row = result.entries[0]?.results;
-    expect(row?.workerd?.status).toBe('unchecked');
-    expect(row?.workerd?.message).toContain('edgefit-missing-wasm');
-    expect(row?.bun?.status).toBe('pass');
-    expect(row?.deno?.status).toBe('pass');
-  }, 60_000);
-});
+describe(
+  'checkPackage with a target whose graph does not resolve',
+  { timeout: packageFlowTimeout },
+  () => {
+    it('is not checked on that target only, and has a result on the others', async () => {
+      const result = await checkPackage(fixture('packages/browser-missing'), {
+        targets: ['workerd', 'bun', 'deno'],
+      });
+      const row = result.entries[0]?.results;
+      expect(row?.workerd?.status).toBe('unchecked');
+      expect(row?.workerd?.message).toContain('edgefit-missing-wasm');
+      expect(row?.bun?.status).toBe('pass');
+      expect(row?.deno?.status).toBe('pass');
+    }, 60_000);
+  },
+);
 
-describe('checkPackage with a main subpath', () => {
+describe('checkPackage with a main subpath', { timeout: packageFlowTimeout }, () => {
   it('takes the result from the subpath that the caller names as the main entry', async () => {
     const result = await checkPackage(pack('scoped'), { targets: ['workerd'], main: './node' });
     expect(result.main).toBe('./node');

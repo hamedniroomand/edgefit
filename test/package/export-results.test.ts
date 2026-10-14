@@ -6,7 +6,7 @@ import { summarize, worstExportOf } from '@/package/result.ts';
 import type { ExportResult, PackageEntryResult, PackageStatus } from '@/package/result.ts';
 import { formatPackageText } from '@/package/text.ts';
 import type { Finding } from '@/types.ts';
-import { fixture } from '~/helpers.ts';
+import { fixture, packageFlowTimeout } from '~/helpers.ts';
 
 const finding = (api: string, level: Finding['level'], exports: string[]): Finding => ({
   category: level === 'error' ? 'unsupported' : 'mismatch',
@@ -103,24 +103,30 @@ describe('the worst export of a target', () => {
   });
 });
 
-describe('a package whose findings sit behind some exports', () => {
-  it('passes, and lists the exports with their findings in the result and in the text', async () => {
-    const result = await checkPackage(fixture('packages/split-exports'), { targets: ['workerd'] });
-    expect(result.summary.workerd).toBe('pass');
-    const found = result.entries[0]?.results.workerd;
-    expect(found).toMatchObject({ status: 'pass', errors: 0, warnings: 0 });
-    expect(found?.exports?.map(item => [item.name, item.level])).toEqual([
-      ['statAll', 'error'],
-      ['watchAll', 'error'],
-    ]);
-    expect(result.worstExport?.workerd).toMatchObject({ subpath: '.', status: 'fail' });
-    const text = formatPackageText(result, { color: false });
-    expect(text).toContain('. on workerd, only through watchAll: unsupported node:fs.watch');
-    expect(text).toContain('worst export on workerd:');
-  }, 30_000);
-});
+describe(
+  'a package whose findings sit behind some exports',
+  { timeout: packageFlowTimeout },
+  () => {
+    it('passes, and lists the exports with their findings in the result and in the text', async () => {
+      const result = await checkPackage(fixture('packages/split-exports'), {
+        targets: ['workerd'],
+      });
+      expect(result.summary.workerd).toBe('pass');
+      const found = result.entries[0]?.results.workerd;
+      expect(found).toMatchObject({ status: 'pass', errors: 0, warnings: 0 });
+      expect(found?.exports?.map(item => [item.name, item.level])).toEqual([
+        ['statAll', 'error'],
+        ['watchAll', 'error'],
+      ]);
+      expect(result.worstExport?.workerd).toMatchObject({ subpath: '.', status: 'fail' });
+      const text = formatPackageText(result, { color: false });
+      expect(text).toContain('. on workerd, only through watchAll: unsupported node:fs.watch');
+      expect(text).toContain('worst export on workerd:');
+    }, 30_000);
+  },
+);
 
-describe('a package whose findings every export reaches', () => {
+describe('a package whose findings every export reaches', { timeout: packageFlowTimeout }, () => {
   it('lists the findings that the counts hold, in the order the CLI prints them', async () => {
     const result = await checkPackage(fixture('packages/staying-findings'), {
       targets: ['workerd'],

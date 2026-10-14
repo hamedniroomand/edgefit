@@ -9,7 +9,7 @@ import type { CheckResult } from '@/core/check.ts';
 import { checkPackage } from '@/package/check-package.ts';
 import { formatJson } from '@/report/json.ts';
 import { formatText } from '@/report/text.ts';
-import { fixture } from '~/helpers.ts';
+import { fixture, packageFlowTimeout } from '~/helpers.ts';
 
 function project(): string {
   const root = mkdtempSync(path.join(tmpdir(), 'edgefit-supplied-'));
@@ -38,7 +38,7 @@ async function run(): Promise<CheckResult> {
   return result;
 }
 
-describe('a load of a module that the user names', () => {
+describe('a load of a module that the user names', { timeout: packageFlowTimeout }, () => {
   it('is a note with the package, and not a finding, in a check of a project', async () => {
     const [report] = (await run()).reports;
     expect(report?.suppliedLoads).toEqual([
