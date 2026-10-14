@@ -140,6 +140,7 @@ export class UsageCollector {
       ...(guarded ? { guarded: true as const } : {}),
       ...(caught ? { caught: true as const } : {}),
       ...(afterLoad ? { afterLoad: true as const } : {}),
+      ...this.#polyfill(),
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),

@@ -3,7 +3,11 @@ import { describe, expect, it } from 'vite-plus/test';
 import { usagesOf } from '~/helpers.ts';
 
 const crypto = "import crypto from 'node:crypto';\n";
-const stored = ['api node:crypto', 'api node:crypto', 'dynamic node:crypto [polyfill crypto]'];
+const stored = [
+  'api node:crypto',
+  'api node:crypto [polyfill crypto]',
+  'dynamic node:crypto [polyfill crypto]',
+];
 const plain = ['api node:crypto', 'api node:crypto', 'dynamic node:crypto'];
 
 describe('a module stored in a global that is only set when it is missing', () => {

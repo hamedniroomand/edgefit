@@ -158,15 +158,17 @@ Usages in the `try` block are guarded, for the APIs the target lacks and for the
 
 ### Polyfills
 
-A module that code stores in a global only when the global is missing is not reached on a target that has the global, so it is guarded:
+The value of a store that runs only when a global is missing does not run on a target that has the global, so it is guarded on that target:
 
 ```js
 import crypto from 'node:crypto';
+import fs from 'node:fs';
 
 globalThis.crypto ??= crypto; // Guarded on Workers, which have `crypto`
+globalThis.fetch ??= () => fs.watch('.'); // Guarded on Workers, which have `fetch`
 ```
 
-The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. On a target that lacks the global, the store runs and stays a finding.
+This applies to a module that the store keeps, to each API in the value, and to the code of a local function that only the store names (see [Functions that only checked code uses](#functions-that-only-checked-code-uses)). The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. On a target that lacks the global, the store runs and stays a finding. The value of a store with no check, such as `globalThis.fetch = fs.watch('.')`, also stays a finding.
 
 ### Runtime checks
 
