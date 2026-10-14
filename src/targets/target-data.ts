@@ -53,7 +53,7 @@ export function loadTargetData(
     ...alwaysTrackedGlobals,
     ...index
       .globalNames()
-      .filter(name => index.hasProblemsBelow({ module: '*globals*', path: [name] })),
+      .filter(name => index.hasProblemsBelow({ module: '*globals*', path: [name] }, true)),
   ]);
   const overrideSources = overrides.map(layer => findSource(dataDirectory, layer.name));
   return {

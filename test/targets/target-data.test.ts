@@ -7,7 +7,7 @@ function override(status: string, note: string): Record<string, string> {
   return { status, note, source: 'x.md' };
 }
 
-const dataDirectory = dataDirectoryWith({
+const files = {
   'source.json': {
     sources: [
       {
@@ -55,7 +55,8 @@ const dataDirectory = dataDirectoryWith({
     modules: { child_process: override('unsupported', 'no subprocesses') },
     apis: { 'fs.writeFile': override('unsupported', 'read-only file system') },
   },
-});
+};
+const dataDirectory = dataDirectoryWith(files);
 
 describe('target data layers', () => {
   const deno = loadTargetData('deno', [], dataDirectory);
@@ -100,5 +101,20 @@ describe('target data layers', () => {
         'https://example.com/deno and https://example.com/deploy, ' +
         'Web APIs from runtime-compat-data@abcdef0 (npm 1)',
     );
+  });
+});
+
+describe('target data globals', () => {
+  it('tracks a global whose only problem is an entry with options', () => {
+    const options = dataDirectoryWith({
+      ...files,
+      'overrides/deno.json': {
+        modules: {},
+        apis: {
+          '*globals*.BroadcastChannel': { ...override('mismatch', 'throws'), options: ['x'] },
+        },
+      },
+    });
+    expect(loadTargetData('deno', [], options).globals.has('BroadcastChannel')).toBe(true);
   });
 });

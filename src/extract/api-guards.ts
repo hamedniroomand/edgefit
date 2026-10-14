@@ -35,6 +35,30 @@ export function absentGuard(node: Node, context: BindingContext, key?: string): 
   ];
 }
 
+/**
+ * Whether a value test sees the global `name` as missing although it exists: `NaN` is falsy, and
+ * `undefined` is also nullish and of type `undefined`. `truthiness` is true for a test that only
+ * reads truthiness.
+ */
+export const looksMissing = (name: string, truthiness: boolean): boolean =>
+  name === 'undefined' || (truthiness && name === 'NaN');
+
+/**
+ * Drops the guards that say a global is missing when it exists and only looks missing:
+ * `undefined`, and `NaN` for a truthiness test.
+ */
+export function withoutLooksMissing(guards: Guard[], truthiness: boolean): Guard[] {
+  return guards.filter(guard => {
+    let name: string | undefined;
+    if (guard.kind === 'global' && !guard.condition.present) {
+      name = guard.condition.name;
+    } else if (guard.kind === 'absent' && guard.ref.module === '*globals*') {
+      name = guard.ref.path.length === 1 ? guard.ref.path[0] : undefined;
+    }
+    return name === undefined || !looksMissing(name, truthiness);
+  });
+}
+
 /** The guard that says the global `node`, or its member `key`, is there or is not. */
 export function globalGuard(
   node: Node,

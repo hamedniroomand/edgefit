@@ -2,7 +2,13 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef, Runtime } from '@/types.ts';
 
-import { absentGuard, globalGuard, guardFor, optionGuards } from './api-guards.ts';
+import {
+  absentGuard,
+  globalGuard,
+  guardFor,
+  optionGuards,
+  withoutLooksMissing,
+} from './api-guards.ts';
 import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import type { BindingContext } from './bindings.ts';
@@ -124,7 +130,7 @@ function typeofGuard(
     return presence(call.argument, true, context);
   }
   // Only `typeof x === 'undefined'` says the value is missing; `!== 'string'` says nothing.
-  return equal ? presence(call.argument, false, context) : [];
+  return equal ? withoutLooksMissing(presence(call.argument, false, context), false) : [];
 }
 
 function comparisonGuard(
@@ -160,7 +166,10 @@ function comparisonGuard(
   if (!left && !isNullish(node.right)) {
     return undefined;
   }
-  const known = presence(left ? node.right : node.left, !equal, context);
+  const known = withoutLooksMissing(
+    presence(left ? node.right : node.left, !equal, context),
+    false,
+  );
   // `!= null`, `!= undefined` and `!== null` rule out `null`; `!== undefined` does not.
   const loose = node.operator === '==' || node.operator === '!=';
   const rulesOutNull = loose || strip(left ? node.left : node.right).type === 'Literal';
@@ -168,7 +177,12 @@ function comparisonGuard(
 }
 
 /** What a call of a helper, or a read of a `const`, tells: the facts of the check it holds. */
-function checkGuards(node: Node, truth: boolean, context: BindingContext): Guard[] {
+function checkGuards(
+  node: Node,
+  truth: boolean,
+  context: BindingContext,
+  nullish: boolean,
+): Guard[] {
   let name: string | undefined;
   if (node.type === 'Identifier') {
     name = node.name;
@@ -182,13 +196,18 @@ function checkGuards(node: Node, truth: boolean, context: BindingContext): Guard
   }
   check.busy = true;
   try {
-    return guardsWhen(check.test, truth, {
-      imported: context.imported,
-      scope: check.scope,
-      globals: context.globals,
-      nodeEnv: context.nodeEnv,
-      wrappers: context.wrappers,
-    });
+    return guardsWhen(
+      check.test,
+      truth,
+      {
+        imported: context.imported,
+        scope: check.scope,
+        globals: context.globals,
+        nodeEnv: context.nodeEnv,
+        wrappers: context.wrappers,
+      },
+      nullish,
+    );
   } finally {
     check.busy = false;
   }
@@ -219,8 +238,16 @@ function callGuards(
   return node.optional && truth ? guardsWhen(node.callee, true, context) : undefined;
 }
 
-/** The APIs that must exist, and what is known of the runtime, whenever `test` evaluates to `truth`. */
-export function guardsWhen(test: Node, truth: boolean, context: BindingContext): Guard[] {
+/**
+ * The APIs that must exist, and what is known of the runtime, whenever `test` evaluates to `truth`.
+ * With `nullish`, a false `test` means that its value is `null` or `undefined`, as on the left of `??`.
+ */
+export function guardsWhen(
+  test: Node,
+  truth: boolean,
+  context: BindingContext,
+  nullish = false,
+): Guard[] {
   const node = strip(test);
   const constant = constantOf(node);
   if (constant !== undefined) {
@@ -231,8 +258,12 @@ export function guardsWhen(test: Node, truth: boolean, context: BindingContext):
   }
   if (node.type === 'LogicalExpression' && node.operator !== '??') {
     // Both sides are known only when they all had to hold: `a && b` true, `a || b` false.
+    // A nullish `a || b` has a falsy `a` and a nullish `b`.
     if (truth === (node.operator === '&&')) {
-      return [...guardsWhen(node.left, truth, context), ...guardsWhen(node.right, truth, context)];
+      return [
+        ...guardsWhen(node.left, truth, context),
+        ...guardsWhen(node.right, truth, context, nullish),
+      ];
     }
     return [];
   }
@@ -249,9 +280,9 @@ export function guardsWhen(test: Node, truth: boolean, context: BindingContext):
       return guards;
     }
   }
-  const known = presence(node, truth, context);
+  const known = withoutLooksMissing(presence(node, truth, context), !nullish);
   return [
-    ...checkGuards(node, truth, context),
+    ...checkGuards(node, truth, context, nullish),
     ...known,
     ...(truth ? moduleGuards(known) : []),
     ...optionalObject(node, truth, context),

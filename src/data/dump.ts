@@ -81,9 +81,12 @@ export function compare(base: DumpNode | undefined, target: DumpNode | undefined
     : { status: 'mismatch', note: `is a ${targetType} on the target but a ${baseType} in Node` };
 }
 
+/** Whether the tree has a problem at or below `base`. It skips each path below for which `curated` is true. */
 export function subtreeHasProblems(
   base: DumpNode | undefined,
   target: DumpNode | undefined,
+  curated: (path: readonly string[]) => boolean = () => false,
+  path: readonly string[] = [],
 ): boolean {
   if (compare(base, target).status !== 'supported') {
     return true;
@@ -91,7 +94,12 @@ export function subtreeHasProblems(
   if (typeof base !== 'object') {
     return false;
   }
-  return Object.entries(base).some(
-    ([key, value]) => key !== '*self*' && subtreeHasProblems(value, child(target, key)),
-  );
+  return Object.entries(base).some(([key, value]) => {
+    const below = [...path, key];
+    return (
+      key !== '*self*' &&
+      !curated(below) &&
+      subtreeHasProblems(value, child(target, key), curated, below)
+    );
+  });
 }

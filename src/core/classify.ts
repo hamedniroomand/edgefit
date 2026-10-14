@@ -91,12 +91,14 @@ function classifyDynamic(usage: Usage, target: Target): Classification | undefin
     return undefined;
   }
   if (usage.api !== undefined) {
-    const covered = target.lookup(usage.api).status !== 'supported';
+    const result = target.lookup(usage.api);
     // A leaf such as `(dynamic)` names this very usage, so no other finding covers it.
     const own = isSyntheticLeaf(usage.api.path);
-    if (own && covered) {
+    if (own && result.status !== 'supported') {
       return classifyApi(usage, target);
     }
+    // An API that fails only for some options has a finding only for a call that passes one.
+    const covered = result.status !== 'supported' && result.options === undefined;
     if (!own && (covered || !target.hasProblemsBelow(usage.api))) {
       return undefined;
     }

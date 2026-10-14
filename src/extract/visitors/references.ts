@@ -1,3 +1,4 @@
+import { looksMissing } from '@/extract/api-guards.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { staticKey, strip } from '@/extract/ast.ts';
 import { resolveBinding, wholeExport } from '@/extract/bindings.ts';
@@ -96,7 +97,9 @@ function polyfilledGlobal(
   if (!global) {
     return undefined;
   }
-  const conditional = node.operator === '??=' || node.operator === '||=';
+  const conditional =
+    (node.operator === '??=' || node.operator === '||=') &&
+    !(ref.module === '*globals*' && looksMissing(ref.path.join('.'), node.operator === '||='));
   return conditional || (node.operator === '=' && context.collector.guards.absent(ref))
     ? ref
     : undefined;

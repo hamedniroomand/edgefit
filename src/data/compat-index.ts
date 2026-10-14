@@ -108,13 +108,17 @@ export class CompatIndex {
     return { status: Object.hasOwn(this.#tree.baseline, api.module) ? 'supported' : 'uncovered' };
   }
 
-  /** Whether anything at or below this API is unsupported, mocked or mismatched. */
-  public hasProblemsBelow(api: ApiRef): boolean {
+  /**
+   * Whether anything at or below this API is unsupported, mocked or mismatched. An entry with
+   * `options` counts only with `withOptions`. A dynamic read shows no option, so the entry gives it
+   * no finding. But a global with such an entry must be tracked, so that its calls are checked.
+   */
+  public hasProblemsBelow(api: ApiRef, withOptions = false): boolean {
     const path = memberPath(api);
-    const cacheKey = entryKey(api.module, path);
+    const cacheKey = `${String(withOptions)} ${entryKey(api.module, path)}`;
     let result = this.#problemsBelow.get(cacheKey);
     if (result === undefined) {
-      result = this.#computeProblemsBelow(api.module, path);
+      result = this.#computeProblemsBelow(api.module, path, withOptions);
       this.#problemsBelow.set(cacheKey, result);
     }
     return result;
@@ -160,26 +164,30 @@ export class CompatIndex {
   }
 
   #fallbackHasProblems(module: string, path: readonly string[]): boolean {
+    // A curated entry between `path` and a fallback entry wins in `lookup`, so that entry does not apply.
     const below = [...this.#fallback.values()].filter(
-      entry => isBelow(entry, module, path) && this.#fallbackApplies(entry),
+      entry =>
+        isBelow(entry, module, path) &&
+        this.#fallbackApplies(entry) &&
+        findEntry(this.#entries, entry.module, entry.path) === undefined,
     );
     return [this.#fallbackFor(module, path), ...below].some(
       entry => entry !== undefined && entry.status !== 'supported',
     );
   }
 
-  #computeProblemsBelow(module: string, path: readonly string[]): boolean {
+  #computeProblemsBelow(module: string, path: readonly string[], withOptions: boolean): boolean {
+    const isProblem = (entry: CompatEntry): boolean =>
+      entry.status !== 'supported' && (withOptions || entry.options === undefined);
     const entry = findEntry(this.#entries, module, path);
     if (
-      (entry !== undefined && entry.status !== 'supported') ||
-      [...this.#entries.values()].some(
-        below => below.status !== 'supported' && isBelow(below, module, path),
-      )
+      (entry !== undefined && isProblem(entry)) ||
+      [...this.#entries.values()].some(below => isProblem(below) && isBelow(below, module, path))
     ) {
       return true;
     }
     if (entry !== undefined) {
-      // Curated as supported, and nothing below it says otherwise.
+      // Curated as supported or for some options only, and nothing below it says otherwise.
       return false;
     }
     return this.#treeHasProblems(module, path) || this.#fallbackHasProblems(module, path);
@@ -199,6 +207,9 @@ export class CompatIndex {
       base = child(base, segment);
       target = child(target, segment);
     }
-    return subtreeHasProblems(base, target);
+    // A curated entry decides its API and everything below it, so the tree there is not read.
+    return subtreeHasProblems(base, target, below =>
+      this.#entries.has(entryKey(module, [...path, ...below])),
+    );
   }
 }

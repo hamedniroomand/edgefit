@@ -69,7 +69,7 @@ edgefit could not determine what is used. Typical causes:
 - an import of an optional peer dependency that is not installed. Edgefit does not install peers, so what the peer provides is not checked
 - a `require('module')` inside a function when the module is not installed. The finding names the module and the call location. A top-level load of a missing module still stops the check
 
-A `require()` or `import()` of a name that the user of the code gives, such as a parameter, is not an `unknown` finding. It is a note, because the code does not choose the module. See [packages](/guide/packages#modules-that-the-user-names). An `unknown` finding is only reported when the access could reach something unsupported. Computed access on a module that is fully supported on the target is not reported.
+A `require()` or `import()` of a name that the user of the code gives, such as a parameter, is not an `unknown` finding. It is a note, because the code does not choose the module. See [packages](/guide/packages#modules-that-the-user-names). An `unknown` finding is only reported when the access could reach something unsupported. Computed access on a module that is fully supported on the target is not reported. An API that fails only for some options does not count, see [Options that are not known](/guide/limitations#options-that-are-not-known). An API that the generated data lists as missing or as a different type does not count either when the curated data marks it as supported.
 
 Symbol keys such as `x[Symbol.iterator]` are never reported, since a symbol cannot name an API. The global object on its own (`globalThis`, `self`) is not reported either, and neither is `globalThis['crypto']`, which is read like `globalThis.crypto`. A computed write to the global object, as in `globalThis[key] = value`, is not reported, because it does not read an API. A computed read with a fallback, as in `globalThis[key] || Fallback` or `globalThis[key] ?? Fallback`, is not reported either, because the code works when the global is missing. The same holds when the read is the value of `x = globalThis[key]` or `let x = globalThis[key]` and the next statement is `if (typeof x !== 'function') x = Fallback;`, `if (!x) x = Fallback;` or `if (x == null) x = Fallback;`.
 
@@ -180,6 +180,7 @@ The value stays a finding when:
 
 - the target lacks the global, or its data marks the global as mocked or not supported, because the store runs
 - the store has no check, such as `globalThis.fetch = fs.watch('.')`, or it uses `&&=`
+- the global is `undefined` or `NaN`. `undefined` is nullish and has the type `undefined`, so each value test sees it as missing. `NaN` is falsy, so `||=` and `if (!globalThis.NaN)` see it as missing. `globalThis.NaN ??= value` stays guarded, because `NaN` is not `null` or `undefined`
 
 ### Runtime checks
 
@@ -221,6 +222,8 @@ if (!global.crypto) {
 ```
 
 The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. A global that the data does not name decides nothing. On a target where the code can run, it stays a finding.
+
+`undefined` and `NaN` exist on every target, but a value test can see them as missing. `undefined` looks missing to each value test, also to `=== undefined` and `typeof … === 'undefined'`. `NaN` looks missing only to a truthiness test, such as `!globalThis.NaN` or `globalThis.NaN || x`. So the code that such a test runs is not guarded, see [Polyfills](#polyfills). `typeof globalThis.NaN`, `globalThis.NaN === undefined` and `globalThis.NaN ?? x` still decide the branch.
 
 The data of `workerd` says that `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing. The data of `netlify-edge` says that `document`, `HTMLAnchorElement` and `Bun` are missing. So code behind `typeof window !== 'undefined'` is guarded on Workers. Netlify Edge Functions have a `window` global, so there the check decides nothing.
 
