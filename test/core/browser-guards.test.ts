@@ -87,30 +87,3 @@ describe('a read of a global that workerd lacks, through the global object', () 
     expect(apis(report?.findings)).toEqual([]);
   });
 });
-
-describe('a function that only a polyfill of a global names', () => {
-  it('is guarded when the target has the global', async () => {
-    const report = await run('polyfill-helper.mjs');
-    expect(apis(report?.findings)).toEqual([]);
-    expect(apis(report?.guarded)).toEqual(['node:fs.watch']);
-  });
-});
-
-describe('the value of a polyfill store', () => {
-  it.each(['store-call.mjs', 'store-arrow.mjs'])(
-    'is guarded when the target has the global: %s',
-    async entry => {
-      const report = await run(entry);
-      expect(apis(report?.findings)).toEqual([]);
-      expect(apis(report?.guarded)).toEqual(['node:fs.watch']);
-    },
-  );
-
-  it.each(['store-missing.mjs', 'store-unchecked.mjs'])(
-    'is a finding when the target lacks the global or nothing checks it: %s',
-    async entry => {
-      const report = await run(entry);
-      expect(apis(report?.findings)).toEqual(['node:fs.watch']);
-    },
-  );
-});

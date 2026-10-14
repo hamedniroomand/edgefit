@@ -177,6 +177,7 @@ export class UsageCollector {
       location: this.location(offset),
       // A `try` that catches the error of a missing addon guards the import.
       ...(this.guards.isCaught() ? { guarded: true as const } : {}),
+      ...this.#polyfill(),
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),

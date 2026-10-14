@@ -31,9 +31,9 @@ export const visitConditional: Visitor<NodeOf<'ConditionalExpression'>> = (node,
 
 export const visitLogical: Visitor<NodeOf<'LogicalExpression'>> = (node, context) => {
   context.visit(node.left);
-  // `a && b` runs b when a is truthy, and `a || b` runs b when a is falsy.
-  const guards =
-    node.operator === '??' ? [] : guardsWhen(node.left, node.operator === '&&', context);
+  // `a && b` runs b when a is truthy. `a || b` runs b when a is falsy, and `a ?? b` when a is
+  // null or undefined, which is falsy too.
+  const guards = guardsWhen(node.left, node.operator === '&&', context);
   context.collector.guards.within(guards, () => {
     context.visit(node.right);
   });

@@ -2,7 +2,7 @@ import type { NodeOf } from '@/extract/ast.ts';
 import { staticKey, strip } from '@/extract/ast.ts';
 import { resolveBinding, wholeExport } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
-import { globalRef, normalizeRef } from '@/extract/refs.ts';
+import { globalAliases, globalRef, isGlobalRoot, normalizeRef } from '@/extract/refs.ts';
 import { isTracked, lookup } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
@@ -57,18 +57,43 @@ export const visitClassMember: Visitor<
   context.visitAll([node.computed ? node.key : null, node.value]);
 };
 
+/**
+ * `globalThis`, `self` or `global` by its own name, or a `const` that holds one of them. A `let` or
+ * `var` alias can be written again, so it does not count.
+ */
+function isGlobalObjectName(
+  node: NodeOf<'MemberExpression'>['object'],
+  context: VisitContext,
+): boolean {
+  const object = strip(node);
+  if (object.type !== 'Identifier') {
+    return false;
+  }
+  const binding = lookup(context.scope, object.name);
+  return binding === undefined
+    ? globalAliases.has(object.name)
+    : isTracked(binding) && binding.constant === true && isGlobalRoot(binding.ref);
+}
+
 /** The global that `node` sets only when it is missing: `globalThis.x ??= v`, or `=` inside `if (!globalThis.x)`. */
 function polyfilledGlobal(
   node: NodeOf<'AssignmentExpression'>,
   context: VisitContext,
 ): ApiRef | undefined {
   const binding =
-    node.left.type === 'MemberExpression' ? resolveBinding(node.left, context) : undefined;
+    node.left.type === 'MemberExpression' && isGlobalObjectName(node.left.object, context)
+      ? resolveBinding(node.left, context)
+      : undefined;
   if (!isTracked(binding)) {
     return undefined;
   }
   const ref = normalizeRef(binding.ref);
-  if (ref.module !== '*globals*' || ref.path.length !== 1) {
+  // `globalThis.process` is the ref of the module `process`, with no path.
+  const global =
+    ref.global === true
+      ? ref.path.length === 0
+      : ref.module === '*globals*' && ref.path.length === 1;
+  if (!global) {
     return undefined;
   }
   const conditional = node.operator === '??=' || node.operator === '||=';

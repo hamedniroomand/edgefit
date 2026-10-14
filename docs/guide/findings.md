@@ -158,7 +158,7 @@ Usages in the `try` block are guarded, for the APIs the target lacks and for the
 
 ### Polyfills
 
-The value of a store that runs only when a global is missing does not run on a target that has the global, so it is guarded on that target:
+Code can set a global only when the global is missing, as in `globalThis.x ??= value`. This is a polyfill store. The value does not run on a target that has the global and whose data marks it as supported, so the value is guarded on that target:
 
 ```js
 import crypto from 'node:crypto';
@@ -168,7 +168,18 @@ globalThis.crypto ??= crypto; // Guarded on Workers, which have `crypto`
 globalThis.fetch ??= () => fs.watch('.'); // Guarded on Workers, which have `fetch`
 ```
 
-This applies to a module that the store keeps, to each API in the value, and to the code of a local function that only the store names (see [Functions that only checked code uses](#functions-that-only-checked-code-uses)). The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. On a target that lacks the global, the store runs and stays a finding. The value of a store with no check, such as `globalThis.fetch = fs.watch('.')`, also stays a finding.
+The guard applies to:
+
+- a module that the store keeps
+- each API and native addon in the value
+- the code of a local function that only the store names, see [Functions that only checked code uses](#functions-that-only-checked-code-uses)
+
+The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. The global object must be `globalThis`, `self` or `global` by its own name, or a `const` declared as `const g = globalThis` (or `self` or `global`). A store through a `let` or `var` alias, such as `let g = globalThis; g.fetch ??= value`, does not count.
+
+The value stays a finding when:
+
+- the target lacks the global, or its data marks the global as mocked or not supported, because the store runs
+- the store has no check, such as `globalThis.fetch = fs.watch('.')`, or it uses `&&=`
 
 ### Runtime checks
 
@@ -209,7 +220,7 @@ if (!global.crypto) {
 }
 ```
 
-The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, an `else` branch and a guard clause. A global that the data does not name decides nothing. On a target where the code can run, it stays a finding.
+The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. A global that the data does not name decides nothing. On a target where the code can run, it stays a finding.
 
 The data of `workerd` says that `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing. The data of `netlify-edge` says that `document`, `HTMLAnchorElement` and `Bun` are missing. So code behind `typeof window !== 'undefined'` is guarded on Workers. Netlify Edge Functions have a `window` global, so there the check decides nothing.
 
@@ -283,12 +294,13 @@ function downloadSaveAs(blob) {
 }
 ```
 
-A use in a [polyfill](#polyfills) store, such as `globalThis.fetch ??= myFetch`, also counts as a use behind a check. A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
+A use in a [polyfill store](#polyfills), such as `globalThis.fetch ??= myFetch`, also counts as a use behind a check. This check depends on the target. On a target that lacks the global, or whose data does not mark it as supported, the store runs, so the code in the function is not behind a check. A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
 
 - one use has no check
 - the file exports the function in any form: `export`, `export default`, `exports.x` or `module.exports`, also inside a check
 - the file sets the name again, or declares the same name again
 - the file calls `eval`
+- the uses share no check, such as stores to two different globals: `globalThis.fetch ??= watch` and `globalThis.Bun ??= watch`
 
 A function that only another function calls gets no check, even when checked code calls that other function. See [Limitations](/guide/limitations).
 

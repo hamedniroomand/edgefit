@@ -103,10 +103,14 @@ export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, con
     return;
   }
   if (id.type === 'Identifier') {
+    const declaration = context.parent();
+    const constant = declaration?.type === 'VariableDeclaration' && declaration.kind === 'const';
     assign(
       context.scope,
       id.name,
-      binding === 'require' ? binding : { ref: binding.ref, recorded: false },
+      binding === 'require'
+        ? binding
+        : { ref: binding.ref, recorded: false, ...(constant ? { constant } : {}) },
     );
     if (init !== null) {
       if (isBound(initial)) {

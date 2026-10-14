@@ -9,7 +9,13 @@ import type { ApiRef } from '@/types.ts';
  * stands for, when that is a Node.js module. Its `ref` is not an API.
  */
 export type Binding =
-  | { ref: ApiRef; recorded: boolean; members?: ReadonlyMap<string, ApiRef> }
+  | {
+      ref: ApiRef;
+      recorded: boolean;
+      members?: ReadonlyMap<string, ApiRef>;
+      /** Set for a `const`, which the code cannot write again. */
+      constant?: true;
+    }
   | 'require'
   | null;
 
