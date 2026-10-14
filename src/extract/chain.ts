@@ -1,13 +1,13 @@
 import type { Node } from 'oxc-parser';
 
-import type { ApiRef } from '@/types.ts';
+import type { ApiRef, PassedKey } from '@/types.ts';
 
 import { invokers, isSymbolKey, staticKey, strip, unwrap } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import { isFallbackRead } from './fallback-reads.ts';
-import { keysOf } from './known-values.ts';
-import { memberRef } from './refs.ts';
+import { keysOf, passedKeysOf } from './known-values.ts';
+import { memberRef, passesOn } from './refs.ts';
 import { declaringScope, isTracked, lookupPresent, lookupSymbol } from './scope.ts';
 import type { Scope } from './scope.ts';
 
@@ -208,4 +208,45 @@ export function isPresentRead(access: Node, parent: Node | undefined, scope: Sco
     entry.object === object.name &&
     entry.scope === declaringScope(scope, object.name)
   );
+}
+
+/** The call or `new` that has `node` as its callee. `outer` holds the ancestors above `parent`, nearest first. */
+function callOf(node: Node, parent: Node | undefined, outer: readonly Node[]): Node | undefined {
+  const ancestors = [parent, ...outer];
+  let value = node;
+  let index = 0;
+  for (let current = ancestors[0]; current !== undefined && passesOn(current, value);) {
+    value = current;
+    index += 1;
+    current = ancestors[index];
+  }
+  const call = ancestors[index];
+  return (call?.type === 'CallExpression' || call?.type === 'NewExpression') &&
+    call.callee === value
+    ? call
+    : undefined;
+}
+
+/**
+ * The keys that a call of `node` passes in its options: the last argument that is an object literal
+ * or a name that holds one, as in `connect(port, host, options, callback)` or
+ * `new TLSSocket(socket, options)`. A spread argument hides which argument holds the options.
+ */
+export function callPassedKeys(
+  node: Node,
+  parent: Node | undefined,
+  outer: readonly Node[],
+  scope: Scope,
+): PassedKey[] | undefined {
+  const call = callOf(node, parent, outer);
+  if (
+    (call?.type !== 'CallExpression' && call?.type !== 'NewExpression') ||
+    call.arguments.some(argument => argument.type === 'SpreadElement')
+  ) {
+    return undefined;
+  }
+  const options = call.arguments
+    .map(argument => passedKeysOf(argument, scope))
+    .findLast(keys => keys !== undefined);
+  return options === undefined || options.length === 0 ? undefined : [...options];
 }

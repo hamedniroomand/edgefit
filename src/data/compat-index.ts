@@ -21,6 +21,7 @@ function toResult(entry: CompatEntry): LookupResult {
     category: entry.category,
     // A Web API the data lists as missing is missing, not stubbed.
     ...(entry.absent === true || entry.category === 'web' ? { absent: true as const } : {}),
+    ...(entry.options === undefined ? {} : { options: entry.options }),
   };
 }
 

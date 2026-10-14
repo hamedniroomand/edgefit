@@ -8,6 +8,15 @@ export interface OverrideEntry {
   missingHarmless?: true;
   /** The API does not exist on the target. Only with status `unsupported`. */
   absent?: true;
+  /** The options that make a call fail. Only with status `mismatch`. */
+  options?: (
+    | string
+    | {
+        key: string;
+        value?: boolean | number | string;
+        gate?: { flag: string; date: string; disableFlag?: string };
+      }
+  )[];
 }
 
 export function readOverrides(runtime: string): Record<string, OverrideEntry>;

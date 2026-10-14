@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import { classify } from '@/core/classify.ts';
+import { collectSupported } from '@/core/findings.ts';
 import type { ApiRef, Usage } from '@/types.ts';
 import { makeUsage, stubTarget } from '~/helpers.ts';
 
@@ -94,5 +95,69 @@ describe('classifying dynamic usages', () => {
     expect(classify(usage, target)?.detail).toBe(
       'cannot be checked statically: it cannot be analyzed statically',
     );
+  });
+});
+
+describe('an API that fails only for some options', () => {
+  const connect = { module: 'tls', path: ['connect'] };
+  const options = stubTarget({
+    'tls.connect': {
+      status: 'mismatch',
+      note: 'throws for some options',
+      options: ['ALPNProtocols', { key: 'rejectUnauthorized', value: false }],
+    },
+  });
+  const categoryOf = (passedKeys?: Usage['passedKeys']): string | undefined =>
+    classify(makeUsage(connect, passedKeys === undefined ? {} : { passedKeys }), options)?.category;
+
+  it('reports a call that passes a key that fails', () => {
+    expect(categoryOf([{ key: 'host', value: 'a' }, { key: 'ALPNProtocols' }])).toBe('mismatch');
+  });
+
+  it('reports a call that passes the value that fails', () => {
+    expect(categoryOf([{ key: 'rejectUnauthorized', value: false }])).toBe('mismatch');
+  });
+
+  it.each([
+    ['no known keys', undefined],
+    ['other keys', [{ key: 'host' }]],
+    ['another value', [{ key: 'rejectUnauthorized', value: true }]],
+    ['a value that is not known', [{ key: 'rejectUnauthorized' }]],
+  ])('does not report a call with %s', (_name, passedKeys) => {
+    expect(categoryOf(passedKeys)).toBeUndefined();
+  });
+});
+
+describe('a usage that counts only for options', () => {
+  const mixed = stubTarget({
+    'fs.watch': { status: 'unsupported', note: 'missing' },
+    'tls.connect': {
+      status: 'mismatch',
+      note: 'throws',
+      options: [{ key: 'checkServerIdentity', gate: { flag: 'f', date: '2026-01-01' } }],
+    },
+  });
+  const call = (api: ApiRef, key: string): Usage =>
+    makeUsage(api, { onlyForOptions: true, passedKeys: [{ key }] });
+  const connect = { module: 'tls', path: ['connect'] };
+
+  it('gives no finding for an API without options, so its other usages decide', () => {
+    expect(classify(call(watch, 'recursive'), mixed)).toBeUndefined();
+  });
+
+  it('matches an item with a key and no value by the key alone', () => {
+    expect(classify(call(connect, 'checkServerIdentity'), mixed)?.category).toBe('mismatch');
+  });
+
+  it('lists neither the call nor an API with options as supported', () => {
+    const modules = [
+      {
+        file: 'a.js',
+        package: undefined,
+        chain: [],
+        usages: [makeUsage(connect), call(watch, 'recursive'), call(connect, 'host')],
+      },
+    ];
+    expect(collectSupported(modules, mixed)).toEqual([]);
   });
 });

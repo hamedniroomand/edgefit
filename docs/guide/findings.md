@@ -28,7 +28,7 @@ When a package uses the same API in several places, the report shows the first o
 | ------------- | -------------------------------------------------------------------------- | ------------- |
 | `unsupported` | The API does not exist on the target, or exists but throws when called     | error         |
 | `mocked`      | The API is a stub that may do nothing, or a polyfill injected by the build | error         |
-| `mismatch`    | The API exists, but its shape differs from Node                            | warning       |
+| `mismatch`    | The API exists, but its shape differs from Node, or some options throw     | warning       |
 | `web`         | A Web API is missing on the target according to runtime-compat-data        | warning       |
 | `unknown`     | Static analysis could not tell                                             | warning       |
 
@@ -48,7 +48,9 @@ On workerd, a Node module that is not native at your compatibility date is also 
 
 ### mismatch
 
-The API exists but differs from Node: a missing property, a different arity, a different type. It may be fine for your use. Check the detail line.
+The API exists but differs from Node: a missing property, a different arity, a different type, or an option that throws. It may be fine for your use. Check the detail line.
+
+Some APIs fail only for some options. When the data names those options, a call is a finding only when it passes one of them in an object literal, or in a local variable that holds an object literal and is not set again. edgefit reads the last argument that is an object, and counts a key only when its value is always defined. A key that is added later, as in `options.key = value`, is not read. A call of a name imported with `import { name }` gets the finding at the call. See [Options that are not known](/guide/limitations#options-that-are-not-known) for the calls that edgefit cannot read.
 
 ### web
 

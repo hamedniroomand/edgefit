@@ -6,6 +6,7 @@ import type { Target } from '@/targets/target.ts';
 import type { ApiRef, WorkerdOptions } from '@/types.ts';
 
 import { workerdEntries } from './entries.ts';
+import { openOptions } from './gates.ts';
 import { assumedNotes, checkSettings, settingsNotes } from './settings.ts';
 import type { AssumedSettings, DataSettings, WorkerdSettings } from './settings.ts';
 import { findWranglerConfig, readWranglerConfig } from './wrangler.ts';
@@ -69,7 +70,8 @@ export function createWorkerdTarget(root: string, options: WorkerdOptions = {}):
   const wrangler = loadWrangler(root, options.wranglerConfig);
   const { settings, assumed } = resolveSettings(root, options, wrangler, dataSettings);
   const wranglerFile = wrangler === undefined ? undefined : path.relative(root, wrangler.file);
-  const lookup = (api: ApiRef): LookupResult => checkSettings(api, settings) ?? index.lookup(api);
+  const lookup = (api: ApiRef): LookupResult =>
+    checkSettings(api, settings) ?? openOptions(index.lookup(api), settings);
 
   return {
     info: {

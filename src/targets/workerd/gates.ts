@@ -1,12 +1,9 @@
+import type { FlagGate, LookupResult } from '@/data/dump.ts';
 import type { ApiRef } from '@/types.ts';
 
 import type { WorkerdSettings } from './settings.ts';
 
-export interface Gate {
-  flag: string;
-  /** With `nodejs_compat`, the flag turns on by default from this compatibility date. */
-  date: string;
-}
+export type Gate = FlagGate;
 
 export const flagsSource =
   'https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/workerd/io/compatibility-date.capnp';
@@ -84,7 +81,11 @@ export function isGateOpen(gate: Gate, settings: WorkerdSettings): boolean {
   if (settings.compatibilityFlags.includes(gate.flag)) {
     return true;
   }
-  if (settings.compatibilityFlags.includes(gate.flag.replace(/^enable_/u, 'disable_'))) {
+  if (
+    settings.compatibilityFlags.includes(
+      gate.disableFlag ?? gate.flag.replace(/^enable_/u, 'disable_'),
+    )
+  ) {
     return false;
   }
   return hasNodeCompat(settings) && settings.compatibilityDate >= gate.date;
@@ -99,4 +100,20 @@ export function gatesFor(api: ApiRef): Gate[] {
     member === undefined ? undefined : memberGates[`${api.module}.${member}`],
   ];
   return gates.filter(gate => gate !== undefined);
+}
+
+/** The options of a result without those whose gate is closed at these settings. */
+export function openOptions(result: LookupResult, settings: WorkerdSettings): LookupResult {
+  const { options } = result;
+  return options === undefined
+    ? result
+    : {
+        ...result,
+        options: options.filter(
+          option =>
+            typeof option === 'string' ||
+            option.gate === undefined ||
+            isGateOpen(option.gate, settings),
+        ),
+      };
 }

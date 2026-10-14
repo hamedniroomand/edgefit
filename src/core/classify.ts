@@ -1,5 +1,5 @@
 import { isSyntheticLeaf } from '@/data/builtins.ts';
-import type { LookupResult, Status } from '@/data/dump.ts';
+import type { LookupResult, OptionMatch, Status } from '@/data/dump.ts';
 import type { Target } from '@/targets/index.ts';
 import type { Category, Suggestion, Usage } from '@/types.ts';
 
@@ -27,13 +27,43 @@ function describe(result: LookupResult): string {
   return result.note ?? `is ${result.status} on the target`;
 }
 
+/** Whether the call passes an option that fails: the key, and the value when the option names one. */
+function passesOption(usage: Usage, options: readonly OptionMatch[]): boolean {
+  return options.some(option =>
+    (usage.passedKeys ?? []).some(passed =>
+      typeof option === 'string'
+        ? passed.key === option
+        : passed.key === option.key &&
+          (option.value === undefined || passed.value === option.value),
+    ),
+  );
+}
+
+/** A usage that only counts for options, on an API without them, or a call that passes none that fail. */
+function isOptionMiss(usage: Usage, result: LookupResult): boolean {
+  return result.options === undefined
+    ? usage.onlyForOptions === true
+    : !passesOption(usage, result.options);
+}
+
+/**
+ * Whether a usage says nothing about support: a call that only counts for options, or an API
+ * that fails only for some options, so a call that passes none of them is not a proof.
+ */
+export function dependsOnOptions(usage: Usage, target: Target): boolean {
+  return (
+    usage.onlyForOptions === true ||
+    (usage.api !== undefined && target.lookup(usage.api).options !== undefined)
+  );
+}
+
 function classifyApi(usage: Usage, target: Target): Classification | undefined {
   if (usage.api === undefined) {
     return undefined;
   }
   const result = target.lookup(usage.api);
   const statusCategory = categoryByStatus[result.status];
-  if (statusCategory === undefined) {
+  if (statusCategory === undefined || isOptionMiss(usage, result)) {
     return undefined;
   }
   const category = result.category ?? statusCategory;

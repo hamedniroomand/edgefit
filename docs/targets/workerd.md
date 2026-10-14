@@ -54,6 +54,9 @@ A module that is not native at your date and flags is reported as `mocked`, beca
 | `node:child_process.*` | `unsupported` | throws `ERR_METHOD_NOT_IMPLEMENTED`; Workers cannot spawn processes |
 | `node:dgram`           | `mocked`      | sockets accept calls but never send or receive                      |
 | `node:readline`        | `mocked`      | functions are no-ops; interfaces never emit input                   |
+| `node:tls.connect`     | `mismatch`    | throws for some options, such as `ALPNProtocols`                    |
+
+An entry with the status `mismatch` can name the options that make a call fail. Then only a call that passes one of them is a finding, and an option that fails only from a compatibility date follows your date and flags.
 
 The full list is in `data/overrides/workerd.json` in the package. Each entry links to the workerd source file it was read from.
 

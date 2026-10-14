@@ -1,4 +1,4 @@
-import type { Dump, Status } from '@/data/dump.ts';
+import type { Dump, OptionMatch, Status } from '@/data/dump.ts';
 import type { Category, TargetKey } from '@/types.ts';
 
 export interface CompatSource {
@@ -19,6 +19,8 @@ export interface CompatEntry {
   category?: Category;
   /** The API does not exist on the target, so a use that checks for it first is not a finding. */
   absent?: true;
+  /** The options that make a call fail. A call that passes none of them is not a finding. */
+  options?: readonly OptionMatch[];
   source: CompatSource;
 }
 

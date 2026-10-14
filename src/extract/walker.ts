@@ -4,6 +4,7 @@ import type { ApiRef } from '@/types.ts';
 
 import { childNodes, isTypeOnly } from './ast.ts';
 import {
+  callPassedKeys,
   computedKey,
   followChain,
   isCheckedOperand,
@@ -28,6 +29,7 @@ import {
 } from './refs.ts';
 import { createScope } from './scope.ts';
 import type { Scope } from './scope.ts';
+import { addPassedKeys } from './usage-collector.ts';
 import type { UsageCollector } from './usage-collector.ts';
 import { visitorFor } from './visitors/index.ts';
 import { visitPattern } from './visitors/patterns.ts';
@@ -246,8 +248,14 @@ export class Walker implements VisitContext {
       }
       return;
     }
+    const keys = callPassedKeys(node, parent, this.#outer(node), this.scope);
     if (recordBare || chain.extended) {
-      this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
+      const usage = this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
+      if (usage !== undefined && keys !== undefined) {
+        addPassedKeys(usage, keys);
+      }
+    } else if (keys !== undefined) {
+      this.collector.optionCall(chain.ref, chain.offset, keys);
     }
     if (
       parent !== undefined &&

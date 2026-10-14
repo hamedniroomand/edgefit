@@ -35,7 +35,7 @@ The graph is resolved with esbuild, using the target's export conditions before 
 
 ### Curated overrides
 
-The matrix only knows whether something exists. It cannot tell that `fs.watch` on Workers exists and throws, or that `async_hooks.createHook` on Bun returns a hook that is never called. Each target has an override file, read by hand from the runtime's source at the same version, that marks these as `unsupported` or `mocked`. Every entry links to the file it was read from, and that link is the `see` line in your report.
+The matrix only knows whether something exists. It cannot tell that `fs.watch` on Workers exists and throws, or that `async_hooks.createHook` on Bun returns a hook that is never called. Each target has an override file, read by hand from the runtime's source at the same version, that marks these as `unsupported` or `mocked`. An API that throws only for some options is marked `mismatch`, and the entry can name those options, so only a call that passes one of them is a finding. Every entry links to the file it was read from, and that link is the `see` line in your report.
 
 ### Web API data
 

@@ -14,7 +14,7 @@ import type {
   Usage,
 } from '@/types.ts';
 
-import { classify } from './classify.ts';
+import { classify, dependsOnOptions } from './classify.ts';
 import type { Classification } from './classify.ts';
 import {
   isAfterMissingModule,
@@ -281,7 +281,12 @@ export function collectSupported(modules: readonly ModuleUsages[], target: Targe
   for (const module of modules) {
     for (const usage of module.usages) {
       const key = `${usage.display}\0${module.package?.name ?? '.'}`;
-      if (usage.kind === 'api' && !supported.has(key) && classify(usage, target) === undefined) {
+      if (
+        usage.kind === 'api' &&
+        !dependsOnOptions(usage, target) &&
+        !supported.has(key) &&
+        classify(usage, target) === undefined
+      ) {
         supported.set(key, {
           api: usage.display,
           package: module.package,
