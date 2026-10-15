@@ -1,6 +1,7 @@
 import type { Node } from 'oxc-parser';
 
 import { childNodes, isFunction } from './ast.ts';
+import type { FunctionNode } from './ast.ts';
 import { collectBlockNames, collectLexicalNames, patternNames } from './declarations.ts';
 
 type Pending = { node: Node; hidden: ReadonlySet<string> };
@@ -38,13 +39,19 @@ function setNames(node: Node): string[] {
   return [];
 }
 
+/** The names that the parameters of a function see: the parameters and the name of a function expression. */
+export function parameterNames(node: FunctionNode): string[] {
+  const names = node.params.flatMap(param => patternNames(param));
+  if (node.type === 'FunctionExpression' && node.id !== null) {
+    names.push(node.id.name);
+  }
+  return names;
+}
+
 /** The names that a nested function, block, loop or `catch` declares for itself. */
-function ownNames(node: Node): string[] {
+export function ownNames(node: Node): string[] {
   if (isFunction(node)) {
-    const names = node.params.flatMap(param => patternNames(param));
-    if (node.type === 'FunctionExpression' && node.id !== null) {
-      names.push(node.id.name);
-    }
+    const names = parameterNames(node);
     return node.body?.type === 'BlockStatement'
       ? [...names, ...collectBlockNames(node.body.body)]
       : names;

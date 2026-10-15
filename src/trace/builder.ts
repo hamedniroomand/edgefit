@@ -1,9 +1,10 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, isTypeOnly, strip } from '@/extract/ast.ts';
+import { childNodes, isFunction, isTypeOnly, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
+import { ownNames, parameterNames } from '@/extract/set-again.ts';
 
-import { isExportsMember, isModuleExports } from './cjs-forms.ts';
+import { isExportsMember, isModuleExports, isName } from './cjs-forms.ts';
 import type { DynamicImports } from './dynamic-imports.ts';
 
 /**
@@ -80,42 +81,84 @@ function writeTarget(node: Node): Node | undefined {
   return node.type === 'UnaryExpression' && node.operator === 'delete' ? node.argument : undefined;
 }
 
-export function mentionsIn(node: Node, names = new Set<string>()): Set<string> {
+/** Whether code writes into the exports of the module. With `local`, a write through `exports`, as `exports.a = 1`, goes to a local variable. */
+function writesExports(node: Node, local: boolean): boolean {
+  const written = writeTarget(node);
+  if (written === undefined || !isExportsMember(written)) {
+    return false;
+  }
+  const inner = strip(written);
+  return !(local && inner.type === 'MemberExpression' && isName(strip(inner.object), 'exports'));
+}
+
+/** A TypeScript parameter decorator, such as `@Inject(token) exports`, runs in the scope around the class. */
+function hasDecorators(node: Node): boolean {
+  return 'decorators' in node && Array.isArray(node.decorators) && node.decorators.length > 0;
+}
+
+/**
+ * Whether `node` declares its own `exports` for `child`. A parameter or a default value does not
+ * see the names that the function body declares. The name of a function declaration and the value
+ * that a `switch` tests belong to the scope around them.
+ */
+function declaresExports(node: Node, child: Node, own: readonly string[]): boolean {
+  if (
+    (node.type === 'FunctionDeclaration' && child === node.id) ||
+    (node.type === 'SwitchStatement' && child === node.discriminant) ||
+    (isFunction(node) && child !== node.body && hasDecorators(child))
+  ) {
+    return false;
+  }
+  return (isFunction(node) && child !== node.body ? parameterNames(node) : own).includes('exports');
+}
+
+/** The text `module.exports.a` or `a.b` for a member read with a plain name. Such a read gives no other mention. */
+function memberMention(node: Node): string | undefined {
+  if (node.type !== 'MemberExpression' || node.computed || node.property.type !== 'Identifier') {
+    return undefined;
+  }
+  if (isModuleExports(node.object)) {
+    return `module.exports.${node.property.name}`;
+  }
+  return node.object.type === 'Identifier'
+    ? `${node.object.name}.${node.property.name}`
+    : undefined;
+}
+
+/**
+ * `local` is set inside a function, block, loop, `switch` or `catch` that declares its own `exports`. There, a
+ * mention of `exports` is a local variable, not the exports of the module. A local `module` or
+ * `eval` stays a mention: a bundle runtime declares its own `module`, and a call of a local `eval`
+ * can still be a direct eval, which sees the module scope.
+ */
+export function mentionsIn(node: Node, names = new Set<string>(), local = false): Set<string> {
   if (isTypeOnly(node)) {
     return names;
   }
   if (node.type === 'VariableDeclarator' && node.init !== null && isRequireCall(node.init)) {
     // The name that a `require` declares is a use only where the code reads it.
-    return mentionsIn(node.init, names);
+    return mentionsIn(node.init, names, local);
   }
-  const written = writeTarget(node);
-  if (written !== undefined && isExportsMember(written)) {
+  if (writesExports(node, local)) {
     // Code that writes the exports changes them after the module loads: they cannot be read.
     names.add('exports');
   }
-  if (
-    node.type === 'MemberExpression' &&
-    !node.computed &&
-    node.property.type === 'Identifier' &&
-    isModuleExports(node.object)
-  ) {
-    names.add(`module.exports.${node.property.name}`);
+  const member = memberMention(node);
+  if (member !== undefined) {
+    if (!(local && member.startsWith('exports.'))) {
+      names.add(member);
+    }
     return names;
   }
   if (
-    node.type === 'MemberExpression' &&
-    !node.computed &&
-    node.object.type === 'Identifier' &&
-    node.property.type === 'Identifier'
+    (node.type === 'Identifier' || node.type === 'JSXIdentifier') &&
+    !(local && node.name === 'exports')
   ) {
-    names.add(`${node.object.name}.${node.property.name}`);
-    return names;
-  }
-  if (node.type === 'Identifier' || node.type === 'JSXIdentifier') {
     names.add(node.name);
   }
+  const own = local ? [] : ownNames(node);
   for (const child of childNodes(node)) {
-    mentionsIn(child, names);
+    mentionsIn(child, names, local || (own.length > 0 && declaresExports(node, child, own)));
   }
   return names;
 }
