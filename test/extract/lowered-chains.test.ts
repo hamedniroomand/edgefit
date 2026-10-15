@@ -42,6 +42,15 @@ const cases: [string, string][] = [
   [`for (const x of ${deno}?.args) f(x);`, `for (const x of ${chain(deno, '.args')}) f(x);`],
   [`const v = ${deno}?.env;\nv.get('X');`, `const v = ${chain(deno, '.env')};\nv.get('X');`],
   [`(${deno}?.env)?.x;`, `(${chain(deno, '.env')})?.x;`],
+  [`${deno}?.env?.x;`, `(_b = ${chain(deno, '.env')}) === null || _b === void 0 ? void 0 : _b.x;`],
+  [
+    `${deno}?.env?.get?.('X');`,
+    `(_c = (_b = ${chain(deno, '.env')}) === null || _b === void 0 ? void 0 : _b.get) === null || _c === void 0 ? void 0 : _c.call(_b, 'X');`,
+  ],
+  [
+    `${deno}?.env?.x.y();`,
+    `(_b = ${chain(deno, '.env')}) === null || _b === void 0 ? void 0 : _b.x.y();`,
+  ],
   [`${deno}?.env.get('X');`, `${chain(deno, ".env.get('X')")};`],
   [`if (${deno}?.cwd()) f();`, `if (${chain(deno, '.cwd()')}) f();`],
   [`const k = 'cwd';\n${deno}?.[k];`, `const k = 'cwd';\n${chain(deno, '[k]')};`],
@@ -86,7 +95,7 @@ describe('a compiled optional chain or nullish fallback', () => {
   it.each(cases)(
     'gives the result of its source form, as TypeScript writes it: %s',
     (source, typescript) => {
-      const compiled = `var _a, _b;\n${typescript}`;
+      const compiled = `var _a, _b, _c;\n${typescript}`;
       expect(usagesOf(compiled)).toEqual(usagesOf(source));
       expect(globalsOf(compiled)).toEqual(globalsOf(source));
     },
@@ -105,9 +114,9 @@ describe('a compiled optional chain or nullish fallback', () => {
 
   it('accepts the operands and the nullish values in any order', () => {
     const expected = usagesOf(`const v = ${deno}?.cwd;`);
-    expect(usagesOf(`const v = null == (_a = ${deno}) ? undefined : _a.cwd;`)).toEqual(expected);
+    expect(usagesOf(`const v = null == (_a = ${deno}) ? void 0 : _a.cwd;`)).toEqual(expected);
     expect(
-      usagesOf(`const v = (_a = ${deno}) === undefined || _a === null ? void 0 : _a.cwd;`),
+      usagesOf(`const v = (_a = ${deno}) === void 0 || _a === null ? void 0 : _a.cwd;`),
     ).toEqual(expected);
     expect(usagesOf(`const v = (_a = ${deno}) != null ? _a.cwd : void 0;`)).toEqual(expected);
     expect(usagesOf(`const v = (_a = ${deno}) == null ? y : _a;`)).toEqual(
@@ -129,6 +138,11 @@ describe('a compare of a temp that is not a compiled chain', () => {
       plainRead,
     );
     expect(usagesOf(`(_a = ${deno}) == null ? null : _a.cwd;`)).toEqual(plainRead);
+    expect(usagesOf(`(_a = ${deno}) == null ? undefined : _a.cwd;`)).toEqual(plainRead);
+    expect(usagesOf(`(_a = ${deno}) == null ? void f() : _a.cwd;`)).toEqual(plainRead);
+    expect(usagesOf(`(_a = ${deno}) === null || _a === undefined ? void 0 : _a.cwd;`)).toEqual(
+      plainRead,
+    );
     expect(usagesOf(`(_a = ${deno}) == null ? void 0 : f(_a);`)).toEqual(plainRead);
     expect(usagesOf(`(o._a = ${deno}) == null ? void 0 : o._a.cwd;`)).toEqual(plainRead);
     expect(

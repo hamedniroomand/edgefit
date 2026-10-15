@@ -25,15 +25,17 @@ function tempOf(node: Node): Temp | undefined {
     : undefined;
 }
 
+/** `null` or `void 0`, the two nullish values a compiler writes. The name `undefined` can be shadowed, so it does not count. */
 function nullishOf(node: Node): 'null' | 'undefined' | undefined {
   const inner = parens(node);
   if (inner.type === 'Literal' && inner.value === null) {
     return 'null';
   }
-  const isUndefined =
-    (inner.type === 'Identifier' && inner.name === 'undefined') ||
-    (inner.type === 'UnaryExpression' && inner.operator === 'void');
-  return isUndefined ? 'undefined' : undefined;
+  const isVoid =
+    inner.type === 'UnaryExpression' &&
+    inner.operator === 'void' &&
+    parens(inner.argument).type === 'Literal';
+  return isVoid ? 'undefined' : undefined;
 }
 
 type Compare = { operand: Node; nullish: 'null' | 'undefined'; strict: boolean; equal: boolean };
