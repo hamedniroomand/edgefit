@@ -8,7 +8,7 @@ edgefit is a static analysis tool, and it is honest about what that means. This 
 
 ## Only some guards are understood
 
-A usage of an API the target lacks, in code that only runs when the API exists, is [guarded](/guide/findings#guarded-usages) and does not fail a check. That covers checks on the API itself (`if (x.y)`, `typeof x.y`, `'y' in x`, `x.y?.()` and guard clauses), a `try` block whose `catch` does not throw again, and code behind a check on the runtime, such as `typeof Deno !== 'undefined'` or `process.versions.bun`. A check does not protect an API that exists and throws, such as `fs.watch` on Workers. Only code that does not run on the target at all is guarded whatever it uses.
+A usage of an API the target lacks, in code that only runs when the API exists, is [guarded](/guide/findings#guarded-usages) and does not fail a check. That covers checks on the API itself (`if (x.y)`, `typeof x.y`, `'y' in x`, `x.y?.()` and guard clauses, also in the form that a compiler writes for ES2019 or older, see [Checks for an API](/guide/findings#checks-for-an-api)), a `try` block whose `catch` does not throw again, and code behind a check on the runtime, such as `typeof Deno !== 'undefined'` or `process.versions.bun`. A check does not protect an API that exists and throws, such as `fs.watch` on Workers. Only code that does not run on the target at all is guarded whatever it uses.
 
 Other ways code decides what to do are not understood, and every branch is reported:
 
