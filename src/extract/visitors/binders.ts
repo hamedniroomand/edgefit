@@ -9,6 +9,8 @@ import { assign } from '@/extract/scope.ts';
 import { destructuredLoad, requireOf } from '@/trace/dynamic-imports.ts';
 import type { ApiRef } from '@/types.ts';
 
+import { visitDefault } from './patterns.ts';
+
 type DestructuredProperty = NodeOf<'ObjectPattern'>['properties'][number];
 
 export function bindTarget(
@@ -19,7 +21,7 @@ export function bindTarget(
 ): void {
   let binding = target;
   if (binding.type === 'AssignmentPattern') {
-    context.visit(binding.right);
+    visitDefault(binding, context);
     binding = binding.left;
   }
   if (binding.type === 'Identifier') {
