@@ -120,9 +120,13 @@ export const visitAssignment: Visitor<NodeOf<'AssignmentExpression'>> = (node, c
       return;
     }
   }
+  // A write through a TypeScript wrapper also ends a guard on the name.
+  const target = strip(node.left);
+  if (target.type === 'Identifier') {
+    context.collector.guards.drop(target.name);
+  }
   // Writing to a plain name neither reads it nor changes what edgefit tracks.
   if (node.left.type === 'Identifier') {
-    context.collector.guards.drop(node.left.name);
     if (bindAssigned(node, context)) {
       return;
     }

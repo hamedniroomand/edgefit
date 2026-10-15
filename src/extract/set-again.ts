@@ -16,7 +16,7 @@ function headNames(head: Node | null, lexical: boolean): string[] {
 
 /**
  * The names that `node` sets to a value in the scope around it: a declaration with a value, a
- * function declaration, `=`, `++`, or a loop target.
+ * function declaration, `=`, `++`, or a loop target, also through a TypeScript wrapper.
  */
 function setNames(node: Node): string[] {
   if (node.type === 'VariableDeclarator') {
@@ -26,15 +26,15 @@ function setNames(node: Node): string[] {
     return node.id === null ? [] : [node.id.name];
   }
   if (node.type === 'AssignmentExpression') {
-    return patternNames(node.left);
+    return patternNames(node.left, [], true);
   }
   if (node.type === 'UpdateExpression') {
-    return patternNames(node.argument);
+    return patternNames(node.argument, [], true);
   }
   if (node.type === 'ForInStatement' || node.type === 'ForOfStatement') {
     return node.left.type === 'VariableDeclaration'
       ? headNames(node.left, false)
-      : patternNames(node.left);
+      : patternNames(node.left, [], true);
   }
   return [];
 }

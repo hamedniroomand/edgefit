@@ -124,6 +124,15 @@ describe('usages the check does not protect', () => {
       'api node:fs.watch',
     ]);
   });
+
+  it.each([
+    ['an `as` target', '(w as any) = other;'],
+    ['a non-null target in parentheses', '(w)! = other;'],
+  ])('drops a guard on an alias that %s writes again', (_, write) => {
+    const usages = usagesOf(`${fs}let w = fs;\nif (w.watch) {\n  ${write}\n  w.watch('.');\n}`);
+    expect(usages).toContain('api node:fs.watch');
+    expect(usages).not.toContain('api node:fs.watch [guarded]');
+  });
 });
 
 describe('uses that only look like checks', () => {

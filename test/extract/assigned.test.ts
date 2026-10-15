@@ -130,6 +130,11 @@ describe('a fallback that a catch assigns', () => {
     expect(usagesOf(source, 'lib/index.ts')).not.toContain('api node:http2.connect');
   });
 
+  it('still follows a variable after a write through a TypeScript wrapper', () => {
+    const source = "let c: any;\nc = require('node:fs');\n(c as any) = other;\nc.watch('.');";
+    expect(usagesOf(source, 'lib/index.ts')).toContain('api node:fs.watch');
+  });
+
   it('keeps a second write that can be a module', () => {
     const source =
       "let http2;\ntry {\n  http2 = require('node:http2');\n} catch {\n  http2 = other;\n}\nhttp2.connect('x');";
