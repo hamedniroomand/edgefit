@@ -162,6 +162,8 @@ describe('usages behind a var or let that holds the check', () => {
     ['a declaration in a block', 'if (flag) { var hasWatch = true; }'],
     ['a loop target', 'for (hasWatch of flags) {}'],
     ['an update', 'hasWatch++;'],
+    ['an `as` target', '(hasWatch as any) = false;'],
+    ['a non-null target in parentheses', '(hasWatch)! = false;'],
   ])('does not follow when %s writes the name again', (_, write) => {
     expect(
       usagesOf(

@@ -24,6 +24,21 @@ describe('names that a block sets again', () => {
   });
 
   it.each([
+    ['an `as` target', 'let a = 1; (a as any) = 2;'],
+    ['a `satisfies` target', 'let a = 1; (a satisfies any) = 2;'],
+    ['a non-null target', 'let a = 1; a! = 2;'],
+    ['a type assertion target', 'let a = 1; (<any>a) = 2;'],
+    ['a wrapped element of an array pattern', 'let a = 1; [(a as any)] = [2];'],
+    ['a wrapped loop target', 'let a = 1; for ((a as any) of xs) {}'],
+    ['a wrapped update', 'let a = 1; (a as any)++;'],
+    ['a name in parentheses in a non-null target', 'let a = 1; (a)! = 2;'],
+    ['a name in parentheses in an `as` target', 'let a = 1; ((a) as any) = 2;'],
+  ])('counts %s in TypeScript', (_, source) => {
+    const { body } = parseSync('input.ts', source, { preserveParens: true }).program;
+    expect([...namesSetAgain(body as Node[])]).toEqual(['a']);
+  });
+
+  it.each([
     ['one value', 'var a = 1; var b; b = 2;'],
     ['a parameter of a nested function', 'var a = 1; function f(a) { a = 2; }'],
     ['a var of a nested function', 'var a = 1; var f = function () { var a = 2; };'],

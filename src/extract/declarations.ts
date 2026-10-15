@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes } from './ast.ts';
+import { childNodes, unwrap } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 
 export const functionTypes = new Set([
@@ -9,26 +9,38 @@ export const functionTypes = new Set([
   'ArrowFunctionExpression',
 ]);
 
-export function patternNames(pattern: Node | null | undefined, names: string[] = []): string[] {
+/**
+ * The names that a pattern declares, or that an assignment target writes. With `throughWrappers`,
+ * a target in a TypeScript wrapper counts too, also with parentheses in it, as in `(a)! = 1`.
+ */
+export function patternNames(
+  pattern: Node | null | undefined,
+  names: string[] = [],
+  throughWrappers = false,
+): string[] {
   if (pattern === null || pattern === undefined) {
     return names;
   }
-  if (pattern.type === 'Identifier') {
+  const inner = throughWrappers ? unwrap(pattern) : undefined;
+  if (inner !== undefined) {
+    patternNames(inner, names, true);
+  } else if (pattern.type === 'Identifier') {
     names.push(pattern.name);
   } else if (pattern.type === 'ObjectPattern') {
     for (const property of pattern.properties) {
-      patternNames(property.type === 'RestElement' ? property.argument : property.value, names);
+      const target = property.type === 'RestElement' ? property.argument : property.value;
+      patternNames(target, names, throughWrappers);
     }
   } else if (pattern.type === 'ArrayPattern') {
     for (const element of pattern.elements) {
-      patternNames(element, names);
+      patternNames(element, names, throughWrappers);
     }
   } else if (pattern.type === 'RestElement') {
-    patternNames(pattern.argument, names);
+    patternNames(pattern.argument, names, throughWrappers);
   } else if (pattern.type === 'AssignmentPattern') {
-    patternNames(pattern.left, names);
+    patternNames(pattern.left, names, throughWrappers);
   } else if (pattern.type === 'TSParameterProperty') {
-    patternNames(pattern.parameter, names);
+    patternNames(pattern.parameter, names, throughWrappers);
   }
   return names;
 }
