@@ -134,6 +134,17 @@ These checks are understood:
 
 A read that is an operand of `||` or `??` is a check too, as in `const f = util.getCallSites ?? util.getCallSite`. A member that the target lacks gives no finding, because it gives `undefined` and the operator moves on. A member that exists and throws is still a finding, because the value goes on. The right operand counts when the left one is an API too. A value that is called in place, such as `(x.y || z)()`, is a use.
 
+A read with `?.`, such as `x?.y`, gives `undefined` when `x` is missing, so it is a check. These uses are the exception. They throw a TypeError for `undefined`, so they are uses, the same as without `?.`:
+
+- `new (x?.y)()` and `class extends (x?.y)`
+- a tag, as in ``(x?.y)`text` ``
+- the right side of `instanceof`
+- destructuring, as in `const { a } = x?.y`, and a default that is destructured, as in `{ a } = x?.y`
+- a spread into an array or into the arguments of a call, `new` or `super`
+- `for (const v of x?.y)` and `yield* x?.y`
+
+A call, as in `x?.y()`, is also a use: it throws when `x` exists but has no `y`.
+
 A check only covers the API it names, and anything below it. `if (fs.watchFile)` does not guard `fs.watch`.
 
 ### Try blocks
@@ -229,7 +240,7 @@ The data of `workerd` says that `window`, `document`, `HTMLAnchorElement`, `Deno
 
 A global that the target lacks is `undefined` on the global object. So these uses of `globalThis.X`, `self.X` or `global.X` do not fail, and they are guarded on a target that lacks `X`:
 
-- the checks in [Checks for an API](#checks-for-an-api), such as a test in an `if`, `?:`, `!`, `&&`, `||` or `??`, and an optional member (`globalThis.X?.y`)
+- the checks in [Checks for an API](#checks-for-an-api), such as a test in an `if`, `?:`, `!`, `&&`, `||` or `??`, and an optional member (`globalThis.X?.y`), except in the uses that [Checks for an API](#checks-for-an-api) lists
 - the test of a `while`, `do` or `for` loop
 - `Boolean(globalThis.X)`
 - a comparison with `===`, `!==`, `==` or `!=`

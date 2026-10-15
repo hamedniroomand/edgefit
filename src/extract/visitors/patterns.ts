@@ -1,6 +1,21 @@
 import type { Node } from 'oxc-parser';
 
+import type { NodeOf } from '@/extract/ast.ts';
 import type { VisitContext } from '@/extract/context.ts';
+
+/**
+ * Visits the default value of `left = right`. The default of an object or array pattern is
+ * destructured. `isOptionalRead` needs the pattern as its parent to see that.
+ */
+export function visitDefault(pattern: NodeOf<'AssignmentPattern'>, context: VisitContext): void {
+  if (pattern.left.type === 'ObjectPattern' || pattern.left.type === 'ArrayPattern') {
+    context.withAncestor(pattern, () => {
+      context.visit(pattern.right);
+    });
+  } else {
+    context.visit(pattern.right);
+  }
+}
 
 /** Visits the runtime parts of a binding pattern: default values and computed keys. */
 export function visitPattern(pattern: Node | null | undefined, context: VisitContext): void {
@@ -24,7 +39,7 @@ export function visitPattern(pattern: Node | null | undefined, context: VisitCon
     visitPattern(pattern.argument, context);
   } else if (pattern.type === 'AssignmentPattern') {
     visitPattern(pattern.left, context);
-    context.visit(pattern.right);
+    visitDefault(pattern, context);
   } else if (pattern.type === 'TSParameterProperty') {
     context.visitAll(pattern.decorators);
     visitPattern(pattern.parameter, context);

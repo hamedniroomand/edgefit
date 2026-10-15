@@ -8,6 +8,7 @@ import {
   computedKey,
   followChain,
   isCheckedOperand,
+  isOptionalRead,
   isPresentRead,
   isSafeRead,
   isTestedChain,
@@ -25,7 +26,6 @@ import {
   memberRef,
   isOnlyTested,
   isMemberWrite,
-  isOptionalRead,
   writtenObject,
 } from './refs.ts';
 import { createScope } from './scope.ts';
@@ -39,7 +39,7 @@ import { visitPattern } from './visitors/patterns.ts';
 function isCheck(node: Node, parent: Node | undefined, outer: readonly Node[]): boolean {
   return (
     (parent !== undefined && (isFeatureCheck(node, parent) || isTestedChain(parent, outer))) ||
-    isOptionalRead(node, parent)
+    isOptionalRead(node, parent, outer)
   );
 }
 

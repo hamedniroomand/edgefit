@@ -11,6 +11,7 @@ import { memberRef, passesOn } from './refs.ts';
 import { declaringScope, isTracked, lookupPresent, lookupSymbol } from './scope.ts';
 import type { Scope } from './scope.ts';
 
+export { isOptionalRead } from './optional-reads.ts';
 export { isSafeRead } from './safe-reads.ts';
 
 export type ChainResult =
