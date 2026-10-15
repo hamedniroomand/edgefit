@@ -7,6 +7,7 @@ import { collectChecks } from '@/extract/checks.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { guardsAfter } from '@/extract/guards-after.ts';
 import { guardsWhen } from '@/extract/guards.ts';
+import { dropRewrittenAlias } from '@/extract/rewritten-alias.ts';
 import { isTracked } from '@/extract/scope.ts';
 
 export const visitIf: Visitor<NodeOf<'IfStatement'>> = (node, context) => {
@@ -78,8 +79,9 @@ export const visitTry: Visitor<NodeOf<'TryStatement'>> = (node, context) => {
 export function visitStatements(statements: readonly Node[], context: VisitContext): void {
   collectChecks(statements, context.scope);
   context.collector.guards.scoped(add => {
-    for (const statement of statements) {
+    for (const [index, statement] of statements.entries()) {
       context.visit(statement);
+      dropRewrittenAlias(statements, index, context);
       if (statement.type === 'IfStatement') {
         add(guardsAfter(statement, context));
       }
