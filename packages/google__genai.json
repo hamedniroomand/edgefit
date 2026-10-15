@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@google/genai",
-  "resolved": "2.29.1",
-  "checkedAt": "2026-10-14T23:20:12.791Z",
-  "edgefit": "0.15.1",
+  "resolved": "2.30.0",
+  "checkedAt": "2026-10-15T09:11:58.815Z",
+  "edgefit": "0.15.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "h3",
   "resolved": "2.0.2",
-  "checkedAt": "2026-10-14T23:18:42.559Z",
-  "edgefit": "0.15.1",
+  "checkedAt": "2026-10-15T09:11:09.195Z",
+  "edgefit": "0.15.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@auth/core",
   "resolved": "0.41.3",
-  "checkedAt": "2026-10-14T23:21:49.255Z",
-  "edgefit": "0.15.1",
+  "checkedAt": "2026-10-15T09:13:35.226Z",
+  "edgefit": "0.15.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

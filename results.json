@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-14T23:27:22.856Z",
-  "edgefit": "0.15.1",
+  "generatedAt": "2026-10-15T09:22:05.591Z",
+  "edgefit": "0.15.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -1259,7 +1259,7 @@
     {
       "name": "@google/genai",
       "file": "google__genai",
-      "resolved": "2.29.1",
+      "resolved": "2.30.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1750,7 +1750,7 @@
     {
       "name": "mssql",
       "file": "mssql",
-      "resolved": "12.7.6",
+      "resolved": "12.7.7",
       "summary": {
         "workerd": "fail",
         "bun": "pass",

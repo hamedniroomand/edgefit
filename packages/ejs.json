@@ -2,8 +2,8 @@
   "version": 2,
   "package": "ejs",
   "resolved": "7.0.1",
-  "checkedAt": "2026-10-14T23:19:27.182Z",
-  "edgefit": "0.15.1",
+  "checkedAt": "2026-10-15T09:11:46.309Z",
+  "edgefit": "0.15.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

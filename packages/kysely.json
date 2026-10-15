@@ -2,8 +2,8 @@
   "version": 2,
   "package": "kysely",
   "resolved": "0.29.6",
-  "checkedAt": "2026-10-14T23:19:47.844Z",
-  "edgefit": "0.15.1",
+  "checkedAt": "2026-10-15T09:11:41.788Z",
+  "edgefit": "0.15.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

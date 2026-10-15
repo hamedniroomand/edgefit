@@ -2,8 +2,8 @@
   "version": 2,
   "package": "unstorage",
   "resolved": "1.17.6",
-  "checkedAt": "2026-10-14T23:22:01.475Z",
-  "edgefit": "0.15.1",
+  "checkedAt": "2026-10-15T09:13:44.609Z",
+  "edgefit": "0.15.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
