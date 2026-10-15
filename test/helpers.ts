@@ -185,3 +185,6 @@ export async function edgefitError(run: Promise<unknown>): Promise<EdgefitError>
   }
   throw new Error('expected the run to fail with an EdgefitError');
 }
+
+/** The time limit of a test that runs the package flow, which packs and installs a package. The apps project uses the same limit. */
+export const packageFlowTimeout = 30_000;

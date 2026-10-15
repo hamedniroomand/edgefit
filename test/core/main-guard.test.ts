@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { check } from '@/core/check.ts';
 import { checkPackage } from '@/package/check-package.ts';
-import { fixture } from '~/helpers.ts';
+import { fixture, packageFlowTimeout } from '~/helpers.ts';
 
-describe('a CommonJS file with a main guard', () => {
+describe('a CommonJS file with a main guard', { timeout: packageFlowTimeout }, () => {
   it.each(['and.cjs', 'if.cjs', 'reverse.cjs', 'helper.cjs', 'bundle.cjs'])(
     'leaves the CLI code out when %s is imported',
     async file => {

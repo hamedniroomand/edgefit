@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { check } from '@/core/check.ts';
 import type { TargetReport } from '@/core/check.ts';
 import { checkPackage } from '@/package/check-package.ts';
-import { fixture } from '~/helpers.ts';
+import { fixture, packageFlowTimeout } from '~/helpers.ts';
 
 const run = async (entry: string): Promise<TargetReport | undefined> => {
   const { reports } = await check({
@@ -13,7 +13,7 @@ const run = async (entry: string): Promise<TargetReport | undefined> => {
   return reports[0];
 };
 
-describe('code behind an option of the API of a package', () => {
+describe('code behind an option of the API of a package', { timeout: packageFlowTimeout }, () => {
   it.each(['unset.mjs', 'false.mjs', 'after-return.mjs'])(
     'is guarded when %s does not set the option',
     async entry => {
