@@ -67,7 +67,6 @@ function ownExport(shape: ModuleShape, name: string): string | undefined {
  * all the exports are known. A read that cannot be told apart stays, so the module counts in full.
  */
 export function resolveOwnReads(shape: ModuleShape): void {
-  // ponytail: a parameter or a variable named `exports` reads as the exports of the module.
   for (const unit of shape.units) {
     for (const mention of unit.mentions) {
       const name = /^(?:module\.)?exports\.([^.]+)$/u.exec(mention)?.[1];
