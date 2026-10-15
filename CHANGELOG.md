@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.15.2
+
+### Patch Changes
+
+- [#331](https://github.com/hamedniroomand/edgefit/pull/331) [`79383cb`](https://github.com/hamedniroomand/edgefit/commit/79383cb1561f113947c833345dad3df8b7349cda) - A module whose function, block, loop or `catch` declares its own `exports`, such as `constructor (client, socket, { exports })` in undici, does not count as a whole only because of that name. A mention of `exports` inside that scope is a local variable. A mention outside it counts as before. This applies only to `exports`: a local `module` is not treated as a local variable.
+
+- [#338](https://github.com/hamedniroomand/edgefit/pull/338) [`dcaf2b7`](https://github.com/hamedniroomand/edgefit/commit/dcaf2b7842679330a64e75b1a883c8c1be5d61ba) - A `?.` or `??` that a compiler wrote for ES2019 or older now gives the same findings as the source. TypeScript, Babel and esbuild write `x.y?.z` as `(_a = x.y) == null ? void 0 : _a.z` or `(_a = x.y) === null || _a === void 0 ? void 0 : _a.z`, `x.y ?? z` as `(_a = x.y) != null ? _a : z`, and a minified `if (x.y?.z)` as `(_a = x.y) != null && _a.z`. edgefit read `x.y` in these forms as a plain use, so a global that the runtime lacks, such as `Deno` on Workers, was a finding where `globalThis.Deno?.cwd` gives none.
+
+- [#337](https://github.com/hamedniroomand/edgefit/pull/337) [`e83a0fb`](https://github.com/hamedniroomand/edgefit/commit/e83a0fbc231bd2c996ccbbd749c0644f09a52ba2) - A read with `?.` is now a use in these places, because each one throws for `undefined`: `new (x?.y)()`, `class extends (x?.y)`, a tag, the right side of `instanceof`, destructuring and a destructured default, a spread into an array or a call, `for…of` and `yield*`. Before, edgefit read `?.` there as a check, so `new (globalThis.Deno?.Command)()` gave no finding on Workers, although it throws. A destructured default such as `const { b: { a } = x.y } = o` can now also give an `unknown` warning for `x.y`, as a destructured parameter default already did.
+
+- [#339](https://github.com/hamedniroomand/edgefit/pull/339) [`d1274eb`](https://github.com/hamedniroomand/edgefit/commit/d1274ebd0e34c4d7e47a0453fb63a4b3e18b0563) - edgefit no longer reports `g.document.body` as the global `document.body` after `let g = globalThis; g = {}`. The alias of the global object now ends when a statement directly in its scope writes a plain value to it, and all other code in that scope only reads members of `g`. At the top level of a file, this applies only in a file with an `export default` of a value, an exported value or `export *`. Code outside a script can write its top-level names, and a compiler can remove an import or an export of names that holds only types. A plain value is one of these:
+
+  - a literal, but not a regular expression
+  - a template
+  - an object literal with plain keys, whose values are such literals or templates
+
+  The alias stays in these cases:
+
+  - The value is not a plain value, for example an array, a nested object or `{} as any`.
+  - Code uses `g` in another way, such as a second write, a call argument, a spread or `typeof`.
+  - Code reads `g` with a computed key that is not a fixed string, or with a key such as `constructor` or `__proto__` that reaches the prototype.
+  - The scope uses `eval` or `with`.
+  - The write is not directly in the scope that declares `g`.
+  - A function declaration comes after the write in the same scope.
+  - The name is a parameter, a top-level `var`, an exported name, or a top-level name of any other file.
+
+- [#334](https://github.com/hamedniroomand/edgefit/pull/334) [`1b881e5`](https://github.com/hamedniroomand/edgefit/commit/1b881e5b4771dbecae09f241dc50b32c24070a08) - A write through a TypeScript wrapper, as in `(a as any) = value`, `a! = value`, `(a)! = value`, `(a as any)++` or `for ((a as any) of list)`, now ends a check on `a`. Before, edgefit did not see such a write. A `let` or `var` that holds a check was still followed, and a test such as `if (a.watch)` still guarded the code after the write, so a finding could be hidden.
+
+- [#328](https://github.com/hamedniroomand/edgefit/pull/328) [`3435b2f`](https://github.com/hamedniroomand/edgefit/commit/3435b2f1986c3c1875a55ea992597a78122ffb02) - A finding now lists each of its other locations once. In built output, several uses can map to one place (line and column) in the source, and `otherLocations` in the JSON output held that location again, once for each copy. The text report counted these copies in `(+N more)` and in the count for each API.
+
 ## 0.15.1
 
 ### Patch Changes
