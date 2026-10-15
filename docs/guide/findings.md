@@ -145,6 +145,8 @@ A read with `?.`, such as `x?.y`, gives `undefined` when `x` is missing, so it i
 
 A call, as in `x?.y()`, is also a use: it throws when `x` exists but has no `y`.
 
+A compiler can write `x.y?.z` and `x.y ?? z` in another form when the code is compiled for ES2019 or older. edgefit reads that output as the source, so it is the same check. TypeScript, Babel and esbuild write `(_a = x.y) == null ? void 0 : _a.z`, `(_a = x.y) === null || _a === void 0 ? void 0 : _a.z`, `(_a = x.y) != null ? _a : z` and `(_a = x.y) !== null && _a !== void 0 ? _a : z`. A minified test is `(_a = x.y) != null && _a.z`. A call `x.y?.()` is `_a.call(x)`, and `(x.y?.z)()` is `(…).call(_a)`. A strict compare alone, as in `(_a = x.y) === null ? void 0 : _a.z`, is not one of them, because it lets `undefined` through. A chain on a plain name has no temp, as in `x == null ? void 0 : x.y`, and its compare is a check like any other.
+
 A check only covers the API it names, and anything below it. `if (fs.watchFile)` does not guard `fs.watch`.
 
 ### Try blocks

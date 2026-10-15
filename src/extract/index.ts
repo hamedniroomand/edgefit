@@ -1,6 +1,3 @@
-import { parseSync } from 'oxc-parser';
-import type { Node, ParseResult, ParserOptions } from 'oxc-parser';
-
 import { collectShape } from '@/trace/shape.ts';
 import type { ModuleShape } from '@/trace/shape.ts';
 import type { ApiRef, Usage } from '@/types.ts';
@@ -8,10 +5,13 @@ import type { ApiRef, Usage } from '@/types.ts';
 import { findAssigned, findAssignedOptions } from './assigned.ts';
 import { findFunctions } from './call-keys.ts';
 import { findImportWrappers } from './import-wrappers.ts';
+import { isTypeScript, parse } from './parse.ts';
 import { findSuppliedLoads } from './supplied-loads.ts';
 import { typeOnlyImports } from './type-only-imports.ts';
 import { UsageCollector } from './usage-collector.ts';
 import { Walker } from './walker.ts';
+
+export { isTypeScript, parse } from './parse.ts';
 
 export interface ExtractOptions {
   /** Global names worth tracking, such as `process` and `Buffer`. */
@@ -45,42 +45,6 @@ export interface ExtractedModule {
   aliases: ReadonlyMap<string, { ref: ApiRef; offset: number }>;
   /** The exports that are a plain string, by exported name. */
   strings: ReadonlyMap<string, string>;
-}
-
-function languageFor(file: string): ParserOptions['lang'] {
-  if (/\.[cm]?tsx$/u.test(file)) {
-    return 'tsx';
-  }
-  if (/\.[cm]?ts$/u.test(file)) {
-    return 'ts';
-  }
-  return file.endsWith('.jsx') ? 'jsx' : 'js';
-}
-
-export function isTypeScript(file: string): boolean {
-  return /\.[cm]?tsx?$/u.test(file);
-}
-
-function sourceTypeFor(file: string): ParserOptions['sourceType'] {
-  if (/\.c[jt]s$/u.test(file)) {
-    return 'commonjs';
-  }
-  return /\.m[jt]s$/u.test(file) ? 'module' : 'unambiguous';
-}
-
-export function parse(file: string, source: string): ParseResult {
-  const options: ParserOptions = {
-    lang: languageFor(file),
-    sourceType: sourceTypeFor(file),
-    preserveParens: true,
-  };
-  const result = parseSync(file, source, options);
-  if (result.errors.length === 0 || options.lang !== 'js') {
-    return result;
-  }
-  // Some packages ship JSX in `.js` files.
-  const retry = parseSync(file, source, { ...options, lang: 'jsx' });
-  return retry.errors.length === 0 ? retry : result;
 }
 
 function finish(
@@ -117,7 +81,7 @@ export function extractModule(
     );
     return finish(collector);
   }
-  const body = result.program.body as Node[];
+  const { body } = result.program;
   // Only a TypeScript compiler drops an import because its names are not used as values.
   const dropped =
     options.keepUnusedImports === true || !isTypeScript(file)
@@ -136,7 +100,7 @@ export function extractModule(
     callKeys,
     options.imported,
   );
-  walker.visit(result.program as Node);
+  walker.visit(result.program);
   collector.omitMainFunctions(body, functions, walker.mainOnlyNodes);
   collector.guardFunctions(body, functions, walker.functionReads);
   const shape =

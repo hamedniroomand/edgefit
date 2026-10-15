@@ -45,6 +45,12 @@ const transparentNodes = new Set([
   'TSTypeAssertion',
 ]);
 
+/**
+ * The `t = V` of a compiled `V?.y` or `V ?? y`, which `restoreChains` keeps as the base of the
+ * chain it restores. The assignment passes its value through, as parentheses do.
+ */
+export const chainTemps = new WeakSet<Node>();
+
 /** Members that call a function: `fn.call(...)` uses `fn` itself, so `call` is not part of the API. */
 export const invokers = new Set(['apply', 'bind', 'call']);
 
@@ -143,10 +149,13 @@ export function rootName(node: Node): string | undefined {
   return inner.type === 'Identifier' ? inner.name : undefined;
 }
 
-/** The operand of a wrapper that passes its value through unchanged, such as `(x)`, `x!` or `await x`. */
+/** The operand of a wrapper that passes its value through unchanged, such as `(x)`, `x!`, `await x` or a restored `(t = x)`. */
 export function unwrap(node: Node): Node | undefined {
   if (transparentNodes.has(node.type) && 'expression' in node) {
     return node.expression as Node;
+  }
+  if (node.type === 'AssignmentExpression' && chainTemps.has(node)) {
+    return node.right;
   }
   return node.type === 'AwaitExpression' ? node.argument : undefined;
 }
