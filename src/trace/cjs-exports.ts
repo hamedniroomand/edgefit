@@ -4,38 +4,37 @@ import { isFunction, staticKey, strip, stringLiteral } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 
 import { isLazyClass, mentionsIn, rootNames } from './builder.ts';
-import type { ShapeBuilder } from './builder.ts';
 import {
   exportKey,
   isExportsObject,
+  isHelperName,
   isModuleExports,
   isName,
   isVoidChain,
   moduleExportsKey,
+  opaqueNames,
   requiredBy,
 } from './cjs-forms.ts';
-import type { Helpers, ObjectLiteral, RequireUse } from './cjs-forms.ts';
+import type { ObjectLiteral } from './cjs-forms.ts';
 import {
   exportedAs,
   isTruthy,
   isTruthyDescriptor,
   loadTimeExport,
+  moduleExportsValue,
   objectExport,
+  readProperties,
+  waitingExport,
 } from './cjs-values.ts';
-
-/** What the reader of a module gives the reader of its exports. */
-export interface ExportContext {
-  builder: ShapeBuilder;
-  helpers: Helpers;
-  /** Notes that a `require` is understood, and that its module is loaded. */
-  load: (found: RequireUse) => void;
-}
+import type { ExportContext } from './cjs-values.ts';
 
 /** Reads what a CommonJS module sets on `exports` and `module.exports`. */
 export class ExportWriter {
   readonly #context: ExportContext;
   /** Writes to `exports` that are not copies of what `module.exports` was set to. */
   #writes = 0;
+  /** Writes of `module.exports.name` after `module.exports = value` that add an export, as a property of that value. */
+  #added = 0;
   /** Set when `module.exports` is assigned: the name it was set to, if it was a variable. */
   #assigned: { name?: string } | undefined;
   /** The writes `exports.k = obj.k`, which copy from the object that `module.exports` may be set to. */
@@ -50,15 +49,10 @@ export class ExportWriter {
     this.#context = context;
   }
 
-  /** Marks the exports as not readable, so the whole module counts. */
-  public giveUp(): void {
-    this.#unreadable = true;
-  }
-
   /** Notes that a variable holds an object literal that `module.exports` is set to. */
   public readObject(name: string, object: ObjectLiteral): void {
     this.#objects.add(name);
-    if (!this.properties(object)) {
+    if (!readProperties(this.#context, object)) {
       this.#unreadable = true;
     }
   }
@@ -76,10 +70,15 @@ export class ExportWriter {
     // What `module.exports` was set to replaces `exports`, so the only writes to `exports` that
     // can be left alone are copies of it. Without that, a copy is an export like any other.
     const stray = this.#mirrors.filter(mirror => mirror.from !== named).length;
-    const mixed =
-      this.#assigned === undefined ? this.#mirrors.length > 0 : this.#writes + stray > 0;
     // A function or a class that waits to be used is read as it is, when nothing else names it.
     const waiting = named !== undefined && !this.#objects.has(named) && shape.declared.has(named);
+    // Only such a value holds its added properties. Other modules can read a required module.
+    const mixed =
+      this.#assigned === undefined
+        ? this.#mirrors.length > 0
+        : this.#writes + stray > 0 ||
+          (this.#added > 0 &&
+            (!waiting || shape.imports.has(named) || this.#context.reaches(false)));
     const used =
       named !== undefined &&
       ((!this.#objects.has(named) && !waiting) ||
@@ -152,12 +151,17 @@ export class ExportWriter {
   }
 
   public assignment(node: NodeOf<'AssignmentExpression'>): boolean {
+    // In a chain, `this` can be the exports object, and the module cannot tell it apart from the value.
+    const whole = moduleExportsValue(node, () => !this.#context.reaches(true));
+    if (whole !== undefined) {
+      return this.#assignModuleExports(whole);
+    }
     if (node.operator !== '=') {
       return false;
     }
     const left = strip(node.left);
-    if (isModuleExports(left)) {
-      return this.#assignModuleExports(strip(node.right));
+    if (left.type === 'Identifier') {
+      return this.alias(left.name, node.right, node);
     }
     if (left.type !== 'MemberExpression' || !isExportsObject(left.object)) {
       return false;
@@ -167,11 +171,35 @@ export class ExportWriter {
       this.#unreadable = true;
       return true;
     }
-    return this.#assignExport(name, strip(node.right));
+    // After `module.exports = value`, `module.exports.key = …` adds a property to that value. A write
+    // through `exports` still counts, because `exports` can name the object that was replaced.
+    const counted = this.#assigned === undefined || !isModuleExports(left.object);
+    const known = this.#context.builder.shape.exports;
+    const before = known.get(name);
+    const read = this.#assignExport(name, strip(node.right), counted);
+    if (!counted && known.get(name) !== before) {
+      this.#added += 1;
+      // Only the last write is an export, but code that runs between the writes can read the first.
+      this.#unreadable ||= before !== undefined;
+    }
+    return read;
+  }
+
+  /** `local = exports.name = value`: the function or lazy class `value` is both the export and `local`. */
+  public alias(local: string, value: Node, unit: Node): boolean {
+    // A helper name skips the opaque check, and `this` can read the export by another name.
+    const write = opaqueNames.has(local) || isHelperName(local) ? undefined : waitingExport(value);
+    if (write === undefined || this.#context.reaches(true)) {
+      return false;
+    }
+    this.#writes += 1;
+    this.#context.builder.unit(unit, local, mentionsIn(write.value));
+    this.#context.builder.export(write.name, { local });
+    return true;
   }
 
   /** `exports.name = value`. */
-  #assignExport(name: string, value: Node): boolean {
+  #assignExport(name: string, value: Node, counted: boolean): boolean {
     if (name === '__esModule') {
       const { shape } = this.#context.builder;
       shape.esModule = isTruthy(value) && (shape.esModule || !this.#esModuleFixed);
@@ -179,7 +207,7 @@ export class ExportWriter {
     }
     if (value.type === 'Identifier') {
       this.#context.builder.export(name, { local: value.name });
-      this.#writes += 1;
+      this.#writes += counted ? 1 : 0;
       return true;
     }
     if (value.type === 'MemberExpression' && !value.computed && isName(value.property, name)) {
@@ -194,7 +222,7 @@ export class ExportWriter {
       // `exports.a = exports.b = void 0`, as tsc declares the names it assigns later.
       return true;
     }
-    this.#writes += 1;
+    this.#writes += counted ? 1 : 0;
     const required = requiredBy(value, this.#context.helpers);
     if (required !== undefined) {
       this.#context.load(required);
@@ -242,7 +270,7 @@ export class ExportWriter {
     }
     if (value.type === 'ObjectExpression') {
       this.#assigned = {};
-      if (!this.properties(value)) {
+      if (!readProperties(this.#context, value)) {
         this.#unreadable = true;
         return false;
       }
@@ -266,34 +294,5 @@ export class ExportWriter {
     }
     this.#unreadable = true;
     return false;
-  }
-
-  /** Reads `{ name: value }` as the exports of the module. */
-  public properties(object: ObjectLiteral): boolean {
-    for (const property of object.properties) {
-      if (property.type !== 'Property' || property.computed) {
-        return false;
-      }
-      const name = staticKey(property.key, false);
-      const value = strip(property.value);
-      if (name === undefined) {
-        return false;
-      }
-      const required = requiredBy(value, this.#context.helpers);
-      if (required !== undefined) {
-        this.#context.load(required);
-        this.#context.builder.export(name, {
-          specifier: required.specifier,
-          imported: required.member ?? '*',
-        });
-      } else if (value.type === 'Identifier') {
-        this.#context.builder.export(name, { local: value.name });
-      } else if (isFunction(value)) {
-        this.#export(name, property.value, property);
-      } else {
-        return false;
-      }
-    }
-    return true;
   }
 }

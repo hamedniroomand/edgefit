@@ -48,6 +48,27 @@ export function addWriteInto(builder: ShapeBuilder, { node, name, value }: Write
   builder.unit(node, runsNothing(value) ? local : undefined);
 }
 
+/**
+ * After `module.exports = whole`, the value can reach each property that the module adds to it in
+ * ways that cannot be read, such as `this` or a copy of the name inside the value. So the value names each property,
+ * and each use of the value keeps all of them.
+ */
+export function joinProperties(shape: ModuleShape): void {
+  const whole = shape.moduleExports?.local;
+  if (whole === undefined) {
+    return;
+  }
+  for (const [name, source] of shape.exports) {
+    const local = 'local' in source ? source.local : `import:${name}`;
+    if (!('local' in source)) {
+      shape.imports.set(local, source);
+    }
+    for (const unit of shape.declared.get(whole) ?? []) {
+      unit.mentions.add(local);
+    }
+  }
+}
+
 /** The name that a read of the export `name` stands for, or `undefined` when it is not known. */
 function ownExport(shape: ModuleShape, name: string): string | undefined {
   if (shape.moduleExports !== undefined) {

@@ -8,7 +8,6 @@ import { ShapeBuilder, isLazyClass, rootNames } from './builder.ts';
 import type { ModuleShape } from './builder.ts';
 import { ExportWriter } from './cjs-exports.ts';
 import {
-  assignsExports,
   destructuredNames,
   helperName,
   isExportsObject,
@@ -21,10 +20,16 @@ import {
   starHelpers,
   topLevelFunctions,
 } from './cjs-forms.ts';
-import type { Call, Helpers, ObjectLiteral, RequireUse } from './cjs-forms.ts';
+import type { Call, Helpers, RequireUse } from './cjs-forms.ts';
 import { readableNestedBindings } from './cjs-nested.ts';
-import { addWriteInto, exportWrittenInto, resolveOwnReads } from './cjs-own-exports.ts';
+import {
+  addWriteInto,
+  exportWrittenInto,
+  joinProperties,
+  resolveOwnReads,
+} from './cjs-own-exports.ts';
 import type { WriteInto } from './cjs-own-exports.ts';
+import { moduleExportsValue, selfReach } from './cjs-values.ts';
 
 class CommonJsReader {
   readonly #builder = new ShapeBuilder();
@@ -47,6 +52,7 @@ class CommonJsReader {
       load: (found: RequireUse): void => {
         this.#load(found);
       },
+      reaches: selfReach(body),
     });
   }
 
@@ -93,6 +99,7 @@ class CommonJsReader {
   #finish(): void {
     const { shape } = this.#builder;
     const settled = this.#writer.settle();
+    joinProperties(shape);
     for (const write of this.#writesInto) {
       addWriteInto(this.#builder, write);
     }
@@ -189,13 +196,7 @@ class CommonJsReader {
         return;
       }
     }
-    if (
-      id.type === 'Identifier' &&
-      init !== null &&
-      strip(init).type === 'ObjectExpression' &&
-      this.#isModuleExportsTarget(id.name)
-    ) {
-      this.#writer.readObject(id.name, strip(init) as ObjectLiteral);
+    if (id.type === 'Identifier' && init !== null && this.#exportedValue(node, id.name, init)) {
       return;
     }
     const lazy =
@@ -205,13 +206,26 @@ class CommonJsReader {
     this.#builder.unit(node, lazy ? patternNames(id)[0] : undefined);
   }
 
+  /** `const name = value`, where `value` is the object that `module.exports` is set to, or is `exports.key = function …` (or `module.exports.key =`, or a lazy class). */
+  #exportedValue(node: Node, name: string, init: Node): boolean {
+    const value = strip(init);
+    if (value.type === 'ObjectExpression' && this.#isModuleExportsTarget(name)) {
+      this.#writer.readObject(name, value);
+      return true;
+    }
+    return this.#writer.alias(name, init, node);
+  }
+
   /** Whether the module sets `module.exports` to this name somewhere. */
   #isModuleExportsTarget(name: string): boolean {
     return this.#body.some(
       statement =>
         statement.type === 'ExpressionStatement' &&
         strip(statement.expression).type === 'AssignmentExpression' &&
-        assignsExports(strip(statement.expression) as NodeOf<'AssignmentExpression'>, name),
+        isName(
+          moduleExportsValue(strip(statement.expression) as NodeOf<'AssignmentExpression'>),
+          name,
+        ),
     );
   }
 
