@@ -289,8 +289,3 @@ export function destructuredNames(
   }
   return names;
 }
-
-/** Whether the assignment is `module.exports = name`. */
-export function assignsExports(node: NodeOf<'AssignmentExpression'>, name: string): boolean {
-  return node.operator === '=' && isModuleExports(node.left) && isName(strip(node.right), name);
-}
