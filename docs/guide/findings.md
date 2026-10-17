@@ -32,6 +32,8 @@ When a package uses the same API in several places, the report shows the first o
 | `web`         | A Web API is missing on the target according to runtime-compat-data        | warning       |
 | `unknown`     | Static analysis could not tell                                             | warning       |
 
+The Node data can lack a member, such as `navigator.locks.zzz`. When the Web API data does not list the member or an API above it, the member gets the result of the closest API above it that the Node data lists. This happens when the target lacks that API, or has it with another type. The detail line then starts with `is below an API that`, for example `is below an API that does not exist on the target`. A member below the point where the Node data stops also gets the result of the API above it. There, the Node data wins over the Web API data. When the target has that API, the Node data gives no finding for the member, but a curated entry or the Web API data can still give one.
+
 ### unsupported
 
 The clearest case. Either the module or member is not there, or it is there and throws, for example `ERR_METHOD_NOT_IMPLEMENTED`. Code that reaches it will fail.

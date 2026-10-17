@@ -60,6 +60,13 @@ function isBelow(entry: CompatEntry, module: string, path: readonly string[]): b
   );
 }
 
+/** The result of a member that the dump does not list: the problem of its parent, if any. */
+function belowParent(parent: LookupResult): LookupResult | undefined {
+  return parent.status === 'supported'
+    ? undefined
+    : { ...parent, note: `is below an API that ${String(parent.note)}` };
+}
+
 /**
  * Compatibility of one target: curated entries first, then the tree, then fallback entries for
  * APIs the tree does not describe. An entry applies to its API and everything below it, and the
@@ -98,12 +105,15 @@ export class CompatIndex {
       return toResult(entry);
     }
     const tree = this.#lookupTree(api.module, path);
-    if (tree !== undefined) {
-      return tree;
+    if (tree !== undefined && !tree.unlisted) {
+      return tree.result;
     }
     const fallback = this.#fallbackFor(api.module, path);
     if (fallback !== undefined) {
       return toResult(fallback);
+    }
+    if (tree !== undefined) {
+      return tree.result;
     }
     return { status: Object.hasOwn(this.#tree.baseline, api.module) ? 'supported' : 'uncovered' };
   }
@@ -125,10 +135,13 @@ export class CompatIndex {
   }
 
   /**
-   * The tree's result, or `undefined` where it has nothing to compare: an API Node lacks too,
-   * or a member below where the dump stops whose parent is supported.
+   * The tree's result, or `undefined` where it has nothing to compare: a module that the dump
+   * does not have, or a member that the dump does not list below a parent that the target supports.
    */
-  #lookupTree(module: string, path: readonly string[]): LookupResult | undefined {
+  #lookupTree(
+    module: string,
+    path: readonly string[],
+  ): { result: LookupResult; unlisted: boolean } | undefined {
     const { baseline, runtime } = this.#tree;
     if (!Object.hasOwn(baseline, module)) {
       return undefined;
@@ -136,18 +149,17 @@ export class CompatIndex {
     let base = baseline[module];
     let target = child(runtime, module);
     for (const segment of path) {
-      if (typeof base !== 'object') {
-        // The dump stops at leaves and at a depth limit; deeper members share a parent's problem.
-        const parent = compare(base, target);
-        return parent.status === 'supported' ? undefined : parent;
-      }
-      if (!Object.hasOwn(base, segment)) {
-        return undefined;
+      // The dump stops at leaves and at a depth limit. It also leaves out a member that Node lacks
+      // and an inherited member such as `toString`. Such a member shares the problem of its
+      // parent. A fallback entry for an unlisted member is more specific, so it wins.
+      if (typeof base !== 'object' || !Object.hasOwn(base, segment)) {
+        const result = belowParent(compare(base, target));
+        return result === undefined ? undefined : { result, unlisted: typeof base === 'object' };
       }
       base = base[segment];
       target = child(target, segment);
     }
-    return compare(base, target);
+    return { result: compare(base, target), unlisted: false };
   }
 
   /**
