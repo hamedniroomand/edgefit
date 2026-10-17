@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { CompatIndex } from '@/data/compat-index.ts';
 import { findDataDirectory } from '@/data/data-directory.ts';
+import type { DumpNode, LookupResult } from '@/data/dump.ts';
 import { matrixProvider } from '@/data/providers/matrix.ts';
 import { overridesProvider } from '@/data/providers/overrides.ts';
 import type { CompatEntry } from '@/data/providers/provider.ts';
@@ -132,5 +133,76 @@ describe('a curated entry below the queried API', () => {
     expect(new CompatIndex(tree, [f], fallback).hasProblemsBelow(module)).toBe(true);
     const h = entry(['h'], {});
     expect(new CompatIndex(tree, [f, h], fallback).hasProblemsBelow(module)).toBe(false);
+  });
+});
+
+const unlistedSource = { provider: 'test', version: '1' };
+const object = (members: Record<string, DumpNode>): DumpNode => ({
+  '*self*': 'object',
+  ...members,
+});
+const unlistedTree = {
+  baseline: {
+    m: object({ gone: object({ a: 'function' }) }),
+    n: {
+      '*self*': 'object',
+      kind: object({ a: 'function' }),
+      here: object({}),
+      leaf: 'function',
+    },
+  },
+  runtime: { m: object({}), n: { '*self*': 'object', kind: 'function', here: object({}) } },
+  source: unlistedSource,
+};
+const unlisted = new CompatIndex(unlistedTree);
+const lookup = (module: string, ...path: string[]): LookupResult =>
+  unlisted.lookup({ module, path });
+
+describe('a member that the dump does not list', () => {
+  it('shares the problem of a parent that the target lacks', () => {
+    expect(lookup('m', 'gone', 'zzz')).toEqual({
+      status: 'unsupported',
+      note: 'is below an API that does not exist on the target',
+      absent: true,
+    });
+    expect(lookup('m', 'gone', 'a').note).toBe('does not exist on the target');
+  });
+
+  it('shares the problem of a parent that has another type on the target', () => {
+    expect(lookup('n', 'kind', 'zzz')).toEqual({
+      status: 'mismatch',
+      note: 'is below an API that is a function on the target but a object in Node',
+    });
+  });
+
+  it('shares the problem of a leaf that the target lacks', () => {
+    expect(lookup('n', 'leaf', 'call')).toEqual({
+      status: 'unsupported',
+      note: 'is below an API that does not exist on the target',
+      absent: true,
+    });
+  });
+
+  it('is supported below a parent that the target has', () => {
+    expect(lookup('n', 'here', 'zzz')).toEqual({ status: 'supported' });
+  });
+
+  it('gives way to a fallback entry for the member, which is more specific', () => {
+    const web = (module: string, path: string[]): CompatEntry => ({
+      target: 'workerd',
+      module,
+      path,
+      status: 'unsupported',
+      category: 'web',
+      source: unlistedSource,
+    });
+    const fallback = [web('m', ['gone', 'web']), web('n', ['leaf', 'web'])];
+    const withFallback = new CompatIndex(unlistedTree, [], fallback);
+    expect(withFallback.lookup({ module: 'm', path: ['gone', 'web'] }).category).toBe('web');
+    expect(withFallback.lookup({ module: 'm', path: ['gone', 'zzz'] }).note).toBe(
+      'is below an API that does not exist on the target',
+    );
+    // Below a leaf of the dump, the tree keeps its place before the fallback entries.
+    expect(withFallback.lookup({ module: 'n', path: ['leaf', 'web'] }).category).toBeUndefined();
   });
 });
