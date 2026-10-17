@@ -25,20 +25,37 @@ function hasThis(node: Node): boolean {
 }
 
 const selfNames = new Set(['arguments', 'caller', 'require']);
+/** These modules give a `require` and the module cache, which reach any module. */
+const loaders = new Set(['module', 'node:module']);
+
+/** What `require(…)` or `import(…)` loads: the specifier, `null` when it is not a string literal, or `undefined` for other code. */
+function loaded(node: Node): string | null | undefined {
+  const source =
+    node.type === 'ImportExpression'
+      ? node.source
+      : node.type === 'CallExpression' && isName(strip(node.callee), 'require')
+        ? node.arguments[0]
+        : null;
+  if (source === null) {
+    return undefined;
+  }
+  return (source === undefined ? undefined : stringLiteral(source)) ?? null;
+}
 
 /**
  * Whether the code can reach the exports of its own module without the names `exports` and
- * `module`: `arguments` of the module wrapper, `caller`, or `require` in any way other than a call
- * with a string literal, such as `require(__filename)` or `require.cache`.
+ * `module`: `arguments` of the module wrapper, `caller`, `require` in any way other than a call
+ * with a string literal, such as `require(__filename)` or `require.cache`, `import()` of a value,
+ * or a load of the `module` module.
  */
 function reachesItself(node: Node): boolean {
-  if (
-    node.type === 'CallExpression' &&
-    isName(strip(node.callee), 'require') &&
-    node.arguments[0] !== undefined &&
-    stringLiteral(node.arguments[0]) !== undefined
-  ) {
-    return node.arguments.some(argument => reachesItself(argument));
+  const specifier = loaded(node);
+  if (specifier !== undefined) {
+    return (
+      specifier === null ||
+      loaders.has(specifier) ||
+      (node.type === 'CallExpression' && node.arguments.some(argument => reachesItself(argument)))
+    );
   }
   return (
     (node.type === 'Identifier' && selfNames.has(node.name)) ||

@@ -95,3 +95,30 @@ describe('a CommonJS module that writes a property after a whole write and can r
     expect(loadedOf(`${form1}${read}`)).toEqual(['node:fs.stat']);
   });
 });
+
+describe('a CommonJS module that writes a property after a whole write and loads itself', () => {
+  const form1 =
+    "function request() {}\nmodule.exports = request;\nmodule.exports.helper = function () {\n  return fs.stat('.');\n};\n";
+
+  it.each([
+    ['createRequire', "require('module').createRequire(__filename)(__filename).helper();\n"],
+    [
+      'createRequire of node:module',
+      "require('node:module').createRequire(__filename)(__filename).helper();\n",
+    ],
+    ['the cache of module', "require('module')._cache[__filename]['exp' + 'orts'].helper();\n"],
+    ['import(__filename)', 'import(__filename).then(m => m.default.helper());\n'],
+    ['an import of a value', "const p = './lib.js';\nimport(p).then(m => m.default.helper());\n"],
+    [
+      "import('module')",
+      "import('module').then(m => m.createRequire(__filename)(__filename).helper());\n",
+    ],
+    [
+      "import('node:module')",
+      "import('node:module').then(m => m.default._cache[__filename]['exp' + 'orts'].helper());\n",
+    ],
+    ['process.mainModule.require', 'process.mainModule.require(__filename).helper();\n'],
+  ])('is checked in full for %s when the module loads', (_, read) => {
+    expect(loadedOf(`${form1}${read}`)).toContain('node:fs.stat');
+  });
+});
