@@ -6,6 +6,7 @@ import { ownNames, parameterNames } from '@/extract/set-again.ts';
 
 import { isExportsMember, isModuleExports, isName } from './cjs-forms.ts';
 import type { DynamicImports } from './dynamic-imports.ts';
+import { thisReads } from './this-reads.ts';
 
 /**
  * A top-level piece of a module. Code that runs when the module loads has no `name`. A function
@@ -151,7 +152,7 @@ export function mentionsIn(node: Node, names = new Set<string>(), local = false)
     return names;
   }
   if (
-    (node.type === 'Identifier' || node.type === 'JSXIdentifier') &&
+    (node.type === 'Identifier' || (node.type === 'JSXIdentifier' && node.name !== 'this')) &&
     !(local && node.name === 'exports')
   ) {
     names.add(node.name);
@@ -218,6 +219,12 @@ export class ShapeBuilder {
 
   public unit(node: Node, name?: string, mentions?: Set<string>): void {
     const unit = { start: node.start, end: node.end, name, mentions: mentions ?? mentionsIn(node) };
+    if (this.shape.commonJs) {
+      // `this` can be the exports of a CommonJS module. `thisReads` says which reads count.
+      for (const read of thisReads(node)) {
+        unit.mentions.add(read);
+      }
+    }
     this.shape.units.push(unit);
     if (name !== undefined) {
       this.shape.declared.set(name, [...(this.shape.declared.get(name) ?? []), unit]);

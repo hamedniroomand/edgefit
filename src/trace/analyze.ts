@@ -71,6 +71,16 @@ class Analyzer {
   }
 
   #follow(name: string): void {
+    if (name === 'this') {
+      // In CommonJS, a use of `this` that cannot be read can be a use of any export.
+      for (const source of this.#shape.exports.values()) {
+        this.route(source);
+      }
+      for (const star of this.#shape.stars) {
+        merge(this.asks, star, 'all');
+      }
+      return;
+    }
     const dot = name.indexOf('.');
     if (dot > 0) {
       // `object.member`: of a module imported as a whole, only that member is used.

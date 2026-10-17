@@ -27,6 +27,7 @@ import {
   exportWrittenInto,
   joinProperties,
   resolveOwnReads,
+  resolveThisReads,
 } from './cjs-own-exports.ts';
 import type { WriteInto } from './cjs-own-exports.ts';
 import { moduleExportsValue, selfReach } from './cjs-values.ts';
@@ -103,6 +104,7 @@ class CommonJsReader {
     for (const write of this.#writesInto) {
       addWriteInto(this.#builder, write);
     }
+    resolveThisReads(shape);
     // resolveOwnReads needs moduleExports, so it runs after settle(); a resolved read never counts
     // as a use for settle().
     resolveOwnReads(shape);

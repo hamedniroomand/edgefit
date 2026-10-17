@@ -69,6 +69,40 @@ export function joinProperties(shape: ModuleShape): void {
   }
 }
 
+/**
+ * Turns each `this.key` that `thisReads` found into a read of the export `key`. A key that is not
+ * an export reads nothing, unless a star re-export can give it: then it counts as any use of
+ * `this`, which the analyzer follows to every export and every star module. A read in a function
+ * (`fn:this`) counts only when the unit is an export.
+ */
+export function resolveThisReads(shape: ModuleShape): void {
+  const exported = new Set(
+    [...shape.exports.values()].flatMap(source => ('local' in source ? [source.local] : [])),
+  );
+  for (const unit of shape.units) {
+    // A Set visits the entries that the loop adds, so `fn:this.key` becomes `this.key` and then
+    // `exports.key` in one pass.
+    for (const mention of unit.mentions) {
+      if (mention.startsWith('fn:')) {
+        unit.mentions.delete(mention);
+        if (unit.name !== undefined && exported.has(unit.name)) {
+          unit.mentions.add(mention.slice('fn:'.length));
+        }
+      }
+      if (!mention.startsWith('this.')) {
+        continue;
+      }
+      unit.mentions.delete(mention);
+      const key = mention.slice('this.'.length);
+      if (shape.exports.has(key)) {
+        unit.mentions.add(`exports.${key}`);
+      } else if (shape.stars.length > 0) {
+        unit.mentions.add('this');
+      }
+    }
+  }
+}
+
 /** The name that a read of the export `name` stands for, or `undefined` when it is not known. */
 function ownExport(shape: ModuleShape, name: string): string | undefined {
   if (shape.moduleExports !== undefined) {
