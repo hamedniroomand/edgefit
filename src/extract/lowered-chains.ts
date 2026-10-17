@@ -1,97 +1,11 @@
 import { visitorKeys } from 'oxc-parser';
 import type { Node } from 'oxc-parser';
 
-import { chainTemps, isEquality, isInequality } from './ast.ts';
+import { chainTemps, staticKey } from './ast.ts';
 import type { NodeOf } from './ast.ts';
-
-/** The operand under parentheses only. `strip` would also pass a temp that an earlier form marked. */
-function parens(node: Node): Node {
-  let inner = node;
-  while (inner.type === 'ParenthesizedExpression') {
-    inner = inner.expression;
-  }
-  return inner;
-}
-
-type Temp = { name: string; node: Node; assignment: NodeOf<'AssignmentExpression'> };
-
-/** `(t = V)`: the temp `t` that a compiler sets to the value it tests. `node` keeps its parentheses. */
-function tempOf(node: Node): Temp | undefined {
-  const assignment = parens(node);
-  return assignment.type === 'AssignmentExpression' &&
-    assignment.operator === '=' &&
-    assignment.left.type === 'Identifier'
-    ? { name: assignment.left.name, node, assignment }
-    : undefined;
-}
-
-/** `null` or `void 0`, the two nullish values a compiler writes. The name `undefined` can be shadowed, so it does not count. */
-function nullishOf(node: Node): 'null' | 'undefined' | undefined {
-  const inner = parens(node);
-  if (inner.type === 'Literal' && inner.value === null) {
-    return 'null';
-  }
-  const isVoid =
-    inner.type === 'UnaryExpression' &&
-    inner.operator === 'void' &&
-    parens(inner.argument).type === 'Literal';
-  return isVoid ? 'undefined' : undefined;
-}
-
-type Compare = { operand: Node; nullish: 'null' | 'undefined'; strict: boolean; equal: boolean };
-
-/** `x == null`, `null === x` and the like: the operand that is compared with a nullish value. */
-function compareOf(node: Node): Compare | undefined {
-  const inner = parens(node);
-  if (
-    inner.type !== 'BinaryExpression' ||
-    (!isEquality(inner.operator) && !isInequality(inner.operator))
-  ) {
-    return undefined;
-  }
-  const right = nullishOf(inner.right);
-  const [operand, nullish] =
-    right === undefined ? [inner.right, nullishOf(inner.left)] : [inner.left, right];
-  return nullish === undefined
-    ? undefined
-    : { operand, nullish, strict: inner.operator.length === 3, equal: isEquality(inner.operator) };
-}
-
-type Test = { temp: Temp; present: boolean };
-
-/**
- * The test of a compiled form: `(t = V) == null` (esbuild), or the strict pair
- * `(t = V) === null || t === void 0` (TypeScript, Babel). `present` is true for `!=` and for the
- * pair with `!==` and `&&`. A strict compare alone is not the form: `(t = V) === null` lets an
- * `undefined` value through to `t.y`.
- */
-function testOf(node: Node): Test | undefined {
-  const inner = parens(node);
-  const single = compareOf(inner);
-  if (single !== undefined) {
-    const temp = tempOf(single.operand);
-    return temp === undefined || single.strict ? undefined : { temp, present: !single.equal };
-  }
-  if (inner.type !== 'LogicalExpression' || (inner.operator !== '||' && inner.operator !== '&&')) {
-    return undefined;
-  }
-  const present = inner.operator === '&&';
-  const first = compareOf(inner.left);
-  const second = compareOf(inner.right);
-  const temp = first === undefined ? undefined : tempOf(first.operand);
-  const paired =
-    first !== undefined &&
-    second !== undefined &&
-    first.strict &&
-    second.strict &&
-    first.equal !== present &&
-    second.equal !== present &&
-    first.nullish !== second.nullish;
-  const name = second === undefined ? undefined : parens(second.operand);
-  return temp !== undefined && paired && name?.type === 'Identifier' && name.name === temp.name
-    ? { temp, present }
-    : undefined;
-}
+import { isTemp, nullishOf, parens, tempOf, testOf } from './lowered-tests.ts';
+import type { Temp } from './lowered-tests.ts';
+import { isStatementUse } from './statement-use.ts';
 
 /** The object `W` of the member `V = W.y`, also when `V` is the chain of an inner form. */
 function objectOf(value: Node): Node | undefined {
@@ -114,16 +28,11 @@ function isObjectOf(thisArg: Node | undefined, value: Node): boolean {
     return false;
   }
   const temp = tempOf(object);
-  if (temp !== undefined && temp.name === name.name) {
+  if (temp?.assignment !== undefined && temp.name === name.name) {
     chainTemps.add(temp.assignment);
     return true;
   }
   return object.type === 'Identifier' && object.name === name.name;
-}
-
-function isTemp(node: Node, temp: Temp): boolean {
-  const inner = parens(node);
-  return inner.type === 'Identifier' && inner.name === temp.name;
 }
 
 /** Whether `callee` is `t.call`, with `t` the temp of the form. */
@@ -163,7 +72,11 @@ function rebase(use: Node, temp: Temp): boolean {
     inner.object = temp.node as typeof inner.object;
   } else if (inner.type === 'CallExpression') {
     const [thisArg, ...rest] = inner.arguments;
-    if (!isCallOf(inner.callee, temp) || !isObjectOf(thisArg, temp.assignment.right)) {
+    if (
+      temp.assignment === undefined ||
+      !isCallOf(inner.callee, temp) ||
+      !isObjectOf(thisArg, temp.assignment.right)
+    ) {
       return rebase(inner.callee, temp);
     }
     inner.callee = temp.node as typeof inner.callee;
@@ -172,7 +85,9 @@ function rebase(use: Node, temp: Temp): boolean {
     return false;
   }
   inner.optional = true;
-  chainTemps.add(temp.assignment);
+  if (temp.assignment !== undefined) {
+    chainTemps.add(temp.assignment);
+  }
   return true;
 }
 
@@ -216,6 +131,39 @@ function calledChain(node: NodeOf<'CallExpression'>): Node | undefined {
   return node;
 }
 
+/** Whether `value` is `x.y` or `x.y.z` on the plain name of `temp`, with static keys and no call. `rebase` refuses `x` alone. */
+function isMemberChain(value: Node, temp: Temp): boolean {
+  let inner = parens(value);
+  while (inner.type === 'MemberExpression') {
+    if (inner.optional || staticKey(inner.property, inner.computed) === undefined) {
+      return false;
+    }
+    inner = parens(inner.object);
+  }
+  return isTemp(inner, temp);
+}
+
+/**
+ * `x == null ? void 0 : x.y` on a plain name `x`, as `x?.y`. Only a statement that reads a member of
+ * the value or calls it counts, as in `(x == null ? void 0 : x.y).z;`: that read throws when `x` is
+ * missing. In any other place the compare stays a check, as a hand-written one is.
+ */
+function plainChain(
+  node: NodeOf<'ConditionalExpression'>,
+  test: { temp: Temp; present: boolean },
+  ancestors: readonly Node[],
+): Node | undefined {
+  const [value, fallback] = test.present
+    ? [node.consequent, node.alternate]
+    : [node.alternate, node.consequent];
+  return nullishOf(fallback) === 'undefined' &&
+    isMemberChain(value, test.temp) &&
+    isStatementUse(node, ancestors) &&
+    rebase(value, test.temp)
+    ? chainOf(value, node)
+    : undefined;
+}
+
 /**
  * The source form of a compiled `V?.y` or `V ?? y`, or `undefined` when `node` is not one:
  * `(t = V) == null ? void 0 : t.y` gives `(t = V)?.y`, `(t = V) != null ? t : y` gives
@@ -223,13 +171,16 @@ function calledChain(node: NodeOf<'CallExpression'>): Node | undefined {
  * `(V?.y).call(t)` gives `(V?.y)()`. The assignment stays, so `t` is still set, and passes its
  * value on.
  */
-function restored(node: Node): Node | undefined {
+function restored(node: Node, ancestors: readonly Node[]): Node | undefined {
   if (node.type === 'CallExpression') {
     return calledChain(node);
   }
   if (node.type === 'LogicalExpression') {
     const test = node.operator === '&&' ? testOf(node.left) : undefined;
-    return test?.present === true && rebase(node.right, test.temp)
+    // A hand-written `x != null && x.y()` on a plain name is a check, so only a temp counts.
+    return test?.present === true &&
+      test.temp.assignment !== undefined &&
+      rebase(node.right, test.temp)
       ? chainOf(node.right, node)
       : undefined;
   }
@@ -239,6 +190,9 @@ function restored(node: Node): Node | undefined {
   const test = testOf(node.test);
   if (test === undefined) {
     return undefined;
+  }
+  if (test.temp.assignment === undefined) {
+    return plainChain(node, test, ancestors);
   }
   const [value, fallback] = test.present
     ? [node.consequent, node.alternate]
@@ -268,19 +222,21 @@ const isNode = (value: unknown): value is Node =>
  * than ES2020, in place, so the walk reads the source form. Children first, so that nested
  * chains compose. Returns the node, or the node that replaces it.
  */
-export function restoreChains(node: Node): Node {
+export function restoreChains(node: Node, ancestors: Node[] = []): Node {
   const record = node as unknown as Record<string, unknown>;
+  ancestors.push(node);
   for (const key of visitorKeys[node.type] ?? []) {
     const value = record[key];
     if (Array.isArray(value)) {
       for (const [index, item] of value.entries()) {
         if (isNode(item)) {
-          value[index] = restoreChains(item);
+          value[index] = restoreChains(item, ancestors);
         }
       }
     } else if (isNode(value)) {
-      record[key] = restoreChains(value);
+      record[key] = restoreChains(value, ancestors);
     }
   }
-  return restored(node) ?? node;
+  ancestors.pop();
+  return restored(node, ancestors) ?? node;
 }
