@@ -1,3 +1,4 @@
+import { memberPath } from '@/data/compat-index.ts';
 import { findSuggestion } from '@/data/suggestions.ts';
 import type { SuggestionData } from '@/data/suggestions.ts';
 import { findUnreached } from '@/data/unreached.ts';
@@ -88,10 +89,14 @@ function isIgnored(finding: Finding, rules: readonly IgnoreRule[]): boolean {
 
 /**
  * Drops `node:fs` when the same file also has a finding for a member such as `node:fs.watch`,
- * so an unsupported module is not reported twice for one use. A guarded member hides the module
- * only when the module is unknown, because the data says nothing about either.
+ * so an unsupported module is not reported twice for one use. A guarded member hides an unknown
+ * module, because the data says nothing about either. It does not hide an unknown member, such as
+ * `v8.startupSnapshot`, because a use of that member can throw or pass the member on.
  */
-function withoutRedundantModules(findings: readonly Finding[]): Finding[] {
+function withoutRedundantModules(
+  findings: readonly Finding[],
+  moduleRoots: ReadonlySet<Finding>,
+): Finding[] {
   return findings.filter(
     finding =>
       !findings.some(
@@ -99,7 +104,9 @@ function withoutRedundantModules(findings: readonly Finding[]): Finding[] {
           other !== finding &&
           other.location.file === finding.location.file &&
           other.category === finding.category &&
-          (other.guarded !== true || finding.guarded === true || finding.category === 'unknown') &&
+          (other.guarded !== true ||
+            finding.guarded === true ||
+            (finding.category === 'unknown' && moduleRoots.has(finding))) &&
           other.api.startsWith(`${finding.api}.`),
       ),
   );
@@ -227,11 +234,17 @@ export function collectFindings(
   modules: readonly ModuleUsages[],
   options: FindingOptions,
 ): FindingSet {
-  const raw = modules.flatMap(module =>
-    withoutRedundantModules(
-      module.usages.flatMap(usage => toFinding(module, usage, options) ?? []),
-    ),
-  );
+  const raw = modules.flatMap(module => {
+    const moduleRoots = new Set<Finding>();
+    const findings = module.usages.flatMap(usage => {
+      const finding = toFinding(module, usage, options);
+      if (finding !== undefined && usage.api !== undefined && memberPath(usage.api).length === 0) {
+        moduleRoots.add(finding);
+      }
+      return finding ?? [];
+    });
+    return withoutRedundantModules(findings, moduleRoots);
+  });
   const kept = raw.filter(finding => !isIgnored(finding, options.ignore));
   return {
     findings: group(kept.filter(finding => finding.guarded !== true)).toSorted(compareFindings),

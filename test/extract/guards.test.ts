@@ -15,7 +15,10 @@ describe('usages guarded by an API check', () => {
     expect(usagesOf(`${fs}if (typeof fs.watch !== 'undefined') fs.watch('.');`)).toEqual(
       guardedWatch,
     );
-    expect(usagesOf(`${fs}if ('watch' in fs) fs.watch('.');`)).toEqual(guardedWatch);
+    expect(usagesOf(`${fs}if ('watch' in fs) fs.watch('.');`)).toEqual([
+      'api node:fs',
+      ...guardedWatch,
+    ]);
     expect(usagesOf(`${fs}if (fs.watch !== undefined) fs.watch('.');`)).toEqual(guardedWatch);
   });
 
@@ -151,7 +154,10 @@ describe('a check on a different API', () => {
   it('does not guard through &&, ?:, in, typeof or ?.()', () => {
     expect(usagesOf(`${fs}fs.watchFile && fs.watch('.');`)).toEqual(plainWatch);
     expect(usagesOf(`${fs}const stop = fs.watchFile ? fs.watch('.') : null;`)).toEqual(plainWatch);
-    expect(usagesOf(`${fs}if ('watchFile' in fs) fs.watch('.');`)).toEqual(plainWatch);
+    expect(usagesOf(`${fs}if ('watchFile' in fs) fs.watch('.');`)).toEqual([
+      'api node:fs',
+      ...plainWatch,
+    ]);
     expect(usagesOf(`${fs}if (typeof fs.watchFile === 'function') fs.watch('.');`)).toEqual(
       plainWatch,
     );
