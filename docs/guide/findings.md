@@ -134,6 +134,8 @@ These checks are understood:
 - `x.y?.()`, and `if (x.y?.z)` or `if (x.y?.z?.())`, which also protect `x.y`
 - a guard clause such as `if (!x.y) throw …` or `return`, for the rest of the block
 
+A minifier writes `typeof x.y === 'undefined'` as `typeof x.y > "u"`. It writes `typeof x.y !== 'undefined'` as `typeof x.y < "u"`. edgefit reads both as the long form. It reads them with the sides swapped too: `"u" < typeof x.y` means `=== 'undefined'`, and `"u" > typeof x.y` means `!== 'undefined'`.
+
 A read that is an operand of `||` or `??` is a check too, as in `const f = util.getCallSites ?? util.getCallSite`. A member that the target lacks gives no finding, because it gives `undefined` and the operator moves on. A member that exists and throws is still a finding, because the value goes on. The right operand counts when the left one is an API too. A value that is called in place, such as `(x.y || z)()`, is a use.
 
 A read with `?.`, such as `x?.y`, gives `undefined` when `x` is missing, so it is a check. These uses are the exception. They throw a TypeError for `undefined`, so they are uses, the same as without `?.`:
@@ -225,6 +227,8 @@ These checks name a runtime:
 - `process.versions.deno` and `process.versions.bun`
 - `navigator.userAgent === 'Cloudflare-Workers'`, and `navigator.userAgent.startsWith('Bun')` or `.includes('Deno')`
 
+The minified form of a `typeof` check, such as `typeof Deno < "u"`, names a runtime too. See [Checks for an API](#checks-for-an-api).
+
 The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
 
 ### Checks for a global
@@ -242,7 +246,7 @@ if (!global.crypto) {
 }
 ```
 
-The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. A global that the data does not name decides nothing. On a target where the code can run, it stays a finding.
+The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding.
 
 `undefined` and `NaN` exist on every target, but a value test can see them as missing. `undefined` looks missing to each value test, also to `=== undefined` and `typeof … === 'undefined'`. `NaN` looks missing only to a truthiness test, such as `!globalThis.NaN` or `globalThis.NaN || x`. So the code that such a test runs is not guarded, see [Polyfills](#polyfills). `typeof globalThis.NaN`, `globalThis.NaN === undefined` and `globalThis.NaN ?? x` still decide the branch.
 

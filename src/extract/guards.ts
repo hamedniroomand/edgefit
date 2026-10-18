@@ -11,7 +11,7 @@ import {
   runtimeGuard,
   withoutLooksMissing,
 } from './api-guards.ts';
-import { isEquality, isInequality, strip, stringLiteral } from './ast.ts';
+import { isEquality, isInequality, minifiedTypeof, strip, stringLiteral } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import type { BindingContext } from './bindings.ts';
 import { computedKey, computedKeys } from './chain.ts';
@@ -82,18 +82,27 @@ function typeofGuard(
   if (call.type !== 'UnaryExpression' || call.operator !== 'typeof' || text === undefined) {
     return undefined;
   }
-  const equal = isEquality(node.operator) ? truth : !truth;
+  return typeIsGuard(call.argument, text, isEquality(node.operator) ? truth : !truth, context);
+}
+
+/** What the code learns when `typeof argument === text` is `equal`. */
+function typeIsGuard(
+  argument: Node,
+  text: string,
+  equal: boolean,
+  context: BindingContext,
+): Guard[] {
   // A runtime marker has a known type, so `typeof EdgeRuntime !== 'string'` says it is missing.
-  const known = markerType(call.argument, context);
+  const known = markerType(argument, context);
   if (known !== undefined && text === known) {
-    return presence(call.argument, equal, context);
+    return presence(argument, equal, context);
   }
   const exists = equal ? text !== 'undefined' : text === 'undefined';
   if (exists) {
-    return presence(call.argument, true, context);
+    return presence(argument, true, context);
   }
   // Only `typeof x === 'undefined'` says the value is missing; `!== 'string'` says nothing.
-  return equal ? withoutLooksMissing(presence(call.argument, false, context), false) : [];
+  return equal ? withoutLooksMissing(presence(argument, false, context), false) : [];
 }
 
 function comparisonGuard(
@@ -101,6 +110,10 @@ function comparisonGuard(
   truth: boolean,
   context: BindingContext,
 ): Guard[] | undefined {
+  const minified = minifiedTypeof(node);
+  if (minified !== undefined) {
+    return typeIsGuard(minified.argument, 'undefined', minified.missing === truth, context);
+  }
   if (!isEquality(node.operator) && !isInequality(node.operator)) {
     return undefined;
   }

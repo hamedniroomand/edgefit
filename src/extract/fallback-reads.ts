@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { isEquality, isInequality, stringLiteral, strip } from './ast.ts';
+import { isEquality, isInequality, minifiedTypeof, stringLiteral, strip } from './ast.ts';
 
 const isNull = (node: Node): boolean => node.type === 'Literal' && node.value === null;
 const isUndefined = (node: Node): boolean =>
@@ -14,6 +14,10 @@ function testsMissing(test: Node, isName: (node: Node) => boolean): boolean {
   }
   if (inner.type !== 'BinaryExpression') {
     return false;
+  }
+  const minified = minifiedTypeof(inner);
+  if (minified !== undefined) {
+    return minified.missing && isName(strip(minified.argument));
   }
   const [left, right] = [strip(inner.left), strip(inner.right)];
   if (
@@ -47,6 +51,10 @@ export function testsPresent(test: Node, isName: (node: Node) => boolean): boole
   }
   if (inner.type !== 'BinaryExpression') {
     return isName(inner);
+  }
+  const minified = minifiedTypeof(inner);
+  if (minified !== undefined) {
+    return !minified.missing && isName(strip(minified.argument));
   }
   const [left, right] = [strip(inner.left), strip(inner.right)];
   if (
