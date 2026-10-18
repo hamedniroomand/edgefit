@@ -245,3 +245,28 @@ describe('renderIssue with many APIs', () => {
     expect(body).toContain('`drift.json` artifacts');
   });
 });
+
+describe('driftFor and modules recorded as present', () => {
+  const present = { status: 'supported', note: '', source: '' };
+  const drift = driftFor({
+    runtime: 'workerd',
+    pinned: '1',
+    latest: '2',
+    outcomes: { v8: 'present', wasi: 'missing', 'fs.cp': 'present', 'fs.F_OK': 'missing' },
+    mocked: {},
+    overrides: { v8: present, wasi: present, 'fs.F_OK': { ...present, missingHarmless: true } },
+  });
+
+  it('does not count a present module as newly present, and lists one that is gone', () => {
+    expect(drift.nowPresent).toEqual(['fs.cp']);
+    // A supported member that is missing on purpose is not a module that stopped loading.
+    expect(drift.modulesGone).toEqual(['wasi']);
+  });
+
+  it('reports a gone module in the issue', () => {
+    const { body, drift: changed } = renderIssue([drift]);
+    expect(changed).toBe(true);
+    expect(body).toContain('**Recorded as loading, but missing in the latest release**');
+    expect(body).toContain('- `wasi`');
+  });
+});

@@ -206,3 +206,33 @@ describe('a member that the dump does not list', () => {
     expect(withFallback.lookup({ module: 'n', path: ['leaf', 'web'] }).category).toBeUndefined();
   });
 });
+
+describe('a module recorded as present', () => {
+  it('has a result for the module itself, and not for its members', () => {
+    expect(statusOf('v8')).toBe('supported');
+    expect(statusOf('v8', 'getHeapStatistics')).toBe('uncovered');
+    expect(statusOf('vm')).toBe('supported');
+    // A member entry is more specific than the module, so it still wins.
+    expect(statusOf('vm', 'runInNewContext')).toBe('unsupported');
+    expect(data.hasProblemsBelow({ module: 'v8', path: [] })).toBe(true);
+  });
+});
+
+describe('an exact entry', () => {
+  const source = { provider: 'test', version: '1' };
+  const index = new CompatIndex(
+    {
+      baseline: { fs: { readFile: 'function' } },
+      runtime: { fs: { readFile: 'function' } },
+      source,
+    },
+    [{ target: 'workerd', module: 'zz', path: [], status: 'supported', exact: true, source }],
+  );
+
+  it('applies to its API alone and leaves what is below it to the tree', () => {
+    expect(index.lookup({ module: 'zz', path: [] }).status).toBe('supported');
+    expect(index.lookup({ module: 'zz', path: ['x'] }).status).toBe('uncovered');
+    expect(index.hasProblemsBelow({ module: 'zz', path: [] })).toBe(true);
+    expect(index.hasProblemsBelow({ module: 'zz', path: ['x'] })).toBe(true);
+  });
+});

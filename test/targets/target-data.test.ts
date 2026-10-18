@@ -49,6 +49,7 @@ const files = {
   },
   'overrides/deno.json': {
     modules: { child_process: { ...override('supported', 'implemented'), except: [] } },
+    present: { zz: { note: 'loads', source: 'zz.md' } },
     apis: {},
   },
   'overrides/deno-deploy.json': {
@@ -116,5 +117,16 @@ describe('target data globals', () => {
       },
     });
     expect(loadTargetData('deno', [], options).globals.has('BroadcastChannel')).toBe(true);
+  });
+});
+
+describe('target data with a module recorded as present', () => {
+  const { index } = loadTargetData('deno', [], dataDirectory);
+
+  it('supports the module itself, with its source, and leaves its members uncovered', () => {
+    const module = index.lookup({ module: 'zz', path: [] });
+    expect(module.status).toBe('supported');
+    expect(module.source).toBe('https://example.com/deno/zz.md');
+    expect(index.lookup({ module: 'zz', path: ['x'] }).status).toBe('uncovered');
   });
 });

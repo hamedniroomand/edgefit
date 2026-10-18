@@ -54,3 +54,10 @@ describe('buildSpec drift against the Node baseline', () => {
     expect(lookups('bun')).toContain('*globals*.caches');
   });
 });
+
+describe('buildSpec and modules recorded as present', () => {
+  it('looks up, and never calls, each module', () => {
+    expect(buildSpec('workerd').apis).toContainEqual({ api: 'v8', lookup: true });
+    expect(buildSpec('bun').apis).toContainEqual({ api: 'wasi', lookup: true });
+  });
+});

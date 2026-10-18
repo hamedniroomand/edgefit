@@ -70,7 +70,7 @@ edgefit could not determine what is used. Typical causes:
 
 - `require(name)` or `import(name)` with a computed module name
 - computed member access on a module that has unsupported members, such as `fs[method]`
-- a module the compatibility data does not cover
+- a module that the compatibility data does not list. An exception: the curated data can record that the module loads. A member of such a module is still not covered, unless another entry covers it
 - a `jsr:` import on Deno
 - an import of an optional peer dependency that is not installed. Edgefit does not install peers, so what the peer provides is not checked
 - a `require('module')` inside a function when the module is not installed. The finding names the module and the call location. A top-level load of a missing module still stops the check

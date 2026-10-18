@@ -74,9 +74,12 @@ export function buildSpec(
         ...webMissingApis(runtime).filter(api => !inBaseline(baseline, api)),
       ]
     : [];
+  // A bare module name is a namespace, which cannot be called, so it is only looked up.
+  const probeOf = api =>
+    api.includes('.') ? { api, kind: kinds.get(api) } : { api, lookup: true };
   return {
     apis: [
-      ...[...names].sort().map(api => ({ api, kind: kinds.get(api) })),
+      ...[...names].sort().map(probeOf),
       ...[...new Set(lookups)].filter(api => !names.has(api)).map(api => ({ api, lookup: true })),
     ],
     mocked: mocked ? Object.keys(overrides).filter(api => overrides[api].status === 'mocked') : [],
