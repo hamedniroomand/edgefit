@@ -9,7 +9,7 @@ import type { ApiRef, Usage } from '@/types.ts';
 
 import { dropFollowed, followAliases } from './aliases.ts';
 import { NativePackages } from './native-packages.ts';
-import { followStrings } from './string-imports.ts';
+import { followChecks, followStrings } from './string-imports.ts';
 import { uncheckedImports } from './unchecked-imports.ts';
 
 export function toPosix(file: string): string {
@@ -84,6 +84,7 @@ function extractOne(
   source: string,
   importedModules?: ReadonlyMap<string, ApiRef>,
   importedStrings?: ReadonlyMap<string, string>,
+  importedChecks?: ExtractedModule['checks'],
 ): ExtractedModule {
   return extractModule(toPosix(file), source, {
     globals,
@@ -96,6 +97,7 @@ function extractOne(
     nativeSpecifiers: native.specifiers(file, module),
     importedModules,
     importedStrings,
+    importedChecks,
   });
 }
 
@@ -147,14 +149,17 @@ export function extractScripts(
   const firstFound = new Map(first.map(({ file, found }) => [file, found]));
   const aliases = options.trace ? followAliases(graph, firstFound) : undefined;
   const strings = options.trace ? followStrings(graph, firstFound) : undefined;
+  const checks = options.trace ? followChecks(graph, firstFound) : undefined;
   return first.map(({ file, module, source, found, natives }) => {
     const seeds = aliases?.seeds.get(file);
     const texts = strings?.get(file);
+    const held = checks?.get(file);
     const again =
       seeds !== undefined ||
       texts !== undefined ||
+      held !== undefined ||
       native.specifiers(file, module).size !== natives;
-    const second = again ? extractOne(context, file, module, source, seeds, texts) : found;
+    const second = again ? extractOne(context, file, module, source, seeds, texts, held) : found;
     return {
       file,
       found: withoutLoaderRequires(

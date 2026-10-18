@@ -50,6 +50,9 @@ export interface OptionGuard {
   name: string;
 }
 
+/** What a `const` that another file exports tells when it is true and when it is false. */
+export type HeldGuards = { whenTrue: readonly Guard[]; whenFalse: readonly Guard[] };
+
 export type Guard =
   | ApiGuard
   | RuntimeGuard

@@ -2,6 +2,8 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef } from '@/types.ts';
 
+import type { HeldGuards } from './guard-stack.ts';
+
 /**
  * What a name refers to: a runtime API, a `require` made by `module.createRequire`,
  * or `null` for any other declaration, which shadows globals and outer bindings.
@@ -46,6 +48,8 @@ export interface Check {
   busy: boolean;
   /** For a `let` or `var`: the block that declares it, where a write ends the check. */
   region: readonly Node[] | undefined;
+  /** For an imported name: what the file that exports it found, in place of `test`. */
+  held?: HeldGuards;
 }
 
 /** The object of an `in` test, and the scope that declares its name. */
