@@ -174,6 +174,30 @@ export function stringLiteral(node: Node): string | undefined {
   return inner.type === 'Literal' && typeof inner.value === 'string' ? inner.value : undefined;
 }
 
+/**
+ * Reads `typeof x > 'u'` (the minified `typeof x === 'undefined'`) and `typeof x < 'u'` (the
+ * minified `typeof x !== 'undefined'`), also with the sides swapped. `'undefined'` is the only
+ * `typeof` result that sorts after `'u'`. `argument` is `x`. `missing` is true when the test is
+ * true for an undefined `x`.
+ */
+export function minifiedTypeof(node: Node): { argument: Node; missing: boolean } | undefined {
+  const inner = strip(node);
+  if (inner.type !== 'BinaryExpression' || (inner.operator !== '<' && inner.operator !== '>')) {
+    return undefined;
+  }
+  const left = strip(inner.left);
+  const swapped = !(left.type === 'UnaryExpression' && left.operator === 'typeof');
+  const operand = swapped ? strip(inner.right) : left;
+  if (
+    operand.type !== 'UnaryExpression' ||
+    operand.operator !== 'typeof' ||
+    stringLiteral(swapped ? inner.left : inner.right) !== 'u'
+  ) {
+    return undefined;
+  }
+  return { argument: operand.argument, missing: (inner.operator === '>') !== swapped };
+}
+
 export function isEquality(operator: string): boolean {
   return operator === '==' || operator === '===';
 }

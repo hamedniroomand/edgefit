@@ -45,7 +45,7 @@ The weekly check reads Next's own list of kept modules, which is the same five, 
 
 Code behind one of these checks is treated as running on Vercel's Edge runtime only, and code behind the opposite check is not checked here:
 
-- `typeof EdgeRuntime` compared with `'string'` (the form [Vercel documents](https://vercel.com/docs/functions/runtimes/edge#check-if-youre-running-on-the-edge-runtime)) or with `'undefined'`, with `===` or `!==`, and `globalThis.EdgeRuntime`.
+- `typeof EdgeRuntime` compared with `'string'` (the form [Vercel documents](https://vercel.com/docs/functions/runtimes/edge#check-if-youre-running-on-the-edge-runtime)) or with `'undefined'`, with `===` or `!==`, or in the minified form `typeof EdgeRuntime < "u"`, and `globalThis.EdgeRuntime`.
 - `process.env.NEXT_RUNTIME` compared with `'edge'` or `'nodejs'`. Next.js replaces it at build time, and Next itself and many libraries built for it branch on it.
 
 ## Next.js middleware
