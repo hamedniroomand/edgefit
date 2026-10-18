@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.15.3
+
+### Patch Changes
+
+- [#343](https://github.com/hamedniroomand/edgefit/pull/343) [`af608e7`](https://github.com/hamedniroomand/edgefit/commit/af608e7cdedca6cca2f60a1928b3706a2d04f849) - Read the exports of a CommonJS module that writes them in two statements or in a chain. These forms are read:
+
+  - `module.exports.key = …` after `module.exports = name` (a function or class that the module declares and nothing else names), `= function …` or `= class …` (a class without code that runs on load). When any export of the module is used, the value and all of these exports count, because the value can reach them through `this`.
+  - `module.exports = exports = …` and `exports = module.exports = …`.
+  - `local = exports.name = function …` or `= class …` (a class without code that runs on load), with or without `const`, `let` or `var`.
+
+  These forms are not read when the module can reach its own exports through `arguments`, `caller`, `require` in any way other than a call with a string literal (such as `require(__filename)` or `require.cache`), `import()` of a value, or a load of `module` or `node:module`. The chain and the `local =` forms are also not read when the module uses `this`.
+
+  Before, edgefit counted the whole module for these forms. Files in `undici` and `jsdom` use some of them. Other mixes of writes, such as `exports.name = …` after `module.exports = …`, still count the whole module.
+
+- [#347](https://github.com/hamedniroomand/edgefit/pull/347) [`53b234c`](https://github.com/hamedniroomand/edgefit/commit/53b234c8b581b1dd8aed9239f3963fc3179a814b) - A CommonJS export that uses another export through `this` now keeps that export. Before, `exports.used = local` with `exports.other = function () { return this.used(); }` lost the use of `used`. So did `this['used']()`. Then the findings for `used` were lost when the project called `lib.other()`.
+
+  `this.name` at the top level, or in an exported function, uses the export `name`. An exported function is the value of `exports.name = function …`, the function of a getter, a method of `module.exports = { … }`, or a function that `exports.name = name` names. A prototype method, a helper that the module does not export, and a function that a getter returns do not count. Any other use of `this` there, such as `const self = this`, keeps every export. A test of `this` itself, such as the `this &&` in the helpers that tsc writes, keeps no export. `this` as the first argument of `__awaiter` or `__generator`, which tsc writes for an async function, or of `name.apply(this, …)` or `name.call(this, …)`, which Babel and SWC write, keeps no export either.
+
+- [#348](https://github.com/hamedniroomand/edgefit/pull/348) [`e04c9a8`](https://github.com/hamedniroomand/edgefit/commit/e04c9a80ef98f9705a2e4eb3cadf978fef037855) - A member that the Node data does not list, below an API that the target lacks or has with another type, now gets the finding of that API, unless the Web API data lists the member or an API above it. For example, `navigator.locks.zzzq()` on workerd is now `unsupported`, because `navigator.locks` does not exist there. Before, edgefit gave no finding for it. The detail line says `is below an API that does not exist on the target`. A member below a leaf of the Node data, or below its depth limit, already got the result of the API above it. Its detail line now also starts with `is below an API that`. Below an API that the target has, the Node data still gives no finding for such a member.
+
+- [#349](https://github.com/hamedniroomand/edgefit/pull/349) [`b7454cd`](https://github.com/hamedniroomand/edgefit/commit/b7454cdbccfea4263afca66e05520cbb732efaf9) - A statement that only reads a member of a compiled chain on a plain name, or calls it directly, is now a use. For example, `(BroadcastChannel == null ? void 0 : BroadcastChannel.prototype).x;` throws when `BroadcastChannel` is missing, the same as `(BroadcastChannel?.prototype).x;`. Before, edgefit read the compare as a guard of the whole statement. A statement that is a list of such reads joined with commas, as minified code writes it, counts too. A read in a declaration, a `return`, an argument or a test, a call through `.call` or `.apply`, and every other form on a plain name keep their result.
+
 ## 0.15.2
 
 ### Patch Changes
