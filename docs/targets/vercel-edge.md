@@ -1,4 +1,8 @@
-# Vercel Edge
+---
+description: 'Vercel Edge runtime compatibility with edgefit, experimental: Node.js modules Vercel allows, Next.js middleware, and how process and require are handled.'
+---
+
+# Vercel Edge runtime compatibility
 
 Target name: `vercel-edge`. **Experimental.**
 

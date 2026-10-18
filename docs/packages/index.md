@@ -1,8 +1,9 @@
 ---
-title: Package compatibility
+description: 'npm package compatibility on Cloudflare Workers, Bun and Deno: popular packages checked with edgefit package from every public entry point.'
+title: npm package compatibility on Cloudflare Workers, Bun and Deno
 ---
 
-# Package compatibility
+# npm package compatibility on Cloudflare Workers, Bun and Deno
 
 Which popular npm packages pass edgefit's static check on Cloudflare Workers, Bun and Deno. Each package is installed without running its scripts, and every public entry point is checked with all of its exports used.
 

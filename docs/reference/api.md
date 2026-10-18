@@ -1,3 +1,7 @@
+---
+description: 'edgefit JavaScript API: check, checkPackage, loadConfig, formatReport, countLevels, defineConfig, EdgefitError and the exported types.'
+---
+
 # JavaScript API
 
 Everything the CLI does is available from code. The package is ESM only.

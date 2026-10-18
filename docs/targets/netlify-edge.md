@@ -1,4 +1,8 @@
-# Netlify Edge Functions
+---
+description: 'Netlify Edge Functions compatibility with edgefit: the Deno data, the entry and import map read from netlify.toml, runtime checks and what is not checked.'
+---
+
+# Netlify Edge Functions compatibility
 
 Target name: `netlify-edge`.
 

@@ -1,3 +1,7 @@
+---
+description: 'edgefit FAQ: npm errors, Nitro and Nuxt builds, packages you never imported, why wrangler builds but edgefit reports errors, and wrong findings.'
+---
+
 # FAQ
 
 ## `npx edgefit` fails with EBADDEVENGINES

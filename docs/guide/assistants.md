@@ -1,3 +1,7 @@
+---
+description: 'Use edgefit with a coding assistant: what to run, how to read the output, exit codes and findings, and instructions to put in your project.'
+---
+
 # Use with a coding assistant
 
 A coding assistant can run edgefit and act on the result. This page tells the assistant, and the person who sets it up, what to run and how to read the output.

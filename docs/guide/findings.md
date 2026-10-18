@@ -1,3 +1,7 @@
+---
+description: 'How to read an edgefit finding: the API, the package, the file, the import chain, the category, the suggested fix, guarded usages and clean runs.'
+---
+
 # Reading findings
 
 A finding is one API, used in one package, that the target does not fully support.

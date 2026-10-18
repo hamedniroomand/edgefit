@@ -1,3 +1,7 @@
+---
+description: 'edgefit suggested fixes: how they work and how to add, correct or replace an entry or a setting hint in the data file.'
+---
+
 # Suggested fixes
 
 A finding says what is wrong. A suggestion says what to do about it, and it appears in every report format: the `fix:` line in the text report, `suggestion` in the [JSON report](/reference/json#finding), the GitHub annotation and the pull request comment.

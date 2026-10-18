@@ -1,4 +1,8 @@
-# Bun
+---
+description: 'Bun Node.js compatibility with edgefit: what the data covers, how your pinned Bun version is used and which export conditions are resolved.'
+---
+
+# Bun Node.js compatibility
 
 Target name: `bun`.
 

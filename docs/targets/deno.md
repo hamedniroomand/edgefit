@@ -1,4 +1,8 @@
-# Deno and Deno Deploy
+---
+description: 'Deno and Deno Deploy Node.js compatibility with edgefit: what the data covers, how import maps and npm: specifiers apply, and what differs on Deno Deploy.'
+---
+
+# Deno and Deno Deploy Node.js compatibility
 
 Target names: `deno` and `deno-deploy`.
 

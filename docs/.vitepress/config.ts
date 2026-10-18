@@ -8,7 +8,7 @@ const repository = 'https://github.com/hamedniroomand/edgefit';
 const site = 'https://edgefit.kitdev.space';
 const title = 'edgefit';
 const description =
-  'Find out whether your project and its dependencies will run on Cloudflare Workers, Bun, Deno, Netlify and Vercel Edge before you deploy.';
+  'A Node.js compatibility checker for Cloudflare Workers, Bun, Deno, Netlify and Vercel Edge. Check your code and every npm package it imports before you deploy.';
 
 function link(name: string, text: string, path: string): DefaultTheme.SidebarItem {
   return { text: icon(name) + text, link: path };
@@ -44,13 +44,25 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#f06a2f' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:site_name', content: title }],
-    ['meta', { property: 'og:title', content: 'edgefit: will it run on the edge?' }],
+    [
+      'meta',
+      {
+        property: 'og:title',
+        content: 'edgefit · Node.js compatibility checker for edge runtimes',
+      },
+    ],
     ['meta', { property: 'og:description', content: description }],
     ['meta', { property: 'og:image', content: `${site}/og-image.png` }],
     ['meta', { property: 'og:image:width', content: '1200' }],
     ['meta', { property: 'og:image:height', content: '630' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-    ['meta', { name: 'twitter:title', content: 'edgefit: will it run on the edge?' }],
+    [
+      'meta',
+      {
+        name: 'twitter:title',
+        content: 'edgefit · Node.js compatibility checker for edge runtimes',
+      },
+    ],
     ['meta', { name: 'twitter:description', content: description }],
     ['meta', { name: 'twitter:image', content: `${site}/og-image.png` }],
     [
@@ -103,7 +115,7 @@ export default defineConfig({
           text: 'More',
           items: [
             link('shield-check', 'Status', '/guide/status'),
-            link('package', 'Checking packages', '/guide/packages'),
+            link('package', "Check an npm package's compatibility", '/guide/packages'),
             link('triangle-alert', 'Limitations', '/guide/limitations'),
             link('circle-alert', 'FAQ', '/guide/faq'),
           ],
@@ -114,11 +126,11 @@ export default defineConfig({
           text: 'Targets',
           items: [
             link('database', 'How results are computed', '/targets/'),
-            link('cloud', 'Cloudflare Workers', '/targets/workerd'),
-            link('zap', 'Bun', '/targets/bun'),
-            link('globe', 'Deno and Deno Deploy', '/targets/deno'),
-            link('network', 'Netlify Edge Functions', '/targets/netlify-edge'),
-            link('layers', 'Vercel Edge', '/targets/vercel-edge'),
+            link('cloud', 'Cloudflare Workers Node.js compatibility', '/targets/workerd'),
+            link('zap', 'Bun Node.js compatibility', '/targets/bun'),
+            link('globe', 'Deno and Deno Deploy Node.js compatibility', '/targets/deno'),
+            link('network', 'Netlify Edge Functions compatibility', '/targets/netlify-edge'),
+            link('layers', 'Vercel Edge runtime compatibility', '/targets/vercel-edge'),
           ],
         },
       ],

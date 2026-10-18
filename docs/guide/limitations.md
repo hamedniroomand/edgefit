@@ -1,3 +1,7 @@
+---
+description: 'What edgefit does not check: guards it does not understand, type-only imports, unknown options, data age, assumed settings and framework build output.'
+---
+
 # Limitations
 
 edgefit is a static analysis tool, and it is honest about what that means. This page lists what it does not do today, so you know where to look yourself. For what it does cover, and against which versions, see [Status](/guide/status).

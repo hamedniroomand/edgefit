@@ -1,3 +1,7 @@
+---
+description: 'edgefit architecture: the five stages of a check, the folder for each one, where the data lives and the design rules.'
+---
+
 # Architecture
 
 A check runs in five stages. Each has its own folder under `src`.

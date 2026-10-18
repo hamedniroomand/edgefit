@@ -1,3 +1,7 @@
+---
+description: 'edgefit compatibility data: where it lives, how override files and runtime probes work, and how to bump a data source.'
+---
+
 # Compatibility data
 
 The quality of edgefit's results is the quality of its data. This page explains where the data lives, how to change it, and how it is kept honest.

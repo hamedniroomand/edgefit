@@ -1,3 +1,7 @@
+---
+description: 'Run your first Node.js compatibility check with edgefit, for example on Cloudflare Workers, Bun or Deno: install, check, read the report and the exit codes.'
+---
+
 # Getting started
 
 This page takes you from nothing to a first report in a couple of minutes.

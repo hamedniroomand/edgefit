@@ -1,13 +1,15 @@
 ---
+description: 'A Node.js compatibility checker for Cloudflare Workers, Bun, Deno, Netlify and Vercel Edge. Check your code and every npm package it imports before you deploy.'
 layout: home
 
 hero:
   name: edgefit
   text: Know it runs on the edge before you deploy.
   tagline: >-
-    edgefit follows your code and every dependency from the entry point and
-    tells you which Node and Web APIs Cloudflare Workers, Bun, Deno, Netlify or Vercel
-    Edge will not run, down to the package, the line and the import chain.
+    A Node.js compatibility checker for Cloudflare Workers, Bun, Deno, Netlify and Vercel Edge.
+    edgefit follows your code and every npm package from the entry point and
+    tells you which Node and Web APIs the runtime will not run, down to the
+    package, the line and the import chain.
   image:
     src: /hero.svg
     alt: edgefit
@@ -88,31 +90,31 @@ Postgres client, a Nitro build) installed from npm.
 
 <CardGroup :cols="3">
 
-<Card title="Cloudflare Workers" icon="cloud" to="/targets/workerd">
+<Card title="Cloudflare Workers Node.js compatibility" icon="cloud" to="/targets/workerd">
 
 `workerd`. Reads your wrangler compatibility date and flags.
 
 </Card>
 
-<Card title="Bun" icon="zap" to="/targets/bun">
+<Card title="Bun Node.js compatibility" icon="zap" to="/targets/bun">
 
 `bun`. Warns when your project pins an older Bun than the data.
 
 </Card>
 
-<Card title="Deno and Deno Deploy" icon="globe" to="/targets/deno">
+<Card title="Deno and Deno Deploy Node.js compatibility" icon="globe" to="/targets/deno">
 
 `deno` and `deno-deploy`. Applies your import map and `npm:` specifiers.
 
 </Card>
 
-<Card title="Netlify Edge Functions" icon="network" to="/targets/netlify-edge">
+<Card title="Netlify Edge Functions compatibility" icon="network" to="/targets/netlify-edge">
 
 `netlify-edge`. The Deno data, with the entry and import map read from `netlify.toml`.
 
 </Card>
 
-<Card title="Vercel Edge" icon="layers" to="/targets/vercel-edge">
+<Card title="Vercel Edge runtime compatibility" icon="layers" to="/targets/vercel-edge">
 
 `vercel-edge`, experimental. Built from Vercel's documented list of allowed modules.
 

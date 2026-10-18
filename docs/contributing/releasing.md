@@ -1,3 +1,7 @@
+---
+description: 'Releasing edgefit: how npm publishes from a version tag with trusted publishing, for the first and every later release.'
+---
+
 # Releasing
 
 `edgefit` is published to npm by `.github/workflows/release.yml` when a version tag such as `v0.3.0` is pushed. Moving the action's major tag (`v0`) does not start a release, because only `v*.*.*` tags trigger it. The

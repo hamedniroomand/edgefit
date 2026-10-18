@@ -1,3 +1,7 @@
+---
+description: 'Configure edgefit in edgefit.config.ts: targets, entries, ignored findings, levels, runtime settings, export conditions and environment.'
+---
+
 # Configuration
 
 edgefit works without a config file. Add one when you want to set targets once, ignore findings you have accepted, or change how strict a category is.
@@ -148,7 +152,7 @@ export default defineConfig({
 });
 ```
 
-Used by `netlify-edge`. By default edgefit looks for `netlify.toml` in the root, for the edge functions and the `deno_import_map` file. Set `configFile: false` to skip it. See [Netlify Edge Functions](/targets/netlify-edge).
+Used by `netlify-edge`. By default edgefit looks for `netlify.toml` in the root, for the edge functions and the `deno_import_map` file. Set `configFile: false` to skip it. See [Netlify Edge Functions compatibility](/targets/netlify-edge).
 
 ## Environment
 
