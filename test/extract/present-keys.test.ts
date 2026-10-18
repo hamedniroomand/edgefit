@@ -21,10 +21,10 @@ describe('a key that an `in` test proved present', () => {
     expect(usages(code)).not.toContain(unknown);
   });
 
-  it('is the use of the object only, as a read with a fallback is', () => {
+  it('adds a use of the object for the in test and for the read, and no use of a key', () => {
     const code =
       "const list = ['log', 'warn'].filter(name => name in console);\nfor (const name of list) console[name];";
-    expect(usages(code)).toEqual(['api console']);
+    expect(usages(code)).toEqual(['api console', 'api console']);
   });
 });
 

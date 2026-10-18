@@ -20,8 +20,8 @@ function isDestructured(node: Node, parent: Node): boolean {
 
 /**
  * Whether `parent` uses the value of `node` in a way that throws a TypeError for `undefined`:
- * `new`, `extends`, a tag, the right side of `instanceof`, destructuring, a spread into an array or
- * a call, `for…of` or `yield*`.
+ * `new`, `extends`, a tag, the right side of `instanceof` or `in`, destructuring, a spread into an
+ * array or a call, `for…of` or `yield*`.
  * `outer` holds the ancestors above `parent`, nearest first.
  */
 function throwsOnUndefined(node: Node, parent: Node, outer: readonly Node[]): boolean {
@@ -31,7 +31,7 @@ function throwsOnUndefined(node: Node, parent: Node, outer: readonly Node[]): bo
       parent.superClass === node) ||
     (parent.type === 'TaggedTemplateExpression' && parent.tag === node) ||
     (parent.type === 'BinaryExpression' &&
-      parent.operator === 'instanceof' &&
+      (parent.operator === 'instanceof' || parent.operator === 'in') &&
       parent.right === node) ||
     (parent.type === 'SpreadElement' && outer[0]?.type !== 'ObjectExpression') ||
     (parent.type === 'ForOfStatement' && parent.right === node) ||

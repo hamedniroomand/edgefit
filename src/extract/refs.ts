@@ -161,18 +161,17 @@ function isNullishOperand(node: Node): boolean {
 }
 
 /**
- * Tests for an API rather than uses it: `typeof x.y`, `'y' in x`, `!x.y`, `x.y === undefined`,
- * and `x.y` as the condition of an `if` or `?:` or the left side of `&&`. The left side of `||`
- * and `??` is a check too, see `isTested`.
+ * Tests for an API rather than uses it: `typeof x.y`, `!x.y`, `x.y === undefined`, and `x.y` as
+ * the condition of an `if` or `?:` or the left side of `&&`. The left side of `||` and `??` is a
+ * check too, see `isTested`. The right side of `in` is a use, because `'k' in x` throws when `x`
+ * is missing. The test still guards `x.k`, see `guardsWhen`. The global object itself is not
+ * recorded, so `'X' in globalThis` records nothing.
  */
 export function isFeatureCheck(node: Node, parent: Node): boolean {
   if (parent.type === 'UnaryExpression') {
     return parent.operator === 'typeof' || parent.operator === '!';
   }
   if (parent.type === 'BinaryExpression') {
-    if (parent.operator === 'in') {
-      return parent.right === node;
-    }
     const other = parent.left === node ? parent.right : parent.left;
     return ['==', '===', '!=', '!=='].includes(parent.operator) && isNullishOperand(other);
   }

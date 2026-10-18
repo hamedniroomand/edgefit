@@ -17,8 +17,9 @@ describe('globals', () => {
     ]);
   });
 
-  it('treats typeof and in checks as feature detection', () => {
+  it('treats typeof as a check and the right side of in as a use', () => {
     expect(usagesOf("import fs from 'fs';\ntypeof fs.watch;\n'watch' in fs;")).toEqual([
+      'api node:fs',
       'api node:fs',
     ]);
   });

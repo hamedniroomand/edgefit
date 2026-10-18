@@ -62,7 +62,7 @@ Some APIs fail only for some options. When the data names those options, a call 
 
 A Web API global or member, such as `FileReader` or `navigator.gpu`, is missing according to [runtime-compat-data](https://www.npmjs.com/package/runtime-compat-data). That data is generated automatically and is not always accurate, so it gets its own category at warning level. Where the Node compatibility matrix has measured the API directly, the matrix wins and the finding is `unsupported` instead.
 
-Feature checks such as `if ('gpu' in navigator)` are not reported.
+A feature check such as `if ('gpu' in navigator)` is not reported for `navigator.gpu`. It is a use of `navigator`, so a target that lacks `navigator`, such as `vercel-edge`, reports `navigator` as `unsupported`.
 
 ### unknown
 
@@ -126,6 +126,8 @@ await subtle.getPublicKey(key, []);
 
 When the target does not have the API, or the data does not cover it, a usage that only runs after such a check is a guarded finding. An API that the data does not cover is then not an `unknown` warning. It is left out of the list and does not fail a check. The report counts them (`1 guarded usage hidden`), and `--verbose` lists them. In JSON they are under `guarded`, next to `findings`.
 
+A use of an API that the data does not cover, outside a check, such as `const s = v8.startupSnapshot`, is still an `unknown` warning, also when the code uses a member of it after a check. A use of the module itself, such as its import, is the exception: when the code uses the module's members only after a check, edgefit does not report the module. It is not a guarded finding either, so the report does not count it.
+
 A check does not protect an API that exists and throws or does nothing, such as `fs.watch` on Workers, because the check passes and the call still fails. Those stay findings, and so do `mocked` and `mismatch` results. Code that does not run at all on the target is the exception, see [Runtime checks](#runtime-checks).
 
 ### Checks for an API
@@ -140,13 +142,15 @@ These checks are understood:
 
 A minifier writes `typeof x.y === 'undefined'` as `typeof x.y > "u"`. It writes `typeof x.y !== 'undefined'` as `typeof x.y < "u"`. edgefit reads both as the long form. It reads them with the sides swapped too: `"u" < typeof x.y` means `=== 'undefined'`, and `"u" > typeof x.y` means `!== 'undefined'`.
 
+`'y' in x` throws when `x` is missing, so it is a use of `x`. It is still a check for `x.y`. edgefit does not report the global object itself (`globalThis`, `self` or `global`), so `'X' in globalThis` is only a check.
+
 A read that is an operand of `||` or `??` is a check too, as in `const f = util.getCallSites ?? util.getCallSite`. A member that the target lacks gives no finding, because it gives `undefined` and the operator moves on. A member that exists and throws is still a finding, because the value goes on. The right operand counts when the left one is an API too. A value that is called in place, such as `(x.y || z)()`, is a use.
 
 A read with `?.`, such as `x?.y`, gives `undefined` when `x` is missing, so it is a check. These uses are the exception. They throw a TypeError for `undefined`, so they are uses, the same as without `?.`:
 
 - `new (x?.y)()` and `class extends (x?.y)`
 - a tag, as in ``(x?.y)`text` ``
-- the right side of `instanceof`
+- the right side of `instanceof` or `in`
 - destructuring, as in `const { a } = x?.y`, and a default that is destructured, as in `{ a } = x?.y`
 - a spread into an array or into the arguments of a call, `new` or `super`
 - `for (const v of x?.y)` and `yield* x?.y`
@@ -258,7 +262,7 @@ The data of `workerd` says that `window`, `document`, `HTMLAnchorElement`, `Deno
 
 A global that the target lacks is `undefined` on the global object. So these uses of `globalThis.X`, `self.X` or `global.X` do not fail, and they are guarded on a target that lacks `X`:
 
-- the checks in [Checks for an API](#checks-for-an-api), such as a test in an `if`, `?:`, `!`, `&&`, `||` or `??`, and an optional member (`globalThis.X?.y`), except in the uses that [Checks for an API](#checks-for-an-api) lists
+- the checks in [Checks for an API](#checks-for-an-api), such as a test in an `if`, `?:`, `!`, `&&`, `||` or `??`, and an optional member (`globalThis.X?.y`), except in the uses that [Checks for an API](#checks-for-an-api) lists. The right side of `in`, as in `'k' in globalThis.X`, is a use.
 - the test of a `while`, `do` or `for` loop
 - `Boolean(globalThis.X)`
 - a comparison with `===`, `!==`, `==` or `!=`

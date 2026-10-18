@@ -84,7 +84,7 @@ describe('usages behind a helper that holds a check', () => {
       usagesOf(
         `${fs}const hasWatch = function () {\n  return 'watch' in fs;\n};\nhasWatch() && fs.watch('.');`,
       ),
-    ).toEqual(guardedWatch);
+    ).toEqual(['api node:fs', ...guardedWatch]);
   });
 });
 
