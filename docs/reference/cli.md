@@ -1,3 +1,7 @@
+---
+description: 'edgefit CLI reference: every command, flag, output format and exit code for check, compare, diff, package and targets.'
+---
+
 # CLI
 
 ```
@@ -74,7 +78,7 @@ Both files must be written by `edgefit check --format json` with the same edgefi
 edgefit package <name[@version]|directory|file.tgz> [options]
 ```
 
-Installs the package into a temporary project with `npm install --ignore-scripts`, then checks each public entry point with every export used. `name`, `name@1.2.3`, `name@^1`, `@scope/name` and `@scope/name@tag` are accepted. A directory is packed with `npm pack` first, so the files are the ones you would publish. See [Checking packages](/guide/packages) for what a result means.
+Installs the package into a temporary project with `npm install --ignore-scripts`, then checks each public entry point with every export used. `name`, `name@1.2.3`, `name@^1`, `@scope/name` and `@scope/name@tag` are accepted. A directory is packed with `npm pack` first, so the files are the ones you would publish. See [Check an npm package's compatibility](/guide/packages) for what a result means.
 
 | Option               | Description                                                       |
 | -------------------- | ----------------------------------------------------------------- |

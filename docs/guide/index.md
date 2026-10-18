@@ -1,3 +1,7 @@
+---
+description: 'An edge runtime compatibility checker: edgefit finds the Node.js and Web APIs your project and its npm packages use that the target runtime does not support.'
+---
+
 # What is edgefit?
 
 edgefit checks whether a JavaScript or TypeScript project, including everything it imports from `node_modules`, will run on an edge or alternative runtime such as Cloudflare Workers, Bun, Deno, Netlify Edge Functions or Vercel Edge.

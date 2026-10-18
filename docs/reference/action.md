@@ -1,3 +1,7 @@
+---
+description: 'edgefit GitHub Action reference: inputs, events, permissions, caching and monorepo setup for compatibility findings on a pull request.'
+---
+
 # GitHub Action
 
 ```yaml

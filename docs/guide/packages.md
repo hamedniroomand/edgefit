@@ -1,6 +1,10 @@
-# Checking packages
+---
+description: "Check an npm package's compatibility with edgefit package on Cloudflare Workers, Bun or Deno, learn what a pass means, and add a badge."
+---
 
-`edgefit package` checks a published package, not a project. It is the tool behind the [package compatibility table](/packages/) and the badge you can put in a README.
+# Check an npm package's compatibility
+
+`edgefit package` checks a published package, not a project. It is the tool behind the [npm package compatibility table](/packages/) and the badge you can put in a README.
 
 ```sh
 npx edgefit package hono
@@ -16,7 +20,7 @@ npx edgefit package .            # your own package, as `npm publish` would ship
 
 A subpath passes when there are no findings, warns when there are only warnings, and fails when there is an error. The result of a target is the result of its main entry. Warnings are never shown as passes.
 
-The result of a target is the result of the main entry (`.`), because that is what an import of the package gets. When a subpath is worse, `edgefit package` names it on a `worst subpath` line, and the [package table](/packages/) shows it as a second, smaller mark, and names it in the tooltip of the cell. The row detail lists the subpaths that are not a pass, with their finding counts. A finding that only some exports of an entry reach, such as `createServer` of `mysql2`, which needs a port that a Worker cannot open, is listed under those exports in the detail, and `edgefit package` names the worst export on a `worst export` line when it is worse than the result of the target. The table shows the worst export as another small mark when it is worse than the result of the target, and names it in the tooltip. The module body and what every export reaches still set the status. `edgefit check` gives the same finding to a project that imports the export, and none to a project that does not. The status filter and the sort of the table use the result of the main entry. A package without a main entry, or whose main entry could not be checked, takes the worst subpath.
+The result of a target is the result of the main entry (`.`), because that is what an import of the package gets. When a subpath is worse, `edgefit package` names it on a `worst subpath` line, and the [npm package compatibility table](/packages/) shows it as a second, smaller mark, and names it in the tooltip of the cell. The row detail lists the subpaths that are not a pass, with their finding counts. A finding that only some exports of an entry reach, such as `createServer` of `mysql2`, which needs a port that a Worker cannot open, is listed under those exports in the detail, and `edgefit package` names the worst export on a `worst export` line when it is worse than the result of the target. The table shows the worst export as another small mark when it is worse than the result of the target, and names it in the tooltip. The module body and what every export reaches still set the status. `edgefit check` gives the same finding to a project that imports the export, and none to a project that does not. The status filter and the sort of the table use the result of the main entry. A package without a main entry, or whose main entry could not be checked, takes the worst subpath.
 
 A package that has no `.` entry, such as `firebase`, can name the subpath that stands for it: `edgefit package firebase --main ./app`. The result of a target then comes from that subpath, `edgefit package` prints `main entry: ./app`, and the worst subpath is still named when it is worse. A row of the table does the same with a `main` field in `table/packages.json`. The subpath has to be one that is checked, so it cannot be one that `--skip` or `--export` leaves out.
 
@@ -51,7 +55,7 @@ Packages in the table have badges at `https://edgefit.kitdev.space/packages/badg
 
 For shields.io styling, use `https://img.shields.io/endpoint?url=https://edgefit.kitdev.space/packages/badges/<name>.json`.
 
-The results for the popular libraries are in the [package table](/packages/).
+The results for the popular libraries are in the [npm package compatibility table](/packages/).
 
 ## Verified rows
 

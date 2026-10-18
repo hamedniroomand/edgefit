@@ -1,3 +1,7 @@
+---
+description: 'edgefit JSON report reference: the versioned output of check, compare, package and diff, with the schema and stability rules.'
+---
+
 # JSON reports
 
 Every command that takes `--format json` prints a versioned object. `version` changes only on breaking changes to the shape. `edgefit diff` reads reports of version 1 and 2, so a base report written before version 2 still works as the base.

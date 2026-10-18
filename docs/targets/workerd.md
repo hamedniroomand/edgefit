@@ -1,4 +1,8 @@
-# Cloudflare Workers
+---
+description: 'Cloudflare Workers Node.js compatibility with edgefit: your wrangler compatibility date and nodejs_compat flag, checked against workerd data.'
+---
+
+# Cloudflare Workers Node.js compatibility
 
 Target name: `workerd`. This is the default target.
 

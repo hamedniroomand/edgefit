@@ -1,3 +1,7 @@
+---
+description: 'Set up edgefit from a fresh clone: prerequisites, repository layout, docs, tests, commits and pull requests.'
+---
+
 # Development setup
 
 Thanks for helping out. This page gets you from a fresh clone to a passing test run.
@@ -64,7 +68,7 @@ vp run docs:preview   # serve that build
 vp run docs:results   # download the package table results
 ```
 
-The [packages page](/packages/) reads its results from the `package-results` branch. Run `vp run docs:results` to show the table locally. Run it again to get newer results.
+The [npm package compatibility page](/packages/) reads its results from the `package-results` branch. Run `vp run docs:results` to show the table locally. Run it again to get newer results.
 
 The site is built with VitePress and deployed to GitHub Pages on every push to `main` that touches `docs/`.
 

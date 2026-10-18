@@ -1,3 +1,7 @@
+---
+description: 'Keeping the edgefit compatibility data current: the weekly check, reading its issue, bumping the data and the tests that change with it.'
+---
+
 # Keeping the data current
 
 edgefit is only as good as its picture of the runtimes, and the runtimes move every week. This page is the runbook for keeping up: how the weekly check works, how to read its issue, how to decide what each entry means, and which code and tests change with a data bump.

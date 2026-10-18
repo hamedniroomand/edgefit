@@ -5,7 +5,7 @@
 <h1 align="center">edgefit</h1>
 
 <p align="center">
-  Know your project runs on Cloudflare Workers, Bun, Deno, Netlify or Vercel Edge before you deploy.
+  A Node.js compatibility checker for Cloudflare Workers, Bun, Deno, Netlify and Vercel Edge.
 </p>
 
 <p align="center">
@@ -59,7 +59,7 @@ On pull requests, with the GitHub Action:
 
 ## Package compatibility
 
-`npx edgefit package <name>` checks a published package, and the [package table](https://edgefit.kitdev.space/packages/) lists popular ones. Add a badge to your README, linking to what it means:
+`npx edgefit package <name>` checks a published package, and the [npm package compatibility table](https://edgefit.kitdev.space/packages/) lists popular ones. Add a badge to your README, linking to what it means:
 
 ```md
 [![edgefit](https://edgefit.kitdev.space/packages/badges/<name>.svg)](https://edgefit.kitdev.space/packages/#<name>)

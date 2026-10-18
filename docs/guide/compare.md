@@ -1,3 +1,7 @@
+---
+description: 'Compare edge runtime compatibility with edgefit compare: one table of the Node.js and Web APIs your project reaches on each target.'
+---
+
 # Comparing targets
 
 `edgefit compare` answers a different question from `check`: not "what breaks on this runtime" but "which runtime fits this project best". It scans once per target and prints one table of the APIs your project reaches.

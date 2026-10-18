@@ -1,3 +1,7 @@
+---
+description: 'Check framework build output with edgefit: Nuxt, Nitro, SvelteKit, Astro, Vercel Build Output and Netlify output, with sourcemaps to your source.'
+---
+
 # Framework build output
 
 Frameworks such as Nuxt, Nitro, SvelteKit and Astro import virtual modules like `#imports` that only the framework's own build can resolve. edgefit cannot follow those from your source, so for framework apps you build first and scan the output.

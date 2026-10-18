@@ -1,3 +1,7 @@
+---
+description: 'Pull request compatibility checks with the edgefit GitHub Action or edgefit diff: reviewers see only the findings a change adds or fixes.'
+---
+
 # Pull request checks
 
 Running `edgefit check` in CI works, but once a project has a few accepted findings, a full report on every pull request turns into noise. What reviewers want to know is whether this change makes things worse. That is what the GitHub Action and `edgefit diff` are for.

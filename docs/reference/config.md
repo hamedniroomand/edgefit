@@ -1,3 +1,7 @@
+---
+description: 'edgefit config reference: every option of edgefit.config.ts, ignore, levels, workerd, bun, deno, netlify and env, with validation rules.'
+---
+
 # Config options
 
 Every option of `edgefit.config.ts`. For examples and explanations, see [Configuration](/guide/configuration).

@@ -1,17 +1,21 @@
+---
+description: 'How edgefit computes a compatibility result: pinned, versioned data for each target, the data layers, why the data is pinned and the licenses.'
+---
+
 # How results are computed
 
 Every result edgefit gives comes from data that is vendored in the package, pinned to a version, and listed with its source and license. This page explains the layers. The per-target pages cover the details.
 
 ## Targets
 
-| Target         | Runtime                                            | Export conditions                 |
-| -------------- | -------------------------------------------------- | --------------------------------- |
-| `workerd`      | [Cloudflare Workers](/targets/workerd)             | `workerd`, `worker`, `browser`    |
-| `bun`          | [Bun](/targets/bun)                                | `bun`, `node`                     |
-| `deno`         | [Deno](/targets/deno)                              | `deno`, `node`                    |
-| `deno-deploy`  | [Deno Deploy](/targets/deno#deno-deploy)           | `deno`, `node`                    |
-| `netlify-edge` | [Netlify Edge Functions](/targets/netlify-edge)    | `node`                            |
-| `vercel-edge`  | [Vercel Edge](/targets/vercel-edge) (experimental) | `edge-light`, `module`, `browser` |
+| Target         | Runtime                                                                  | Export conditions                 |
+| -------------- | ------------------------------------------------------------------------ | --------------------------------- |
+| `workerd`      | [Cloudflare Workers Node.js compatibility](/targets/workerd)             | `workerd`, `worker`, `browser`    |
+| `bun`          | [Bun Node.js compatibility](/targets/bun)                                | `bun`, `node`                     |
+| `deno`         | [Deno and Deno Deploy Node.js compatibility](/targets/deno)              | `deno`, `node`                    |
+| `deno-deploy`  | [Deno Deploy Node.js compatibility](/targets/deno#deno-deploy)           | `deno`, `node`                    |
+| `netlify-edge` | [Netlify Edge Functions compatibility](/targets/netlify-edge)            | `node`                            |
+| `vercel-edge`  | [Vercel Edge runtime compatibility](/targets/vercel-edge) (experimental) | `edge-light`, `module`, `browser` |
 
 Run `edgefit targets` to print this list along with the exact data versions:
 
