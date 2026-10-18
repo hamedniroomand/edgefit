@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-18T06:54:46.809Z",
-  "edgefit": "0.15.3",
+  "generatedAt": "2026-10-18T13:55:23.190Z",
+  "edgefit": "0.15.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -1061,7 +1061,7 @@
     {
       "name": "nodemailer",
       "file": "nodemailer",
-      "resolved": "10.1.2",
+      "resolved": "10.1.6",
       "summary": {
         "workerd": "fail",
         "bun": "pass",

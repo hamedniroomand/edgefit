@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@slack/web-api",
   "resolved": "8.2.0",
-  "checkedAt": "2026-10-18T06:42:52.517Z",
-  "edgefit": "0.15.3",
+  "checkedAt": "2026-10-18T13:44:17.248Z",
+  "edgefit": "0.15.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

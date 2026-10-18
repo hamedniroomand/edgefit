@@ -2,8 +2,8 @@
   "version": 2,
   "package": "pdf-lib",
   "resolved": "1.17.1",
-  "checkedAt": "2026-10-18T06:44:25.556Z",
-  "edgefit": "0.15.3",
+  "checkedAt": "2026-10-18T13:46:09.773Z",
+  "edgefit": "0.15.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

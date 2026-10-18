@@ -2,8 +2,8 @@
   "version": 2,
   "package": "firebase",
   "resolved": "13.0.0",
-  "checkedAt": "2026-10-18T06:44:14.444Z",
-  "edgefit": "0.15.3",
+  "checkedAt": "2026-10-18T13:46:01.379Z",
+  "edgefit": "0.15.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

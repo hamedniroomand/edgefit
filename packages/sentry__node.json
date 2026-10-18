@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.8.0",
-  "checkedAt": "2026-10-18T06:51:27.453Z",
-  "edgefit": "0.15.3",
+  "checkedAt": "2026-10-18T13:52:07.865Z",
+  "edgefit": "0.15.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -64,7 +64,7 @@
         "workerd": {
           "status": "fail",
           "errors": 8,
-          "warnings": 7,
+          "warnings": 5,
           "findings": [
             {
               "api": "node:child_process.execFile",
@@ -125,18 +125,6 @@
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
-            },
-            {
-              "api": "node:worker_threads",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "node:inspector",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
             },
             {
               "api": "node:worker_threads.isMainThread",
