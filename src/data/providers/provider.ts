@@ -21,6 +21,8 @@ export interface CompatEntry {
   absent?: true;
   /** The options that make a call fail. A call that passes none of them is not a finding. */
   options?: readonly OptionMatch[];
+  /** Applies to this API alone. What is below it is not described, so a member stays uncovered. */
+  exact?: true;
   source: CompatSource;
 }
 

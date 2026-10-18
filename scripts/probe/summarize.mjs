@@ -52,6 +52,7 @@ if (channel === 'latest') {
     ),
     ...section('Curated stubs that now work (bump the pinned data)', drift.stubsNowWork.map(code)),
     ...section('Mocked entries that are now implemented', drift.mocksImplemented.map(code)),
+    ...section('Recorded as loading, but missing in this release', drift.modulesGone.map(code)),
     ...proposed,
   ];
 } else {

@@ -15,6 +15,7 @@ npx edgefit check --target bun --entry src/index.ts
 - **Node API data** is the compatibility matrix's Bun `1.4.2` dump, compared with the same Node baseline as the other targets.
 - **Curated overrides** cover APIs that exist in Bun but throw or do nothing, such as `v8.setFlagsFromString` and `async_hooks.createHook`. They are read from Bun's Node compatibility docs and sources at the same version.
 - The overrides also mark matrix differences that are values rather than behavior, such as `process.versions.*`, as supported. Bun reporting a different version string is not a compatibility problem.
+- The matrix does not list `node:cluster`, `domain`, `inspector`, `v8` and `wasi`. The overrides record that each of them loads, so an import of one gives no finding. Their members are not measured, so a use of a member is an `unknown` warning, unless an `apis` entry covers it.
 
 ## Your Bun version
 

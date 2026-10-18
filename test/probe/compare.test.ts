@@ -130,3 +130,16 @@ describe('compareOutcomes with the workerd overrides', () => {
     ]);
   });
 });
+
+describe('compareOutcomes for a module recorded as present', () => {
+  it('lists the module only when the probe finds it missing', () => {
+    expect(compareOutcomes({ v8: 'present' }, readOverrides('workerd'), {})).toEqual([]);
+    expect(compareOutcomes({ v8: 'missing' }, readOverrides('workerd'), {})).toEqual([
+      {
+        api: 'v8',
+        message: 'override says `supported`, probe says `missing`',
+        dataSaysPresent: true,
+      },
+    ]);
+  });
+});

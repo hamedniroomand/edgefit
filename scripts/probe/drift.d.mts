@@ -10,6 +10,8 @@ export interface Drift {
   stubsNowWork: string[];
   /** Mocked entries the latest release implements. */
   mocksImplemented: string[];
+  /** Modules recorded as present that the latest release does not load. */
+  modulesGone?: string[];
   /** Findings that are not API lists, such as a documentation page that changed. */
   sections?: { title: string; items: string[] }[];
 }

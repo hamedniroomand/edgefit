@@ -28,9 +28,18 @@ interface OverrideEntry {
   options?: OptionMatch[];
 }
 
+/** A module that the matrix does not list but that loads on the target. Its members are not measured. */
+interface PresentEntry {
+  note: string;
+  /** Path of the runtime source file, relative to the source's URL. */
+  source: string;
+}
+
 interface OverridesFile {
   /** Keyed by module, e.g. `child_process`. */
   modules: Record<string, OverrideEntry>;
+  /** Keyed by module, e.g. `v8`. An import of the module gives no finding; a member that no `apis` entry covers stays uncovered. */
+  present?: Record<string, PresentEntry>;
   /** Keyed by module and member path, e.g. `fs.promises.watch`. */
   apis: Record<string, OverrideEntry>;
 }
@@ -130,7 +139,17 @@ export function overridesProvider(target: TargetKey): CompatProvider<CompatEntry
         const [module = key, ...path] = key.split('.');
         return toEntry(module, path, entry);
       });
-      return [...moduleEntries, ...apiEntries];
+      const presentEntries = Object.entries(file.present ?? {}).map(
+        ([module, entry]): CompatEntry => ({
+          target,
+          module,
+          path: [],
+          status: 'supported',
+          exact: true,
+          source: { provider: name, version, url: new URL(entry.source, `${url}/`).href },
+        }),
+      );
+      return [...moduleEntries, ...apiEntries, ...presentEntries];
     },
   };
 }

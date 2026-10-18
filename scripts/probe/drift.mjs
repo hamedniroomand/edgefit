@@ -71,15 +71,23 @@ export function driftFor({ runtime, pinned, latest, outcomes, mocked, overrides 
       !overrides[api].validatesFirst &&
       outcomes[api] === 'implemented',
   );
+  // A module recorded as `present` is looked up too, so its `present` outcome is not drift.
+  const nowPresent = Object.keys(outcomes).filter(
+    api => outcomes[api] === 'present' && overrides[api] === undefined,
+  );
+  // Only a bare module name is a `present` entry; a `supported` member can be missing on purpose.
+  const modulesGone = Object.keys(outcomes).filter(
+    api =>
+      outcomes[api] === 'missing' && !api.includes('.') && overrides[api]?.status === 'supported',
+  );
   return {
     runtime,
     pinned,
     latest,
-    nowPresent: Object.keys(outcomes)
-      .filter(api => outcomes[api] === 'present')
-      .sort(),
+    nowPresent: nowPresent.sort(),
     stubsNowWork: stubs.sort(),
     mocksImplemented: implementedMocks(mocked).sort(),
+    modulesGone: modulesGone.sort(),
   };
 }
 
@@ -87,6 +95,7 @@ export const hasDrift = drift =>
   drift.nowPresent.length +
     drift.stubsNowWork.length +
     drift.mocksImplemented.length +
+    (drift.modulesGone?.length ?? 0) +
     (drift.sections?.length ?? 0) >
   0;
 
@@ -134,6 +143,7 @@ export function renderIssue(drifts) {
     ),
     ...list('Curated stubs that now work', drift.stubsNowWork),
     ...list('Mocked entries that are now implemented', drift.mocksImplemented),
+    ...list('Recorded as loading, but missing in the latest release', drift.modulesGone ?? []),
     ...(drift.sections ?? []).flatMap(({ title, items }) => list(title, items)),
   ]);
   const body = [

@@ -35,6 +35,12 @@ The matrix only records whether an API exists. Override files record what happen
       "except": []
     }
   },
+  "present": {
+    "v8": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "v8.ts"
+    }
+  },
   "apis": {
     "fs.watch": {
       "status": "unsupported",
@@ -47,6 +53,7 @@ The matrix only records whether an API exists. Override files record what happen
 
 - `modules` covers a whole module, minus the members in `except`.
 - `apis` covers one member.
+- `present` records a module that the matrix does not list but that loads on the target. An import of the module gives no finding, so its `note` is for maintainers only. Its members are not measured, so a use of one is `unknown`, unless an `apis` entry covers it. The probe looks each module up and reports one that no longer loads.
 - `status` is `unsupported`, `mocked`, `mismatch` or `supported`.
 - `note` is the detail line users see. Say what happens, in plain words.
 - `source` is a path relative to the source URL in `source.json`, pinned to the runtime version. It becomes the `see` link in reports.
@@ -101,11 +108,12 @@ The workflow runs twice per runtime:
 - **pinned** probes the versions in `source.json` and lists every disagreement with the overrides and the matrix in the job summary.
 - **latest** probes the newest release and lists what differs from the pinned data. For workerd it uses the newest compatibility date that release accepts, since newer dates turn features on.
 
-Both channels also look up every API the runtime's data marks as missing (Web APIs like `crypto.subtle.getPublicKey` included, and each global counted once), without calling it. A `missing` API that exists in the newest release is the clearest sign that the data is behind. The latest channel reports three kinds of drift:
+Both channels also look up every API the runtime's data marks as missing (Web APIs like `crypto.subtle.getPublicKey` included, and each global counted once), without calling it. They also look up each module that `present` records. A `missing` API that exists in the newest release is the clearest sign that the data is behind. The latest channel reports four kinds of drift:
 
 - APIs the data marks missing that now exist
 - curated stubs that now work, which means the probe got an argument error from real code (an inconclusive result is not counted)
 - `mocked` entries the targeted check found implemented
+- modules recorded as `present` that no longer load
 
 Every Monday, and on a manual run with **open-issue** ticked, a last job collects the latest results and keeps one issue, labelled `data`, up to date with them. It opens the issue when there is drift, edits it on later weeks, and closes it when the data agrees with the newest releases again.
 

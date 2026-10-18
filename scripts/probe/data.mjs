@@ -23,7 +23,18 @@ export const workerdSettings = () =>
   readData('source.json').sources.find(source => source.provider === 'workers-nodejs-compat-matrix')
     .settings.workerd;
 
-export const readOverrides = runtime => readData(`overrides/${runtime}.json`).apis;
+/**
+ * The curated entries the probe checks: the member entries, and the modules recorded as `present`,
+ * which load on the target and so count as `supported` overrides of the module itself.
+ */
+export const readOverrides = runtime => {
+  const { present = {}, apis } = readData(`overrides/${runtime}.json`);
+  const modules = Object.entries(present).map(([module, entry]) => [
+    module,
+    { status: 'supported', ...entry },
+  ]);
+  return { ...Object.fromEntries(modules), ...apis };
+};
 
 /** The matrix keys prefix-only modules such as `node:sqlite` with their prefix. */
 const withoutNodePrefix = dump =>

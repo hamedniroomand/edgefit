@@ -29,7 +29,7 @@ function entryMap(entries: readonly CompatEntry[]): Map<string, CompatEntry> {
   return new Map(entries.map(entry => [entryKey(entry.module, entry.path), entry]));
 }
 
-/** The entry for the API or its closest ancestor. */
+/** The entry for the API or its closest ancestor. An `exact` ancestor says nothing about the API. */
 function findEntry(
   entries: ReadonlyMap<string, CompatEntry>,
   module: string,
@@ -37,7 +37,7 @@ function findEntry(
 ): CompatEntry | undefined {
   for (let length = path.length; length >= 0; length -= 1) {
     const entry = entries.get(entryKey(module, path.slice(0, length)));
-    if (entry !== undefined) {
+    if (entry !== undefined && (entry.exact !== true || length === path.length)) {
       return entry;
     }
   }
@@ -69,8 +69,8 @@ function belowParent(parent: LookupResult): LookupResult | undefined {
 
 /**
  * Compatibility of one target: curated entries first, then the tree, then fallback entries for
- * APIs the tree does not describe. An entry applies to its API and everything below it, and the
- * most specific entry wins.
+ * APIs the tree does not describe. An entry applies to its API and everything below it, unless it
+ * is `exact`, and the most specific entry wins.
  */
 export class CompatIndex {
   readonly #tree: CompatTree;
@@ -198,10 +198,11 @@ export class CompatIndex {
     ) {
       return true;
     }
-    if (entry !== undefined) {
+    if (entry !== undefined && entry.exact !== true) {
       // Curated as supported or for some options only, and nothing below it says otherwise.
       return false;
     }
+    // An `exact` entry describes nothing below it, so the tree decides what is there.
     return this.#treeHasProblems(module, path) || this.#fallbackHasProblems(module, path);
   }
 

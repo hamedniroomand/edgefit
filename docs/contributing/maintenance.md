@@ -39,7 +39,7 @@ The complete lists are in the `drift.json` artifact of each `probe-<runtime>-lat
 
 ## Reading the issue
 
-The issue has up to three lists per runtime.
+The issue has up to four lists per runtime.
 
 ### Marked missing in the data, but present in the latest release
 
@@ -61,6 +61,10 @@ A bare call fails validation, so the probe sees an argument error and thinks the
 ### Mocked entries that are now implemented
 
 A `mocked` override says the API does nothing. The targeted check in `scripts/probe/mocked-checks.mjs` found it doing real work now. Read the source, then remove or change the entry.
+
+### Recorded as loading, but missing in the latest release
+
+A `present` entry says the module loads, and the probe could not load it. A lookup can fail because the runtime removed the module, because a flag or a compatibility date no longer turns it on, or because the module throws while it loads. Read the release notes. If the runtime removed the module, delete the entry, so that an import is reported again. If the probe setup is wrong, fix the probe.
 
 ## Deciding what an entry means
 
@@ -86,7 +90,7 @@ Some rules of thumb from past bumps:
 - A stub that throws `ERR_METHOD_NOT_IMPLEMENTED` **after** validation is still `unsupported`.
 - `inconclusive` proves nothing. It means the call returned or threw something else.
 - A class whose constructor works but whose methods throw is `unsupported` with a note that says so (workerd's `vm.Script`).
-- Module-level entries (`"modules"`) are not checked by the probe. Review them by hand when a runtime changes a module (Bun's `repl`, `trace_events`, Deno's `cluster`, `wasi`).
+- Entries under `"modules"` are not checked by the probe. Review them by hand when a runtime changes a module (Bun's `repl`, `trace_events`, Deno's `cluster`, `wasi`). The probe looks up each `present` module. It lists one that no longer loads.
 
 ## Bumping the data
 

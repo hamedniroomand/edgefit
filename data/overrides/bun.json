@@ -1,5 +1,5 @@
 {
-  "description": "APIs that exist on Bun but throw or silently do nothing when called, and matrix differences that are values rather than behavior. The compatibility matrix only records whether an API exists. Curated by reading Bun's Node compatibility docs and sources at the release the matrix was generated with.",
+  "description": "APIs that exist on Bun but throw or silently do nothing when called, and matrix differences that are values rather than behavior. The compatibility matrix only records whether an API exists. Curated by reading Bun's Node compatibility docs and sources at the release the matrix was generated with. It also records modules that the matrix does not list but that load.",
   "modules": {
     "child_process": {
       "status": "supported",
@@ -54,6 +54,28 @@
       "note": "is a stub: createTracing returns an object without enable or disable, and getEnabledCategories always returns an empty string",
       "source": "src/js/node/trace_events.ts",
       "except": []
+    }
+  },
+  "present": {
+    "cluster": {
+      "note": "loads; the matrix does not list the module, so its members are not measured",
+      "source": "src/js/node/cluster.ts"
+    },
+    "domain": {
+      "note": "loads; the matrix does not list the module, so its members are not measured",
+      "source": "src/js/node/domain.ts"
+    },
+    "inspector": {
+      "note": "loads; the matrix does not list the module, so its members are not measured",
+      "source": "src/js/node/inspector.ts"
+    },
+    "v8": {
+      "note": "loads; the matrix does not list the module, so its members are not measured",
+      "source": "src/js/node/v8.ts"
+    },
+    "wasi": {
+      "note": "loads; the matrix does not list the module, so its members are not measured",
+      "source": "src/js/node/wasi.ts"
     }
   },
   "apis": {

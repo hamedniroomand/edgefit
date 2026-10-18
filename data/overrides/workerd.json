@@ -1,5 +1,5 @@
 {
-  "description": "APIs that exist on workerd but throw or silently do nothing when called. The compatibility matrix only records whether an API exists, so it reports these as supported. Curated by reading the workerd sources at the release the matrix was generated with.",
+  "description": "APIs that exist on workerd but throw or silently do nothing when called. The compatibility matrix only records whether an API exists, so it reports these as supported. Curated by reading the workerd sources at the release the matrix was generated with. It also records modules that the matrix does not list but that load.",
   "modules": {
     "child_process": {
       "status": "unsupported",
@@ -24,6 +24,48 @@
       "note": "dgram sockets accept calls but never send or receive; bind, connect and send are no-ops",
       "source": "dgram.ts",
       "except": []
+    }
+  },
+  "present": {
+    "cluster": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "cluster.ts"
+    },
+    "domain": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "domain.ts"
+    },
+    "inspector": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "inspector.ts"
+    },
+    "punycode": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "punycode.ts"
+    },
+    "repl": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "repl.ts"
+    },
+    "tty": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "tty.ts"
+    },
+    "v8": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "v8.ts"
+    },
+    "vm": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "vm.ts"
+    },
+    "wasi": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "wasi.ts"
+    },
+    "worker_threads": {
+      "note": "loads with nodejs_compat; the matrix does not list the module, so its members are not measured",
+      "source": "worker_threads.ts"
     }
   },
   "apis": {
