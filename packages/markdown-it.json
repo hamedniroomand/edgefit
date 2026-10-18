@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "markdown-it",
-  "resolved": "15.0.2",
-  "checkedAt": "2026-10-15T09:12:04.217Z",
-  "edgefit": "0.15.2",
+  "resolved": "15.0.3",
+  "checkedAt": "2026-10-18T06:43:11.834Z",
+  "edgefit": "0.15.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

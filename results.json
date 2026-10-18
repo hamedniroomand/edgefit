@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-15T09:22:05.591Z",
-  "edgefit": "0.15.2",
+  "generatedAt": "2026-10-18T06:54:46.809Z",
+  "edgefit": "0.15.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -72,7 +72,7 @@
     {
       "name": "h3",
       "file": "h3",
-      "resolved": "2.0.2",
+      "resolved": "2.0.5",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -301,7 +301,7 @@
     {
       "name": "openai",
       "file": "openai",
-      "resolved": "7.34.0",
+      "resolved": "7.38.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -317,7 +317,7 @@
     {
       "name": "@anthropic-ai/sdk",
       "file": "anthropic-ai__sdk",
-      "resolved": "0.134.0",
+      "resolved": "0.135.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -646,7 +646,7 @@
     {
       "name": "jsdom",
       "file": "jsdom",
-      "resolved": "30.1.2",
+      "resolved": "30.1.3",
       "summary": {
         "workerd": "fail",
         "bun": "pass",
@@ -759,7 +759,7 @@
     {
       "name": "undici",
       "file": "undici",
-      "resolved": "8.12.1",
+      "resolved": "8.12.2",
       "summary": {
         "workerd": "fail",
         "bun": "pass",
@@ -792,7 +792,7 @@
     {
       "name": "graphql-yoga",
       "file": "graphql-yoga",
-      "resolved": "5.24.5",
+      "resolved": "5.24.6",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -824,17 +824,15 @@
     {
       "name": "@supabase/supabase-js",
       "file": "supabase__supabase-js",
-      "resolved": "2.117.3",
+      "resolved": "2.118.0",
       "summary": {
-        "workerd": "pass",
-        "bun": "pass",
+        "workerd": "fail",
+        "bun": "fail",
         "deno": "pass"
       },
       "subpaths": 3,
       "verified": {
-        "bun": "verified",
-        "deno": "verified",
-        "workerd": "verified"
+        "deno": "verified"
       }
     },
     {
@@ -872,7 +870,7 @@
     {
       "name": "@sentry/node",
       "file": "sentry__node",
-      "resolved": "11.7.0",
+      "resolved": "11.8.0",
       "summary": {
         "workerd": "fail",
         "bun": "warn",
@@ -979,7 +977,7 @@
     {
       "name": "kysely",
       "file": "kysely",
-      "resolved": "0.29.6",
+      "resolved": "0.29.7",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1047,7 +1045,7 @@
     {
       "name": "resend",
       "file": "resend",
-      "resolved": "6.33.0",
+      "resolved": "6.34.1",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1063,17 +1061,16 @@
     {
       "name": "nodemailer",
       "file": "nodemailer",
-      "resolved": "10.1.1",
+      "resolved": "10.1.2",
       "summary": {
-        "workerd": "pass",
+        "workerd": "fail",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 21,
       "verified": {
         "bun": "verified",
-        "deno": "verified",
-        "workerd": "verified"
+        "deno": "verified"
       }
     },
     {
@@ -1281,7 +1278,7 @@
     {
       "name": "@langchain/core",
       "file": "langchain__core",
-      "resolved": "1.2.17",
+      "resolved": "1.2.18",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1393,7 +1390,7 @@
     {
       "name": "posthog-node",
       "file": "posthog-node",
-      "resolved": "5.56.1",
+      "resolved": "5.56.2",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1504,7 +1501,7 @@
     {
       "name": "ejs",
       "file": "ejs",
-      "resolved": "7.0.1",
+      "resolved": "7.0.2",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1520,7 +1517,7 @@
     {
       "name": "markdown-it",
       "file": "markdown-it",
-      "resolved": "15.0.2",
+      "resolved": "15.0.3",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1616,7 +1613,7 @@
     {
       "name": "joi",
       "file": "joi",
-      "resolved": "18.2.9",
+      "resolved": "18.3.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1750,7 +1747,7 @@
     {
       "name": "mssql",
       "file": "mssql",
-      "resolved": "12.7.7",
+      "resolved": "12.7.9",
       "summary": {
         "workerd": "fail",
         "bun": "pass",
