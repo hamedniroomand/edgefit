@@ -51,6 +51,23 @@ describe('mocked checks', () => {
     expect(await runMockedChecks(apis, loadFake)).toEqual(allAs('noop'));
   });
 
+  it('does not count a tick that earlier work queued as a working createHook', async () => {
+    type Hooks = { init: (id: number, type: string) => void; before?: (id: number) => void };
+    const createHook = (hooks: Hooks): unknown => ({
+      enable() {
+        hooks.init(1, 'TickObject');
+        hooks.before?.(1);
+        return { disable: noop };
+      },
+    });
+    const modules: Record<string, unknown> = { ...fakes, async_hooks: { createHook } };
+    const load = async (name: string): Promise<unknown> =>
+      modules[name] ?? (await loadNodeModule(name));
+    expect(await runMockedChecks(['async_hooks.createHook'], load)).toEqual({
+      'async_hooks.createHook': 'noop',
+    });
+  });
+
   // A plain Node process, because module hooks do not apply inside the test worker.
   it('reports implemented under Node', () => {
     const script = `
