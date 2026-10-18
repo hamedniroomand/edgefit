@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.15.4
+
+### Patch Changes
+
+- [#362](https://github.com/hamedniroomand/edgefit/pull/362) [`b98f022`](https://github.com/hamedniroomand/edgefit/commit/b98f02250d411db895be3a042cc1a032ab87757e) - A check that another file exports in a `const` now guards the code that imports it, like a `const` in the same file. For example, `export const isDeno = typeof globalThis.Deno !== 'undefined'` in one file, and `isDeno ? globalThis.Deno.version : null` after `import { isDeno } from './runtime.js'` in another, no longer give a false finding on Workers. The other file must export the `const` with `export const`, `export { name }` or `export { name as other }`. The importing file must import it by name, as in `import { name }` or `import { name as other }`. A file between them can pass it on with `export { name } from` or with an import that it exports again. A `let`, a `var`, a default import, a namespace import, `export *`, `require` and a function are not followed. In build output (`--built`, or an entry below a `nitro.json`), edgefit does not follow such a `const` to another file.
+
+- [#363](https://github.com/hamedniroomand/edgefit/pull/363) [`4e0980a`](https://github.com/hamedniroomand/edgefit/commit/4e0980a6a5c6b1dfab9df43c5fb5ba97544452e8) - `'k' in x.y` and `'k' in x?.y` now count as a use of `x.y`, so edgefit reports `x.y` when the target lacks it. They are still a check for `x.y.k`. `'X' in globalThis` is still only a check. A use of an API that the data does not cover, outside a check, is now an `unknown` warning also when the code uses a member of it after a check. The module itself, such as its import, is still not reported then.
+
+- [#356](https://github.com/hamedniroomand/edgefit/pull/356) [`5425324`](https://github.com/hamedniroomand/edgefit/commit/5425324d4759447eb950ce2bfb6c8a8ce5b4cb57) - A minified `typeof` check now works like its long form. A minifier writes `typeof x === 'undefined'` as `typeof x > "u"`, and `typeof x !== 'undefined'` as `typeof x < "u"`. Before, edgefit did not read these forms as checks. Code behind them gave false findings, for example `typeof globalThis.Deno > "u" ? 0 : globalThis.Deno.version` on Workers. edgefit reads both orders, as in `"u" < typeof x`.
+
+- [#367](https://github.com/hamedniroomand/edgefit/pull/367) [`349a06b`](https://github.com/hamedniroomand/edgefit/commit/349a06be56d0616c41c37e8822028ac8c4710a03) - An import of these modules no longer gives an `unknown` warning. On Cloudflare Workers: `node:cluster`, `domain`, `inspector`, `punycode`, `repl`, `tty`, `v8`, `vm`, `wasi` and `worker_threads`. On Bun: `node:cluster`, `domain`, `inspector`, `v8` and `wasi`. A run on workerd 1.20260929.1 with `nodejs_compat` and on Bun 1.4.2 showed that they load. The data does not measure the members. A member that no other entry covers stays `unknown`.
+
 ## 0.15.3
 
 ### Patch Changes
