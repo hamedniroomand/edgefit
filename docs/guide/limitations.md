@@ -28,7 +28,7 @@ if (isDeno()) {
 }
 ```
 
-- **Helpers from another file.** A helper is followed only when it is in the same file and has no parameters. It must only return the check, or only test the check in one `if` and return `true` in one place and `false` in the other. One that is imported, takes an argument or does more is not.
+- **Helpers from another file.** A helper is followed only when it is in the same file and has no parameters. It must only return the check, or only test the check in one `if` and return `true` in one place and `false` in the other. One that is imported, takes an argument or does more is not. A `const` that holds a check is followed from another file, see [Helpers](/guide/findings#helpers).
 - **Browser globals by their bare name.** edgefit does not report a use such as `document.title` or `window.name`, so it can hide a real failure. It reports only a use through the global object, such as `globalThis.document.title`.
 - **Functions that another function calls.** A function that only another function calls gets no check, even when checked code calls that other function.
 - **Polyfill stores after a write.** A [polyfill store](/guide/findings#polyfills) is guarded on a target that has the global, even when earlier code sets the global to `undefined`, as in `globalThis.fetch = undefined; globalThis.fetch ??= value`. Then the value runs, so this can hide a real failure. The same applies to the right side of `globalThis.fetch ?? value` and `globalThis.fetch || value`, as in `globalThis.fetch = null; globalThis.fetch ?? globalThis.Deno.cwd()`.

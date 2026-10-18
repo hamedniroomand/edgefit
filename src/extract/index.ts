@@ -31,6 +31,8 @@ export interface ExtractOptions {
   importedModules?: ReadonlyMap<string, ApiRef>;
   /** Imported local names that another module of the graph exports as a plain string. */
   importedStrings?: ReadonlyMap<string, string>;
+  /** Imported local names that another module of the graph exports as a `const` holding a check. */
+  importedChecks?: UsageCollector['importedChecks'];
 }
 
 export interface ExtractedModule {
@@ -45,6 +47,8 @@ export interface ExtractedModule {
   aliases: ReadonlyMap<string, { ref: ApiRef; offset: number }>;
   /** The exports that are a plain string, by exported name. */
   strings: ReadonlyMap<string, string>;
+  /** The exports that are a `const` holding a check, by exported name. */
+  checks: UsageCollector['importedChecks'];
 }
 
 function finish(
@@ -52,8 +56,8 @@ function finish(
   shape?: ModuleShape,
   optionsSet: readonly string[] = [],
 ): ExtractedModule {
-  const { usages, offsets, aliases, strings } = collector;
-  return { usages, offsets, aliases, strings, optionsSet, shape };
+  const { usages, offsets, aliases, strings, checks } = collector;
+  return { usages, offsets, aliases, strings, checks, optionsSet, shape };
 }
 
 /** Parses a file and returns every runtime API use in it, and where each one is. */
@@ -67,8 +71,7 @@ export function extractModule(
     source,
     options.lazyNodeImports === true,
     options.nativeSpecifiers,
-    options.importedModules,
-    options.importedStrings,
+    options,
   );
   const result = parse(file, source);
   const [error] = result.errors;

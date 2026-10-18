@@ -5,6 +5,7 @@ import { staticKey } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { fileMembers } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
+import { exportedCheck } from '@/extract/exported-checks.ts';
 import { displayRef, isGlobalRoot, moduleRef } from '@/extract/refs.ts';
 import { assign, isTracked, lookup, lookupString } from '@/extract/scope.ts';
 import type { Binding } from '@/extract/scope.ts';
@@ -16,6 +17,27 @@ const wasmSource = /\.wasm(?:\?module)?$/u;
 function namedRef(module: string, name: Node): ApiRef {
   const key = staticKey(name, false) ?? 'default';
   return key === 'default' ? moduleRef(module) : { module, path: [key] };
+}
+
+/** What another file of the graph exports under an imported name: a plain string or a check. */
+function seedImported(
+  specifier: NodeOf<'ImportDeclaration'>['specifiers'][number],
+  context: VisitContext,
+): void {
+  const name = specifier.local.name;
+  const text = context.collector.importedStrings.get(name);
+  if (text !== undefined) {
+    context.scope.strings.set(name, text);
+  }
+  const held = context.collector.importedChecks.get(name);
+  if (
+    held !== undefined &&
+    specifier.type === 'ImportSpecifier' &&
+    staticKey(specifier.imported, false) !== 'default'
+  ) {
+    const check = { test: specifier, negated: false, call: false, busy: false, region: undefined };
+    context.scope.checks.set(name, { ...check, scope: context.scope, held });
+  }
 }
 
 export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context) => {
@@ -30,10 +52,7 @@ export const visitImport: Visitor<NodeOf<'ImportDeclaration'>> = (node, context)
   if (module === undefined) {
     const isWasm = wasmSource.test(node.source.value);
     for (const specifier of used) {
-      const text = context.collector.importedStrings.get(specifier.local.name);
-      if (text !== undefined) {
-        context.scope.strings.set(specifier.local.name, text);
-      }
+      seedImported(specifier, context);
       const alias = context.collector.importedModules.get(specifier.local.name);
       const members =
         specifier.type === 'ImportNamespaceSpecifier'
@@ -94,6 +113,19 @@ function exportStrings(declaration: Node, context: VisitContext): void {
   }
 }
 
+/**
+ * `export const name = check` and `export { name }` of such a `const` tell the files that import
+ * the name what the check tells. A `let` or `var` can change, and a default export is not followed.
+ * An export inside a TypeScript `namespace` is a member of the namespace, not of the module.
+ */
+function exportCheck(local: string, exported: string, context: VisitContext): void {
+  const followed = exported !== 'default' && context.parent()?.type === 'Program';
+  const held = followed ? exportedCheck(local, context) : undefined;
+  if (held !== undefined) {
+    context.collector.checks.set(exported, held);
+  }
+}
+
 export const visitExportNamed: Visitor<NodeOf<'ExportNamedDeclaration'>> = (node, context) => {
   if (node.exportKind === 'type') {
     return;
@@ -101,6 +133,13 @@ export const visitExportNamed: Visitor<NodeOf<'ExportNamedDeclaration'>> = (node
   if (node.declaration !== null) {
     context.visit(node.declaration);
     exportStrings(node.declaration, context);
+    if (node.declaration.type === 'VariableDeclaration') {
+      for (const { id } of node.declaration.declarations) {
+        if (id.type === 'Identifier') {
+          exportCheck(id.name, id.name, context);
+        }
+      }
+    }
     return;
   }
   const module = node.source === null ? undefined : builtinName(node.source.value);
@@ -119,6 +158,9 @@ export const visitExportNamed: Visitor<NodeOf<'ExportNamedDeclaration'>> = (node
           : undefined;
       if (text !== undefined) {
         context.collector.strings.set(exported, text);
+      }
+      if (specifier.local.type === 'Identifier' && node.source === null) {
+        exportCheck(specifier.local.name, exported, context);
       }
       exportLocal(specifier.local, exported, context);
     } else {

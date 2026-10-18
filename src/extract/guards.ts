@@ -170,6 +170,9 @@ function checkGuards(
   if (check === undefined || check.call !== (node.type === 'CallExpression') || check.busy) {
     return [];
   }
+  if (check.held !== undefined) {
+    return [...(truth ? check.held.whenTrue : check.held.whenFalse)];
+  }
   check.busy = true;
   try {
     return guardsWhen(

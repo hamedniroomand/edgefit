@@ -1,3 +1,4 @@
+import type { HeldGuards } from '@/extract/guard-stack.ts';
 import type { ExtractedModule } from '@/extract/index.ts';
 import type { ModuleGraph } from '@/resolve/graph.ts';
 
@@ -24,12 +25,15 @@ function reexportedFrom(
   return from === undefined || file === undefined ? undefined : { file, name: from.imported };
 }
 
-/** The string that a file exports under a name, through any re-export of the name. */
-function stringOf(
+type Exported<TValue> = (module: ExtractedModule) => ReadonlyMap<string, TValue>;
+
+/** The value that a file exports under a name, through any re-export of the name. */
+function valueOf<TValue>(
   graph: ModuleGraph,
   modules: ReadonlyMap<string, ExtractedModule>,
   start: Source,
-): string | undefined {
+  exported: Exported<TValue>,
+): TValue | undefined {
   const seen = new Set<string>();
   for (
     let source: Source | undefined = start;
@@ -37,12 +41,35 @@ function stringOf(
     source = reexportedFrom(graph, modules, source)
   ) {
     seen.add(`${source.file}\0${source.name}`);
-    const text = modules.get(source.file)?.strings.get(source.name);
-    if (text !== undefined) {
-      return text;
+    const module = modules.get(source.file);
+    const value = module === undefined ? undefined : exported(module).get(source.name);
+    if (value !== undefined) {
+      return value;
     }
   }
   return undefined;
+}
+
+/** For each importing file: the local names that stand for a value which another file of the graph exports. */
+function followExports<TValue>(
+  graph: ModuleGraph,
+  modules: ReadonlyMap<string, ExtractedModule>,
+  exported: Exported<TValue>,
+): Map<string, Map<string, TValue>> {
+  const seeds = new Map<string, Map<string, TValue>>();
+  for (const [file, { shape }] of modules) {
+    for (const [local, { specifier, imported }] of shape?.imports ?? []) {
+      const target = targetOf(graph, file, specifier);
+      const value =
+        target === undefined
+          ? undefined
+          : valueOf(graph, modules, { file: target, name: imported }, exported);
+      if (value !== undefined) {
+        seeds.set(file, (seeds.get(file) ?? new Map<string, TValue>()).set(local, value));
+      }
+    }
+  }
+  return seeds;
 }
 
 /**
@@ -52,22 +79,18 @@ function stringOf(
  * string that a file builds from an import of its own is not followed, because the first
  * extraction does not know it. Upgrade: run the extraction again until no new string appears.
  */
-export function followStrings(
+export const followStrings = (
   graph: ModuleGraph,
   modules: ReadonlyMap<string, ExtractedModule>,
-): Map<string, Map<string, string>> {
-  const seeds = new Map<string, Map<string, string>>();
-  for (const [file, { shape }] of modules) {
-    for (const [local, { specifier, imported }] of shape?.imports ?? []) {
-      const target = targetOf(graph, file, specifier);
-      const text =
-        target === undefined
-          ? undefined
-          : stringOf(graph, modules, { file: target, name: imported });
-      if (text !== undefined) {
-        seeds.set(file, (seeds.get(file) ?? new Map<string, string>()).set(local, text));
-      }
-    }
-  }
-  return seeds;
-}
+): Map<string, Map<string, string>> => followExports(graph, modules, module => module.strings);
+
+/**
+ * For each importing file: the local names that stand for a `const` holding a check which another
+ * file of the graph exports. The same limits apply as for strings: `export * from` is not followed,
+ * and a check that a file builds from an import of its own is not followed, so that file gives
+ * fewer guards, never more.
+ */
+export const followChecks = (
+  graph: ModuleGraph,
+  modules: ReadonlyMap<string, ExtractedModule>,
+): Map<string, Map<string, HeldGuards>> => followExports(graph, modules, module => module.checks);

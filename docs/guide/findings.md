@@ -296,7 +296,7 @@ To check the development build, set `env: { NODE_ENV: 'development' }` in the [c
 
 ### Helpers
 
-A check kept in a helper is understood when the helper is in the same file, has no parameters, is not `async`, and only returns the check or tests it in one `if` (see below). So is a `const` that holds one, and a `let` or `var` that its block does not set again:
+A check kept in a helper is understood when the helper is in the same file, has no parameters, is not `async`, and only returns the check or tests it in one `if` (see below). So is a `const` that holds one, also one from another file (see below), and a `let` or `var` that its block does not set again:
 
 ```js
 const isDeno = typeof Deno !== 'undefined';
@@ -310,6 +310,13 @@ if (reading) reader = new FileReader();
 A helper can also test the check in one `if` and return `true` or `false`. The `if` and one `return` after it are its only statements, or the `if` has an `else` (not an `else if`) and is its only statement. The two returns must have different values. So `if (check) { return true; } return false;` holds the check, and `if (check) { return false; } return true;` holds the opposite check.
 
 edgefit does not follow a `let` or `var` that its block sets again, because the check may no longer hold. A write is an `=`, a `++`, a loop over the name, a second `var` with a value, or a function declaration with the same name. A write in a nested function or block that declares its own variable with the same name does not count. For a `var` in a nested block, only the writes in that block count. See [Limitations](/guide/limitations).
+
+A `const` that holds a check can also come from another file of the project or of a package. The import gives the same guards as the `const` in the other file when these are true:
+
+- The other file declares the `const` with `export const`, or exports it with `export { name }` or `export { name as other }`, at the top level of the file.
+- The importing file imports it by name, as in `import { isDeno } from './runtime.js'` or `import { isDeno as deno } from './runtime.js'`.
+
+A file between them can pass the name on with `export { name } from` or with an import that it exports again. A `let` or `var`, a default import (`import runtime from` or `import { default as runtime } from`), a namespace import (`import * as runtime`), `export * from`, `require` and a helper do not count. A `const` whose check uses a check that its own file imports, as in `export const isNode = !isDeno && …`, gives only the guards of the part that does not use the import. A part of the check that uses a name that is local to the other file, such as a computed key or `require.main`, gives no guard. In build output, edgefit does not follow such a `const` to another file. This is a run with `--built`, or with an entry below a `nitro.json`.
 
 A `process.domain` that is truthy, or that a comparison with `null` rules out, guards the `domain` module, because only that module sets the value. Node.js sets it to `null` first, so `typeof process.domain`, `'domain' in process` and `process.domain !== undefined` do not guard the module.
 

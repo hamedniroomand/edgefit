@@ -12,7 +12,7 @@ import type {
 
 import type { ComputedKey } from './chain.ts';
 import { GuardStack } from './guard-stack.ts';
-import type { Guard } from './guard-stack.ts';
+import type { Guard, HeldGuards } from './guard-stack.ts';
 import { functionGuards } from './guarded-functions.ts';
 import type { LocalFunction } from './local-functions.ts';
 import { omitMainFunctions } from './main-only.ts';
@@ -76,6 +76,10 @@ export class UsageCollector {
   public readonly strings = new Map<string, string>();
   /** Imported local names that another module of the graph exports as a plain string. */
   public readonly importedStrings: ReadonlyMap<string, string>;
+  /** What the module exports that is a `const` holding a check, by exported name. */
+  public readonly checks = new Map<string, HeldGuards>();
+  /** Imported local names that another module of the graph exports as a `const` holding a check. */
+  public readonly importedChecks: ReadonlyMap<string, HeldGuards>;
   /** Imported local names that another module of the graph exports as a Node.js module. */
   public readonly importedModules: ReadonlyMap<string, ApiRef>;
   /** Specifiers that resolve to a native addon. */
@@ -88,11 +92,13 @@ export class UsageCollector {
     source: string,
     lazyNodeImports = false,
     nativeSpecifiers: ReadonlyMap<string, string> = new Map(),
-    importedModules: ReadonlyMap<string, ApiRef> = new Map(),
-    importedStrings: ReadonlyMap<string, string> = new Map(),
+    imported: Partial<
+      Pick<UsageCollector, 'importedModules' | 'importedStrings' | 'importedChecks'>
+    > = {},
   ) {
-    this.importedModules = importedModules;
-    this.importedStrings = importedStrings;
+    this.importedModules = imported.importedModules ?? new Map();
+    this.importedStrings = imported.importedStrings ?? new Map();
+    this.importedChecks = imported.importedChecks ?? new Map();
     this.#file = file;
     this.#nativeSpecifiers = nativeSpecifiers;
     this.lazyNodeImports = lazyNodeImports;
