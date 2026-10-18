@@ -30,15 +30,21 @@ const hooksSource = `export async function resolve(specifier, context, next) {
 export const mockedChecks = {
   async 'async_hooks.createHook'(load) {
     const { createHook } = await load('async_hooks');
-    let called = false;
+    // Only a timer created while the hook is enabled counts. A tick that earlier work queued can
+    // reach init inside the window, and Bun delivers init for ticks but calls no other hook.
+    const timers = new Set();
+    let wrapped = false;
     const hook = createHook({
-      init() {
-        called = true;
+      init(asyncId, type) {
+        if (type === 'Timeout') timers.add(asyncId);
+      },
+      before(asyncId) {
+        if (timers.has(asyncId)) wrapped = true;
       },
     }).enable();
     await tick();
     hook.disable();
-    return verdict(called);
+    return verdict(wrapped);
   },
   async 'async_hooks.executionAsyncId'(load) {
     const hooks = await load('async_hooks');
