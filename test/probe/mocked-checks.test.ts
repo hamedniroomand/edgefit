@@ -29,6 +29,7 @@ const fakes: Record<string, unknown> = {
     setSourceMapsEnabled: noop,
     sourceMapsEnabled: true,
   },
+  test: { run: () => [] },
   v8: { setFlagsFromString: noop },
 };
 const loadFake = async (name: string): Promise<unknown> =>

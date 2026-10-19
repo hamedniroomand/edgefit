@@ -129,10 +129,50 @@
       "note": "does not exist on Deno",
       "source": "v8.ts"
     },
+    "v8.startCpuProfile": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "v8.ts",
+      "absent": true
+    },
     "vm.measureMemory": {
       "status": "unsupported",
       "note": "throws Not implemented",
       "source": "vm.js"
+    },
+    "worker_threads.parentPort.emit": {
+      "status": "unsupported",
+      "note": "throws Not implemented inside a worker",
+      "source": "worker_threads.ts"
+    },
+    "worker_threads.parentPort.removeAllListeners": {
+      "status": "unsupported",
+      "note": "throws Not implemented inside a worker",
+      "source": "worker_threads.ts"
+    },
+    "worker_threads.parentPort.close": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "worker_threads.ts",
+      "absent": true
+    },
+    "worker_threads.parentPort.dispatchEvent": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "worker_threads.ts",
+      "absent": true
+    },
+    "worker_threads.parentPort.hasRef": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "worker_threads.ts",
+      "absent": true
+    },
+    "worker_threads.parentPort.start": {
+      "status": "unsupported",
+      "note": "does not exist on Deno",
+      "source": "worker_threads.ts",
+      "absent": true
     },
     "inspector.NetworkResources": {
       "status": "unsupported",
@@ -157,6 +197,11 @@
     "test.assert": {
       "status": "unsupported",
       "note": "does not exist on Deno",
+      "source": "testing.ts"
+    },
+    "test.run": {
+      "status": "mocked",
+      "note": "does not find or run test files; its stream reports only empty runs",
       "source": "testing.ts"
     },
     "tls.createSecurePair": {
