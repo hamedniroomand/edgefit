@@ -137,10 +137,42 @@ export function fallbackSources(root: string): EntrySource[] {
 }
 
 /**
+ * The flags whose value is the next token, from the parsers of Bun 1.4.3
+ * (`src/runtime/cli/Arguments.rs`) and Deno 2.9.7 (`libs/cli_parser/src/defs.rs`). A flag that
+ * takes a value only as `--flag=value`, such as `bun --inspect` or `deno --allow-read`, is not in
+ * this list.
+ */
+const valueFlags: Record<'bun' | 'deno', ReadonlySet<string>> = {
+  bun: new Set(
+    (
+      '--conditions --console-depth --cpu-prof-dir --cpu-prof-interval --cpu-prof-name ' +
+      '--cron-period --cron-title --cwd --define -d --disable-warning --dns-result-order --drop ' +
+      '--elide-lines --env-file --eval -e --extension-order --feature --fetch-preconnect ' +
+      '--filter -F --heap-prof-dir --heap-prof-interval --heap-prof-name --import --install ' +
+      '--jsx-factory --jsx-fragment --jsx-import-source --jsx-runtime --loader -l --main-fields ' +
+      '--max-http-header-size --origin -u --port --preload -r --print -p --redirect-warnings ' +
+      '--require --shell --stack-trace-limit --title --trace-event-categories ' +
+      '--trace-event-file-pattern --tsconfig-override --unhandled-rejections --user-agent ' +
+      '--watch-kill-signal'
+    ).split(' '),
+  ),
+  deno: new Set(
+    (
+      '--cert --conditions --config -c --cpu-prof-dir --cpu-prof-interval --cpu-prof-name --ext ' +
+      '--host --import-map --importmap --inspect-publish-uid --location --lock --log-level -L ' +
+      '--min-dep-age --minimum-dependency-age --node-modules-linker --linker --port --preload ' +
+      '--import --require --seed'
+    ).split(' '),
+  ),
+};
+
+/**
  * The file a start command runs: `bun run src/index.ts`, `bun --hot src/index.ts`,
- * `deno serve main.ts`. Only the first command of a chain is read.
- * ponytail: a flag's value is not told from a file, so the first source file that exists wins.
- * Upgrade by listing the flags that take a value.
+ * `deno serve main.ts`. Only the first command of a chain is read. The value of a flag, as in
+ * `bun --preload ./setup.ts src/index.ts`, is not the file.
+ * ponytail: combined short flags that end in a flag with a value, such as `bun -ir ./setup.ts`,
+ * are not split, so that value can be read as the file. Deno has no such case for a source file.
+ * Upgrade by reading each letter as the runtime's parser does.
  */
 export function entryFromCommand(
   root: string,
@@ -161,6 +193,7 @@ export function entryFromCommand(
   }
   // `bun run dev` names a script, not a file, and has no source extension.
   return tokens
+    .filter((token, index) => !valueFlags[runner].has(tokens[index - 1] ?? ''))
     .filter(token => sourceExtensions.includes(path.extname(token)))
     .map(token => existingFile(root, token))
     .find(file => file !== undefined);
