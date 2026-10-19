@@ -156,6 +156,7 @@ const valueFlags: Record<'bun' | 'deno', ReadonlySet<string>> = {
       '--watch-kill-signal'
     ).split(' '),
   ),
+  // `--lock` takes the next word unless it starts with `-`: `deno run --lock server.ts` has no script.
   deno: new Set(
     (
       '--cert --conditions --config -c --cpu-prof-dir --cpu-prof-interval --cpu-prof-name --ext ' +
