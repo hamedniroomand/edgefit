@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.15.5
+
+### Patch Changes
+
+- [#368](https://github.com/hamedniroomand/edgefit/pull/368) [`0dc1564`](https://github.com/hamedniroomand/edgefit/commit/0dc156426e95f772839c922193c1bc27ebef0471) - A default import of a CommonJS module that sets `__esModule` now uses all of the module when the importing file is in node mode. Node.js and esbuild give all of `module.exports` as the default export in this mode. Before, edgefit used only the `default` export, so it could lose findings. A file is in node mode when it is `.mjs` or `.mts`. A file is also in node mode when it is not `.cjs` or `.cts` and its nearest `package.json` has `"type": "module"`, or when that `package.json` cannot be read. This also applies to `export { default } from` and to `import()`. `edgefit package` checks each entry in node mode, so a finding that only some exports of such a module reach is now also listed under `default`. An `__esModule` mark now counts only when it is on the object that the module exports at the end. A mark set before a later `module.exports = …` no longer counts.
+
+- [#369](https://github.com/hamedniroomand/edgefit/pull/369) [`59ad99f`](https://github.com/hamedniroomand/edgefit/commit/59ad99f097f82a27fb52778bc8739e3e68b1581d) - The entry that edgefit reads from a start command is no longer the value of a flag. In `bun --preload ./setup.ts src/index.ts`, the entry is now `src/index.ts`, not `setup.ts`. The same applies to the other flags that take a value in the next word, such as `--require` and `--env-file` for Bun, and `--config` and `--import-map` for Deno.
+
+- [#372](https://github.com/hamedniroomand/edgefit/pull/372) [`17fac49`](https://github.com/hamedniroomand/edgefit/commit/17fac49b7434b307badcf0945b8369f83164166e) - A tsconfig `extends` with a package name, such as `"extends": "@tsconfig/strictest/tsconfig.json"`, or with an absolute path is now followed. Before, edgefit did not read a `verbatimModuleSyntax` that such a base config sets. So it dropped an import that the bundler keeps, and it did not report a failure when that module loads. A package or file that is not there, or that the `exports` of the package do not list, still gives no base config. Any other error when edgefit resolves the name now stops the run. The `tsconfig` field of the package.json is not read. A base config from a package or an absolute path can only make edgefit keep more imports, never fewer than the relative bases keep.
+
+- [#371](https://github.com/hamedniroomand/edgefit/pull/371) [`7fa34d3`](https://github.com/hamedniroomand/edgefit/commit/7fa34d31442d35ec7ca564379dc1c882d5fd1ca6) - Report `worker_threads.locks` on Bun, which does not exist there. On Deno, report `test.run`, which does not run tests, `worker_threads.parentPort.emit` and `removeAllListeners`, which throw, and `v8.startCpuProfile` and `worker_threads.parentPort.close`, `dispatchEvent`, `hasRef` and `start`, which do not exist. Before, a use of these members gave no finding, because the data marked the whole module as supported. On Deno, a `node:worker_threads` module object or its `parentPort` that is passed on as a value now also gives an `unknown` warning.
+
 ## 0.15.4
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "edgefit",
-  "version": "0.15.4",
+  "version": "0.15.5",
   "description": "Node.js compatibility checker for Cloudflare Workers, Bun, Deno, Netlify and Vercel Edge. Check your code and every npm package it imports before you deploy.",
   "keywords": [
     "bun",
