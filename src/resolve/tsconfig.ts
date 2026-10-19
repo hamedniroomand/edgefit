@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 
 import { parseJSONC } from 'confbox';
@@ -33,20 +34,67 @@ function configFile(from: string, name: string): string | undefined {
   return [parent, `${parent}.json`].find(file => existsSync(file) && statSync(file).isFile());
 }
 
-/** The compiler options of a config, each one set by the config that is nearest to the file. `seen` holds the configs that extend this one, so a loop ends. */
-function compilerOptions(file: string, seen: Set<string>): Record<string, unknown> {
+/** The resolve errors that mean no base config: the package or file is missing, or the `exports` of the package do not list the file. */
+const notFound = new Set(['MODULE_NOT_FOUND', 'ERR_PACKAGE_PATH_NOT_EXPORTED']);
+
+/**
+ * The base config that a package name in `extends` names, found as a module from the config, as
+ * TypeScript does. A file comes before a folder, and a folder gives its `tsconfig.json`. The name
+ * alone comes last, for an `exports` entry that names the config without `.json`, such as `.` or
+ * `./tsc/dom/app`. In a package with no `tsconfig.json`, it can give a JSON `main` or `index.json`
+ * that the bundler does not read. `directoryKeeps` stops such a file from removing an import that
+ * the relative bases keep.
+ * ponytail: the package.json `tsconfig` field and package `imports` (`#name`) are not read, and
+ * the `exports` conditions of Node.js (`require`, `node`, `default`) replace those of TypeScript
+ * and esbuild. Upgrade by reading them as the bundler does.
+ */
+function packageConfig(from: string, name: string): string | undefined {
+  const require = createRequire(from);
+  const first = name.endsWith('.json') ? [name] : [];
+  for (const request of [...first, `${name}.json`, `${name}/tsconfig.json`, name]) {
+    try {
+      const file = require.resolve(request);
+      // A package `main` can be a script. Only a `.json` file is a config.
+      if (file.endsWith('.json')) {
+        return file;
+      }
+    } catch (error) {
+      if (!notFound.has(String((error as NodeJS.ErrnoException).code))) {
+        throw error;
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * The compiler options of a config, each one set by the config that is nearest to the file. `seen`
+ * holds the configs that extend this one, so a loop ends. Without `packages`, only an `extends`
+ * that starts with `.` is followed.
+ */
+function compilerOptions(
+  file: string,
+  seen: Set<string>,
+  packages: boolean,
+): Record<string, unknown> {
   if (seen.has(file)) {
     return {};
   }
   const chain = new Set(seen).add(file);
   const config = readConfig(file);
-  // ponytail: a package name in `extends` is not followed. Resolve it with `createRequire` to cover it.
+  // An empty name would make `packageConfig` read `/tsconfig.json` at the file system root. A
+  // `#name` is a package import, which is not read.
   const parents = (Array.isArray(config.extends) ? config.extends : [config.extends]).filter(
-    (name): name is string => typeof name === 'string' && name.startsWith('.'),
+    (name): name is string =>
+      typeof name === 'string' &&
+      (name.startsWith('.') || (packages && name !== '' && !name.startsWith('#'))),
   );
   const inherited = parents.map(name => {
-    const parent = configFile(file, name);
-    return parent === undefined ? {} : compilerOptions(parent, chain);
+    const parent =
+      name.startsWith('.') || path.isAbsolute(name)
+        ? configFile(file, name)
+        : packageConfig(file, name);
+    return parent === undefined ? {} : compilerOptions(parent, chain, packages);
   });
   // The last config in a list wins.
   return Object.assign({}, ...(inherited as object[]), config.compilerOptions) as Record<
@@ -64,7 +112,11 @@ function directoryKeeps(directory: string, root: string, cache: Map<string, bool
   const up = path.dirname(directory);
   let result = false;
   if (existsSync(config)) {
-    result = keeps(compilerOptions(config, new Set()));
+    // A base from a package or an absolute path, which edgefit did not read before, can only add
+    // kept imports. It must not remove an import that the relative bases keep.
+    result =
+      keeps(compilerOptions(config, new Set(), false)) ||
+      keeps(compilerOptions(config, new Set(), true));
   } else if (directory !== root && up !== directory) {
     result = directoryKeeps(up, root, cache);
   }

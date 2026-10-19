@@ -111,7 +111,7 @@ describe('reading a tree of extended configs', () => {
     expect(keepsUnusedImports(path.join(root, 'three/a.ts'), root)).toBe(true);
   });
 
-  it('stops at a package extends and at a loop', () => {
+  it('stops at a package that is not installed and at a loop', () => {
     const root = project({
       'tsconfig.json': '{ "extends": "@tsconfig/node22/tsconfig.json" }',
       'loop/tsconfig.json': '{ "extends": "./tsconfig.json" }',
