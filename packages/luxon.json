@@ -2,8 +2,8 @@
   "version": 2,
   "package": "luxon",
   "resolved": "3.7.2",
-  "checkedAt": "2026-10-18T13:48:29.224Z",
-  "edgefit": "0.15.4",
+  "checkedAt": "2026-10-19T08:55:08.809Z",
+  "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

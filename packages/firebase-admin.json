@@ -2,8 +2,8 @@
   "version": 2,
   "package": "firebase-admin",
   "resolved": "14.5.0",
-  "checkedAt": "2026-10-18T13:46:15.526Z",
-  "edgefit": "0.15.4",
+  "checkedAt": "2026-10-19T08:53:41.870Z",
+  "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -543,9 +543,15 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 2,
+          "errors": 3,
           "warnings": 0,
           "findings": [
+            {
+              "api": "node:http2.connect",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
             {
               "api": "node:child_process.exec",
               "category": "unsupported",

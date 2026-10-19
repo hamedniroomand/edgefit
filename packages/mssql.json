@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "mssql",
-  "resolved": "12.7.9",
-  "checkedAt": "2026-10-18T13:44:42.694Z",
-  "edgefit": "0.15.4",
+  "resolved": "12.7.10",
+  "checkedAt": "2026-10-19T08:51:57.039Z",
+  "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

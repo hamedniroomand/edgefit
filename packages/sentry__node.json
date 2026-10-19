@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.8.0",
-  "checkedAt": "2026-10-18T13:52:07.865Z",
-  "edgefit": "0.15.4",
+  "checkedAt": "2026-10-19T08:57:09.534Z",
+  "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -451,7 +451,7 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3,
+          "warnings": 4,
           "findings": [
             {
               "api": "globalThis[<expression>]",
@@ -461,6 +461,12 @@
             },
             {
               "api": "node:zlib.constants",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:worker_threads",
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
@@ -549,7 +555,7 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3,
+          "warnings": 4,
           "findings": [
             {
               "api": "globalThis[<expression>]",
@@ -559,6 +565,12 @@
             },
             {
               "api": "node:zlib.constants",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:worker_threads",
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
@@ -647,7 +659,7 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3,
+          "warnings": 4,
           "findings": [
             {
               "api": "globalThis[<expression>]",
@@ -657,6 +669,12 @@
             },
             {
               "api": "node:zlib.constants",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:worker_threads",
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
@@ -745,7 +763,7 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3,
+          "warnings": 4,
           "findings": [
             {
               "api": "globalThis[<expression>]",
@@ -755,6 +773,12 @@
             },
             {
               "api": "node:zlib.constants",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
+              "api": "node:worker_threads",
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"

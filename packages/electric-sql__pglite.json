@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@electric-sql/pglite",
   "resolved": "0.5.10",
-  "checkedAt": "2026-10-18T13:45:31.944Z",
-  "edgefit": "0.15.4",
+  "checkedAt": "2026-10-19T08:53:09.242Z",
+  "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

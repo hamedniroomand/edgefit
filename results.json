@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-18T13:55:23.190Z",
-  "edgefit": "0.15.4",
+  "generatedAt": "2026-10-19T09:00:27.589Z",
+  "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -301,7 +301,7 @@
     {
       "name": "openai",
       "file": "openai",
-      "resolved": "7.38.0",
+      "resolved": "7.39.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1061,7 +1061,7 @@
     {
       "name": "nodemailer",
       "file": "nodemailer",
-      "resolved": "10.1.6",
+      "resolved": "10.1.7",
       "summary": {
         "workerd": "fail",
         "bun": "pass",
@@ -1747,7 +1747,7 @@
     {
       "name": "mssql",
       "file": "mssql",
-      "resolved": "12.7.9",
+      "resolved": "12.7.10",
       "summary": {
         "workerd": "fail",
         "bun": "pass",

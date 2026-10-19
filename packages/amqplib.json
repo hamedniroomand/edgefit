@@ -2,8 +2,8 @@
   "version": 2,
   "package": "amqplib",
   "resolved": "2.2.0",
-  "checkedAt": "2026-10-18T13:48:27.889Z",
-  "edgefit": "0.15.4",
+  "checkedAt": "2026-10-19T08:55:07.721Z",
+  "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
