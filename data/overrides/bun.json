@@ -3,7 +3,7 @@
   "modules": {
     "child_process": {
       "status": "supported",
-      "note": "documented as implemented; the compatibility matrix does not cover node:child_process",
+      "note": "implemented; the gaps the docs list are options and members of a child process. The compatibility matrix does not cover node:child_process",
       "source": "docs/runtime/nodejs-compat.mdx",
       "except": []
     },
@@ -33,13 +33,13 @@
     },
     "vm": {
       "status": "supported",
-      "note": "documented as implemented; the compatibility matrix does not cover node:vm",
+      "note": "implemented; the compatibility matrix does not cover node:vm",
       "source": "docs/runtime/nodejs-compat.mdx",
       "except": []
     },
     "worker_threads": {
       "status": "supported",
-      "note": "documented as implemented; the compatibility matrix does not cover node:worker_threads",
+      "note": "implemented, except moveMessagePortToContext and locks, which have their own entries; the compatibility matrix does not cover node:worker_threads",
       "source": "docs/runtime/nodejs-compat.mdx",
       "except": []
     },
@@ -179,6 +179,12 @@
       "note": "throws a NotImplementedError",
       "source": "src/js/node/worker_threads.ts",
       "validatesFirst": true
+    },
+    "worker_threads.locks": {
+      "status": "unsupported",
+      "note": "does not exist on Bun",
+      "source": "src/js/node/worker_threads.ts",
+      "absent": true
     },
     "module.register": {
       "status": "mocked",

@@ -64,6 +64,19 @@ describe('bun lookups', () => {
   });
 });
 
+describe('bun members of a module marked supported as a whole', () => {
+  const target = createBunTarget(projectWith({}));
+
+  it('reports a missing member and keeps the other members', () => {
+    expect(target.lookup({ module: 'worker_threads', path: ['Worker'] }).status).toBe('supported');
+    expect(target.lookup({ module: 'worker_threads', path: ['locks'] })).toMatchObject({
+      status: 'unsupported',
+      note: 'does not exist on Bun',
+      absent: true,
+    });
+  });
+});
+
 describe('bun target info', () => {
   it('names the matrix commit and Bun version', () => {
     const { info } = createBunTarget(projectWith({}));

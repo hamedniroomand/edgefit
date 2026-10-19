@@ -54,6 +54,37 @@ describe('deno lookups', () => {
   });
 });
 
+describe('deno members of a module marked supported as a whole', () => {
+  const target = createDenoTarget(emptyProject);
+
+  it('reports the stubs and keeps the other members', () => {
+    expect(target.lookup({ module: 'test', path: ['run'] }).status).toBe('mocked');
+    for (const member of ['emit', 'removeAllListeners']) {
+      expect(target.lookup({ module: 'worker_threads', path: ['parentPort', member] })).toEqual({
+        status: 'unsupported',
+        note: 'throws Not implemented inside a worker',
+        source: 'https://github.com/denoland/deno/tree/v2.9.7/ext/node/polyfills/worker_threads.ts',
+      });
+    }
+    expect(target.lookup({ module: 'worker_threads', path: ['parentPort', 'on'] }).status).toBe(
+      'supported',
+    );
+  });
+
+  it('reports members that Deno lacks', () => {
+    for (const path of [
+      ['parentPort', 'close'],
+      ['parentPort', 'start'],
+    ]) {
+      expect(target.lookup({ module: 'worker_threads', path })).toMatchObject({
+        status: 'unsupported',
+        absent: true,
+      });
+    }
+    expect(target.lookup({ module: 'v8', path: ['startCpuProfile'] }).absent).toBe(true);
+  });
+});
+
 describe('deno target info', () => {
   it('names the matrix commit, the Deno version and the import map', () => {
     const { info } = createDenoTarget(fixture('deno-app'));

@@ -1,3 +1,7 @@
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+
 /**
  * One targeted check per curated `mocked` entry. Each reports `implemented` when the API now does
  * its job, `noop` while it still does nothing, and `inconclusive` when it throws. `load` imports
@@ -121,6 +125,20 @@ export const mockedChecks = {
       return verdict(process.sourceMapsEnabled === false);
     } finally {
       process.setSourceMapsEnabled(true);
+    }
+  },
+  async 'test.run'(load) {
+    const { run } = await load('test');
+    const directory = await mkdtemp(path.join(tmpdir(), 'edgefit-probe-'));
+    const file = path.join(directory, 'probe.test.mjs');
+    await writeFile(file, "import test from 'node:test';\ntest('probe', () => {});\n");
+    try {
+      for await (const event of run({ files: [file] })) {
+        if (event.type === 'test:pass') return 'implemented';
+      }
+      return 'noop';
+    } finally {
+      await rm(directory, { recursive: true, force: true });
     }
   },
   async 'v8.setFlagsFromString'(load) {
