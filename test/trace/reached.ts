@@ -7,6 +7,8 @@ export interface Source {
   code: string;
   /** Specifier to file. Anything other than a static import is given as `kind:specifier`. */
   imports?: Record<string, string>;
+  /** Whether esbuild reads the file in node mode. */
+  nodeMode?: boolean;
 }
 
 const globals = new Set(['process', 'Buffer']);
@@ -27,13 +29,14 @@ export function build(
 ): { graph: ModuleGraph; modules: Map<string, ExtractedModule> } {
   const modules = new Map<string, ExtractedModule>();
   const graph: ModuleGraph = { entries: [entry], modules: new Map<string, GraphModule>() };
-  for (const [file, { code, imports = {} }] of Object.entries(files)) {
+  for (const [file, { code, imports = {}, nodeMode }] of Object.entries(files)) {
     const links = linksOf(imports);
     graph.modules.set(file, {
       imports: links.map(link => link.path),
       links,
       externals: [],
       missingPeers: [],
+      nodeMode,
     });
     modules.set(file, extractModule(file, code, { globals, shape: true, nodeEnv: 'production' }));
   }

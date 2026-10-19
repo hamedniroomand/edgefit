@@ -31,7 +31,7 @@ export interface ModuleShape {
   traceable: boolean;
   /** Whether the module is CommonJS, so its `default` export is all of what it exports. */
   commonJs: boolean;
-  /** Whether a CommonJS module sets `__esModule` to a value that is true, so it has a `default` export of its own. */
+  /** Whether the object that a CommonJS module exports at the end has an `__esModule` mark that is true, so it has a `default` export of its own. A node-mode importer does not use this mark. */
   esModule: boolean;
   /** In source order. They never overlap. */
   units: Unit[];

@@ -19,6 +19,26 @@ function runsOnLoad(shape: ModuleShape, link: GraphModule['links'][number]): boo
   );
 }
 
+/**
+ * In node mode, a `default` import of a CommonJS module asks for all of `module.exports`, whatever
+ * `__esModule` says. A `require` gives `module.exports` itself, so its `.default` is only that
+ * export. A graph without `nodeMode` keeps the `__esModule` rule in `analyze`.
+ */
+function nodeModeAsk(
+  names: Demand | undefined,
+  importer: GraphModule | undefined,
+  link: GraphModule['links'][number],
+  target: ModuleShape | undefined,
+): Demand | undefined {
+  const whole =
+    importer?.nodeMode === true &&
+    link.kind !== 'require-call' &&
+    target?.commonJs === true &&
+    names instanceof Set &&
+    names.has('default');
+  return whole ? 'all' : names;
+}
+
 /** What is asked of each module, the modules that the trace loads, and the files left to analyze. */
 class Demands {
   public readonly loaded = new Set<string>();
@@ -69,18 +89,24 @@ export type EntryAsk = { entry: string; names: Set<string> };
  * import whose specifier was read from a module that can be traced.
  */
 function seedLinks(
-  links: GraphModule['links'],
+  module: GraphModule | undefined,
+  shapes: ReadonlyMap<string, ModuleShape>,
   shape: ModuleShape | undefined,
   demands: Demands,
 ): void {
-  for (const link of links) {
+  for (const link of module?.links ?? []) {
     const named =
       shape?.traceable === true && isStatic(link.kind) && shape.specifiers.has(link.original ?? '');
     // A file loaded with `import()` or `require()` that only gets destructured by name is asked
     // for those names. An understood `require` is already read through `named`.
     const loaded = loadsFor(shape, link.kind)?.get(link.original ?? '');
     // The names a file reads are known whether or not its own exports can be told apart.
-    const asked = link.kind === 'dynamic-import' || !named ? loaded : undefined;
+    const asked = nodeModeAsk(
+      link.kind === 'dynamic-import' || !named ? loaded : undefined,
+      module,
+      link,
+      shapes.get(link.path),
+    );
     if (asked instanceof Set) {
       demands.visit(link.path, asked);
     } else if (!named) {
@@ -117,9 +143,9 @@ export function traceReach(
   const traced = new Map<string, Set<Unit>>();
   for (let file = demands.queue.pop(); file !== undefined; file = demands.queue.pop()) {
     const shape = shapes.get(file);
-    const links = graph.modules.get(file)?.links ?? [];
+    const module = graph.modules.get(file);
     if (!seeded.has(file) && file !== ask?.entry) {
-      seedLinks(links, shape, demands);
+      seedLinks(module, shapes, shape, demands);
     }
     seeded.add(file);
     if (shape?.traceable !== true) {
@@ -127,9 +153,14 @@ export function traceReach(
     }
     const { live, asks } = analyze(shape, demands.get(file));
     traced.set(file, live);
-    for (const link of links) {
+    for (const link of module?.links ?? []) {
       const asked = file === ask?.entry ? ask.names : asks.get(link.original ?? '');
-      const names = isStatic(link.kind) ? asked : undefined;
+      const names = nodeModeAsk(
+        isStatic(link.kind) ? asked : undefined,
+        module,
+        link,
+        shapes.get(link.path),
+      );
       if (names !== undefined || runsOnLoad(shape, link)) {
         demands.visit(link.path, names);
       }

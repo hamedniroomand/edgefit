@@ -4,6 +4,7 @@ import { isFunction, staticKey, strip, stringLiteral } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 
 import { isLazyClass, mentionsIn, rootNames } from './builder.ts';
+import { EsModuleMark } from './cjs-es-module.ts';
 import {
   exportKey,
   isExportsObject,
@@ -18,8 +19,6 @@ import {
 import type { ObjectLiteral } from './cjs-forms.ts';
 import {
   exportedAs,
-  isTruthy,
-  isTruthyDescriptor,
   loadTimeExport,
   moduleExportsValue,
   objectExport,
@@ -42,11 +41,11 @@ export class ExportWriter {
   /** The variables that were set to an object literal and read as exports. */
   readonly #objects = new Set<string>();
   #unreadable = false;
-  /** Set by `Object.defineProperty` of `__esModule`, unless its `writable` is known to be true. Then a later `=` can only clear the flag. A later `defineProperty` sets the flag again. */
-  #esModuleFixed = false;
+  readonly #mark: EsModuleMark;
 
   public constructor(context: ExportContext) {
     this.#context = context;
+    this.#mark = new EsModuleMark(context.builder.shape);
   }
 
   /** Notes that a variable holds an object literal that `module.exports` is set to. */
@@ -100,8 +99,7 @@ export class ExportWriter {
       return false;
     }
     if (name === '__esModule') {
-      this.#context.builder.shape.esModule = isTruthyDescriptor(object, 'value');
-      this.#esModuleFixed = !isTruthyDescriptor(object, 'writable');
+      this.#mark.define(target, object);
       return true;
     }
     this.#writes += 1;
@@ -174,6 +172,10 @@ export class ExportWriter {
     // After `module.exports = value`, `module.exports.key = …` adds a property to that value. A write
     // through `exports` still counts, because `exports` can name the object that was replaced.
     const counted = this.#assigned === undefined || !isModuleExports(left.object);
+    if (name === '__esModule') {
+      this.#mark.assign(left.object, strip(node.right));
+      return true;
+    }
     const known = this.#context.builder.shape.exports;
     const before = known.get(name);
     const read = this.#assignExport(name, strip(node.right), counted);
@@ -200,11 +202,6 @@ export class ExportWriter {
 
   /** `exports.name = value`. */
   #assignExport(name: string, value: Node, counted: boolean): boolean {
-    if (name === '__esModule') {
-      const { shape } = this.#context.builder;
-      shape.esModule = isTruthy(value) && (shape.esModule || !this.#esModuleFixed);
-      return true;
-    }
     if (value.type === 'Identifier') {
       this.#context.builder.export(name, { local: value.name });
       this.#writes += counted ? 1 : 0;
@@ -264,6 +261,7 @@ export class ExportWriter {
 
   /** `module.exports = value`. */
   #assignModuleExports(value: Node): boolean {
+    this.#mark.replace();
     if (this.#assigned !== undefined) {
       this.#unreadable = true;
       return false;
