@@ -38,3 +38,27 @@ describe('the file in a start command', () => {
     expect(bun('')).toBeUndefined();
   });
 });
+
+describe('a flag value in a start command', () => {
+  it('skips the value of a flag that takes one', () => {
+    expect(bun('bun --preload ./setup.ts src/index.ts')).toBe('src/index.ts');
+    expect(bun('bun run -r ./setup.ts src/index.ts')).toBe('src/index.ts');
+    expect(bun('bun --require ./setup.ts --import ./setup.ts server.ts')).toBe('server.ts');
+    expect(bun('bun --env-file ./setup.ts src/index.ts')).toBe('src/index.ts');
+    expect(deno('deno run --preload ./setup.ts server.ts')).toBe('server.ts');
+    expect(deno('deno serve -c ./setup.ts --port 8000 server.ts')).toBe('server.ts');
+    expect(deno('deno run --lock ./setup.ts server.ts')).toBe('server.ts');
+  });
+
+  it('never reads a `--flag=value` word as the file', () => {
+    expect(bun('bun --preload=./setup.ts src/index.ts')).toBe('src/index.ts');
+  });
+
+  it('reads the file after a flag that takes a value only with `=`', () => {
+    expect(bun('bun --inspect src/index.ts')).toBe('src/index.ts');
+    // Deno reads this file as the script, and `--allow-read` gets no value.
+    expect(deno('deno run --allow-read ./setup.ts server.ts')).toBe('setup.ts');
+    // Deno's `--watch` takes paths only as `--watch=…`.
+    expect(deno('deno run --watch ./setup.ts server.ts')).toBe('setup.ts');
+  });
+});
