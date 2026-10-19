@@ -5,11 +5,10 @@ import { build } from 'esbuild';
 import type { Loader, Message, Metafile, Plugin } from 'esbuild';
 
 import { toResolveError } from './errors.ts';
-import { importWrappers } from './import-wrappers.ts';
-import { mainOnly } from './main-only.ts';
 import { acceptMissingRequires } from './missing-requires.ts';
-import { acceptMissingPeers, importKey, moduleName, optionalPeers } from './optional-peers.ts';
-import { runtimeExternals } from './runtime-externals.ts';
+import { isNodeMode } from './node-mode.ts';
+import { acceptMissingPeers, importKey, moduleName } from './optional-peers.ts';
+import { graphPlugins } from './plugins.ts';
 import { tsconfigRawFor } from './tsconfig.ts';
 
 /** An import of a module in the graph, as esbuild resolved it. */
@@ -30,6 +29,8 @@ export interface GraphModule {
   /** The externals that are optional peer dependencies which are not installed. */
   missingPeers: string[];
   missingRequires?: string[];
+  /** Whether esbuild can read the file in node mode. See `isNodeMode`. */
+  nodeMode?: boolean;
 }
 
 export interface ModuleGraph {
@@ -117,13 +118,7 @@ async function bundleMetafile(
       tsconfigRaw: tsconfigRawFor(options.root),
       define,
       logLevel: 'silent',
-      plugins: [
-        ...(options.plugins ?? []),
-        runtimeExternals,
-        importWrappers,
-        mainOnly(new Set(options.entries.map(entry => path.resolve(options.root, entry)))),
-        optionalPeers(new Set([...accepted, ...missingRequires])),
-      ],
+      plugins: graphPlugins(options, new Set([...accepted, ...missingRequires])),
     });
     return result.metafile;
   } catch (error) {
@@ -155,6 +150,7 @@ export async function resolveGraph(requested: ResolveOptions): Promise<ModuleGra
   const missingRequires = new Set<string>();
   const metafile = await bundleMetafile(options, accepted, missingRequires);
   const modules = new Map<string, GraphModule>();
+  const scopes = new Map<string, boolean>();
   for (const [file, input] of Object.entries(metafile.inputs)) {
     if (file.startsWith(disabledPrefix)) {
       continue;
@@ -179,6 +175,7 @@ export async function resolveGraph(requested: ResolveOptions): Promise<ModuleGra
       missingRequires: externals.filter(item =>
         missingRequires.has(importKey(path.resolve(options.root, file), item)),
       ),
+      nodeMode: isNodeMode(path.resolve(options.root, file), scopes),
     });
   }
   const entries = Object.values(metafile.outputs).flatMap(output => output.entryPoint ?? []);
