@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-19T09:00:27.589Z",
+  "generatedAt": "2026-10-20T09:48:57.759Z",
   "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -126,7 +126,7 @@
     {
       "name": "jose",
       "file": "jose",
-      "resolved": "6.2.12",
+      "resolved": "6.2.13",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -333,7 +333,7 @@
     {
       "name": "@aws-sdk/client-s3",
       "file": "aws-sdk__client-s3",
-      "resolved": "3.1152.0",
+      "resolved": "3.1153.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -533,13 +533,13 @@
     {
       "name": "chokidar",
       "file": "chokidar",
-      "resolved": "5.0.0",
+      "resolved": "6.0.0",
       "summary": {
         "workerd": "fail",
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 2,
+      "subpaths": 1,
       "notes": "Watches the file system.",
       "verified": {
         "bun": "verified",
@@ -759,7 +759,7 @@
     {
       "name": "undici",
       "file": "undici",
-      "resolved": "8.12.2",
+      "resolved": "8.12.3",
       "summary": {
         "workerd": "fail",
         "bun": "pass",

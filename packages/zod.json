@@ -2,7 +2,7 @@
   "version": 2,
   "package": "zod",
   "resolved": "4.6.7",
-  "checkedAt": "2026-10-19T08:51:23.670Z",
+  "checkedAt": "2026-10-20T09:37:22.378Z",
   "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

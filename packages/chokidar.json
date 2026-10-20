@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "chokidar",
-  "resolved": "5.0.0",
-  "checkedAt": "2026-10-19T08:51:16.059Z",
+  "resolved": "6.0.0",
+  "checkedAt": "2026-10-20T09:37:14.328Z",
   "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -50,7 +50,7 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 3,
+          "errors": 1,
           "warnings": 0,
           "findings": [
             {
@@ -58,65 +58,6 @@
               "category": "unsupported",
               "level": "error",
               "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
-            },
-            {
-              "api": "node:fs.unwatchFile",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
-            },
-            {
-              "api": "node:fs.watchFile",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
-            }
-          ]
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./handler.js",
-      "specifier": "chokidar/handler.js",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0,
-          "exports": [
-            {
-              "name": "NodeFsHandler",
-              "level": "error",
-              "findings": [
-                {
-                  "api": "node:fs.watch",
-                  "category": "unsupported",
-                  "level": "error",
-                  "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
-                },
-                {
-                  "api": "node:fs.unwatchFile",
-                  "category": "unsupported",
-                  "level": "error",
-                  "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
-                },
-                {
-                  "api": "node:fs.watchFile",
-                  "category": "unsupported",
-                  "level": "error",
-                  "detail": "file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION"
-                }
-              ]
             }
           ]
         },

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "pdf-lib",
   "resolved": "1.17.1",
-  "checkedAt": "2026-10-19T08:52:37.768Z",
+  "checkedAt": "2026-10-20T09:39:37.339Z",
   "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

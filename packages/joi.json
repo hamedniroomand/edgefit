@@ -2,7 +2,7 @@
   "version": 2,
   "package": "joi",
   "resolved": "18.3.0",
-  "checkedAt": "2026-10-19T08:51:44.124Z",
+  "checkedAt": "2026-10-20T09:37:33.518Z",
   "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

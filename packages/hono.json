@@ -2,7 +2,7 @@
   "version": 2,
   "package": "hono",
   "resolved": "4.13.13",
-  "checkedAt": "2026-10-19T08:51:19.824Z",
+  "checkedAt": "2026-10-20T09:37:17.845Z",
   "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "jsdom",
   "resolved": "30.1.3",
-  "checkedAt": "2026-10-19T08:52:11.304Z",
+  "checkedAt": "2026-10-20T09:38:54.531Z",
   "edgefit": "0.15.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
