@@ -320,7 +320,7 @@
     },
     {
       "name": "firebase-admin",
-      "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process, and on Deno the Firestore client reads http2 status constants that Deno lacks."
+      "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process."
     },
     {
       "name": "@google-cloud/storage",

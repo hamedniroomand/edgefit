@@ -163,6 +163,15 @@
       "target": "bun",
       "reason": "Runs only with the `worker` option, which defaults to false. It starts the heartbeat in a Web Worker.",
       "source": "https://github.com/supabase/supabase-js/blob/v2.117.3/packages/core/realtime-js/src/RealtimeClient.ts#L813"
+    },
+    {
+      "package": "@grpc/grpc-js",
+      "versions": { "min": "1.14.0", "max": "1.14.6" },
+      "file": "build/src/server.js",
+      "apis": ["node:http2.constants.HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE"],
+      "target": "deno",
+      "reason": "Runs only in `Server#_verifyContentType`, when a gRPC server gets a request that has no gRPC content type. A gRPC client never runs it. On Deno the constant is `undefined`, and the server answers that request with status 200 and keeps running.",
+      "source": "https://github.com/grpc/grpc-node/blob/@grpc/grpc-js@1.14.6/packages/grpc-js/src/server.ts#L1272-L1294"
     }
   ]
 }
