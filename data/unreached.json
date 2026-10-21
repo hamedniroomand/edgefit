@@ -4,57 +4,57 @@
   "entries": [
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/esm/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
       "reason": "Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/crates/next-core/src/next_edge/context.rs#L128"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/crates/next-core/src/next_edge/context.rs#L128"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
       "reason": "Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/crates/next-core/src/next_edge/context.rs#L128"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/crates/next-core/src/next_edge/context.rs#L128"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/esm/build/templates/app-route.js",
       "apis": ["node:process.hrtime.bigint"],
       "target": "vercel-edge",
       "reason": "Runs only when routeModule.isDev is true. isDev is set from __NEXT_DEV_SERVER, which only next dev sets, so a deployed build never runs it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/build/templates/app-route.ts#L117"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/packages/next/src/build/templates/app-route.ts#L117"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/build/templates/app-route.js",
       "apis": ["node:process.hrtime.bigint"],
       "target": "vercel-edge",
       "reason": "Runs only when routeModule.isDev is true. isDev is set from __NEXT_DEV_SERVER, which only next dev sets, so a deployed build never runs it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/build/templates/app-route.ts#L117"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/packages/next/src/build/templates/app-route.ts#L117"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/esm/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
       "reason": "Runs only inside `if (registry)`, and `registry` is set only when `globalThis.FinalizationRegistry` exists. Vercel edge functions have no FinalizationRegistry, so the branch never runs there.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/server/lib/clone-response.ts#L5"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/packages/next/src/server/lib/clone-response.ts#L5"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
       "reason": "Runs only inside `if (registry)`, and `registry` is set only when `globalThis.FinalizationRegistry` exists. Vercel edge functions have no FinalizationRegistry, so the branch never runs there.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/server/lib/clone-response.ts#L5"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/packages/next/src/server/lib/clone-response.ts#L5"
     },
     {
       "package": "postal-mime",
@@ -76,7 +76,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.6" },
+      "versions": { "min": "4.0.2", "max": "4.1.3" },
       "file": "dist/esm/decode-strings.js",
       "apis": ["FileReader"],
       "target": "workerd",
@@ -85,7 +85,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.6" },
+      "versions": { "min": "4.0.2", "max": "4.1.3" },
       "file": "dist/esm/decode-strings.js",
       "apis": ["FileReader"],
       "target": "bun",
@@ -94,7 +94,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.6" },
+      "versions": { "min": "4.0.2", "max": "4.1.3" },
       "file": "dist/cjs/decode-strings.js",
       "apis": ["FileReader"],
       "target": "workerd",
@@ -103,7 +103,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.6" },
+      "versions": { "min": "4.0.2", "max": "4.1.3" },
       "file": "dist/cjs/decode-strings.js",
       "apis": ["FileReader"],
       "target": "bun",
@@ -112,12 +112,12 @@
     },
     {
       "package": "nodemailer",
-      "versions": { "min": "10.0.13", "max": "10.1.1" },
+      "versions": { "min": "10.0.13", "max": "10.2.0" },
       "file": "dist/esm/sendmail-transport/index.js",
       "apis": ["node:child_process", "node:child_process.spawn"],
       "target": "workerd",
       "reason": "Runs only with the sendmail transport, which starts a local `sendmail` binary. A Worker sends mail with the SMTP transport.",
-      "source": "https://github.com/nodemailer/nodemailer/blob/v10.1.1/src/sendmail-transport/index.ts#L154"
+      "source": "https://github.com/nodemailer/nodemailer/blob/v10.2.0/src/sendmail-transport/index.ts#L150"
     },
     {
       "package": "mongodb",
@@ -130,39 +130,39 @@
     },
     {
       "package": "@supabase/auth-js",
-      "versions": { "min": "2.117.2", "max": "2.117.3" },
+      "versions": { "min": "2.117.2", "max": "2.118.0" },
       "file": "dist/module/lib/locks.js",
       "apis": ["navigator.locks.request"],
       "target": "workerd",
       "reason": "Runs only when a project passes `navigatorLock` as the deprecated `lock` option. The client coordinates session refreshes without a lock by default and does not use `navigator.locks`.",
-      "source": "https://github.com/supabase/supabase-js/blob/v2.117.3/packages/core/auth-js/src/GoTrueClient.ts#L465"
+      "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/auth-js/src/GoTrueClient.ts#L465"
     },
     {
       "package": "@supabase/auth-js",
-      "versions": { "min": "2.117.2", "max": "2.117.3" },
+      "versions": { "min": "2.117.2", "max": "2.118.0" },
       "file": "dist/module/lib/locks.js",
       "apis": ["navigator.locks.request"],
       "target": "bun",
       "reason": "Runs only when a project passes `navigatorLock` as the deprecated `lock` option. The client coordinates session refreshes without a lock by default and does not use `navigator.locks`.",
-      "source": "https://github.com/supabase/supabase-js/blob/v2.117.3/packages/core/auth-js/src/GoTrueClient.ts#L465"
+      "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/auth-js/src/GoTrueClient.ts#L465"
     },
     {
       "package": "@supabase/realtime-js",
-      "versions": { "min": "2.117.2", "max": "2.117.3" },
+      "versions": { "min": "2.117.2", "max": "2.118.0" },
       "file": "dist/module/RealtimeClient.js",
       "apis": ["Worker", "URL.createObjectURL"],
       "target": "workerd",
       "reason": "Runs only with the `worker` option, which defaults to false. It starts the heartbeat in a Web Worker.",
-      "source": "https://github.com/supabase/supabase-js/blob/v2.117.3/packages/core/realtime-js/src/RealtimeClient.ts#L813"
+      "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/realtime-js/src/RealtimeClient.ts#L813"
     },
     {
       "package": "@supabase/realtime-js",
-      "versions": { "min": "2.117.2", "max": "2.117.3" },
+      "versions": { "min": "2.117.2", "max": "2.118.0" },
       "file": "dist/module/RealtimeClient.js",
       "apis": ["Worker", "URL.createObjectURL"],
       "target": "bun",
       "reason": "Runs only with the `worker` option, which defaults to false. It starts the heartbeat in a Web Worker.",
-      "source": "https://github.com/supabase/supabase-js/blob/v2.117.3/packages/core/realtime-js/src/RealtimeClient.ts#L813"
+      "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/realtime-js/src/RealtimeClient.ts#L813"
     },
     {
       "package": "@grpc/grpc-js",
