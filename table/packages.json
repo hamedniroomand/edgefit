@@ -329,7 +329,7 @@
     },
     {
       "name": "mssql",
-      "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either."
+      "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either. Tedious calls an @azure/identity credential only after a SQL Server accepts the login, so a run without one cannot reach the child_process calls. The UDP lookup for a named instance does not throw on workerd, and the connection times out."
     },
     {
       "name": "argon2",
@@ -337,7 +337,7 @@
     },
     {
       "name": "@electric-sql/pglite",
-      "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support, and its multi-tab worker uses navigator.locks, which Bun does not have."
+      "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support, and its multi-tab worker uses navigator.locks, which Bun does not have. On workerd, `PGlite.create()` fails with ENOENT on `pglite.data` before it uses WebAssembly, and a request cannot compile WebAssembly from bytes."
     },
     {
       "name": "socket.io",
