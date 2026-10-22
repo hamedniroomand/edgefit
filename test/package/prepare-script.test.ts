@@ -8,6 +8,7 @@ import { checkPackage } from '@/package/check-package.ts';
 import { packageFlowTimeout } from '~/helpers.ts';
 
 let source: string;
+let markerDirectory: string;
 const writeJson = (file: string, value: unknown): void => {
   mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, JSON.stringify(value));
@@ -15,26 +16,30 @@ const writeJson = (file: string, value: unknown): void => {
 
 beforeEach(() => {
   source = mkdtempSync(path.join(tmpdir(), 'edgefit-prepare-'));
+  markerDirectory = mkdtempSync(path.join(tmpdir(), 'edgefit-marker-'));
   writeFileSync(path.join(source, 'index.js'), 'export const ready = true;\n');
 });
 afterEach(() => {
   rmSync(source, { recursive: true, force: true });
+  rmSync(markerDirectory, { recursive: true, force: true });
 });
 
 describe('checkPackage on a directory', { timeout: packageFlowTimeout }, () => {
   // npm 10 runs `prepare` in `npm pack` even with `--ignore-scripts`. npm 11 does not, so this
-  // test shows the fix only when npm is version 10, as on the Node 22 job of the CI.
+  // test shows the fix only when npm is version 10, as on the Node 22 job of the CI. The script
+  // runs in the folder that npm packs, which is a copy, so the marker has an absolute path.
   it('does not run the prepare script of the package', async () => {
+    const marker = path.join(markerDirectory, 'marker.txt').replaceAll('\\', '/');
     writeJson(path.join(source, 'package.json'), {
       name: 'edgefit-fixture-prepare',
       version: '1.0.0',
       type: 'module',
       main: './index.js',
-      scripts: { prepare: "node -e \"require('fs').writeFileSync('marker.txt', 'ran')\"" },
+      scripts: { prepare: `node -e "require('fs').writeFileSync('${marker}', 'ran')"` },
     });
     const result = await checkPackage(source, { targets: ['workerd'] });
     expect(result.package).toBe('edgefit-fixture-prepare');
-    expect(existsSync(path.join(source, 'marker.txt'))).toBe(false);
+    expect(existsSync(marker)).toBe(false);
   });
 
   it('keeps the bundled dependencies of the package', async () => {
