@@ -132,7 +132,68 @@ function memberKey(node: Node): string | undefined {
   return object?.type === 'Identifier' && name !== undefined ? `${object.name}.${name}` : undefined;
 }
 
-type Walk = { node: Node; nested: boolean; tests: readonly Node[] };
+/**
+ * The tests that are true when a child of `node` runs. A function starts a new list. The true
+ * branch of an `if` adds the test of the `if`.
+ */
+function testsFor(node: Node, child: Node, tests: readonly Node[]): readonly Node[] {
+  if (isFunction(node)) {
+    return [];
+  }
+  return node.type === 'IfStatement' && child === node.consequent ? [...tests, node.test] : tests;
+}
+
+type Walk = {
+  node: Node;
+  nested: boolean;
+  /** The node is a direct child of an object pattern. Its key names a value that the code reads. */
+  read: boolean;
+  tests: readonly Node[];
+};
+
+/** What a node sets: the name of the option, and the value that it gets. */
+type Setting = { name: string | undefined; value: Node | undefined };
+
+/**
+ * The member that a destructuring pattern writes, as in `({ a: options.http2 } = env)`. It sets the
+ * name of the member, to a value that is not known. A plain name, such as `{ http2 }`, sets nothing.
+ */
+function patternTarget(property: NodeOf<'Property'>): Setting | undefined {
+  const target = strip(property.value);
+  const member = target.type === 'AssignmentPattern' ? strip(target.left) : target;
+  return member.type === 'MemberExpression'
+    ? { name: staticKey(member.property, member.computed), value: member }
+    : undefined;
+}
+
+/** `x.name = value`, unless a test shows that the member is present: see `findAssignedOptions`. */
+function memberAssignment(
+  node: NodeOf<'AssignmentExpression'>,
+  left: NodeOf<'MemberExpression'>,
+  tests: readonly Node[],
+): Setting {
+  const key = memberKey(left);
+  const guarded =
+    node.operator === '=' &&
+    tests.some(test => testsPresent(test, side => memberKey(side) === key));
+  return { name: staticKey(left.property, left.computed), value: guarded ? undefined : node.right };
+}
+
+function settingOf({ node, nested, read, tests }: Walk): Setting | undefined {
+  if (node.type === 'Property' && node.kind === 'init' && !node.method && !nested) {
+    return read
+      ? patternTarget(node)
+      : { name: staticKey(node.key, node.computed), value: node.value };
+  }
+  if (
+    node.type === 'AssignmentExpression' &&
+    ['=', '||=', '??='].includes(node.operator) &&
+    node.left.type === 'MemberExpression'
+  ) {
+    return memberAssignment(node, node.left, tests);
+  }
+  return undefined;
+}
 
 /**
  * The names of the options that this file sets: a property of an object literal, or a member that
@@ -145,6 +206,11 @@ type Walk = { node: Node; nested: boolean; tests: readonly Node[] };
  * of a schema is a description, and `other({ server: { http2: true } })` is read as `options.server.http2`,
  * which no guard covers, so its finding stays.
  *
+ * The keys of a destructuring pattern do not count, because the pattern reads those names:
+ * `const { http2 } = env`, `function f({ http2 }) {}` and `({ http2 } = env)`, also with a default
+ * value (`{ http2 = true }`). The target of a pattern is a write when it is a member:
+ * `({ a: options.http2 } = env)` sets `http2`.
+ *
  * An assignment in the true branch of a test that shows the member present does not count either:
  * it runs only when something else set the option, as a validator does that coerces a value and
  * writes it back. That other site counts by itself. A test of an absent member (`!x.name`) or a
@@ -152,37 +218,20 @@ type Walk = { node: Node; nested: boolean; tests: readonly Node[] };
  */
 export function findAssignedOptions(body: readonly Node[]): string[] {
   const found = new Set<string>();
-  const pending: Walk[] = body.map(node => ({ node, nested: false, tests: [] }));
+  const pending: Walk[] = body.map(node => ({ node, nested: false, read: false, tests: [] }));
   for (let item = pending.pop(); item !== undefined; item = pending.pop()) {
     const { node, nested, tests } = item;
-    let name: string | undefined;
-    let value: Node | undefined;
-    if (node.type === 'Property' && node.kind === 'init' && !node.method && !nested) {
-      name = staticKey(node.key, node.computed);
-      value = node.value;
-    } else if (
-      node.type === 'AssignmentExpression' &&
-      ['=', '||=', '??='].includes(node.operator) &&
-      node.left.type === 'MemberExpression'
-    ) {
-      name = staticKey(node.left.property, node.left.computed);
-      const key = memberKey(node.left);
-      const guarded =
-        node.operator === '=' &&
-        tests.some(test => testsPresent(test, side => memberKey(side) === key));
-      value = guarded ? undefined : node.right;
+    const setting = settingOf(item);
+    if (setting?.name !== undefined && setting.value !== undefined && isSetValue(setting.value)) {
+      found.add(setting.name);
     }
-    if (name !== undefined && value !== undefined && isSetValue(value)) found.add(name);
     const reset = isFunction(node);
     for (const child of childNodes(node)) {
       pending.push({
         node: child,
         nested: !reset && (nested || node.type === 'Property'),
-        tests: reset
-          ? []
-          : node.type === 'IfStatement' && child === node.consequent
-            ? [...tests, node.test]
-            : tests,
+        read: node.type === 'ObjectPattern',
+        tests: testsFor(node, child, tests),
       });
     }
   }

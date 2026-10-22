@@ -34,15 +34,17 @@ describe(
       expect(report.guarded).toEqual([]);
     });
 
-    it.each(['without-http2.mjs', 'nested-http2.mjs', 'through-wrapper.mjs'])(
-      'stays hidden for got when %s sets no direct http2 property in a file of the project',
-      async entry => {
-        const report = await run(entry);
-        expect(report.findings).toEqual([]);
-        expect(apis(report.guarded)).toEqual(['node:tls.connect']);
-        expect(report.guarded[0]?.unreached).toBeDefined();
-      },
-    );
+    it.each([
+      'without-http2.mjs',
+      'nested-http2.mjs',
+      'through-wrapper.mjs',
+      'destructured-http2.mjs',
+    ])('stays hidden for got when %s does not set http2 in a file of the project', async entry => {
+      const report = await run(entry);
+      expect(report.findings).toEqual([]);
+      expect(apis(report.guarded)).toEqual(['node:tls.connect']);
+      expect(report.guarded[0]?.unreached).toBeDefined();
+    });
 
     it('is a finding for nodemailer when the project sets sendmail', async () => {
       const report = await run('with-sendmail.mjs');

@@ -14,7 +14,7 @@ const run = async (entry: string): Promise<TargetReport | undefined> => {
 };
 
 describe('code behind an option of the API of a package', { timeout: packageFlowTimeout }, () => {
-  it.each(['unset.mjs', 'false.mjs', 'after-return.mjs'])(
+  it.each(['unset.mjs', 'false.mjs', 'after-return.mjs', 'destructured.mjs'])(
     'is guarded when %s does not set the option',
     async entry => {
       const report = await run(entry);
@@ -24,7 +24,7 @@ describe('code behind an option of the API of a package', { timeout: packageFlow
     },
   );
 
-  it.each(['literal.mjs', 'variable.mjs', 'assigned.mjs'])(
+  it.each(['literal.mjs', 'variable.mjs', 'assigned.mjs', 'destructured-member.mjs'])(
     'is a finding when %s sets the option',
     async entry => {
       const report = await run(entry);
