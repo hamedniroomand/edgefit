@@ -36,6 +36,11 @@ export type EntryDetection = {
   shared: boolean;
   /** What to do next, for the error shown when nothing is found. The generic advice stays unless every target has its own. */
   advice?: () => string;
+  /**
+   * Set when nothing is found because the target has nothing to run, such as a Pages output folder
+   * with static files only. Then the target gives a result with the note, not an error.
+   */
+  staticOutput?: () => { source: string; note: string } | undefined;
 };
 
 function firstMatch(sources: readonly EntrySource[], guessed: boolean): EntryMatch | undefined {
