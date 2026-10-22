@@ -114,7 +114,7 @@
     },
     {
       "package": "nodemailer",
-      "versions": { "min": "10.0.13", "max": "10.2.0" },
+      "versions": { "min": "10.0.13", "max": "10.2.1" },
       "file": "dist/esm/sendmail-transport/index.js",
       "guards": ["dist/esm/nodemailer.js"],
       "apis": ["node:child_process", "node:child_process.spawn"],
@@ -125,7 +125,7 @@
     },
     {
       "package": "nodemailer",
-      "versions": { "min": "10.0.13", "max": "10.2.0" },
+      "versions": { "min": "10.0.13", "max": "10.2.1" },
       "file": "dist/cjs/sendmail-transport/index.js",
       "guards": ["dist/cjs/nodemailer.js"],
       "apis": ["node:child_process", "node:child_process.spawn"],
