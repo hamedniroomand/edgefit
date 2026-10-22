@@ -32,6 +32,19 @@ describe('formatPackageText', () => {
     expect(text).toContain('. on bun: could not be checked: boom');
   });
 
+  it('lists a skipped subpath with the reason', () => {
+    const skipped: PackageResult = {
+      ...result,
+      skipped: [
+        { subpath: './a.js.map', reason: 'no target of this subpath is a script file (.map)' },
+      ],
+    };
+    expect(formatPackageText(skipped, { color: false })).toContain(
+      '  skipped ./a.js.map: no target of this subpath is a script file (.map)',
+    );
+    expect(formatPackageText(result, { color: false })).not.toContain('skipped');
+  });
+
   it('lists an unchecked entry with the reason', () => {
     const unchecked: PackageResult = {
       ...result,

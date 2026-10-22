@@ -65,6 +65,11 @@ function noteLines(result: PackageResult): string[] {
   return [...bySubpaths].map(([note, subpaths]) => `  ${note}: ${[...subpaths].join(', ')}`);
 }
 
+/** The subpaths that are not checked, with the reason. */
+function skippedLines(result: PackageResult): string[] {
+  return (result.skipped ?? []).map(item => `  skipped ${item.subpath}: ${item.reason}`);
+}
+
 function mainLines(result: PackageResult): string[] {
   return result.main === undefined ? [] : [`  main entry: ${result.main}`];
 }
@@ -165,6 +170,7 @@ export function formatPackageText(result: PackageResult, options: { color: boole
     ...worstLines(result, paint),
     ...worstExportLines(result, paint),
     ...noteLines(result).map(line => paint('dim', line)),
+    ...skippedLines(result).map(line => paint('dim', line)),
     ...problemLines(result, paint),
     ...exportLines(result, paint),
     ...footerLines(result, paint),

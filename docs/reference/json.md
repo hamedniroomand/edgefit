@@ -135,6 +135,12 @@ edgefit check --format json
   "summary": { "workerd": "pass", "bun": "pass", "deno": "warn" },
   "worst": { "workerd": { "subpath": "./node", "status": "fail" } },
   "worstExport": { "workerd": { "subpath": ".", "name": "createServer", "status": "warn" } },
+  "skipped": [
+    {
+      "subpath": "./dist/index.js.map",
+      "reason": "no target of this subpath is a script file (.map)"
+    }
+  ],
   "context": { "workerd": { "settings": "compatibility_date …", "notes": [] } },
   "entries": [
     {
@@ -179,7 +185,7 @@ edgefit check --format json
 }
 ```
 
-`status` is `pass`, `warn` (warnings only), `fail` (an error), `error` (the entry could not be checked, with a `message`) or `unchecked` (the entry needs a module that the package does not declare, with a `message`). `summary` is the status of the main entry for each target, or of the worst entry for a package without a checked main entry. `worst` names the worst entry of a target, and is only there when it is worse than `summary`. `main` is the subpath that decides `summary` when it was named with `--main`, and is left out otherwise. `findings` lists the findings that `errors` and `warnings` count, in the order that `edgefit check` prints them, with the same fields as an export finding. It is left out when there are none. A native addon finding has the category `unsupported` and an `api` that starts with `native addon `. `exports` lists the findings that only some exports of the entry reach, by export. They do not change `status` or the counts. `worstExport` names the export with the worst findings among all entries of a target, with the status of its worst finding, and is only there when it is worse than `summary`. `resolved` is the installed version, never the requested range.
+`status` is `pass`, `warn` (warnings only), `fail` (an error), `error` (the entry could not be checked, with a `message`) or `unchecked` (the entry needs a module that the package does not declare, with a `message`). `summary` is the status of the main entry for each target, or of the worst entry for a package without a checked main entry. `worst` names the worst entry of a target, and is only there when it is worse than `summary`. `main` is the subpath that decides `summary` when it was named with `--main`, and is left out otherwise. `findings` lists the findings that `errors` and `warnings` count, in the order that `edgefit check` prints them, with the same fields as an export finding. It is left out when there are none. A native addon finding has the category `unsupported` and an `api` that starts with `native addon `. `exports` lists the findings that only some exports of the entry reach, by export. They do not change `status` or the counts. `worstExport` names the export with the worst findings among all entries of a target, with the status of its worst finding, and is only there when it is worse than `summary`. `skipped` lists the subpaths of `exports` that edgefit does not check, each as `{ subpath, reason }`. `reason` is a sentence for a person. A skipped subpath has no item in `entries`. edgefit skips a subpath when it maps only to files that are not script files, such as a sourcemap or a JSON file. See [How it works](/guide/packages#how-it-works) for the files that count as script files. `skipped` is only there when edgefit skips a subpath. It does not list a pattern such as `./*`, `./package.json`, or a subpath that the package blocks with `null`. It does not list a subpath that `--skip` removes, or that `--export` does not name. The `skipped` list of `check` is another list: it holds the runtimes that have no entry. `resolved` is the installed version, never the requested range.
 
 The table's `results.json` lists one row per package with `name`, `file`, `resolved`, `summary`, `worst`, `worstExport`, `subpaths`, `main` when the row names one, and `error` when the package could not be installed or checked.
 

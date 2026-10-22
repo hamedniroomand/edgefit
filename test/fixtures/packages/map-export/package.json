@@ -1,0 +1,9 @@
+{
+  "name": "edgefit-fixture-map-export",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./dist/index.js.map": "./dist/index.js.map"
+  }
+}
