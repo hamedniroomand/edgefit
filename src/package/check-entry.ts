@@ -21,6 +21,7 @@ function entryStatus(report: TargetReport): EntryStatus {
   const errors = staying.filter(finding => finding.level === 'error').length;
   const warnings = staying.length - errors;
   const exports = resultsByExport(report.findings);
+  // scripts/package-table/verify/install.mjs reads the text of the peer note.
   const notes = [
     ...(report.missingPeers ?? []).map(
       name => `peer ${name} not installed, checked in your project`,

@@ -44,6 +44,11 @@ export function rowFindings(result, target) {
   return [...(cell?.findings ?? []), ...byApi.values()];
 }
 
+/** The notes of a row on a target, such as `peer react not installed, checked in your project`. */
+export function rowNotes(result, target) {
+  return mainEntry(result)?.results[target]?.notes ?? [];
+}
+
 /** Why a reach script cannot verify its row, or `undefined` when it can. */
 export function scriptProblem(imports, name, findings) {
   const names = namesFrom(imports, name);
@@ -79,7 +84,14 @@ export function planOf(result, runtime, script) {
   // A row that names its main subpath, such as `./app` for `firebase`, loads that subpath.
   const specifier =
     result.main === undefined ? result.package : `${result.package}${result.main.slice(1)}`;
-  const plan = { package: result.package, specifier, resolved: result.resolved, status, findings };
+  const plan = {
+    package: result.package,
+    specifier,
+    resolved: result.resolved,
+    status,
+    findings,
+    notes: rowNotes(result, runtime),
+  };
   if (status === 'pass' || script === undefined) {
     return { ...plan, kind: 'load' };
   }

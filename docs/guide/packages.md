@@ -65,10 +65,12 @@ A cell can have one of these outcomes:
 
 - **verified**: the run agreed with the row. For a pass, the main entry loaded on the runtime. For a failure, the run threw an error that matches an error finding that fails the row on that target, one that every export reaches. A finding under some exports does not change the status of a row, so a run that throws it is confirmed, not verified. The cell shows the ✔ mark, and the row detail says what ran.
 - **confirmed**: the runtime failed, but on a different error before the finding. The status agrees, but the finding was not reproduced. The row detail shows the error. The cell has no mark.
-- **mismatch**: a failing row ran with no error, or a passing row failed to load. The script or edgefit is wrong. Nothing is published for the cell, and the verify job fails so the problem is seen.
-- no outcome: a row with warnings only, a row that could not be checked, a run that timed out, an install that failed, or a run that failed on the network.
+- **mismatch**: a failing row ran with no error, or a passing row failed to load. The script or edgefit is wrong, or an optional peer that CI installed fails on the runtime. Nothing is published for the cell, and the verify job fails so the problem is seen.
+- no outcome: a row with warnings only, a row that could not be checked, a run that timed out, an install that failed, an optional peer that did not install, or a run that failed on the network.
 
 A pass only means that the main entry loads. No run can choose which exports to call for a pass, so a pass claims nothing more. A row with warnings only is not verified, because a run that ends with no error says nothing about an API that edgefit cannot check.
+
+CI also installs the optional peers that the main entry of a row names in a note for that runtime, such as `peer react not installed, checked in your project` for `zustand`. It installs each peer in the same folder as the package, at a version in the range that the package gives for it in `peerDependencies`. A ✔ on such a row means that the main entry loaded with those peers present. If a peer that a note names does not install, the cell has no outcome. The note stays in the row detail, because the static check does not install peers.
 
 An error matches a finding when the error has the code that the finding names, such as `ERR_UNSUPPORTED_OPERATION`, and its message or stack names the member of the API, such as `watch` for `node:fs.watch`. The run reads the whole `cause` chain of the error. A native addon finding matches the error of the addon loader. On workerd, a load error about `__dirname`, `__filename` or a dynamic `require` comes from the bundle that the run makes, so it is never a match.
 
@@ -82,7 +84,7 @@ A new failing row whose finding only an export reaches should come with a reach 
 
 ## Optional peer dependencies
 
-`edgefit package` does not install peer dependencies. An optional peer that is not installed gives no finding. The entry lists it as a note, `peer react not installed, checked in your project`, in the output of `edgefit package`, in the `notes` of the entry in the JSON result, and in the row detail of the table. The status of the entry comes from the other findings. `edgefit check` on a project does not change: a missing optional peer there is still an `unknown` warning, because the code of the project can reach it.
+`edgefit package` does not install peer dependencies. An optional peer that is not installed gives no finding. The entry lists it as a note, `peer react not installed, checked in your project`, in the output of `edgefit package`, in the `notes` of the entry in the JSON result, and in the row detail of the table. The status of the entry comes from the other findings. `edgefit check` on a project does not change: a missing optional peer there is still an `unknown` warning, because the code of the project can reach it. The verify job of the table is the exception: it installs the optional peers that the main entry of a row names in a note. See [Verified rows](#verified-rows).
 
 ## Modules that the user names
 
