@@ -29,6 +29,8 @@ export interface ScanOptions {
   leaveOutMissingPeers?: boolean;
   /** Name the exports of the entry's package that reach a usage, when only some of them do. */
   byExport?: boolean;
+  /** The options that the data names as a path, such as `auth.lock`. A file lists each one that it sets. */
+  optionPaths?: readonly string[];
 }
 
 // esbuild's metafile also lists JSON and asset inputs, which hold no code.
@@ -98,6 +100,7 @@ function extractOne(
     importedModules,
     importedStrings,
     importedChecks,
+    optionPaths: options.optionPaths,
   });
 }
 

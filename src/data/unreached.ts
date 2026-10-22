@@ -20,9 +20,11 @@ export type UnreachedEntry = {
   /** APIs as shown in reports. */
   apis: string[];
   /**
-   * The names of the options that make the code run. The entry applies only when no file of the
-   * project sets one of them. In build output it always applies. An entry without `options`
-   * applies to every project.
+   * The options that make the code run. The entry applies only when no file of the project sets
+   * one of them. In build output it always applies. An entry without `options` applies to every
+   * project. An item is a name, such as `http2`, which a property of an object literal or an
+   * assigned member sets, or a path, such as `auth.lock`, which is the property `lock` of an object
+   * literal that is the value of the property `auth`.
    */
   options?: string[];
   target: TargetKey;
@@ -101,6 +103,13 @@ function validNames(names: unknown): names is string[] {
   );
 }
 
+/** An option is a name or a path of names, such as `auth.lock`, with no empty name in it. */
+function validOptions(options: unknown): options is string[] {
+  return (
+    validNames(options) && options.every(name => name.split('.').every(part => part.trim() !== ''))
+  );
+}
+
 /** A list of paths from the package root: not absolute, and with no `..` segment. */
 function validGuards(guards: unknown): boolean {
   return (
@@ -113,8 +122,12 @@ function checkEntry(where: string, entry: UnreachedEntry): void {
   if (!hasText(entry) || entry.apis.length === 0) {
     invalidEntry('unreached.json', where, 'package, file, apis and reason are required');
   }
-  if (entry.options !== undefined && !validNames(entry.options)) {
-    invalidEntry('unreached.json', where, 'options must be a list of one or more option names');
+  if (entry.options !== undefined && !validOptions(entry.options)) {
+    invalidEntry(
+      'unreached.json',
+      where,
+      'options must be a list of one or more option names or paths, such as `http2` or `auth.lock`',
+    );
   }
   if (entry.guards !== undefined && !validGuards(entry.guards)) {
     invalidEntry(
@@ -141,6 +154,12 @@ export function loadUnreached(dataDirectory?: string): UnreachedEntry[] {
     cached = entries;
   }
   return entries;
+}
+
+/** The options of the entries that are paths, such as `auth.lock`. The scan reads these in addition to every plain name. */
+export function unreachedOptionPaths(entries: readonly UnreachedEntry[]): string[] {
+  const paths = entries.flatMap(entry => (entry.options ?? []).filter(name => name.includes('.')));
+  return [...new Set(paths)].toSorted();
 }
 
 /** The part of a path below `node_modules/<package>/`, or `undefined` when it is not in that package. */

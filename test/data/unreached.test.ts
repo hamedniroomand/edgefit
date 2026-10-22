@@ -6,7 +6,12 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { collectFindings, defaultLevels } from '@/core/findings.ts';
 import type { ModuleUsages } from '@/core/findings.ts';
-import { fileInPackage, findUnreached, loadUnreached } from '@/data/unreached.ts';
+import {
+  fileInPackage,
+  findUnreached,
+  loadUnreached,
+  unreachedOptionPaths,
+} from '@/data/unreached.ts';
 import type { UnreachedEntry, UnreachedQuery } from '@/data/unreached.ts';
 import { makeUsage, stubTarget } from '~/helpers.ts';
 
@@ -203,5 +208,44 @@ describe('a warning in code that is not reached', () => {
     expect(findings).toEqual([]);
     expect(guarded).toMatchObject([{ level: 'warning', category: 'mismatch', guarded: true }]);
     expect(guarded[0]?.unreached).toBeDefined();
+  });
+});
+
+describe('an entry that names an option path', () => {
+  const withPath: UnreachedEntry = { ...entry, options: ['auth.lock'] };
+
+  it.each(['a..b', '.lock', 'auth.'])('rejects the path %s', path => {
+    expect(() => loadUnreached(dataWith({ options: [path] }))).toThrow('option names or paths');
+  });
+
+  it('is read from the data file', () => {
+    expect(loadUnreached(dataWith({ options: ['auth.lock', 'http2'] }))[0]?.options).toEqual([
+      'auth.lock',
+      'http2',
+    ]);
+  });
+
+  it('matches until the project sets the path, and a plain name does not set it', () => {
+    expect(findUnreached([withPath], { ...query, optionsSet: new Set(['lock', 'auth']) })).toBe(
+      withPath,
+    );
+    expect(findUnreached([withPath], { ...query, optionsSet: new Set(['auth.lock']) })).toBe(
+      undefined,
+    );
+  });
+
+  it('lists each path once, sorted, and no plain name', () => {
+    const entries = [
+      { ...entry, options: ['http2', 'auth.lock'] },
+      { ...entry, options: ['auth.lock', 'a.b.c'] },
+      entry,
+    ];
+    expect(unreachedOptionPaths(entries)).toEqual(['a.b.c', 'auth.lock']);
+  });
+
+  it('lists the paths of the shipped data', () => {
+    expect(unreachedOptionPaths(loadUnreached())).toEqual(
+      expect.arrayContaining(['auth.lock', 'realtime.worker']),
+    );
   });
 });

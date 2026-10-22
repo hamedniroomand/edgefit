@@ -33,6 +33,8 @@ export interface ExtractOptions {
   importedStrings?: ReadonlyMap<string, string>;
   /** Imported local names that another module of the graph exports as a `const` holding a check. */
   importedChecks?: UsageCollector['importedChecks'];
+  /** The options that the data names as a path, such as `auth.lock`. The file lists each one that it sets. */
+  optionPaths?: readonly string[];
 }
 
 export interface ExtractedModule {
@@ -42,7 +44,7 @@ export interface ExtractedModule {
   /** Set when `shape` was asked for and the file could be parsed. */
   shape: ModuleShape | undefined;
   /** The exports that are a Node.js module, by exported name, with where the export is written. */
-  /** The names of the options this file sets to a value that is not `false`, `0`, `null`, `undefined` or `''`. */
+  /** The names of the options this file sets to a value that is not `false`, `0`, `null`, `undefined` or `''`, and the paths of the data that it sets. */
   optionsSet: readonly string[];
   aliases: ReadonlyMap<string, { ref: ApiRef; offset: number }>;
   /** The exports that are a plain string, by exported name. */
@@ -108,7 +110,7 @@ export function extractModule(
   collector.guardFunctions(body, functions, walker.functionReads);
   const shape =
     options.shape === true ? collectShape(body, result.module.hasModuleSyntax, dropped) : undefined;
-  return finish(collector, shape, findAssignedOptions(body));
+  return finish(collector, shape, findAssignedOptions(body, options.optionPaths));
 }
 
 /** Parses a file and returns every runtime API use in it. */

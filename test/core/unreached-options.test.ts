@@ -111,3 +111,30 @@ describe('an entry that names an option, in build output', { timeout: packageFlo
     expect(guarded?.unreached).toBeDefined();
   });
 });
+
+describe(
+  'an entry of the unreached data that names an option path',
+  { timeout: packageFlowTimeout },
+  () => {
+    it.each([
+      ['with-auth-lock.mjs', 'navigator.locks.request'],
+      ['wrapped-auth-lock.mjs', 'navigator.locks.request'],
+      ['with-realtime-worker.mjs', 'Worker'],
+    ])('is a finding when %s sets the option in an object literal', async (entry, api) => {
+      const report = await run(entry);
+      expect(apis(report.findings)).toContain(api);
+      expect(report.guarded).toEqual([]);
+    });
+
+    it.each([
+      ['without-auth-lock.mjs', 'navigator.locks.request'],
+      ['destructured-auth-lock.mjs', 'navigator.locks.request'],
+      ['without-realtime-worker.mjs', 'Worker'],
+    ])('stays hidden when %s does not set the option', async (entry, api) => {
+      const report = await run(entry);
+      expect(report.findings).toEqual([]);
+      expect(apis(report.guarded)).toContain(api);
+      expect(report.guarded[0]?.unreached).toBeDefined();
+    });
+  },
+);

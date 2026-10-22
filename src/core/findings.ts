@@ -27,7 +27,7 @@ import {
 
 /** Re-exported so the check reads the shipped suggestions through the same module that applies them. */
 export { loadSuggestions } from '@/data/suggestions.ts';
-export { loadUnreached } from '@/data/unreached.ts';
+export { loadUnreached, unreachedOptionPaths } from '@/data/unreached.ts';
 export { readStoredModules } from './stored-modules.ts';
 export { findingKey } from './finding-groups.ts';
 

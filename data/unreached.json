@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Code that a package ships and a bundler includes, but that does not run on the target. A finding in a listed file for a listed API is reported as guarded, with the reason, and never fails a check. Each entry names the package, the versions it was read in, the file inside the package, the APIs as shown in reports, the target, why the code is not reached, and where the reason is stated. An entry can also name `options` that make the code run. A project that sets one of them gets the ordinary finding instead, and the entry applies to every other project. In build output the entry always applies. An entry can also list `guards`: the other files of the package that hold the condition that the reason names. The weekly check flags an entry whose file, guard files or APIs no longer match, and a release that no entry covers. It opens a pull request that widens the newest range of a package when every file that range names, and every file that those entries list in `guards`, has the same bytes in the new release and in the last release of the range.",
+  "description": "Code that a package ships and a bundler includes, but that does not run on the target. A finding in a listed file for a listed API is reported as guarded, with the reason, and never fails a check. Each entry names the package, the versions it was read in, the file inside the package, the APIs as shown in reports, the target, why the code is not reached, and where the reason is stated. An entry can also name `options` that make the code run. An option is a name, such as `http2`, or a path, such as `auth.lock`, which is a property `lock` in an object literal that is the value of the property `auth`. A project that sets one of them gets the ordinary finding instead, and the entry applies to every other project. In build output the entry always applies. An entry can also list `guards`: the other files of the package that hold the condition that the reason names. The weekly check flags an entry whose file, guard files or APIs no longer match, and a release that no entry covers. It opens a pull request that widens the newest range of a package when every file that range names, and every file that those entries list in `guards`, has the same bytes in the new release and in the last release of the range.",
   "entries": [
     {
       "package": "next",
@@ -150,6 +150,7 @@
       "file": "dist/module/lib/locks.js",
       "guards": ["dist/module/GoTrueClient.js"],
       "apis": ["navigator.locks.request"],
+      "options": ["auth.lock"],
       "target": "workerd",
       "reason": "Runs only when a project passes `navigatorLock` as the deprecated `lock` option. The client coordinates session refreshes without a lock by default and does not use `navigator.locks`.",
       "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/auth-js/src/GoTrueClient.ts#L465"
@@ -160,6 +161,7 @@
       "file": "dist/module/lib/locks.js",
       "guards": ["dist/module/GoTrueClient.js"],
       "apis": ["navigator.locks.request"],
+      "options": ["auth.lock"],
       "target": "bun",
       "reason": "Runs only when a project passes `navigatorLock` as the deprecated `lock` option. The client coordinates session refreshes without a lock by default and does not use `navigator.locks`.",
       "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/auth-js/src/GoTrueClient.ts#L465"
@@ -169,6 +171,7 @@
       "versions": { "min": "2.117.2", "max": "2.118.0" },
       "file": "dist/module/RealtimeClient.js",
       "apis": ["Worker", "URL.createObjectURL"],
+      "options": ["realtime.worker"],
       "target": "workerd",
       "reason": "Runs only with the `worker` option, which defaults to false. It starts the heartbeat in a Web Worker.",
       "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/realtime-js/src/RealtimeClient.ts#L813"
@@ -178,6 +181,7 @@
       "versions": { "min": "2.117.2", "max": "2.118.0" },
       "file": "dist/module/RealtimeClient.js",
       "apis": ["Worker", "URL.createObjectURL"],
+      "options": ["realtime.worker"],
       "target": "bun",
       "reason": "Runs only with the `worker` option, which defaults to false. It starts the heartbeat in a Web Worker.",
       "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/realtime-js/src/RealtimeClient.ts#L813"
