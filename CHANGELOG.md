@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.15.6
+
+### Patch Changes
+
+- [#402](https://github.com/hamedniroomand/edgefit/pull/402) [`9c18875`](https://github.com/hamedniroomand/edgefit/commit/9c188752cc6a5df7f712546d0e6385eb75269138) - `edgefit check` no longer takes a destructured name as an option that your code sets. A line such as `const { http2 } = env` or `function f({ http2 }) {}` only reads the name. Before, such a line made a guarded finding an ordinary finding, for example `node:tls.connect` of `got` on workerd, although the project never passed `http2: true`. Now that finding stays guarded.
+
+- [#382](https://github.com/hamedniroomand/edgefit/pull/382) [`d74d027`](https://github.com/hamedniroomand/edgefit/commit/d74d027d78efdc87481ba5708861574841d64b85) - List the content type check of the `@grpc/grpc-js` server as code that a gRPC client on `deno` never runs. It runs only when a project starts a gRPC server. The Firestore client is a gRPC client. `firebase-admin/firestore` no longer fails on `node:http2.constants.HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE` on Deno.
+
+- [#406](https://github.com/hamedniroomand/edgefit/pull/406) [`1d21923`](https://github.com/hamedniroomand/edgefit/commit/1d21923abf42475abc7e492ef644c20f2158673a) - `edgefit check` reads a nested option when the data of edgefit names its path. A project that passes `{ auth: { lock: navigatorLock } }` or `{ realtime: { worker: true } }` to `createClient` of `@supabase/supabase-js` now gets the findings of `@supabase/auth-js` and `@supabase/realtime-js`, such as `navigator.locks.request` on workerd and Bun and `URL.createObjectURL` on workerd. A project that sets neither option shows no finding, as before.
+
+- [#396](https://github.com/hamedniroomand/edgefit/pull/396) [`221a002`](https://github.com/hamedniroomand/edgefit/commit/221a0029b851e545fc1d0ed0b50d9ab2d35ad250) - `edgefit package <directory>` no longer runs the `prepare` script of the package. npm 10, the version of Node 22, runs that script in `npm pack` although edgefit passes `--ignore-scripts`. edgefit now packs a copy of the directory without that script, so build the package before you check it.
+
+- [#405](https://github.com/hamedniroomand/edgefit/pull/405) [`52692b9`](https://github.com/hamedniroomand/edgefit/commit/52692b92833365ec5ff850f7e650bfed3cfea6d3) - Add `postal-mime` 4.1.4 to the data for code that a target never runs. A project that imports `postal-mime` 4.1.4 no longer gets a warning for `FileReader` on workerd and Bun, and `edgefit package postal-mime` no longer names `FileReader` as a worst export.
+
+- [#398](https://github.com/hamedniroomand/edgefit/pull/398) [`01e43af`](https://github.com/hamedniroomand/edgefit/commit/01e43af2b0c5a7a0ec1f8233deccf9e219d4e686) - Report a finding for a package in the list of code that a target does not run when the project sets the option that makes that code run. For example, `edgefit check` now reports `node:tls.connect` of `got` on workerd when the project passes `http2: true`, and `node:child_process.spawn` of `nodemailer` when it passes `sendmail: true`. The option must be a direct property in a file of your own code. A property inside another object does not count, unless the entry names its path, and a check of build output does not count.
+
+- [#387](https://github.com/hamedniroomand/edgefit/pull/387) [`f05eef6`](https://github.com/hamedniroomand/edgefit/commit/f05eef64b34c2f6951109291ee09d95437858ba1) - Hide the `node:tls.connect` warning of `got` 16.1.0 on workerd in a project that does not set `http2`. `got` reaches it only when a project sets the `http2` option, which is off by default. `edgefit package got` now shows ✓ on workerd.
+
+- [#390](https://github.com/hamedniroomand/edgefit/pull/390) [`cb44bab`](https://github.com/hamedniroomand/edgefit/commit/cb44bab29566597d90d75703ee20f109b03210c2) - List the CommonJS sendmail transport of `nodemailer` 10.0.13 to 10.2.0 as code that runs only with the `sendmail` option, as the ES module transport already is. `edgefit check` on a project that calls `require('nodemailer')` and does not set `sendmail` no longer shows `node:child_process.spawn` as an error on workerd.
+
+- [#403](https://github.com/hamedniroomand/edgefit/pull/403) [`7b3d75a`](https://github.com/hamedniroomand/edgefit/commit/7b3d75ae61470b9ccda2db14aa0cb2c9e4f295e4) - Add the newest releases to the data about code that a target never runs and modules that a package stores: `nodemailer` 10.2.1.
+
+- [#384](https://github.com/hamedniroomand/edgefit/pull/384) [`aab4e4d`](https://github.com/hamedniroomand/edgefit/commit/aab4e4dbd502655d3d265e01f0a517ac7abc2b3f) - Add the newest releases to the data for code that a target never runs: `nodemailer` 10.1.2 to 10.2.0, `@supabase/auth-js` and `@supabase/realtime-js` 2.118.0, `next` 16.4.2, and `postal-mime` 4.0.7 to 4.1.3. For example, `edgefit package nodemailer` no longer fails on `node:child_process.spawn` on workerd, and `edgefit package @supabase/supabase-js` no longer fails on workerd and Bun.
+
 ## 0.15.5
 
 ### Patch Changes
