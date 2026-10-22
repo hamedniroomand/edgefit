@@ -47,6 +47,10 @@ describe('the shipped unreached data', () => {
       expect(item.versions.min).toMatch(/^\d+\.\d+\.\d+$/u);
       expect(item.source).toMatch(/^https:\/\//u);
       expect(item.file).not.toMatch(/^\/|node_modules/u);
+      for (const guard of item.guards ?? []) {
+        expect(guard).not.toMatch(/^\/|node_modules|\.\./u);
+        expect(guard).not.toBe(item.file);
+      }
     }
   });
 
@@ -64,6 +68,16 @@ describe('the shipped unreached data', () => {
     ['a blank option name', { options: [' '] }, 'options must be a list of one or more'],
     ['an option that is not text', { options: [1] }, 'options must be a list of one or more'],
     ['options that are not a list', { options: 'http2' }, 'options must be a list of one or more'],
+    ['an empty list of guards', { guards: [] }, 'guards must be a list of one or more paths'],
+    ['a blank guard', { guards: [' '] }, 'guards must be a list of one or more paths'],
+    ['a guard that is not text', { guards: [1] }, 'guards must be a list of one or more paths'],
+    [
+      'guards that are not a list',
+      { guards: 'a.js' },
+      'guards must be a list of one or more paths',
+    ],
+    ['an absolute guard', { guards: ['/dist/a.js'] }, 'guards must be a list of one or more paths'],
+    ['a guard with a .. segment', { guards: ['dist/../a.js'] }, 'guards must be a list of one or'],
   ])('rejects %s', (_name, overrides, message) => {
     expect(() => loadUnreached(dataWith(overrides))).toThrow(message);
   });

@@ -3,8 +3,11 @@ import path from 'node:path';
 
 import {
   applyWidening,
+  changedGuards,
   changesetText,
+  guardNote,
   listLimit,
+  missingGuards,
   newestRange,
   pullRequestBody,
   widenPlan,
@@ -92,6 +95,77 @@ describe('widening a range on its own', () => {
   });
 });
 
+describe('guard files of an entry', () => {
+  const guarded = (file: string, ...guards: string[]) => ({
+    ...entry(file, '1.0.0'),
+    guards,
+  });
+
+  it('widens when the named file and each guard file have the same bytes', () => {
+    const entries = [guarded('dist/gate.js', 'dist/run.js')];
+    expect(widenPlan(entries, identical, () => last)).toMatchObject({ from: '1.0.0', to: '1.0.1' });
+    expect(changedGuards(entries, identical, () => last)).toBeUndefined();
+  });
+
+  it('does not widen when only a guard file changed, and names that file only', () => {
+    // In the changed release, gate.js has the same bytes and run.js has other bytes.
+    const entries = [guarded('dist/gate.js', 'dist/gate.js', 'dist/run.js')];
+    expect(widenPlan(entries, changed, () => last)).toBeUndefined();
+    expect(changedGuards(entries, changed, () => last)).toEqual({
+      from: '1.0.0',
+      files: ['dist/run.js'],
+    });
+  });
+
+  it.each([
+    ['is missing in both releases', changed, 'dist/none.js'],
+    ['is missing in the release before', changed, 'dist/new.js'],
+    ['is a folder in the latest release', folder, 'dist/run.js'],
+  ])('does not widen when a guard file %s', (_name, latest, guard) => {
+    const entries = [guarded('dist/gate.js', guard)];
+    expect(widenPlan(entries, latest, () => last)).toBeUndefined();
+    expect(changedGuards(entries, latest, () => last)).toEqual({ from: '1.0.0', files: [guard] });
+  });
+
+  it('names a guard file once, also when two entries list it', () => {
+    const entries = [
+      guarded('dist/gate.js', 'dist/run.js'),
+      guarded('dist/other.js', 'dist/run.js'),
+    ];
+    expect(changedGuards(entries, changed, () => last)?.files).toEqual(['dist/run.js']);
+  });
+
+  it('names no guard file when a named file changed and each guard file did not', () => {
+    const entries = [guarded('dist/run.js', 'dist/gate.js')];
+    expect(widenPlan(entries, changed, () => last)).toBeUndefined();
+    expect(changedGuards(entries, changed, () => last)).toBeUndefined();
+  });
+
+  it('reads the guard files of the newest range only', () => {
+    const older = {
+      ...guarded('dist/run.js', 'dist/none.js'),
+      versions: { min: '0.1.0', max: '0.9.0' },
+    };
+    const entries = [older, guarded('dist/gate.js', 'dist/gate.js')];
+    expect(widenPlan(entries, changed, () => last)).toMatchObject({ to: '1.0.2' });
+    expect(changedGuards(entries, changed, () => last)).toBeUndefined();
+  });
+
+  it('finds the guard files that are not a file in a release', () => {
+    const item = guarded('dist/gate.js', 'dist/run.js', 'dist/none.js');
+    expect(missingGuards(last, item)).toEqual(['dist/none.js']);
+    expect(missingGuards(folder.root, item)).toEqual(['dist/run.js', 'dist/none.js']);
+    expect(missingGuards(last, entry('dist/gate.js'))).toEqual([]);
+  });
+
+  it('writes a sentence that names the guard files that differ or are missing, or no sentence', () => {
+    expect(guardNote(undefined)).toBe('');
+    expect(guardNote({ from: '1.0.0', files: ['a.js', 'b.js'] })).toBe(
+      ' Guard files that are missing or have other bytes than in 1.0.0: a.js, b.js.',
+    );
+  });
+});
+
 describe('a latest release that does not widen a range', () => {
   const gate = entry('dist/gate.js', '1.0.0');
 
@@ -107,6 +181,7 @@ describe('a latest release that does not widen a range', () => {
   ])('reads no other release when the latest release %s', (_name, entries, latest) => {
     const fetchRelease = vi.fn(() => last);
     expect(widenPlan(entries, latest, fetchRelease)).toBeUndefined();
+    expect(changedGuards(entries, latest, fetchRelease)).toBeUndefined();
     expect(fetchRelease).not.toHaveBeenCalled();
   });
 });
@@ -182,6 +257,8 @@ describe('the changeset and the pull request body', () => {
     const body = pullRequestBody([item]);
     expect(body).toContain('does not read the releases between them');
     expect(body).toContain('does not read other files of the package');
+    expect(body).toContain('when no entry lists that file in `guards`');
+    expect(body).toContain('and every file that those entries list in `guards`');
     expect(body).toContain('does not change `source`');
   });
 

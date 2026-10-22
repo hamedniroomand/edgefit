@@ -11,6 +11,12 @@ export type UnreachedEntry = {
   versions: { min: string; max: string };
   /** The file inside the package, such as `dist/esm/server/app-render/cache-signal.js`. */
   file: string;
+  /**
+   * The other files of the package that hold the condition that the reason names. edgefit does not
+   * use this field when it checks a project. Only the weekly check reads it: it widens a range only
+   * when each of these files has the same bytes in both releases. The loader checks the shape.
+   */
+  guards?: string[];
   /** APIs as shown in reports. */
   apis: string[];
   /**
@@ -87,11 +93,19 @@ export function readEntries<TEntry>(
   return file.entries;
 }
 
-function validOptions(options: unknown): boolean {
+function validNames(names: unknown): names is string[] {
   return (
-    Array.isArray(options) &&
-    options.length > 0 &&
-    options.every(name => typeof name === 'string' && name.trim() !== '')
+    Array.isArray(names) &&
+    names.length > 0 &&
+    names.every(name => typeof name === 'string' && name.trim() !== '')
+  );
+}
+
+/** A list of paths from the package root: not absolute, and with no `..` segment. */
+function validGuards(guards: unknown): boolean {
+  return (
+    validNames(guards) &&
+    guards.every(guard => !guard.startsWith('/') && !guard.split('/').includes('..'))
   );
 }
 
@@ -99,8 +113,15 @@ function checkEntry(where: string, entry: UnreachedEntry): void {
   if (!hasText(entry) || entry.apis.length === 0) {
     invalidEntry('unreached.json', where, 'package, file, apis and reason are required');
   }
-  if (entry.options !== undefined && !validOptions(entry.options)) {
+  if (entry.options !== undefined && !validNames(entry.options)) {
     invalidEntry('unreached.json', where, 'options must be a list of one or more option names');
+  }
+  if (entry.guards !== undefined && !validGuards(entry.guards)) {
+    invalidEntry(
+      'unreached.json',
+      where,
+      'guards must be a list of one or more paths from the package root, with no leading `/` and no `..` segment',
+    );
   }
   if (!targetKeys.has(entry.target)) {
     invalidEntry('unreached.json', where, 'target must be a known target key');
