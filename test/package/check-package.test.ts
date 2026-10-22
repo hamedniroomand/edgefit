@@ -76,6 +76,43 @@ describe('checkPackage', { timeout: packageFlowTimeout }, () => {
 });
 
 describe(
+  'checkPackage with a subpath that is not a script',
+  { timeout: packageFlowTimeout },
+  () => {
+    it('skips a subpath that is a sourcemap, and lists it as skipped', async () => {
+      const result = await checkPackage(pack('map-export'), { targets: ['workerd'] });
+      expect(result.entries.map(entry => entry.subpath)).toEqual(['.']);
+      expect(result.skipped).toEqual([
+        {
+          subpath: './dist/index.js.map',
+          reason: 'no target of this subpath is a script file (.map)',
+        },
+      ]);
+      expect(result.entries.flatMap(entry => Object.values(entry.results))).not.toContainEqual(
+        expect.objectContaining({ status: 'error' }),
+      );
+      expect(result.summary).toEqual({ workerd: 'pass' });
+    });
+
+    it('says why when the only subpath to check is skipped', async () => {
+      const failure = checkPackage(pack('map-export'), {
+        targets: ['workerd'],
+        subpaths: ['./dist/index.js.map'],
+      });
+      await expect(failure).rejects.toThrow('has no public entry point to check');
+      await expect(failure).rejects.toMatchObject({
+        hint: 'Skipped ./dist/index.js.map: no target of this subpath is a script file (.map).',
+      });
+    });
+
+    it('leaves skipped out of the result when nothing is skipped', async () => {
+      const result = await checkPackage(pack('plain'), { targets: ['workerd'] });
+      expect(result).not.toHaveProperty('skipped');
+    });
+  },
+);
+
+describe(
   'checkPackage with a target whose graph does not resolve',
   { timeout: packageFlowTimeout },
   () => {

@@ -1,5 +1,7 @@
 import type { Category, TargetKey } from '@/types.ts';
 
+import type { SkippedSubpath } from './entry.ts';
+
 /** Bumped on any breaking change to the package result shape. */
 export const packageResultVersion = 2;
 
@@ -74,6 +76,8 @@ export interface PackageResult {
   worst?: Partial<Record<TargetKey, WorstEntry>>;
   /** The export with the worst findings that only some exports reach, among all entries, when it is worse than the result of the target. */
   worstExport?: Partial<Record<TargetKey, WorstExport>>;
+  /** The subpaths of `exports` that are not checked because no target of them is a script, such as a sourcemap. Left out when there are none. */
+  skipped?: SkippedSubpath[];
   /** Settings and notes each target ran with, as `check` prints them. */
   context: Partial<Record<TargetKey, { settings: string; notes: string[] }>>;
   entries: PackageEntryResult[];
