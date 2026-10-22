@@ -56,6 +56,11 @@ export interface FindingOptions {
   suggestions?: SuggestionData;
   /** Cases of code a package ships that the target never runs. Matching findings are guarded. */
   unreached?: readonly UnreachedEntry[];
+  /**
+   * The options that a file of the project sets. An entry of the unreached data that names
+   * options reads it. Empty for build output. Without it, such an entry always applies.
+   */
+  optionsSet?: ReadonlySet<string>;
 }
 
 /** A reached API the target fully supports. */
@@ -136,6 +141,8 @@ function suggest(
   });
 }
 
+const noOptionsSet: ReadonlySet<string> = new Set();
+
 function unreachedFor(
   module: ModuleUsages,
   usage: Usage,
@@ -151,6 +158,7 @@ function unreachedFor(
     file: usage.location.file,
     api: usage.display,
     target: options.target.info.key,
+    optionsSet: options.optionsSet ?? noOptionsSet,
   });
 }
 

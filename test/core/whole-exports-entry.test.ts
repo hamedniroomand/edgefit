@@ -18,7 +18,7 @@ describe('a whole-module export and a stored-modules entry', () => {
       nodeEnv: undefined,
     });
     const modules = readStoredModules(
-      scanModules(graph, root, new Set(), { trace: true, nodeEnv: undefined }),
+      scanModules(graph, root, new Set(), { trace: true, nodeEnv: undefined }).modules,
     );
     const found = modules.find(module => module.file.endsWith('util/fs.js'));
     return (found?.usages ?? []).map(usage => `${usage.kind} ${usage.display}`);

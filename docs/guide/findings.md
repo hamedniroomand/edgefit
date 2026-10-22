@@ -274,7 +274,7 @@ edgefit does not report a browser global that the code uses by its bare name, su
 
 ### Code a package ships and the target does not run
 
-A bundle can hold code that a target never runs, and that no check in the code shows. Next.js's Edge bundle holds the code for Cache Components, which Next turns off on the Edge runtime, and a timing call that only `next dev` makes. edgefit keeps a reviewed list of such cases in `data/unreached.json`: the package, the releases it was read in, the file, the APIs, the target, why the code does not run and where that is stated. A finding in a listed file is guarded and shows the reason:
+A bundle can hold code that a target never runs, and that no check in the code shows. Next.js's Edge bundle holds the code for Cache Components, which Next turns off on the Edge runtime, and a timing call that only `next dev` makes. edgefit keeps a reviewed list of such cases in `data/unreached.json`: the package, the releases it was read in, the file, the APIs, the options that make the code run when the entry names any, the target, why the code does not run and where that is stated. A finding in a listed file is guarded and shows the reason, unless the project sets an option that the entry names (see [Options of the package](#options-of-the-package)):
 
 ```
 guarded  unsupported  setImmediate  (vercel-edge)
@@ -282,7 +282,7 @@ guarded  unsupported  setImmediate  (vercel-edge)
        not reached: Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.
 ```
 
-It applies to a check of the source and of build output alike. A release outside the listed range is checked as usual, so a new release is not assumed to behave the same. A weekly check reads the latest release and flags an entry whose file or APIs no longer match. The new release is checked as usual until a maintainer merges a pull request that widens the range. The check opens that pull request when every file that the newest range of the package names has the same bytes in the new release and in the last release of that range.
+An entry applies to a check of the source and of build output alike. An entry that names options is read in a different way in the two: see [Options of the package](#options-of-the-package). A release outside the listed range is checked as usual, so a new release is not assumed to behave the same. A weekly check reads the latest release and flags an entry whose file or APIs no longer match. The new release is checked as usual until a maintainer merges a pull request that widens the range. The check opens that pull request when every file that the newest range of the package names has the same bytes in the new release and in the last release of that range.
 
 ### A module that a package file stores
 
@@ -290,7 +290,11 @@ Some code keeps a Node.js module in a lookup table and reads it later, as `follo
 
 ### Options of the package
 
-Some code in a package runs only when the project sets an option of its API, as `fastify` does for `http2: true`. A usage that sits behind a test of an option that its function gets, such as `if (options.http2)`, `options.http2 === true`, `options.http2 ? a : b` or `if (!options.http2) return` before the code, is guarded when no file of the graph sets that option to a value other than `false`, `0`, `null`, `undefined` or `''`. A property of an object literal, a member assignment, and a value that is not a literal count as a setting. The verbose list says `runs only when the option `http2` is set`. When the project sets the option, the usage is an ordinary finding, so run `edgefit check` on your app. An option that a function reads through a destructured parameter, or through `this`, is not recognized. An entry of the [list of code that a target does not run](#code-a-package-ships-and-the-target-does-not-run) applies to every project, also to one that sets the option that its reason names.
+Some code in a package runs only when the project sets an option of its API, as `fastify` does for `http2: true`. A usage that sits behind a test of an option that its function gets, such as `if (options.http2)`, `options.http2 === true`, `options.http2 ? a : b` or `if (!options.http2) return` before the code, is guarded when no file of the graph sets that option to a value other than `false`, `0`, `null`, `undefined` or `''`. A property of an object literal, a member assignment, and a value that is not a literal count as a setting. The verbose list says `runs only when the option `http2` is set`. When the project sets the option, the usage is an ordinary finding, so run `edgefit check` on your app. An option that a function reads through a destructured parameter, or through `this`, is not recognized.
+
+An entry of the [list of code that a target does not run](#code-a-package-ships-and-the-target-does-not-run) can name the options that make the code run. It applies only when no file of your own code in the graph sets one of them. A setting is as described above, and the match is by name only, so a property with the same name for another call also counts. So `got(url, { http2: true })` gives an ordinary finding, and `got(url)` gives a guarded one.
+
+Three cases do not bring the finding back. A file of a package does not count, because a package forwards the option that its own user sets. A nested property, such as `{ hooks: { http2: true } }`, does not count, and the finding stays guarded. In build output edgefit does not read the options, so the entry applies also when the project sets one. The code of the project and of its packages is in the same files there.
 
 ### Production builds
 

@@ -27,13 +27,18 @@ function withUnsetOptions(usage: Usage, set: ReadonlySet<string>): Usage {
   return unset.length === 0 ? rest : { ...rest, options: unset };
 }
 
-/** Extracts runtime API usages from every script in the graph, with its package and import chain. */
+/**
+ * Extracts runtime API usages from every script in the graph, with its package and import chain.
+ * The result holds `modules`, and `optionsSet`: the options that the files of the project set. The
+ * entries of the unreached data that name options read it. A package file does not count, because
+ * a package forwards the option that its own user sets.
+ */
 export function scanModules(
   graph: ModuleGraph,
   root: string,
   globals: ReadonlySet<string>,
   options: ScanOptions,
-): ModuleUsages[] {
+): { modules: ModuleUsages[]; optionsSet: ReadonlySet<string> } {
   const packages = new PackageResolver(root);
   const chains = new ImportChains(graph, packages);
   const scripts = extractScripts(graph, root, globals, options);
@@ -46,10 +51,14 @@ export function scanModules(
         ? tagUsagesByExport(graph, modules, traced)
         : traced;
   const set = new Set(scripts.flatMap(({ found }) => found.optionsSet));
-  return scripts.map(({ file, unchecked }) => ({
+  const scanned = scripts.map(({ file, unchecked }) => ({
     file,
     package: packages.packageFor(file),
     chain: chains.chainTo(file),
     usages: [...(reached.get(file) ?? []), ...unchecked].map(usage => withUnsetOptions(usage, set)),
   }));
+  const projectOptions = scripts.flatMap(({ file, found }) =>
+    packages.packageFor(file) === undefined ? found.optionsSet : [],
+  );
+  return { modules: scanned, optionsSet: new Set(projectOptions) };
 }

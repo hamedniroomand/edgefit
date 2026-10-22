@@ -27,6 +27,7 @@ const query: UnreachedQuery = {
   file,
   api: 'node:fs.watch',
   target: 'workerd',
+  optionsSet: new Set(),
 };
 
 function dataWith(overrides: Record<string, unknown>): string {
@@ -59,6 +60,10 @@ describe('the shipped unreached data', () => {
       'versions must be major.minor.patch',
     ],
     ['a source that is not a link', { source: 'next' }, 'source must be an https link'],
+    ['an empty list of options', { options: [] }, 'options must be a list of one or more'],
+    ['a blank option name', { options: [' '] }, 'options must be a list of one or more'],
+    ['an option that is not text', { options: [1] }, 'options must be a list of one or more'],
+    ['options that are not a list', { options: 'http2' }, 'options must be a list of one or more'],
   ])('rejects %s', (_name, overrides, message) => {
     expect(() => loadUnreached(dataWith(overrides))).toThrow(message);
   });
@@ -85,6 +90,30 @@ describe('matching an entry', () => {
     ['another target', { target: 'bun' }],
   ])('does not match %s', (_name, change) => {
     expect(findUnreached([entry], { ...query, ...change })).toBeUndefined();
+  });
+
+  describe('an entry that names options', () => {
+    const withOptions: UnreachedEntry = { ...entry, options: ['http2', 'h2'] };
+    it.each<[string, string[]]>([
+      ['no file sets an option', []],
+      ['a file sets another option', ['http3']],
+    ])('matches when %s', (_name, names) => {
+      const optionsSet = new Set(names);
+      expect(findUnreached([withOptions], { ...query, optionsSet })).toBe(withOptions);
+    });
+
+    it.each<[string, string[]]>([
+      ['the project sets the first option', ['http2']],
+      ['the project sets the second option', ['h2']],
+      ['the project sets both options', ['h2', 'http2']],
+    ])('does not match when %s', (_name, names) => {
+      const optionsSet = new Set(names);
+      expect(findUnreached([withOptions], { ...query, optionsSet })).toBeUndefined();
+    });
+
+    it('matches an entry without options whatever the project sets', () => {
+      expect(findUnreached([entry], { ...query, optionsSet: new Set(['http2']) })).toBe(entry);
+    });
   });
 
   it('finds the file below the package inside a pnpm store path', () => {
