@@ -172,6 +172,15 @@
       "target": "deno",
       "reason": "Runs only in `Server#_verifyContentType`, when a gRPC server gets a request that has no gRPC content type. A gRPC client never runs it. On Deno the constant is `undefined`, and the server answers that request with status 200 and keeps running.",
       "source": "https://github.com/grpc/grpc-node/blob/@grpc/grpc-js@1.14.6/packages/grpc-js/src/server.ts#L1272-L1294"
+    },
+    {
+      "package": "got",
+      "versions": { "min": "16.1.0", "max": "16.1.0" },
+      "file": "dist/source/core/utils/http2-client.js",
+      "apis": ["node:tls.connect"],
+      "target": "workerd",
+      "reason": "Runs only when a project sets the `http2` option, which is off by default. `got` then opens the TLS connection itself, in its HTTP/2 client. With an `h2session`, `got` uses the session of the project and opens no connection.",
+      "source": "https://github.com/sindresorhus/got/blob/v16.1.0/source/core/options.ts#L3777-L3779"
     }
   ]
 }
