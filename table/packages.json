@@ -290,6 +290,14 @@
       "name": "kafkajs"
     },
     {
+      "name": "bullmq",
+      "notes": "bullmq runs a processor file in a child process or a worker thread, which workerd does not implement; use Cloudflare Queues on Workers."
+    },
+    {
+      "name": "node-cron",
+      "notes": "A node-cron task that names a file runs in a child process, which workerd does not implement; use a Cron Trigger on Workers."
+    },
+    {
       "name": "busboy"
     },
     {
@@ -390,6 +398,10 @@
     },
     {
       "name": "meilisearch"
+    },
+    {
+      "name": "@elastic/elasticsearch",
+      "notes": "The client sends requests with undici, and workerd rejects the ALPNProtocols option of node:tls.connect that undici sets; call the Elasticsearch REST API with fetch on Workers."
     }
   ]
 }
