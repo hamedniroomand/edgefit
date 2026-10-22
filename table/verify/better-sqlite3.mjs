@@ -1,4 +1,4 @@
-// Reaches the native addon: the database loads it when it opens.
+// Opens a database, which loads the native addon. On workerd the run throws a TypeError first: see the note of the row.
 import Database from 'better-sqlite3';
 
 export async function run() {

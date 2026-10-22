@@ -174,7 +174,7 @@
     },
     {
       "name": "better-sqlite3",
-      "notes": "Native addon."
+      "notes": "Native addon. On workerd, process.report.getReport() returns an empty object with no header. The package reads header.glibcVersionRuntime, so the run throws a TypeError before it reaches the native addon."
     },
     {
       "name": "sqlite3",
