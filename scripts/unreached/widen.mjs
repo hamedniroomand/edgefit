@@ -1,13 +1,20 @@
-// Widens the range of an entry on its own, when every file that the newest range of a package names
-// has the same bytes in the latest release and in the last release of the range. The bytes are the
-// only rule. This does not tell a harmless change from a real one, it does not read the releases
-// between the two, and it does not read the code in other files that decides whether a file runs.
+// Widens the range of an entry on its own, when every file that the newest range of a package
+// names, and every file that those entries list in `guards`, has the same bytes in the latest
+// release and in the last release of the range. The bytes are the only rule. This does not tell a
+// harmless change from a real one, it does not read the releases between the two, and it does not
+// compare other files that decide whether a file runs, unless an entry lists that file in `guards`.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 import { compareVersions, inRange, semver } from '../../src/data/version-range.ts';
 
-/** @typedef {{ package: string, versions: { min: string, max?: string }, file: string }} Entry */
+/**
+ * @typedef {object} Entry
+ * @property {string} package
+ * @property {{ min: string, max?: string }} versions
+ * @property {string} file
+ * @property {string[]} [guards] The other files that hold the condition that the reason names.
+ */
 /**
  * @typedef {object} Widening
  * @property {string} name The package.
@@ -43,13 +50,30 @@ function readFile(file) {
   return statSync(file, { throwIfNoEntry: false })?.isFile() ? readFileSync(file) : undefined;
 }
 
-/** Whether each file that the entries name exists in both releases, with the same bytes. */
+/** Whether a file exists in both releases, with the same bytes. */
+function sameInBoth(file, latestRoot, lastRoot) {
+  const latest = readFile(path.join(latestRoot, file));
+  const last = readFile(path.join(lastRoot, file));
+  return latest !== undefined && last !== undefined && latest.equals(last);
+}
+
+/** The guard files of the entries, once each. */
+function guardsOf(entries) {
+  return [...new Set(entries.flatMap(entry => entry.guards ?? []))];
+}
+
+/**
+ * Whether each file that the entries name, and each guard file, exists in both releases, with the
+ * same bytes.
+ */
 export function namedFilesUnchanged(entries, latestRoot, lastRoot) {
-  return [...new Set(entries.map(entry => entry.file))].every(file => {
-    const latest = readFile(path.join(latestRoot, file));
-    const last = readFile(path.join(lastRoot, file));
-    return latest !== undefined && last !== undefined && latest.equals(last);
-  });
+  const files = new Set([...entries.map(entry => entry.file), ...guardsOf(entries)]);
+  return [...files].every(file => sameInBoth(file, latestRoot, lastRoot));
+}
+
+/** The guard files of an entry that are not a file in the release at `root`. */
+export function missingGuards(root, entry) {
+  return (entry.guards ?? []).filter(guard => readFile(path.join(root, guard)) === undefined);
 }
 
 /** The files below a folder, as paths with `/`. Only files count: a link or another entry is skipped. */
@@ -76,18 +100,18 @@ export function differingFiles(latestRoot, lastRoot) {
 }
 
 /**
- * What to widen, for the entries of one package in one data file, against the latest release.
- * Nothing in these cases:
+ * The newest range and its last release, when the latest release may widen it. Nothing in these
+ * cases, and `fetchRelease` is not called:
  * - The latest release is in a range already, or is below the newest range.
  * - The latest release is a pre-release, which is not a valid max.
- * - A file that the newest range names is missing in one of the two releases, or has other bytes.
+ * - No entry has a `max`.
  * `fetchRelease(version)` unpacks that release and gives the folder of its files.
  * @param {Entry[]} entries
  * @param {{ version: string, root: string }} latest
  * @param {(version: string) => string} fetchRelease
- * @returns {Widening | undefined}
+ * @returns {{ range: Entry[], from: string, lastRoot: string } | undefined}
  */
-export function widenPlan(entries, latest, fetchRelease) {
+function lastOfNewestRange(entries, latest, fetchRelease) {
   const range = newestRange(entries);
   if (
     !semver.test(latest.version) ||
@@ -100,7 +124,57 @@ export function widenPlan(entries, latest, fetchRelease) {
   if (compareVersions(latest.version, from) <= 0) {
     return undefined;
   }
-  const lastRoot = fetchRelease(from);
+  return { range, from, lastRoot: fetchRelease(from) };
+}
+
+/**
+ * The guard files of the newest range that are missing or have other bytes in one of the two
+ * releases, and the release that the range ends at. Undefined when the latest release cannot widen
+ * the range (see `lastOfNewestRange`), or when no guard file differs. It asks `fetchRelease` for
+ * the same release as `widenPlan` does, so the caller keeps that folder instead of unpacking it
+ * twice.
+ * @param {Entry[]} entries
+ * @param {{ version: string, root: string }} latest
+ * @param {(version: string) => string} fetchRelease
+ * @returns {{ from: string, files: string[] } | undefined}
+ */
+export function changedGuards(entries, latest, fetchRelease) {
+  const found = lastOfNewestRange(entries, latest, fetchRelease);
+  const files = found
+    ? guardsOf(found.range)
+        .filter(guard => !sameInBoth(guard, latest.root, found.lastRoot))
+        .sort()
+    : [];
+  return found && files.length > 0 ? { from: found.from, files } : undefined;
+}
+
+/**
+ * The sentence that names the guard files that kept a range from widening, for the end of the
+ * failure message. It is an empty string when `change` is undefined.
+ */
+export function guardNote(change) {
+  return change === undefined
+    ? ''
+    : ` Guard files that are missing or have other bytes than in ${change.from}: ${change.files.join(', ')}.`;
+}
+
+/**
+ * What to widen, for the entries of one package in one data file, against the latest release.
+ * Nothing in these cases:
+ * - The latest release cannot widen the newest range, see `lastOfNewestRange`.
+ * - A file that the newest range names, or a guard file of it, is missing in one of the two
+ *   releases, or has other bytes.
+ * @param {Entry[]} entries
+ * @param {{ version: string, root: string }} latest
+ * @param {(version: string) => string} fetchRelease
+ * @returns {Widening | undefined}
+ */
+export function widenPlan(entries, latest, fetchRelease) {
+  const found = lastOfNewestRange(entries, latest, fetchRelease);
+  if (found === undefined) {
+    return undefined;
+  }
+  const { range, from, lastRoot } = found;
   if (!namedFilesUnchanged(range, latest.root, lastRoot)) {
     return undefined;
   }
@@ -200,8 +274,8 @@ export function pullRequestBody(widenings) {
     ].join('\n'),
   );
   return [
-    'The weekly Unreached data check found new releases that are outside the ranges of the data files. For each package below, every file that its newest range names has the same bytes in the new release and in the last release of that range. This change sets `max` of those entries to the new release. It changes no reason and no `source`.',
-    'The check compares only the files that the entries name, in two releases: the new one and the last one of the range. It does not read the releases between them. It does not read other files of the package, such as a file that decides whether a named file runs. It does not read the code that `source` points to, and it does not change `source`. Read the diff and the lists below before you merge.',
+    'The weekly Unreached data check found new releases that are outside the ranges of the data files. For each package below, every file that its newest range names, and every file that those entries list in `guards`, has the same bytes in the new release and in the last release of that range. This change sets `max` of those entries to the new release. It changes no reason and no `source`.',
+    'The check compares only the files that the entries name, and the files that they list in `guards`, in two releases: the new one and the last one of the range. It does not read the releases between them. It does not read other files of the package, such as a file that decides whether a named file runs, when no entry lists that file in `guards`. It does not read the code that `source` points to, and it does not change `source`. Read the diff and the lists below before you merge.',
     ...sections,
   ].join('\n\n');
 }

@@ -1,10 +1,10 @@
 // Checks data/unreached.json and data/stored-modules.json against the latest release of each
 // package they name, so an entry that stopped matching, or a release no entry covers, is noticed.
-// When every file that the newest range of a package names has the same bytes in the latest release
-// and in the last release of the range, the check widens the range itself, see widen.mjs. It writes
-// the data files and a changeset in the current folder, so run it in a clean working tree. When
-// PR_BODY_FILE is set, it also writes the body of the pull request to that file. The weekly workflow
-// opens that pull request.
+// When every file that the newest range of a package names, and every file that those entries list
+// in `guards`, has the same bytes in the latest release and in the last release of the range, the
+// check widens the range itself, see widen.mjs. It writes the data files and a changeset in the
+// current folder, so run it in a clean working tree. When PR_BODY_FILE is set, it also writes the
+// body of the pull request to that file. The weekly workflow opens that pull request.
 // Run weekly by CI.
 // Usage: node scripts/unreached/check.mjs
 import { execFileSync } from 'node:child_process';
@@ -14,7 +14,16 @@ import path from 'node:path';
 import process from 'node:process';
 
 import { inRange, problemsOf } from './entries.mjs';
-import { applyWidening, changesetText, pullRequestBody, widenPlan, widenedText } from './widen.mjs';
+import {
+  applyWidening,
+  changedGuards,
+  changesetText,
+  guardNote,
+  missingGuards,
+  pullRequestBody,
+  widenPlan,
+  widenedText,
+} from './widen.mjs';
 
 const files = ['data/unreached.json', 'data/stored-modules.json'];
 
@@ -42,11 +51,19 @@ function download(name, directory, requested) {
   return { version, root: path.join(directory, 'package') };
 }
 
-/** The problems of the entries of one data file for one package, against its latest release. */
-function problemsFor(dataFile, entries, name, { version, root }) {
+/**
+ * The problems of the entries of one data file for one package, against its latest release.
+ * `guardChange` names the guard files that kept a range from widening, see `changedGuards`.
+ */
+function problemsFor(dataFile, entries, name, { version, root }, guardChange) {
   const problems = [];
   // An entry for an older release describes that release, not the latest one.
   for (const entry of entries.filter(item => inRange(version, item.versions))) {
+    for (const guard of missingGuards(root, entry)) {
+      problems.push(
+        `${dataFile}: ${name}@${version}: ${guard} is not a file in this release. It is a guard file of ${entry.file}. Find the file that holds the condition now, and change \`guards\` of the entry.`,
+      );
+    }
     const file = path.join(root, entry.file);
     // Only ENOENT and ENOTDIR give undefined. Any other error, such as EACCES, is thrown.
     if (statSync(file, { throwIfNoEntry: false }) === undefined) {
@@ -60,10 +77,11 @@ function problemsFor(dataFile, entries, name, { version, root }) {
   }
   if (!entries.some(entry => inRange(version, entry.versions))) {
     problems.push(
-      `${dataFile}: ${name}@${version} is outside every range. Read the entries against it, then widen the ranges.`,
+      `${dataFile}: ${name}@${version} is outside every range. Read the entries against it, then widen the ranges.${guardNote(guardChange)}`,
     );
   }
-  return problems;
+  // Two entries of one file, such as the workerd and bun entries, can give the same problem.
+  return [...new Set(problems)];
 }
 
 /** Deletes a file or folder. A failure only gives a warning, so it does not hide the result or an error. */
@@ -90,11 +108,17 @@ try {
     // One package at a time: each one is deleted before the next one is downloaded.
     const directory = path.join(downloads, String(index));
     const release = download(name, directory);
-    const lastReleases = [];
+    const lastReleases = new Map();
+    // The same last release serves the widening and the sentence about guard files.
     const fetchLast = version => {
-      const lastDirectory = mkdtempSync(path.join(downloads, 'last-'));
-      lastReleases.push(lastDirectory);
-      return download(name, lastDirectory, version).root;
+      if (!lastReleases.has(version)) {
+        const lastDirectory = mkdtempSync(path.join(downloads, 'last-'));
+        lastReleases.set(version, {
+          lastDirectory,
+          root: download(name, lastDirectory, version).root,
+        });
+      }
+      return lastReleases.get(version).root;
     };
     for (const { dataFile, entries } of data) {
       const own = entries.filter(entry => entry.package === name);
@@ -104,11 +128,13 @@ try {
           widenings.push({ dataFile, ...widening });
           applyWidening(widening);
         }
-        problems.get(dataFile).set(name, problemsFor(dataFile, own, name, release));
+        const guardChange =
+          widening === undefined ? changedGuards(own, release, fetchLast) : undefined;
+        problems.get(dataFile).set(name, problemsFor(dataFile, own, name, release, guardChange));
       }
     }
     remove(directory);
-    for (const lastDirectory of lastReleases) {
+    for (const { lastDirectory } of lastReleases.values()) {
       remove(lastDirectory);
     }
   }
@@ -143,7 +169,7 @@ function writeWidenings() {
   }
   for (const { dataFile, name, from, to } of widenings) {
     console.log(
-      `::notice title=data::${dataFile}: ${name} ${from} to ${to}: every named file has the same bytes in both releases, so the range is widened.`,
+      `::notice title=data::${dataFile}: ${name} ${from} to ${to}: every named file and guard file has the same bytes in both releases, so the range is widened.`,
     );
   }
 }

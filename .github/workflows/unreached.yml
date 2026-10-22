@@ -4,10 +4,11 @@ name: Unreached data
 # never runs, and which modules a package file stores. They were read in one release each, so each
 # week they are checked against the latest one.
 #
-# When every file that the newest range of a package names has the same bytes in the latest release
-# and in the last release of the range, the check widens the range itself, and the last step opens
-# one pull request with the change. When a named file changed, the check fails and a person reads
-# the file. See docs/contributing/maintenance.md.
+# When every file that the newest range of a package names, and every file that those entries list
+# in `guards`, has the same bytes in the latest release and in the last release of the range, the
+# check widens the range itself, and the last step opens one pull request with the change. When a
+# named file or a guard file changed or is missing, the check fails and a person reads the entry and
+# its files. See docs/contributing/maintenance.md.
 #
 # A pull request opened with GITHUB_TOKEN does not start other workflows, so CI would not run on
 # it. Set the RELEASE_PR_TOKEN secret (fine-grained token, contents and pull requests: write) to

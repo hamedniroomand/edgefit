@@ -274,7 +274,7 @@ edgefit does not report a browser global that the code uses by its bare name, su
 
 ### Code a package ships and the target does not run
 
-A bundle can hold code that a target never runs, and that no check in the code shows. Next.js's Edge bundle holds the code for Cache Components, which Next turns off on the Edge runtime, and a timing call that only `next dev` makes. edgefit keeps a reviewed list of such cases in `data/unreached.json`: the package, the releases it was read in, the file, the APIs, the options that make the code run when the entry names any, the target, why the code does not run and where that is stated. A finding in a listed file is guarded and shows the reason, unless the project sets an option that the entry names (see [Options of the package](#options-of-the-package)):
+A bundle can hold code that a target never runs, and that no check in the code shows. Next.js's Edge bundle holds the code for Cache Components, which Next turns off on the Edge runtime, and a timing call that only `next dev` makes. edgefit keeps a reviewed list of such cases in `data/unreached.json`: the package, the releases it was read in, the file, the other files that hold the condition when it is not in that file, the APIs, the options that make the code run when the entry names any, the target, why the code does not run and where that is stated. A finding in a listed file is guarded and shows the reason, unless the project sets an option that the entry names (see [Options of the package](#options-of-the-package)):
 
 ```
 guarded  unsupported  setImmediate  (vercel-edge)
@@ -282,7 +282,7 @@ guarded  unsupported  setImmediate  (vercel-edge)
        not reached: Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.
 ```
 
-An entry applies to a check of the source and of build output alike. An entry that names options is read in a different way in the two: see [Options of the package](#options-of-the-package). A release outside the listed range is checked as usual, so a new release is not assumed to behave the same. A weekly check reads the latest release and flags an entry whose file or APIs no longer match. The new release is checked as usual until a maintainer merges a pull request that widens the range. The check opens that pull request when every file that the newest range of the package names has the same bytes in the new release and in the last release of that range.
+An entry applies to a check of the source and of build output alike. An entry that names options is read in a different way in the two: see [Options of the package](#options-of-the-package). A release outside the listed range is checked as usual, so a new release is not assumed to behave the same. A weekly check reads the latest release and flags an entry whose files or APIs no longer match. The new release is checked as usual until a maintainer merges a pull request that widens the range. The check opens that pull request when every file that the newest range of the package names, and every file that its entries list as holding the condition, has the same bytes in the new release and in the last release of that range.
 
 ### A module that a package file stores
 
