@@ -15,6 +15,7 @@ import {
   defaultLevels,
   loadSuggestions,
   loadUnreached,
+  unreachedOptionPaths,
 } from './findings.ts';
 import type { FindingOptions, SupportedApi } from './findings.ts';
 import { shownModules, settleTargets } from './run-targets.ts';
@@ -95,6 +96,23 @@ function findingOptions(
   };
 }
 
+/** The options of the scan of one target. A file lists each option path that the data names and it sets. */
+function scanOptionsOf(
+  target: Target,
+  nodeEnv: string | undefined,
+  isBuilt: boolean,
+  options: CheckOptions,
+): Parameters<typeof scanModules>[3] {
+  return {
+    trace: !isBuilt,
+    lazyNodeImports: target.lazyNodeImports,
+    nodeEnv,
+    leaveOutMissingPeers: options.missingPeersAsNotes,
+    byExport: options.byExport,
+    optionPaths: unreachedOptionPaths(loadUnreached()),
+  };
+}
+
 async function checkTarget(
   target: Target,
   { entries, source, notes: entryNotes, built }: TargetEntries,
@@ -113,13 +131,12 @@ async function checkTarget(
     plugins: target.resolvePlugins,
   });
   const isBuilt = built || entries.some(entry => isBuildOutput(root, entry));
-  const scanned = scanModules(graph, root, target.globals, {
-    trace: !isBuilt,
-    lazyNodeImports: target.lazyNodeImports,
-    nodeEnv,
-    leaveOutMissingPeers: options.missingPeersAsNotes,
-    byExport: options.byExport,
-  });
+  const scanned = scanModules(
+    graph,
+    root,
+    target.globals,
+    scanOptionsOf(target, nodeEnv, isBuilt, options),
+  );
   const { modules, notes, supplied } = shownModules(scanned.modules, root, isBuilt);
   // Build output holds the code of the project and of its packages in the same files, so an option
   // name that a file sets can come from a package.

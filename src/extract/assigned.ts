@@ -148,8 +148,47 @@ type Walk = {
   nested: boolean;
   /** The node is a direct child of an object pattern. Its key names a value that the code reads. */
   read: boolean;
+  /**
+   * The keys of the properties that enclose the node, the nearest last, with an object literal as
+   * each value. A function, a property with another value and a key that is not static start the
+   * list again. A spread or a call inside the object does not, so that match can only show a finding.
+   */
+  keys: readonly string[];
   tests: readonly Node[];
 };
+
+/** The keys that enclose a child of `node`: see `Walk`. */
+function keysFor(node: Node, keys: readonly string[]): readonly string[] {
+  if (node.type !== 'Property') {
+    return keys;
+  }
+  const name = staticKey(node.key, node.computed);
+  return name !== undefined && strip(node.value).type === 'ObjectExpression' ? [...keys, name] : [];
+}
+
+/** The option paths that a property sets: its key is the last name, and the keys above it end with the other names. */
+function pathsSetBy({ node, read, keys }: Walk, known: readonly (readonly string[])[]): string[] {
+  if (
+    known.length === 0 ||
+    node.type !== 'Property' ||
+    node.kind !== 'init' ||
+    node.method ||
+    read
+  ) {
+    return [];
+  }
+  const name = staticKey(node.key, node.computed);
+  if (name === undefined || !isSetValue(node.value)) {
+    return [];
+  }
+  return known
+    .filter(
+      path =>
+        path.at(-1) === name &&
+        path.slice(0, -1).every((key, place, above) => keys.at(place - above.length) === key),
+    )
+    .map(path => path.join('.'));
+}
 
 /** What a node sets: the name of the option, and the value that it gets. */
 type Setting = { name: string | undefined; value: Node | undefined };
@@ -196,15 +235,19 @@ function settingOf({ node, nested, read, tests }: Walk): Setting | undefined {
 }
 
 /**
- * The names of the options that this file sets: a property of an object literal, or a member that
+ * The names of the options that this file sets, and the paths of `paths` that it sets: a property of an object literal, or a member that
  * is assigned (`x.http2 = true`), whose value is not `false`, `0`, `null`, `undefined` or `''`. A
  * value that is not a literal counts as set, since it can be anything.
  *
- * Only a direct property counts, because the guard of an option reads a direct member of a
+ * A name counts only as a direct property, because the guard of an option reads a direct member of a
  * parameter (`options.http2`). A property of an object that is itself the value of a property does
  * not, at any depth, until a function starts: `{ http2: { type: 'boolean' } }` inside the `properties`
  * of a schema is a description, and `other({ server: { http2: true } })` is read as `options.server.http2`,
  * which no guard covers, so its finding stays.
+ *
+ * A path of `paths`, such as `auth.lock`, is set by a property `lock` in an object literal that is the
+ * value of the property `auth`. The match is at the end of the path, so `{ supabase: { auth: { lock } } }`
+ * sets it too. A path never sets its plain name, and no nested key is in the result except a path of `paths`.
  *
  * The keys of a destructuring pattern do not count, because the pattern reads those names:
  * `const { http2 } = env`, `function f({ http2 }) {}` and `({ http2 } = env)`, also with a default
@@ -216,14 +259,27 @@ function settingOf({ node, nested, read, tests }: Walk): Setting | undefined {
  * writes it back. That other site counts by itself. A test of an absent member (`!x.name`) or a
  * default (`x.name ??= v`) still sets the option.
  */
-export function findAssignedOptions(body: readonly Node[]): string[] {
+export function findAssignedOptions(
+  body: readonly Node[],
+  paths: readonly string[] = [],
+): string[] {
   const found = new Set<string>();
-  const pending: Walk[] = body.map(node => ({ node, nested: false, read: false, tests: [] }));
+  const known = paths.map(path => path.split('.'));
+  const pending: Walk[] = body.map(node => ({
+    node,
+    nested: false,
+    read: false,
+    keys: [],
+    tests: [],
+  }));
   for (let item = pending.pop(); item !== undefined; item = pending.pop()) {
-    const { node, nested, tests } = item;
+    const { node, nested, keys, tests } = item;
     const setting = settingOf(item);
     if (setting?.name !== undefined && setting.value !== undefined && isSetValue(setting.value)) {
       found.add(setting.name);
+    }
+    for (const path of pathsSetBy(item, known)) {
+      found.add(path);
     }
     const reset = isFunction(node);
     for (const child of childNodes(node)) {
@@ -231,6 +287,7 @@ export function findAssignedOptions(body: readonly Node[]): string[] {
         node: child,
         nested: !reset && (nested || node.type === 'Property'),
         read: node.type === 'ObjectPattern',
+        keys: reset ? [] : keysFor(node, keys),
         tests: testsFor(node, child, tests),
       });
     }
