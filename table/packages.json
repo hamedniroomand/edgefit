@@ -50,6 +50,9 @@
       "name": "@upstash/redis"
     },
     {
+      "name": "@upstash/ratelimit"
+    },
+    {
       "name": "stripe"
     },
     {
@@ -59,7 +62,16 @@
       "name": "@anthropic-ai/sdk"
     },
     {
+      "name": "ai"
+    },
+    {
+      "name": "@ai-sdk/openai"
+    },
+    {
       "name": "@aws-sdk/client-s3"
+    },
+    {
+      "name": "@aws-sdk/client-dynamodb"
     },
     {
       "name": "lodash"
@@ -113,6 +125,9 @@
       "name": "cors"
     },
     {
+      "name": "helmet"
+    },
+    {
       "name": "jsonwebtoken"
     },
     {
@@ -135,6 +150,9 @@
       "name": "zustand"
     },
     {
+      "name": "immer"
+    },
+    {
       "name": "ky"
     },
     {
@@ -150,6 +168,9 @@
     },
     {
       "name": "graphql-yoga"
+    },
+    {
+      "name": "graphql-request"
     },
     {
       "name": "@trpc/server"
@@ -251,6 +272,9 @@
       "name": "passport"
     },
     {
+      "name": "@clerk/backend"
+    },
+    {
       "name": "twilio"
     },
     {
@@ -264,6 +288,9 @@
     },
     {
       "name": "amqplib"
+    },
+    {
+      "name": "kafkajs"
     },
     {
       "name": "busboy"
@@ -281,7 +308,16 @@
       "name": "fast-xml-parser"
     },
     {
+      "name": "csv-parse"
+    },
+    {
       "name": "ejs"
+    },
+    {
+      "name": "handlebars"
+    },
+    {
+      "name": "nunjucks"
     },
     {
       "name": "markdown-it"
@@ -303,6 +339,9 @@
     },
     {
       "name": "joi"
+    },
+    {
+      "name": "class-validator"
     },
     {
       "name": "bignumber.js"
@@ -328,6 +367,9 @@
       "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run."
     },
     {
+      "name": "@azure/storage-blob"
+    },
+    {
       "name": "mssql",
       "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either. Tedious calls an @azure/identity credential only after a SQL Server accepts the login, so a run without one cannot reach the child_process calls. The UDP lookup for a named instance does not throw on workerd, and the connection times out."
     },
@@ -342,6 +384,15 @@
     {
       "name": "socket.io",
       "notes": "On Workers the browser build of engine.io-parser reads a Blob with FileReader, which Workers do not have."
+    },
+    {
+      "name": "dotenv"
+    },
+    {
+      "name": "lru-cache"
+    },
+    {
+      "name": "meilisearch"
     }
   ]
 }
