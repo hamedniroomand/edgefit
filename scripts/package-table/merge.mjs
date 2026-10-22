@@ -1,7 +1,8 @@
 // Usage: node merge.mjs <edgefit-dist-index> <shards-dir> <out-dir> [previous-dir]
 // Merges every shard's per-package JSON into results.json, writes each package's badge, and
 // lists the packages that got worse since the previous run. With VERIFY_DIR set, it adds the
-// outcome of each verify job that ran the same version.
+// outcome of each verify job that ran the same version. It fails when a listed package has no
+// shard output. Each row keeps the `durationMs` that the shards use for the next plan.
 import {
   appendFileSync,
   copyFileSync,
@@ -40,6 +41,19 @@ for (const shard of readdirSync(shards)) {
   }
 }
 
+// A listed package that has no shard output is lost from the table. This happens when the shards
+// dealt different plans, or when an output is missing. The merge stops, so the publish job does
+// not change the branch.
+const unchecked = readList()
+  .map(({ name }) => name)
+  .filter(name => !found.has(`${fileNameOf(name)}.json`));
+if (unchecked.length > 0) {
+  console.log(
+    `::error title=package table::No shard checked these packages: ${unchecked.join(', ')}. The results branch stays as it was. Run the Package table workflow again.`,
+  );
+  process.exit(1);
+}
+
 const rows = [];
 
 /**
@@ -62,6 +76,8 @@ function keepPrevious(name, file, error) {
   for (const entry of kept) {
     copyFileSync(path.join(previousDir, entry), path.join(out, entry));
   }
+  // The row keeps the duration of its last good run, also after a timeout. A run that fails after
+  // a few seconds must not make the package light.
   rows.push({ ...before, staleError: error });
   stale.push(`- \`${name}\`: ${error} (kept the result for ${before.resolved})`);
   return true;
@@ -79,9 +95,6 @@ let sample;
 for (const { name } of readList()) {
   const file = fileNameOf(name);
   const result = found.get(`${file}.json`);
-  if (result === undefined) {
-    continue;
-  }
   if (result.error !== undefined && keepPrevious(name, file, result.error)) {
     continue;
   }
@@ -117,6 +130,7 @@ for (const { name } of readList()) {
     ...(result.error === undefined ? worstColumns(result) : {}),
     ...(result.error === undefined ? {} : { error: result.error }),
     ...(result.notes === undefined ? {} : { notes: result.notes }),
+    ...(result.durationMs === undefined ? {} : { durationMs: result.durationMs }),
     ...(verified === undefined ? {} : { verified: verifiedRow(verified) }),
   });
 }

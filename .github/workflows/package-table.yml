@@ -36,9 +36,48 @@ jobs:
           cache: true
           run-install: true
       - run: vp pack
+      # The shards deal the packages by the duration of each package in the previous results.json
+      # (on the package-results branch), longest first. Without that file, or when it has no
+      # durations, they deal in list order.
+      # All shards must read the same file. With different files, a package can run on no shard or
+      # on two shards. Only the publish job writes the branch, and the concurrency group of this
+      # workflow allows one run at a time, so the file does not change while one attempt of a run
+      # deals the packages. A re-run of one job is a new attempt and can read a newer file, so
+      # start a new run instead. A missing branch is the same for every shard (a first run, a
+      # fork), so it is not an error. Any other error stops the shard after three tries.
+      - name: Fetch the previous results
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url="https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+          fetch() {
+            local status=0
+            git ls-remote --exit-code --heads "$url" refs/heads/package-results > /dev/null || status=$?
+            case $status in
+              0)
+                # The URL of the remote holds the token, so the clone must not keep the remote.
+                git clone --quiet --depth 1 --branch package-results "$url" results \
+                  && git -C results remote remove origin
+                ;;
+              2)
+                echo "No package-results branch: the shards deal in list order."
+                mkdir results
+                ;;
+              *) return "$status" ;;
+            esac
+          }
+          for attempt in 1 2 3; do
+            rm -rf results
+            if fetch; then
+              exit 0
+            fi
+            sleep $((attempt * 5))
+          done
+          echo "::error title=package table::Could not read the package-results branch. The shards must use the same input, so this shard stops. Start a new run of the workflow. Do not re-run only this job."
+          exit 1
       # Packages are installed with --ignore-scripts and never run. A package that fails or times
       # out becomes an error row, never a failed run.
-      - run: node "$TABLE/run.mjs" dist/cli/main.mjs shard-out ${{ matrix.shard }} 8
+      - run: node "$TABLE/run.mjs" dist/cli/main.mjs shard-out ${{ matrix.shard }} 8 results
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: shard-${{ matrix.shard }}
