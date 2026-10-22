@@ -1,11 +1,12 @@
 import { execFile } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import { EdgefitError } from '@/errors.ts';
 
 import type { PackageManifest } from './entry.ts';
+import { copyWithoutPrepare } from './source-copy.ts';
 import { installSpec } from './spec.ts';
 import type { PackageSpec } from './spec.ts';
 
@@ -65,7 +66,7 @@ async function npm(args: string[], cwd: string): Promise<string> {
   }
 }
 
-/** A local directory is packed as `npm publish` would, so the files match what users install. */
+/** A local directory is packed with `npm pack`, so the file list follows `files` and `.npmignore` as in a publish. */
 async function tarballOf(directory: string, into: string): Promise<string> {
   const output = await npm(
     ['pack', path.resolve(directory), '--pack-destination', into, '--json', '--ignore-scripts'],
@@ -73,14 +74,26 @@ async function tarballOf(directory: string, into: string): Promise<string> {
   );
   const [packed] = JSON.parse(output) as { filename: string }[];
   if (packed === undefined) {
-    throw new EdgefitError(`npm pack produced no tarball for ${directory}.`);
+    throw new EdgefitError('npm pack produced no tarball.');
   }
   return path.join(into, packed.filename);
 }
 
+/** Packs a directory from a copy of it that has no `prepare` script. */
+async function packDirectory(source: string, root: string): Promise<string> {
+  const packs = path.join(root, '.pack');
+  await mkdir(packs);
+  // npm leaves the bundled dependencies out of a package when the path has a symbolic link in it,
+  // for example `/var` on macOS.
+  const copy = path.join(await realpath(root), '.source');
+  await copyWithoutPrepare(source, copy);
+  return tarballOf(copy, packs);
+}
+
 /**
  * Installs the package into a throwaway project. `--ignore-scripts` is not optional: the package
- * is only read, never run.
+ * is only read, never run. A directory is packed from a copy without its `prepare` script for the
+ * same reason.
  */
 export async function createWorkspace(
   spec: PackageSpec,
@@ -103,9 +116,7 @@ export async function createWorkspace(
       if (source.endsWith('.tgz') || source.endsWith('.tar.gz')) {
         target = source;
       } else {
-        const packs = path.join(root, '.pack');
-        await mkdir(packs);
-        target = await tarballOf(source, packs);
+        target = await packDirectory(source, root);
       }
     }
     const flags = ['--ignore-scripts', '--no-audit', '--no-fund', '--no-package-lock'];

@@ -65,7 +65,7 @@ On pull requests, with the GitHub Action:
 [![edgefit](https://edgefit.kitdev.space/packages/badges/<name>.svg)](https://edgefit.kitdev.space/packages/#<name>)
 ```
 
-For a package that is not on the table, run `npx edgefit package . --badge badge.svg` and commit the result.
+For a package that is not on the table, build the package, run `npx edgefit package . --badge badge.svg` and commit the result.
 
 ## Status
 

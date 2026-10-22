@@ -9,12 +9,12 @@ description: "Check an npm package's compatibility with edgefit package on Cloud
 ```sh
 npx edgefit package hono
 npx edgefit package @scope/name@^2 --target workerd
-npx edgefit package .            # your own package, as `npm publish` would ship it
+npx edgefit package .            # your own package, after you build it
 ```
 
 ## How it works
 
-1. The package is installed into a temporary project with `npm install --ignore-scripts`. Its code is never run, only read, and the project is deleted afterwards.
+1. For a directory, edgefit first packs a copy of it with `npm pack`. The copy has no `prepare` script, because npm 10 runs that script even with `--ignore-scripts`. Build the package before you check it, because no script of the package runs. Then the package is installed into a temporary project with `npm install --ignore-scripts`. Its code is never run, only read, and the project is deleted afterwards.
 2. Each public entry point, one for every subpath in `exports` (or `main` without one), gets an entry file that imports it as a namespace. Every export counts as used, which is the worst case for "I import this entry point". A finding that only some exports reach is listed under those exports and does not change the status of the entry.
 3. The usual [check](/guide/findings) runs on each entry for each target.
 

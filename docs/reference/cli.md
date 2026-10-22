@@ -78,7 +78,7 @@ Both files must be written by `edgefit check --format json` with the same edgefi
 edgefit package <name[@version]|directory|file.tgz> [options]
 ```
 
-Installs the package into a temporary project with `npm install --ignore-scripts`, then checks each public entry point with every export used. `name`, `name@1.2.3`, `name@^1`, `@scope/name` and `@scope/name@tag` are accepted. A directory is packed with `npm pack` first, so the files are the ones you would publish. See [Check an npm package's compatibility](/guide/packages) for what a result means.
+Installs the package into a temporary project with `npm install --ignore-scripts`, then checks each public entry point with every export used. `name`, `name@1.2.3`, `name@^1`, `@scope/name` and `@scope/name@tag` are accepted. A directory is packed with `npm pack` first, from a copy without its `prepare` script. The files are the ones you would publish, but no script of the package runs, so build the package before you check it. See [Check an npm package's compatibility](/guide/packages) for what a result means.
 
 | Option               | Description                                                       |
 | -------------------- | ----------------------------------------------------------------- |
