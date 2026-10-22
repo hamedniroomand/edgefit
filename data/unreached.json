@@ -120,6 +120,15 @@
       "source": "https://github.com/nodemailer/nodemailer/blob/v10.2.0/src/sendmail-transport/index.ts#L150"
     },
     {
+      "package": "nodemailer",
+      "versions": { "min": "10.0.13", "max": "10.2.0" },
+      "file": "dist/cjs/sendmail-transport/index.js",
+      "apis": ["node:child_process", "node:child_process.spawn"],
+      "target": "workerd",
+      "reason": "Runs only with the sendmail transport, which starts a local `sendmail` binary. A Worker sends mail with the SMTP transport.",
+      "source": "https://github.com/nodemailer/nodemailer/blob/v10.2.0/src/sendmail-transport/index.ts#L150"
+    },
+    {
       "package": "mongodb",
       "versions": { "min": "7.6.0", "max": "7.7.0" },
       "file": "lib/client-side-encryption/mongocryptd_manager.js",
