@@ -25,5 +25,9 @@ export function workerdEntries(root: string, wrangler: WranglerConfig | undefine
     return detectEntries([main, ...fallbackSources(root)], true);
   }
   // Not shared: Pages handlers are not entries for other runtimes, and their guesses are not Pages'.
-  return { ...detectEntries([main, ...pages.sources], false), advice: pages.advice };
+  return {
+    ...detectEntries([main, ...pages.sources], false),
+    advice: pages.advice,
+    staticOutput: pages.staticOutput,
+  };
 }

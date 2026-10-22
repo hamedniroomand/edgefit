@@ -32,8 +32,11 @@ export function expandEntries(root: string, patterns: readonly string[]): string
 
 const shownEntries = 3;
 
-/** `entry a.ts`, or `entries a.ts, b.ts, c.ts +2 more` when there are more than a few. */
+/** `entry a.ts`, `entries a.ts, b.ts, c.ts +2 more` when there are more than a few, or `no server code` for none. */
 export function describeEntries(entries: readonly string[]): string {
+  if (entries.length === 0) {
+    return 'no server code';
+  }
   if (entries.length === 1) {
     return `entry ${entries[0]}`;
   }
@@ -43,6 +46,7 @@ export function describeEntries(entries: readonly string[]): string {
 }
 
 export interface TargetEntries {
+  /** Empty when the target has nothing to run: the check gives an empty result with the note in `notes`. */
   entries: string[];
   /** Where the entries came from, as shown in the settings line. */
   source: string;
@@ -60,11 +64,42 @@ function explain(target: Target): string[] {
 }
 
 /**
+ * The entries of one target, from its own exact match, then its static output, then the exact
+ * match of the `lender`, then its own guess. A target with static output has no entry on purpose,
+ * so its list stays empty: the graph is empty, and the report holds the note and no finding.
+ */
+function detected(target: Target, lender: Target | undefined): TargetEntries | undefined {
+  const { exact, guess, shared, staticOutput } = target.entries;
+  if (exact !== undefined) {
+    return { entries: exact.files, source: exact.source, notes: exact.notes, built: exact.built };
+  }
+  const nothing = staticOutput?.();
+  if (nothing !== undefined) {
+    return { entries: [], source: nothing.source, notes: [nothing.note], built: false };
+  }
+  if (shared && lender?.entries.exact !== undefined) {
+    const { files, source, notes, built } = lender.entries.exact;
+    return { entries: files, source: `${lender.info.key}: ${source}`, notes, built };
+  }
+  return guess === undefined
+    ? undefined
+    : {
+        entries: guess.files,
+        source: guess.source,
+        notes: [
+          ...guess.notes,
+          `The entries were guessed from ${guess.source}. Pass --entry if they are wrong.`,
+        ],
+        built: guess.built,
+      };
+}
+
+/**
  * An entry from the CLI or the config applies to every target. Without one, a target uses, in
- * order: its own exact match, the exact match of the first other shared target that has one, and
- * its own guess. A guess is never lent to another target. A target left without entries gets
- * `undefined` and is skipped, unless no target has any: then the run fails and the error lists
- * where each target looked.
+ * order: its own exact match, its static output, the exact match of the first other shared target
+ * that has one, and its own guess. A guess is never lent to another target. A target left without
+ * entries gets `undefined` and is skipped, unless no target has any: then the run fails and the
+ * error lists where each target looked.
  */
 export function entriesFor(
   root: string,
@@ -79,27 +114,7 @@ export function entriesFor(
   const lender = targets.find(
     target => target.entries.shared && target.entries.exact !== undefined,
   );
-  const found = targets.map((target): TargetEntries | undefined => {
-    const { exact, guess, shared } = target.entries;
-    if (exact !== undefined) {
-      return { entries: exact.files, source: exact.source, notes: exact.notes, built: exact.built };
-    }
-    if (shared && lender?.entries.exact !== undefined) {
-      const { files, source, notes, built } = lender.entries.exact;
-      return { entries: files, source: `${lender.info.key}: ${source}`, notes, built };
-    }
-    return guess === undefined
-      ? undefined
-      : {
-          entries: guess.files,
-          source: guess.source,
-          notes: [
-            ...guess.notes,
-            `The entries were guessed from ${guess.source}. Pass --entry if they are wrong.`,
-          ],
-          built: guess.built,
-        };
-  });
+  const found = targets.map(target => detected(target, lender));
   if (found.every(item => item === undefined)) {
     const searched = targets.flatMap(target => explain(target));
     const advice = targets.flatMap(target => target.entries.advice?.() ?? []);
