@@ -58,38 +58,54 @@ describe(
   },
 );
 
-/** The Nitro fixture with its lock package renamed to the file of `@supabase/auth-js` that an entry lists, and a chunk that sets `lock`. */
-function builtWithLockSet(): string {
+/**
+ * The Nitro fixture with its lock package renamed to the file of the HTTP/2 client of `got`, a call of
+ * `tls.connect` in place of the lock call, and a chunk that sets `http2`.
+ */
+function builtWithHttp2Set(): string {
   const root = mkdtempSync(path.join(tmpdir(), 'edgefit-built-options-'));
   cpSync(fixture('nitro-app'), root, { recursive: true });
-  const original = path.join(root, 'node_modules/task-lock');
-  const file = 'node_modules/@supabase/auth-js/dist/module/lib/locks.js';
+  const file = 'node_modules/got/dist/source/core/utils/http2-client.js';
   mkdirSync(path.join(root, path.dirname(file)), { recursive: true });
-  renameSync(path.join(original, 'index.js'), path.join(root, file));
+  renameSync(path.join(root, 'node_modules/task-lock/index.js'), path.join(root, file));
   writeFileSync(
-    path.join(root, 'node_modules/@supabase/auth-js/package.json'),
-    '{ "name": "@supabase/auth-js", "version": "2.118.0" }\n',
+    path.join(root, 'node_modules/got/package.json'),
+    '{ "name": "got", "version": "16.1.0" }\n',
   );
   const chunk = path.join(root, '.output/server/chunks/routes/index.mjs');
   const map = `${chunk}.map`;
-  writeFileSync(map, readFileSync(map, 'utf8').replace('node_modules/task-lock/index.js', file));
+  const sourcemap = JSON.parse(readFileSync(map, 'utf8')) as {
+    sources: string[];
+    mappings: string;
+  };
+  sourcemap.sources = sourcemap.sources.map(source =>
+    source.endsWith('node_modules/task-lock/index.js') ? `../../../../${file}` : source,
+  );
+  // The import is a new first line, so the mappings start with an empty line.
+  sourcemap.mappings = `;${sourcemap.mappings}`;
+  writeFileSync(map, JSON.stringify(sourcemap));
   writeFileSync(
     chunk,
-    readFileSync(chunk, 'utf8').replace(
-      '//# sourceMappingURL',
-      'export const settings={lock:1};\n//# sourceMappingURL',
-    ),
+    `import tls from"node:tls";\n${readFileSync(chunk, 'utf8')
+      .replace(
+        'navigator.locks.request(a,c)',
+        'tls.connect({host:a,port:443,ALPNProtocols:["h2"]})',
+      )
+      .replace(
+        '//# sourceMappingURL',
+        'export const settings={http2:true};\n//# sourceMappingURL',
+      )}`,
   );
   return root;
 }
 
 describe('an entry that names an option, in build output', { timeout: packageFlowTimeout }, () => {
   it('applies although a file of the bundle sets the option, because the file may be from a package', async () => {
-    const { reports } = await check({ root: builtWithLockSet(), built: '.output/server' });
+    const { reports } = await check({ root: builtWithHttp2Set(), built: '.output/server' });
     const [report] = reports;
-    expect(apis(report?.findings ?? [])).not.toContain('navigator.locks.request');
-    const guarded = report?.guarded.find(finding => finding.api === 'navigator.locks.request');
-    expect(guarded).toMatchObject({ package: { name: '@supabase/auth-js' } });
+    expect(apis(report?.findings ?? [])).not.toContain('node:tls.connect');
+    const guarded = report?.guarded.find(finding => finding.api === 'node:tls.connect');
+    expect(guarded).toMatchObject({ package: { name: 'got' }, category: 'mismatch' });
     expect(guarded?.unreached).toBeDefined();
   });
 });
