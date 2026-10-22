@@ -4,7 +4,7 @@
 // the credential start the executable. GOOGLE_CLOUD_PROJECT keeps the project lookup away from
 // child_process.exec. On workerd, spawn throws before any call to the network. A runtime that has
 // spawn runs echo, and the call to the token URL fails, because the host does not exist. The
-// script ignores that error and rethrows only ERR_METHOD_NOT_IMPLEMENTED.
+// script ignores only that error, which has the code ENOTFOUND, and rethrows every other error.
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -39,7 +39,7 @@ export async function run() {
     process.env.GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES = '1';
     await applicationDefault().getAccessToken();
   } catch (error) {
-    if (error.code === 'ERR_METHOD_NOT_IMPLEMENTED') {
+    if (error.code !== 'ENOTFOUND') {
       throw error;
     }
   } finally {

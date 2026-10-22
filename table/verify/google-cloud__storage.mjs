@@ -1,7 +1,7 @@
 // Reaches node:child_process.spawn: a credential of type external_account starts its executable to
 // get the subject token. On workerd, spawn throws before any call to the network. A runtime that
 // has spawn runs echo, and the call to the token URL fails, because the host does not exist. The
-// script ignores that error and rethrows only ERR_METHOD_NOT_IMPLEMENTED.
+// script ignores only that error, which has the code ENOTFOUND, and rethrows every other error.
 import { Storage } from '@google-cloud/storage';
 
 const token = {
@@ -28,7 +28,7 @@ export async function run() {
   try {
     await storage.authClient.getAccessToken();
   } catch (error) {
-    if (error.code === 'ERR_METHOD_NOT_IMPLEMENTED') {
+    if (error.code !== 'ENOTFOUND') {
       throw error;
     }
   }
