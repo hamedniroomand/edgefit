@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Code that a package ships and a bundler includes, but that does not run on the target. A finding in a listed file for a listed API is reported as guarded, with the reason, and never fails a check. Each entry names the package, the versions it was read in, the file inside the package, the APIs as shown in reports, the target, why the code is not reached, and where the reason is stated. The weekly check flags an entry whose file or APIs no longer match, and a release that no entry covers. It opens a pull request that widens the newest range of a package when every file that range names has the same bytes in the new release and in the last release of the range.",
+  "description": "Code that a package ships and a bundler includes, but that does not run on the target. A finding in a listed file for a listed API is reported as guarded, with the reason, and never fails a check. Each entry names the package, the versions it was read in, the file inside the package, the APIs as shown in reports, the target, why the code is not reached, and where the reason is stated. An entry can also name `options` that make the code run. A project that sets one of them gets the ordinary finding instead, and the entry applies to every other project. In build output the entry always applies. The weekly check flags an entry whose file or APIs no longer match, and a release that no entry covers. It opens a pull request that widens the newest range of a package when every file that range names has the same bytes in the new release and in the last release of the range.",
   "entries": [
     {
       "package": "next",
@@ -115,6 +115,7 @@
       "versions": { "min": "10.0.13", "max": "10.2.0" },
       "file": "dist/esm/sendmail-transport/index.js",
       "apis": ["node:child_process", "node:child_process.spawn"],
+      "options": ["sendmail"],
       "target": "workerd",
       "reason": "Runs only with the sendmail transport, which starts a local `sendmail` binary. A Worker sends mail with the SMTP transport.",
       "source": "https://github.com/nodemailer/nodemailer/blob/v10.2.0/src/sendmail-transport/index.ts#L150"
@@ -124,6 +125,7 @@
       "versions": { "min": "10.0.13", "max": "10.2.0" },
       "file": "dist/cjs/sendmail-transport/index.js",
       "apis": ["node:child_process", "node:child_process.spawn"],
+      "options": ["sendmail"],
       "target": "workerd",
       "reason": "Runs only with the sendmail transport, which starts a local `sendmail` binary. A Worker sends mail with the SMTP transport.",
       "source": "https://github.com/nodemailer/nodemailer/blob/v10.2.0/src/sendmail-transport/index.ts#L150"
@@ -187,6 +189,7 @@
       "versions": { "min": "16.1.0", "max": "16.1.0" },
       "file": "dist/source/core/utils/http2-client.js",
       "apis": ["node:tls.connect"],
+      "options": ["http2"],
       "target": "workerd",
       "reason": "Runs only when a project sets the `http2` option, which is off by default. `got` then opens the TLS connection itself, in its HTTP/2 client. With an `h2session`, `got` uses the session of the project and opens no connection.",
       "source": "https://github.com/sindresorhus/got/blob/v16.1.0/source/core/options.ts#L3777-L3779"

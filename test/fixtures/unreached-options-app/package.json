@@ -1,0 +1,1 @@
+{ "name": "edgefit-fixture-unreached-options", "version": "1.0.0", "type": "module", "main": "without-http2.mjs" }

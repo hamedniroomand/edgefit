@@ -13,6 +13,12 @@ export type UnreachedEntry = {
   file: string;
   /** APIs as shown in reports. */
   apis: string[];
+  /**
+   * The names of the options that make the code run. The entry applies only when no file of the
+   * project sets one of them. In build output it always applies. An entry without `options`
+   * applies to every project.
+   */
+  options?: string[];
   target: TargetKey;
   /** Why the code does not run on the target. */
   reason: string;
@@ -27,6 +33,8 @@ export type UnreachedQuery = {
   file: string;
   api: string;
   target: TargetKey;
+  /** The options that a file of the project sets. A package file does not count. Empty in build output. */
+  optionsSet: ReadonlySet<string>;
 };
 
 const fileVersion = 1;
@@ -79,9 +87,20 @@ export function readEntries<TEntry>(
   return file.entries;
 }
 
+function validOptions(options: unknown): boolean {
+  return (
+    Array.isArray(options) &&
+    options.length > 0 &&
+    options.every(name => typeof name === 'string' && name.trim() !== '')
+  );
+}
+
 function checkEntry(where: string, entry: UnreachedEntry): void {
   if (!hasText(entry) || entry.apis.length === 0) {
     invalidEntry('unreached.json', where, 'package, file, apis and reason are required');
+  }
+  if (entry.options !== undefined && !validOptions(entry.options)) {
+    invalidEntry('unreached.json', where, 'options must be a list of one or more option names');
   }
   if (!targetKeys.has(entry.target)) {
     invalidEntry('unreached.json', where, 'target must be a known target key');
@@ -120,6 +139,7 @@ export function findUnreached(
       entry.package === query.package &&
       entry.apis.includes(query.api) &&
       inRange(query.version, entry.versions) &&
-      fileInPackage(query.file, entry.package) === entry.file,
+      fileInPackage(query.file, entry.package) === entry.file &&
+      !(entry.options ?? []).some(name => query.optionsSet.has(name)),
   );
 }
