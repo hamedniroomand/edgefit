@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Code that a package ships and a bundler includes, but that does not run on the target. A finding in a listed file for a listed API is reported as guarded, with the reason, and never fails a check. Each entry names the package, the versions it was read in, the file inside the package, the APIs as shown in reports, the target, why the code is not reached, and where the reason is stated. The weekly check flags an entry whose file or APIs no longer match, and a release that no entry covers.",
+  "description": "Code that a package ships and a bundler includes, but that does not run on the target. A finding in a listed file for a listed API is reported as guarded, with the reason, and never fails a check. Each entry names the package, the versions it was read in, the file inside the package, the APIs as shown in reports, the target, why the code is not reached, and where the reason is stated. The weekly check flags an entry whose file or APIs no longer match, and a release that no entry covers. It opens a pull request that widens the newest range of a package when every file that range names has the same bytes in the new release and in the last release of the range.",
   "entries": [
     {
       "package": "next",

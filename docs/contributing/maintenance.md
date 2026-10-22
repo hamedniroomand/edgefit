@@ -4,18 +4,19 @@ description: 'Keeping the edgefit compatibility data current: the weekly check, 
 
 # Keeping the data current
 
-edgefit is only as good as its picture of the runtimes, and the runtimes move every week. This page is the runbook for keeping up: how the weekly check works, how to read its issue, how to decide what each entry means, and which code and tests change with a data bump.
+edgefit is only as good as its picture of the runtimes, and the runtimes move every week. This page is the runbook for keeping up: how the weekly check works, how to read its issue, how to decide what each entry means, how the weekly check of the unreached data widens a range, and which code and tests change with a data bump.
 
 ## The moving parts
 
-| Piece                                      | What it is                                                                               |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| `data/workers-nodejs-compat-matrix/*.json` | One dump of Node's API tree per runtime (`bun`, `deno`, `workerd`) and a Node `baseline` |
-| `data/overrides/<target>.json`             | What the matrix cannot say: APIs that exist but throw, do nothing, or differ             |
-| `data/source.json`                         | The versions, commit and date every file was made from. `edgefit targets` prints it      |
-| `scripts/probe`                            | Runs real runtimes and compares them with the data                                       |
-| `.github/workflows/probe.yml`              | The weekly run. Its last job keeps one issue up to date                                  |
-| `.github/workflows/witness.yml`            | Deploys the production witness to Netlify and Vercel, by hand                            |
+| Piece                                      | What it is                                                                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `data/workers-nodejs-compat-matrix/*.json` | One dump of Node's API tree per runtime (`bun`, `deno`, `workerd`) and a Node `baseline`                                 |
+| `data/overrides/<target>.json`             | What the matrix cannot say: APIs that exist but throw, do nothing, or differ                                             |
+| `data/source.json`                         | The versions, commit and date every file was made from. `edgefit targets` prints it                                      |
+| `scripts/probe`                            | Runs real runtimes and compares them with the data                                                                       |
+| `.github/workflows/probe.yml`              | The weekly run. Its last job keeps one issue up to date                                                                  |
+| `.github/workflows/witness.yml`            | Deploys the production witness to Netlify and Vercel, by hand                                                            |
+| `.github/workflows/unreached.yml`          | The weekly check of `data/unreached.json` and `data/stored-modules.json`. It opens a pull request when a range can widen |
 
 The matrix answers "does this API exist?". The overrides answer "what happens when it is called?". The probe checks both against the real thing, and never changes data by itself.
 
@@ -196,6 +197,18 @@ Some calls block for ever with no arguments. `inspector.waitForDebugger` waits f
 
 - **Exact lookups.** The matrix records a module's named exports and its `default` separately. A lookup-only check therefore does not fall back to `default` for a name the namespace lacks. Calls still do.
 - **Validate-first stubs and bare calls.** See above. A `mismatch` override is not compared with a bare call either, since a partial implementation cannot be confirmed that way.
+
+## The unreached data
+
+Each entry of `data/unreached.json` and `data/stored-modules.json` names a package, a file in the package and the releases in which a person read the file. Every Monday the **Unreached data** workflow reads the latest release of each package that an entry names. It checks the entries against that release.
+
+When the latest release is outside every range of a package, there are three cases:
+
+- **The named files have the same bytes.** The check takes the entries with the highest `max`, which are the newest range. It compares each file that these entries name, in the latest release, with the same file in the release at that `max`. When every file has the same bytes, the check sets `max` of those entries to the latest release and adds a changeset. The workflow opens one pull request with this change. The check does not change `source`, and an older range of the package stays as it is. The pull request lists the files of the package that differ between the two releases, 30 names at most, and gives the `npm diff` command for the full list. Read the diff and the list before you merge.
+- **A named file changed or is missing.** The check fails with `is outside every range`. A person compares the file with the reason of the entry. When the reason is still true, set `max` to the latest release and change the version in the `source` link to that release. When the reason is not true, change or remove the entry. When some named files have the same bytes and others changed, the check widens nothing for the package, so a person reads all its entries together.
+- **The latest release is a pre-release, or is older than the newest range.** The check widens nothing and fails in the same way.
+
+The check compares only the latest release and the release at `max`. It does not read the releases between them, so a file that changed and then changed back in between is not seen. It does not read other files of the package, such as a file that decides whether a named file runs. It does not read the code that `source` points to, which can be in another file or outside the package. An entry without a `max` has no end, so the check never widens it. The check writes the data files and a changeset in the folder where it runs, so run it in a clean working tree.
 
 ## Code and tests that change with the data
 

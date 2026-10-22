@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Modules that a package file stores and passes on, where the file reads only the listed members of them. Without an entry a check reports the module as unknown, because it cannot follow a module that is kept in a lookup table. Each entry names the package, the releases it was read in (a missing max has no upper end), the file inside the package, the modules, the members that the file reads, why those are the only ones, and where that is stated. The weekly check flags an entry whose file or members no longer match, and a release that no entry covers.",
+  "description": "Modules that a package file stores and passes on, where the file reads only the listed members of them. Without an entry a check reports the module as unknown, because it cannot follow a module that is kept in a lookup table. Each entry names the package, the releases it was read in (a missing max has no upper end), the file inside the package, the modules, the members that the file reads, why those are the only ones, and where that is stated. The weekly check flags an entry whose file or members no longer match, and a release that no entry covers. It opens a pull request that widens the newest range of a package when every file that range names has the same bytes in the new release and in the last release of the range.",
   "entries": [
     {
       "package": "follow-redirects",
