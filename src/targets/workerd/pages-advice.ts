@@ -79,6 +79,8 @@ export function staticNote(root: string, directory: string): string | undefined 
   if (!holdsFiles(folder)) {
     return undefined;
   }
+  // Only the marker in the Pages output folder counts. Pages deploys this folder and nothing else,
+  // so a build in `.output`, whatever its preset, does not change what Pages serves.
   const marker = readMarker(root, path.join(directory, 'nitro.json'));
   if (marker !== undefined && !isStaticPreset(marker.preset)) {
     return undefined;
