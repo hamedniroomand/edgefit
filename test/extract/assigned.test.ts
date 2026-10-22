@@ -175,6 +175,41 @@ describe('the options that a file sets', () => {
   });
 });
 
+describe('a destructuring pattern', () => {
+  const optionsOf = (source: string): string[] =>
+    findAssignedOptions(parse('lib/input.js', source).program.body as never);
+
+  it.each([
+    ['an object literal as the value of a pattern', 'const { value } = { http2: true };'],
+    [
+      'an object literal as the default of a whole pattern',
+      'function f({ a } = { http2: true }) {}',
+    ],
+    ['a member target of a pattern', '({ http2: options.http2 } = env);'],
+    ['a member target with another key', '({ other: options.http2 } = env);'],
+    ['a member target with a default value', '({ other: options.http2 = true } = env);'],
+    ['a member target in a loop head', 'for ({ other: options.http2 } of list) {}'],
+  ])('sets an option with %s', (_label, code) => {
+    expect(optionsOf(code)).toEqual(['http2']);
+  });
+
+  it.each([
+    ['a destructured declaration', 'const { http2 } = env;'],
+    ['a destructured declaration with a default value', 'const { http2 = true } = env;'],
+    ['a renamed key with a default value', 'const { http2: enabled = true } = env;'],
+    ['a nested pattern', 'const { server: { http2 } } = env;'],
+    ['a pattern in an array pattern', 'const [{ http2 }] = list;'],
+    ['a destructured parameter', 'function f({ http2 }) {}'],
+    ['a destructured parameter with a default value', 'function f({ http2 = true } = {}) {}'],
+    ['a destructured arrow parameter', 'const f = ({ http2 }) => 0;'],
+    ['a destructuring assignment', '({ http2 } = env);'],
+    ['a destructured loop head', 'for (const { http2 } of items) {}'],
+    ['a destructured catch parameter', 'try {} catch ({ http2 }) {}'],
+  ])('does not set an option with %s', (_label, code) => {
+    expect(optionsOf(code)).toEqual([]);
+  });
+});
+
 describe('the nested properties of an object', () => {
   const optionsOf = (source: string): string[] =>
     findAssignedOptions(parse('lib/input.js', source).program.body as never);
