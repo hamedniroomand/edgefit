@@ -39,7 +39,7 @@ function readResults() {
 
 /** Installs, runs and judges one planned package. */
 async function verifyPackage(plan, file) {
-  const installed = install(work, file, plan.package, plan.resolved);
+  const installed = install(work, file, plan.package, plan.resolved, plan.notes);
   if (installed.error !== undefined) {
     return { outcome: 'absent', kind: plan.kind, reason: 'install', error: installed.error };
   }
@@ -57,6 +57,7 @@ async function verifyPackage(plan, file) {
         run,
         findings: plan.findings,
         optionalPeers: installed.optionalPeers,
+        peerFailures: installed.peerFailures,
       });
 }
 
