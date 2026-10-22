@@ -131,3 +131,34 @@ describe('findings in code that is not reached', () => {
     expect(collectFindings([module('16.3.8')], base).findings).toHaveLength(1);
   });
 });
+
+describe('a warning in code that is not reached', () => {
+  const gotFile = 'node_modules/got/dist/source/core/utils/http2-client.js';
+  const target = stubTarget({
+    'tls.connect': { status: 'mismatch', note: 'throws for some options' },
+  });
+  const usage = makeUsage(
+    { module: 'tls', path: ['connect'] },
+    { location: { file: gotFile, line: 235, column: 15 } },
+  );
+  const module: ModuleUsages = {
+    file: gotFile,
+    package: { name: 'got', version: '16.1.0' },
+    chain: ['index.js', 'got'],
+    usages: [usage],
+  };
+  const base = { target, levels: defaultLevels, ignore: [] };
+
+  it('is guarded by the shipped entry for the HTTP/2 client of got', () => {
+    expect(collectFindings([module], base).findings).toMatchObject([
+      { level: 'warning', category: 'mismatch' },
+    ]);
+    const { findings, guarded } = collectFindings([module], {
+      ...base,
+      unreached: loadUnreached(),
+    });
+    expect(findings).toEqual([]);
+    expect(guarded).toMatchObject([{ level: 'warning', category: 'mismatch', guarded: true }]);
+    expect(guarded[0]?.unreached).toBeDefined();
+  });
+});

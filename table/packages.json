@@ -138,7 +138,8 @@
       "name": "ky"
     },
     {
-      "name": "got"
+      "name": "got",
+      "notes": "With the http2 option, got calls node:tls.connect with options that Workers reject, and the default options work."
     },
     {
       "name": "undici",
