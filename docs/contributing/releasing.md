@@ -95,7 +95,7 @@ Changes are described with [changesets](https://github.com/changesets/changesets
    git push origin v0.2.0
    ```
 
-The Release PR workflow opens its pull request with `GITHUB_TOKEN`, which does not start other workflows, so CI does not run on it. Store a fine-grained token (contents and pull requests: write) as the `RELEASE_PR_TOKEN` secret to get CI on that pull request, or close and reopen it to run the checks.
+The Release PR workflow opens its pull request with `GITHUB_TOKEN`, which does not start other workflows, so CI does not run on it. Store a fine-grained token (contents and pull requests: write) as the `RELEASE_PR_TOKEN` secret to get CI on that pull request, or close and reopen it to run the checks. The Unreached data workflow opens its pull request in the same way, and the same secret serves it.
 
 For a pre-release, run `vp run changeset pre enter beta` on a branch, merge, and leave with `vp run changeset pre exit`; tag `v0.2.0-beta.1` as below.
 

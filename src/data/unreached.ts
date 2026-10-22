@@ -1,6 +1,6 @@
 import { findDataDirectory, readDataFile } from '@/data/data-directory.ts';
 import { targetKeys } from '@/data/suggestions.ts';
-import { inRange } from '@/data/version-range.ts';
+import { inRange, semver } from '@/data/version-range.ts';
 import type { VersionRange } from '@/data/version-range.ts';
 import type { TargetKey } from '@/types.ts';
 
@@ -30,7 +30,6 @@ export type UnreachedQuery = {
 };
 
 const fileVersion = 1;
-const semver = /^\d+\.\d+\.\d+$/u;
 
 /** The fields that every reviewed entry of a data file has. */
 export type EntryBase = {
