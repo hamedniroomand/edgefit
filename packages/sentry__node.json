@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.8.0",
-  "checkedAt": "2026-10-20T09:45:44.944Z",
-  "edgefit": "0.15.5",
+  "checkedAt": "2026-10-22T22:16:19.705Z",
+  "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -800,5 +800,14 @@
       }
     }
   ],
-  "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement, and its ./import hook calls node:module.register, which Bun mocks; use @sentry/cloudflare or @sentry/bun."
+  "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement, and its ./import hook calls node:module.register, which Bun mocks; use @sentry/cloudflare or @sentry/bun.",
+  "verified": {
+    "workerd": {
+      "outcome": "verified",
+      "kind": "reach",
+      "runtime": "workerd 1.20260929.1",
+      "error": "ERR_METHOD_NOT_IMPLEMENTED: The process.cpuUsage method is not implemented, at process.cpuUsage (node-internal:public_process:235:11)",
+      "api": "node:process.cpuUsage"
+    }
+  }
 }

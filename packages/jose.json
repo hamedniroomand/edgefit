@@ -2,8 +2,8 @@
   "version": 2,
   "package": "jose",
   "resolved": "6.2.13",
-  "checkedAt": "2026-10-20T09:37:15.203Z",
-  "edgefit": "0.15.5",
+  "checkedAt": "2026-10-22T22:09:53.302Z",
+  "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

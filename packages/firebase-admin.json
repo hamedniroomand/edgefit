@@ -2,8 +2,8 @@
   "version": 2,
   "package": "firebase-admin",
   "resolved": "14.5.0",
-  "checkedAt": "2026-10-20T09:39:40.640Z",
-  "edgefit": "0.15.5",
+  "checkedAt": "2026-10-22T22:12:11.445Z",
+  "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -26,12 +26,6 @@
     "workerd": "fail",
     "bun": "pass",
     "deno": "pass"
-  },
-  "worst": {
-    "deno": {
-      "subpath": "./firestore",
-      "status": "fail"
-    }
   },
   "context": {
     "workerd": {
@@ -418,17 +412,9 @@
           "warnings": 0
         },
         "deno": {
-          "status": "fail",
-          "errors": 1,
-          "warnings": 0,
-          "findings": [
-            {
-              "api": "node:http2.constants.HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "does not exist on the target"
-            }
-          ]
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
         }
       }
     },
@@ -719,7 +705,7 @@
       }
     }
   ],
-  "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process, and on Deno the Firestore client reads http2 status constants that Deno lacks.",
+  "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process.",
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -730,6 +716,13 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "reach",
+      "runtime": "workerd 1.20260929.1",
+      "error": "ERR_METHOD_NOT_IMPLEMENTED: The child_process.spawn method is not implemented, at Object.spawn (node:child_process:81:11)",
+      "api": "node:child_process.spawn"
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-10-20T09:48:57.759Z",
-  "edgefit": "0.15.5",
+  "generatedAt": "2026-10-22T22:19:39.068Z",
+  "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -72,7 +72,7 @@
     {
       "name": "h3",
       "file": "h3",
-      "resolved": "2.0.5",
+      "resolved": "2.0.8",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -285,7 +285,7 @@
     {
       "name": "stripe",
       "file": "stripe",
-      "resolved": "23.0.0",
+      "resolved": "23.0.1",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -301,7 +301,7 @@
     {
       "name": "openai",
       "file": "openai",
-      "resolved": "7.39.0",
+      "resolved": "7.43.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -317,7 +317,7 @@
     {
       "name": "@anthropic-ai/sdk",
       "file": "anthropic-ai__sdk",
-      "resolved": "0.135.0",
+      "resolved": "1.1.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -333,7 +333,7 @@
     {
       "name": "@aws-sdk/client-s3",
       "file": "aws-sdk__client-s3",
-      "resolved": "3.1153.0",
+      "resolved": "3.1156.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -717,13 +717,18 @@
     {
       "name": "zustand",
       "file": "zustand",
-      "resolved": "5.0.15",
+      "resolved": "5.0.16",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 1
+      "subpaths": 1,
+      "verified": {
+        "bun": "verified",
+        "deno": "verified",
+        "workerd": "verified"
+      }
     },
     {
       "name": "ky",
@@ -746,14 +751,16 @@
       "file": "got",
       "resolved": "16.1.0",
       "summary": {
-        "workerd": "warn",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
+      "notes": "With the http2 option, got calls node:tls.connect with options that Workers reject, and the default options work.",
       "verified": {
         "bun": "verified",
-        "deno": "verified"
+        "deno": "verified",
+        "workerd": "verified"
       }
     },
     {
@@ -792,7 +799,7 @@
     {
       "name": "graphql-yoga",
       "file": "graphql-yoga",
-      "resolved": "5.24.6",
+      "resolved": "6.0.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -826,19 +833,21 @@
       "file": "supabase__supabase-js",
       "resolved": "2.118.0",
       "summary": {
-        "workerd": "fail",
-        "bun": "fail",
+        "workerd": "pass",
+        "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 3,
       "verified": {
-        "deno": "verified"
+        "bun": "verified",
+        "deno": "verified",
+        "workerd": "verified"
       }
     },
     {
       "name": "firebase",
       "file": "firebase",
-      "resolved": "13.0.0",
+      "resolved": "13.1.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -890,7 +899,10 @@
           "status": "fail"
         }
       },
-      "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement, and its ./import hook calls node:module.register, which Bun mocks; use @sentry/cloudflare or @sentry/bun."
+      "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement, and its ./import hook calls node:module.register, which Bun mocks; use @sentry/cloudflare or @sentry/bun.",
+      "verified": {
+        "workerd": "verified"
+      }
     },
     {
       "name": "mongodb",
@@ -911,7 +923,7 @@
     {
       "name": "mongoose",
       "file": "mongoose",
-      "resolved": "9.11.2",
+      "resolved": "9.11.3",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1061,16 +1073,17 @@
     {
       "name": "nodemailer",
       "file": "nodemailer",
-      "resolved": "10.1.7",
+      "resolved": "10.2.1",
       "summary": {
-        "workerd": "fail",
+        "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 21,
       "verified": {
         "bun": "verified",
-        "deno": "verified"
+        "deno": "verified",
+        "workerd": "verified"
       }
     },
     {
@@ -1278,7 +1291,7 @@
     {
       "name": "@langchain/core",
       "file": "langchain__core",
-      "resolved": "1.2.18",
+      "resolved": "1.3.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1390,7 +1403,7 @@
     {
       "name": "posthog-node",
       "file": "posthog-node",
-      "resolved": "5.56.2",
+      "resolved": "5.57.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1399,7 +1412,8 @@
       "subpaths": 4,
       "verified": {
         "bun": "verified",
-        "deno": "verified"
+        "deno": "verified",
+        "workerd": "verified"
       }
     },
     {
@@ -1437,7 +1451,7 @@
     {
       "name": "multer",
       "file": "multer",
-      "resolved": "2.4.0",
+      "resolved": "2.5.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -1693,13 +1707,13 @@
     {
       "name": "unstorage",
       "file": "unstorage",
-      "resolved": "1.17.6",
+      "resolved": "2.0.0-beta.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
-      "subpaths": 2,
+      "subpaths": 3,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1716,16 +1730,11 @@
         "deno": "pass"
       },
       "subpaths": 18,
-      "worst": {
-        "deno": {
-          "subpath": "./firestore",
-          "status": "fail"
-        }
-      },
-      "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process, and on Deno the Firestore client reads http2 status constants that Deno lacks.",
+      "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process.",
       "verified": {
         "bun": "verified",
-        "deno": "verified"
+        "deno": "verified",
+        "workerd": "verified"
       }
     },
     {
@@ -1741,20 +1750,21 @@
       "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run.",
       "verified": {
         "bun": "verified",
-        "deno": "verified"
+        "deno": "verified",
+        "workerd": "verified"
       }
     },
     {
       "name": "mssql",
       "file": "mssql",
-      "resolved": "12.7.10",
+      "resolved": "12.7.11",
       "summary": {
         "workerd": "fail",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
-      "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either.",
+      "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either. Tedious calls an @azure/identity credential only after a SQL Server accepts the login, so a run without one cannot reach the child_process calls. The UDP lookup for a named instance does not throw on workerd, and the connection times out.",
       "verified": {
         "bun": "verified",
         "deno": "verified"
@@ -1780,7 +1790,7 @@
     {
       "name": "@electric-sql/pglite",
       "file": "electric-sql__pglite",
-      "resolved": "0.5.10",
+      "resolved": "0.5.11",
       "summary": {
         "workerd": "fail",
         "bun": "pass",
@@ -1793,7 +1803,7 @@
           "status": "fail"
         }
       },
-      "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support, and its multi-tab worker uses navigator.locks, which Bun does not have.",
+      "notes": "PGlite calls WebAssembly.instantiateStreaming only in its browser branch. With nodejs_compat at the date of the table, PGlite takes its Node branch on workerd, so this call does not run. The Node branch reads its files from disk, and the Worker bundle has none, so PGlite.create() fails before it uses WebAssembly or reaches node:process.binding. The multi-tab worker of PGlite uses navigator.locks, which Bun and workerd do not have.",
       "verified": {
         "bun": "verified",
         "deno": "verified"

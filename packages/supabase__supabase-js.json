@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@supabase/supabase-js",
   "resolved": "2.118.0",
-  "checkedAt": "2026-10-20T09:37:49.499Z",
-  "edgefit": "0.15.5",
+  "checkedAt": "2026-10-22T22:10:45.823Z",
+  "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -23,8 +23,8 @@
     "deno"
   ],
   "summary": {
-    "workerd": "fail",
-    "bun": "fail",
+    "workerd": "pass",
+    "bun": "pass",
     "deno": "pass"
   },
   "context": {
@@ -49,42 +49,14 @@
       "specifier": "@supabase/supabase-js",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 2,
-          "warnings": 1,
-          "findings": [
-            {
-              "api": "navigator.locks.request",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "does not exist on the target"
-            },
-            {
-              "api": "URL.createObjectURL",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "exists, but throws: not implemented"
-            },
-            {
-              "api": "Worker",
-              "category": "web",
-              "level": "warning",
-              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
-            }
-          ]
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
         },
         "bun": {
-          "status": "fail",
-          "errors": 1,
-          "warnings": 0,
-          "findings": [
-            {
-              "api": "navigator.locks.request",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "does not exist on the target"
-            }
-          ]
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -146,10 +118,20 @@
     }
   ],
   "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
     "deno": {
       "outcome": "verified",
       "kind": "load",
       "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "workerd 1.20260929.1"
     }
   }
 }
