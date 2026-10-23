@@ -3,98 +3,10 @@ import type { Node } from 'oxc-parser';
 
 import { chainTemps, staticKey } from './ast.ts';
 import type { NodeOf } from './ast.ts';
-import { isTemp, nullishOf, parens, tempOf, testOf } from './lowered-tests.ts';
+import { chainOf, rebase } from './lowered-rebase.ts';
+import { isTemp, nullishOf, parens, testOf } from './lowered-tests.ts';
 import type { Temp } from './lowered-tests.ts';
 import { isDiscarded, isStatementUse } from './statement-use.ts';
-
-/** The object `W` of the member `V = W.y`, also when `V` is the chain of an inner form. */
-function objectOf(value: Node): Node | undefined {
-  let inner = parens(value);
-  if (inner.type === 'ChainExpression') {
-    inner = parens(inner.expression);
-  }
-  return inner.type === 'MemberExpression' ? parens(inner.object) : undefined;
-}
-
-/**
- * Whether `thisArg` of `t.call(thisArg, …)`, which a compiler writes for `V?.()`, is the object
- * of `V`: the temp `u` of `(u = W).y`, or the same name. The temp is marked, so it passes its
- * value on.
- */
-function isObjectOf(thisArg: Node | undefined, value: Node): boolean {
-  const object = objectOf(value);
-  const name = thisArg === undefined ? undefined : parens(thisArg);
-  if (object === undefined || name?.type !== 'Identifier') {
-    return false;
-  }
-  const temp = tempOf(object);
-  if (temp?.assignment !== undefined && temp.name === name.name) {
-    chainTemps.add(temp.assignment);
-    return true;
-  }
-  return object.type === 'Identifier' && object.name === name.name;
-}
-
-/** Whether `callee` is `t.call`, with `t` the temp of the form. */
-function isCallOf(callee: Node, temp: Temp): boolean {
-  const inner = parens(callee);
-  return (
-    inner.type === 'MemberExpression' &&
-    !inner.computed &&
-    inner.property.type === 'Identifier' &&
-    inner.property.name === 'call' &&
-    isTemp(inner.object, temp)
-  );
-}
-
-/**
- * Makes `use` a chain on `(t = V)`: `t.y.z` gives `(t = V)?.y.z`, and `t.call(o, x)` gives
- * `(t = V)?.(x)` when `o` is the object of `V`. Returns whether it did: nothing changes when `use`
- * does not start with `t`.
- */
-function rebase(use: Node, temp: Temp): boolean {
-  const inner = parens(use);
-  if (inner.type === 'MemberExpression') {
-    const object = parens(inner.object);
-    if (
-      object.type === 'AssignmentExpression' &&
-      object.operator === '=' &&
-      object.left.type === 'Identifier'
-    ) {
-      // `(u = t.y).z`: `u` is the receiver of a later `.call(u)`, so it passes its value on.
-      const found = rebase(object.right, temp);
-      if (found) chainTemps.add(object);
-      return found;
-    }
-    if (!isTemp(inner.object, temp)) {
-      return rebase(inner.object, temp);
-    }
-    inner.object = temp.node as typeof inner.object;
-  } else if (inner.type === 'CallExpression') {
-    const [thisArg, ...rest] = inner.arguments;
-    if (
-      temp.assignment === undefined ||
-      !isCallOf(inner.callee, temp) ||
-      !isObjectOf(thisArg, temp.assignment.right)
-    ) {
-      return rebase(inner.callee, temp);
-    }
-    inner.callee = temp.node as typeof inner.callee;
-    inner.arguments = rest;
-  } else {
-    return false;
-  }
-  inner.optional = true;
-  if (temp.assignment !== undefined) {
-    chainTemps.add(temp.assignment);
-  }
-  return true;
-}
-
-function chainOf(use: Node, replaced: Node): Node {
-  const expression = use as NodeOf<'ChainExpression'>['expression'];
-  return { type: 'ChainExpression', expression, start: replaced.start, end: replaced.end };
-}
 
 /** Whether `receiver` names the temp that is the object of the last member of the restored chain `object`. */
 function isReceiverOf(receiver: Node | undefined, object: Node): boolean {
@@ -165,29 +77,160 @@ function plainChain(
 }
 
 /**
+ * `(t = V) != null && t.y` and `(t = V) == null || t.y`, as `(t = V)?.y`.
+ */
+function testedChain(
+  node: NodeOf<'LogicalExpression'>,
+  ancestors: readonly Node[],
+): Node | undefined {
+  const present = node.operator === '&&';
+  const test = present || node.operator === '||' ? testOf(node.left) : undefined;
+  // A hand-written `x != null && x.y()` or `x == null || x.y()` on a plain name is a check, so
+  // only a temp counts. The `(t = V) == null || t.y` of a minifier is `true` when `V` is missing,
+  // so it is the chain only where its value is dropped.
+  return test?.present === present &&
+    test.temp.assignment !== undefined &&
+    (present || isDiscarded(node, ancestors)) &&
+    rebase(node.right, test.temp)
+    ? chainOf(node.right, node)
+    : undefined;
+}
+
+const isNode = (value: unknown): value is Node =>
+  typeof value === 'object' && value !== null && 'type' in value;
+
+/** Whether `node` holds a name `name`. */
+function mentions(node: Node, name: string): boolean {
+  if (node.type === 'Identifier') {
+    return node.name === name;
+  }
+  const record = node as unknown as Record<string, unknown>;
+  return (visitorKeys[node.type] ?? []).some(key => {
+    const value = record[key];
+    const items = Array.isArray(value) ? value : [value];
+    return items.some(item => isNode(item) && mentions(item, name));
+  });
+}
+
+/**
+ * `(t = V) != null || y()`, which a minifier writes for the statement `V ?? y()`, as
+ * `(t = V) ?? y()`. Both run `y()` when `V` is missing, and the value is dropped.
+ */
+function nullishStatement(
+  node: NodeOf<'LogicalExpression'>,
+  ancestors: readonly Node[],
+): Node | undefined {
+  const test = node.operator === '||' ? testOf(node.left) : undefined;
+  // The fallback of `V ?? y` cannot read the temp. A fallback that reads it is not a compiled `??`.
+  if (
+    test?.present !== true ||
+    test.temp.assignment === undefined ||
+    mentions(node.right, test.temp.name) ||
+    !isDiscarded(node, ancestors)
+  ) {
+    return undefined;
+  }
+  chainTemps.add(test.temp.assignment);
+  const left = test.temp.node as NodeOf<'LogicalExpression'>['left'];
+  return {
+    type: 'LogicalExpression',
+    operator: '??',
+    left,
+    right: node.right,
+    start: node.start,
+    end: node.end,
+  };
+}
+
+/**
+ * `a || (t = V) == null || t.y`, which a minifier writes for `a || (V?.y)`, as `a || (t = V)?.y`.
+ * `||` is associative, so `(a || b) || c` is `a || (b || c)`.
+ */
+function flatChain(
+  node: NodeOf<'LogicalExpression'>,
+  ancestors: readonly Node[],
+): Node | undefined {
+  const left = parens(node.left);
+  if (node.operator !== '||' || left.type !== 'LogicalExpression' || left.operator !== '||') {
+    return undefined;
+  }
+  const test = testOf(left.right);
+  if (
+    test?.present !== false ||
+    test.temp.assignment === undefined ||
+    !isDiscarded(node, ancestors) ||
+    !rebase(node.right, test.temp)
+  ) {
+    return undefined;
+  }
+  const right = chainOf(node.right, node) as NodeOf<'LogicalExpression'>['right'];
+  return {
+    type: 'LogicalExpression',
+    operator: '||',
+    left: left.left,
+    right,
+    start: node.start,
+    end: node.end,
+  };
+}
+
+/** Whether `node` is `true` or its minified form `!0`, the value of `delete x?.y` when `x` is missing. */
+function isTrue(node: Node): boolean {
+  const inner = parens(node);
+  const negated =
+    inner.type === 'UnaryExpression' && inner.operator === '!' ? parens(inner.argument) : undefined;
+  return (
+    (inner.type === 'Literal' && inner.value === true) ||
+    (negated?.type === 'Literal' && negated.value === 0)
+  );
+}
+
+/**
+ * `delete t.y` on the temp of a form, as `delete (t = V)?.y`. The form gives `true` when `V` is
+ * missing, as `delete V?.y` does, so the value is the same wherever it goes.
+ */
+function deletedChain(use: Node, temp: Temp): Node | undefined {
+  const deleted = parens(use);
+  if (
+    deleted.type !== 'UnaryExpression' ||
+    deleted.operator !== 'delete' ||
+    !rebase(deleted.argument, temp)
+  ) {
+    return undefined;
+  }
+  deleted.argument = chainOf(deleted.argument, deleted) as typeof deleted.argument;
+  return deleted;
+}
+
+/** `(t = V) == null || delete t.y`, as `delete (t = V)?.y`. */
+function deletedOr(node: NodeOf<'LogicalExpression'>): Node | undefined {
+  const test = node.operator === '||' ? testOf(node.left) : undefined;
+  return test?.present === false && test.temp.assignment !== undefined
+    ? deletedChain(node.right, test.temp)
+    : undefined;
+}
+
+/**
  * The source form of a compiled `V?.y` or `V ?? y`, or `undefined` when `node` is not one:
  * `(t = V) == null ? void 0 : t.y` gives `(t = V)?.y`, `(t = V) != null ? t : y` gives
  * `(t = V) ?? y`, the `(t = V) != null && t.y` of a minified test gives `(t = V)?.y`, the
  * `(t = V) == null || t.y` of a minified statement gives `(t = V)?.y` where its value is dropped,
- * and `(V?.y).call(t)` gives `(V?.y)()`. The assignment stays, so `t` is still set, and passes its
- * value on.
+ * `(t = V) != null || y()` gives `(t = V) ?? y()` and `a || (t = V) == null || t.y` gives
+ * `a || (t = V)?.y` where their value is dropped, `(t = V) == null ? true : delete t.y` and
+ * `(t = V) == null || delete t.y` give `delete (t = V)?.y`, and `(V?.y).call(t)` gives
+ * `(V?.y)()`. The assignment stays, so `t` is still set, and passes its value on.
  */
 function restored(node: Node, ancestors: readonly Node[]): Node | undefined {
   if (node.type === 'CallExpression') {
     return calledChain(node);
   }
   if (node.type === 'LogicalExpression') {
-    const present = node.operator === '&&';
-    const test = present || node.operator === '||' ? testOf(node.left) : undefined;
-    // A hand-written `x != null && x.y()` or `x == null || x.y()` on a plain name is a check, so
-    // only a temp counts. The `(t = V) == null || t.y` of a minifier is `true` when `V` is missing,
-    // so it is the chain only where its value is dropped.
-    return test?.present === present &&
-      test.temp.assignment !== undefined &&
-      (present || isDiscarded(node, ancestors)) &&
-      rebase(node.right, test.temp)
-      ? chainOf(node.right, node)
-      : undefined;
+    return (
+      testedChain(node, ancestors) ??
+      nullishStatement(node, ancestors) ??
+      flatChain(node, ancestors) ??
+      deletedOr(node)
+    );
   }
   if (node.type !== 'ConditionalExpression') {
     return undefined;
@@ -214,16 +257,16 @@ function restored(node: Node, ancestors: readonly Node[]): Node | undefined {
       end: node.end,
     };
   }
+  if (isTrue(fallback)) {
+    return deletedChain(value, test.temp);
+  }
   return nullishOf(fallback) === 'undefined' && rebase(value, test.temp)
     ? chainOf(value, node)
     : undefined;
 }
 
-const isNode = (value: unknown): value is Node =>
-  typeof value === 'object' && value !== null && 'type' in value;
-
 /**
- * Restores each `V?.y` and `V ?? y` that TypeScript, Babel or esbuild compiled for a target older
+ * Restores each `V?.y`, `V ?? y` and `delete V?.y` that TypeScript, Babel or esbuild compiled for a target older
  * than ES2020, in place, so the walk reads the source form. Children first, so that nested
  * chains compose. Returns the node, or the node that replaces it.
  */
