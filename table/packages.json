@@ -188,6 +188,9 @@
       "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement, and its ./import hook calls node:module.register, which Bun mocks; use @sentry/cloudflare or @sentry/bun."
     },
     {
+      "name": "@sentry/cloudflare"
+    },
+    {
       "name": "mongodb"
     },
     {
