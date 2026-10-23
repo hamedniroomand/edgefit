@@ -140,6 +140,16 @@ export function isSymbolKey(node: Node): boolean {
   return inner.type === 'MemberExpression' && isSymbolGlobal(inner.object);
 }
 
+/** Adds `value` to the list of `key`. The list is made once and never copied, so a long list costs no more for each value. */
+export function append<TKey, TValue>(map: Map<TKey, TValue[]>, key: TKey, value: TValue): void {
+  const list = map.get(key);
+  if (list === undefined) {
+    map.set(key, [value]);
+  } else {
+    list.push(value);
+  }
+}
+
 /** The name at the start of `a.b.c`, or `a` itself. */
 export function rootName(node: Node): string | undefined {
   const inner = strip(node);

@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, staticKey, strip } from './ast.ts';
+import { append, childNodes, staticKey, strip } from './ast.ts';
 
 export type Loader = { specifier: string; caught: boolean };
 
@@ -63,7 +63,7 @@ function collect(body: readonly Node[], wrapperOf: RequireWrapperOf): Found {
       }
     }
     if (node.type === 'Identifier') {
-      found.references.set(node.name, [...(found.references.get(node.name) ?? []), node]);
+      append(found.references, node.name, node);
     }
     const callee = node.type === 'CallExpression' ? strip(node.callee) : undefined;
     if (node.type === 'CallExpression' && callee?.type === 'MemberExpression') {
@@ -95,8 +95,12 @@ export function findLoaderObjects(
 ): LoaderObjects {
   const { objects, references, calls } = collect(body, wrapperOf);
   const result: LoaderObjects = { calls: new Map(), requires: new Set() };
+  const callsByName = new Map<string, Found['calls']>();
+  for (const call of calls) {
+    append(callsByName, call.name, call);
+  }
   for (const [name, { id, loaders }] of objects) {
-    const mine = calls.filter(call => call.name === name);
+    const mine = callsByName.get(name) ?? [];
     const accounted = new Set<Node>([id, ...mine.map(call => call.object)]);
     const loose = (references.get(name) ?? []).some(reference => !accounted.has(reference));
     const missing = mine.some(call => call.key !== undefined && !loaders.has(call.key));
