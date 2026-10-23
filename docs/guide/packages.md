@@ -80,7 +80,11 @@ A row that fails on a runtime needs a reach script for that runtime to be verifi
 
 Open an issue with the package request form, or a pull request that adds one line to `table/packages.json`, and a reach script for a row that fails on a runtime. CI runs `edgefit package` on the added package, so the pull request shows its result. A package that needs a generate step before it can be imported, such as `@prisma/client`, is not a row. Its users run `edgefit check` on their project.
 
-A new row that fails on a runtime needs a reach script in the same pull request. The script must call an export that reaches the finding. See [Verified rows](#verified-rows) for the rows that need none.
+A new row that fails on a runtime needs a `notes` field that says why, and a reach script, in the same pull request. The script must call an export that reaches the finding. See [Verified rows](#verified-rows) for the rows that need none.
+
+The Package list job of CI runs `edgefit package` on each added row, as the table does, with the `skip` and `main` fields of the row. It fails for a row that has no result. It also fails for a row that fails, or cannot be checked, on a target and has no `notes` field. The `notes` field is in `table/packages.json`, and it says why in one sentence. The site shows it in the detail of the row. The job does not check the reach script. Without one, the cell only gets no ✔ mark.
+
+The job uses the mark of the row, which is the result of its main entry. A subpath that fails does not make the job fail when the main entry passes, as `hono/bun` on workerd does not. The same holds for an export that fails while the main entry passes. The comment lists both. The job shows the results of each added row in the job summary and in one comment on the pull request. A pull request from a fork gets no comment, because its token is read-only.
 
 ## Optional peer dependencies
 

@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { packageArgs } from './args.mjs';
 import { fileNameOf, readList } from './list.mjs';
 import { dealShards, knownOf, readDurations } from './shards.mjs';
 
@@ -50,13 +51,7 @@ list.forEach((entry, position) => {
   if (plan[position] !== shard) {
     return;
   }
-  const args = [cli, 'package', entry.name, '--format', 'json'];
-  for (const subpath of entry.skip ?? []) {
-    args.push('--skip', subpath);
-  }
-  if (entry.main !== undefined) {
-    args.push('--main', entry.main);
-  }
+  const args = [cli, ...packageArgs(entry)];
   const started = Date.now();
   const run = spawnSync(process.execPath, args, { encoding: 'utf8', timeout: timeoutMs });
   const durationMs = Date.now() - started;
