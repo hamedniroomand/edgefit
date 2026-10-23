@@ -51,7 +51,7 @@ A window has about 640 globals that a worker scope does not. Examples are `DOMPa
 
 Each runtime has its own column of the names that it has:
 
-- The workerd, Bun and Deno columns come from `typeof globalThis[name]` on the versions that the data pins: workerd 1.20260929.1, Bun 1.4.2 and Deno 2.9.7. Deno Deploy uses the Deno column.
+- The workerd, Bun and Deno columns come from `typeof globalThis[name]` on the versions that the data pins: workerd 1.20260929.1, Bun 1.4.4 and Deno 2.9.7. Deno Deploy uses the Deno column.
 - The Netlify column is the list of these names in the production witness of a Netlify Edge Function. Deno 2.3.1 has the same names, except `window`.
 - Vercel Edge has no column, so no name is present there. No name is in the middleware names of the Vercel witness or in `@edge-runtime/vm` 5.0.0.
 

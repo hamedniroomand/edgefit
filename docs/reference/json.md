@@ -130,7 +130,7 @@ edgefit check --format json
   "resolved": "2.3.1",
   "checkedAt": "2026-09-30T12:00:00.000Z",
   "edgefit": "0.5.0",
-  "data": { "workerd": "1.20260929.1", "bun": "1.4.2", "deno": "2.9.7" },
+  "data": { "workerd": "1.20260929.1", "bun": "1.4.4", "deno": "2.9.7" },
   "targets": ["workerd", "bun", "deno"],
   "summary": { "workerd": "pass", "bun": "pass", "deno": "warn" },
   "worst": { "workerd": { "subpath": "./node", "status": "fail" } },

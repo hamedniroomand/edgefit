@@ -129,7 +129,7 @@ By default these come from `wrangler.jsonc`, `wrangler.json` or `wrangler.toml` 
 
 ```ts
 export default defineConfig({
-  bun: { version: '1.4.2' },
+  bun: { version: '1.4.4' },
 });
 ```
 
