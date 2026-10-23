@@ -140,7 +140,28 @@ These checks are understood:
 - `x.y && x.y()`, `!x.y || x.y()` and `x.y ? x.y() : fallback`
 - `x.y` in any place of an `&&` or `||` chain that is the test of an `if`, a loop or `?:`, or the operand of `!`, such as `if (a && x.y && b)`
 - `x.y?.()`, and `if (x.y?.z)` or `if (x.y?.z?.())`, which also protect `x.y`
-- a guard clause such as `if (!x.y) throw …` or `return`, for the rest of the block
+- a guard clause such as `if (!x.y) throw …`, `return`, `break` or `continue`, for the rest of the block
+
+A guard clause at the top level of a `try` block also protects the code after the `try` statement. This holds when the `catch` has a `return`, `throw`, `break` or `continue` at its top level. Then the code after the `try` runs only when the block ended without an error or a jump. So the test of the clause was false:
+
+```js
+export function config() {
+  try {
+    if (!globalThis.FileList) return false;
+  } catch (_) {
+    return false;
+  }
+  return globalThis.FileList.prototype; // guarded
+}
+```
+
+The clause does not protect the code after the `try` in these cases:
+
+- The `catch` has no jump at its top level, as in `catch (_) { log(_); }`, `catch (_) { if (a) return; else throw _; }` or `catch (_) { process.exit(1); }`. The code after the `try` can then run after an error. The error can come from the test of the clause or from code before it.
+- The `try` has a `finally` block.
+- The clause is in a nested block, in a branch or in a function. It then protects the rest of that block only. A `try` inside a `try` is the exception: the code after the outer `try` is protected when both `catch` blocks have a jump at their top level.
+
+This holds for each check that a guard clause understands, such as `typeof Deno === 'undefined'`.
 
 A minifier writes `typeof x.y === 'undefined'` as `typeof x.y > "u"`. It writes `typeof x.y !== 'undefined'` as `typeof x.y < "u"`. edgefit reads both as the long form. It reads them with the sides swapped too: `"u" < typeof x.y` means `=== 'undefined'`, and `"u" > typeof x.y` means `!== 'undefined'`.
 
@@ -188,6 +209,8 @@ Usages in the `try` block are guarded, for the APIs the target lacks and for the
 - the `catch` and `finally` blocks themselves
 - a function defined in the block, which may run after the block has ended, and a class body
 - an `import()` that nothing awaits, since its error does not reach the block. `await import(…)` does
+
+A guard clause at the top level of a `try` block protects the code after the `try`, see [Checks for an API](#checks-for-an-api).
 
 A `require()` or an `import()` in a `try` block that guards can name its module with a conditional expression of strings, such as `require(flag ? 'a' : 'b')`. The `import()` must follow `await` directly. A `const` can hold the expression, but a `let` or a `var` cannot. Each branch can be a string, a `const` that holds a string, or strings that a template literal or a `+` joins. A branch can also be `undefined`, `null` or `void 0`, which loads nothing. When every branch is one of these, edgefit reads one `require()` or `import()` for each string, and it does not report `require(<expression>)` or `import(<expression>)`. A Node.js module that a string names is then reported by name, as for a plain call. A test such as `typeof Deno !== 'undefined'` limits its branch to that runtime, as in an `if`. See [Runtime checks](#runtime-checks). Edgefit does not read the code of a package that a string names when a `const` holds the expression or `createRequire` makes the call. It does not read it for a `const` that holds one string either.
 
