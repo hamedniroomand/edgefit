@@ -1,13 +1,14 @@
 import type { Node } from 'oxc-parser';
 
 import { memberPath } from '@/data/compat-index.ts';
-import { isFunction, stringLiteral, strip } from '@/extract/ast.ts';
+import { isFunction, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
-import { resolveBinding } from '@/extract/bindings.ts';
+import { foldedString, resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext } from '@/extract/context.ts';
 import type { Guard } from '@/extract/guard-stack.ts';
+import { isSettled } from '@/extract/known-values.ts';
 import { normalizeRef } from '@/extract/refs.ts';
-import { isTracked } from '@/extract/scope.ts';
+import { isTracked, lookupKeys } from '@/extract/scope.ts';
 
 const addMethods = new Set(['on', 'once', 'addListener']);
 const removeMethods = new Set(['off', 'removeListener']);
@@ -33,6 +34,22 @@ function processMethod(node: NodeOf<'CallExpression'>, context: VisitContext): s
 }
 
 /**
+ * Whether the event is a signal, and no code can change that. The event is a string, a `const`
+ * string, or the loop variable of an array that the code writes in place. A list that has a name
+ * can get a string that is not a signal later, as `names.push('exit')` does, so it does not count.
+ */
+function namesSignals(event: Node, context: VisitContext): boolean {
+  const { scope } = context;
+  const text = foldedString(event, scope);
+  if (text !== undefined) {
+    return text.startsWith('SIG');
+  }
+  const inner = strip(event);
+  const keys = inner.type === 'Identifier' ? lookupKeys(scope, inner.name) : undefined;
+  return isSettled(keys) && keys?.every(name => name.startsWith('SIG')) === true;
+}
+
+/**
  * The function that a call of `process` sets as the handler of a signal, such as
  * `process.on('SIGTERM', handler)`, or takes away from `process`. A call as the handler runs now,
  * so it is not one.
@@ -52,7 +69,7 @@ function signalHandler(node: NodeOf<'CallExpression'>, context: VisitContext): N
     return undefined;
   }
   const isSignal = addMethods.has(method)
-    ? (stringLiteral(event) ?? '').startsWith('SIG')
+    ? namesSignals(event, context)
     : removeMethods.has(method);
   return isSignal ? handler : undefined;
 }

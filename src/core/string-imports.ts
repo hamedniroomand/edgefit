@@ -94,3 +94,27 @@ export const followChecks = (
   graph: ModuleGraph,
   modules: ReadonlyMap<string, ExtractedModule>,
 ): Map<string, Map<string, HeldGuards>> => followExports(graph, modules, module => module.checks);
+
+type Script = { file: string; source: string; found: ExtractedModule };
+
+/** The pattern of `name` as a whole word, so `.name(`, `['name']` and a read that is not a call all match. */
+function wordOf(name: string): RegExp {
+  return new RegExp(`(?<![\\w$])${name.replaceAll('$', '\\$')}(?![\\w$])`, 'u');
+}
+
+/**
+ * For each file, the methods of its classes that got a list from their one call, and that another
+ * file of the graph also mentions. That file can call the method with another list, so the list is
+ * not read. A method of the same name in an unrelated class only keeps the finding as it was.
+ */
+export function sharedMethods(scripts: readonly Script[]): Map<string, ReadonlySet<string>> {
+  const result = new Map<string, ReadonlySet<string>>();
+  for (const { file, found } of scripts) {
+    const shared = found.listMethods.filter(name => {
+      const word = wordOf(name);
+      return scripts.some(other => other.file !== file && word.test(other.source));
+    });
+    if (shared.length > 0) result.set(file, new Set(shared));
+  }
+  return result;
+}

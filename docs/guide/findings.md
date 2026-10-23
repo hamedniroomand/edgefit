@@ -81,7 +81,7 @@ Symbol keys such as `x[Symbol.iterator]` are never reported, since a symbol cann
 
 A computed read that a function only returns is not an `unknown` finding. Examples are `return globalThis[key]` and `key => globalThis[key]`. The function does not use the value, and edgefit does not follow the value into the code that calls the function, see [Only some guards are understood](/guide/limitations#only-some-guards-are-understood). A read that the function uses in any other way stays `unknown`. Examples are a call, `new`, `await`, an argument of a call, and an assignment to a name. An assignment is not reported when a check follows, as described above.
 
-A key that is a parameter of a function of the file is each string that the calls pass, when the function is only called by name, every call passes the argument, and edgefit knows each argument. An argument can be a string, a name that holds known strings, or a member of each object of a known list, as in `map[i].name`. A function that is exported, passed on, or called with an unknown value keeps the key as `unknown`.
+A key that is a parameter of a function of the file is each string that the calls pass, when the function is only called by name, every call passes the argument, and edgefit knows each argument. An argument can be a string, a name that holds known strings, or a member of each object of a known list, as in `map[i].name`. A function that is exported, passed on, or called with an unknown value keeps the key as `unknown`. The parameter of a method of a class is read too, from its one call, see [Signal handlers](#signal-handlers).
 
 A key from a loop over a list is a key that the object has, when the list is a `const` made by `.filter` with a test `name in obj`, as in `Object.entries(x).filter(([name]) => name in obj)`, and the loop reads `obj[name]` on the same binding of `obj`. The read cannot use an API that the target lacks, so it is not reported as `unknown`. A negated test, a test of another object, a loop that writes the name, and a `let` list keep the key as `unknown`.
 
@@ -290,13 +290,52 @@ process.on('SIGTERM', () => {
 });
 ```
 
-A handler is the function in a call of `process.on`, `process.once` or `process.addListener`, when the event is a string in quotes that starts with `SIG`. The function can be written in the call, or it can be a local function that the call names. A local function gets the same guards when its only uses are these two: a handler in such a call, and a call of `process.off` or `process.removeListener` that removes it. The event of a `process.off` call is not checked.
+A handler is the function in a call of `process.on`, `process.once` or `process.addListener`, when the event is a string that starts with `SIG` and no code can change it. The event can be:
+
+- a string in quotes
+- a `const` that holds a string, or a template literal or a `+` that joins such strings
+- the loop variable of an array that the code writes in place, as in `for (const signal of ['SIGINT', 'SIGTERM'])` or `['SIGINT', 'SIGTERM'].forEach(signal => …)`
+- the loop variable of the list that a method gets, see below
+
+The callback of `forEach` and the other iterators gets the array as its third argument. So a callback with a third parameter, a rest parameter or the name `arguments` can change the array, and its event does not count.
+
+The function can be written in the call, or it can be a local function that the call names. A local function gets the same guards when its only uses are these two: a handler in such a call, and a call of `process.off` or `process.removeListener` that removes it. The event of a `process.off` call is not checked.
+
+A list can come from the parameter of a method:
+
+```js
+class Server {
+  start() {
+    this.register(['SIGINT', 'SIGTERM']);
+  }
+
+  register(signals) {
+    const stop = () => process.kill(process.pid); // Guarded on Workers and Vercel Edge
+    signals.forEach(signal => process.on(signal, stop));
+  }
+}
+```
+
+The loop variable holds the strings of the list that the one call passes. This holds when all of these are true:
+
+- The class defines the method once, as a method of its instances with a plain name. A static method, a private method and a field that holds an arrow function do not count.
+- The file has one call `this.register(…)`, and `this` in it is the instance. The call can be in a method, or in an arrow function in a method. A call in a function, a field initializer, a static block or another class does not count.
+- The argument is an array of strings that the call writes in place. A name that holds the array does not count, because other code can change it.
+- The method only walks the parameter, with `forEach`, `map`, `filter`, `some`, `every`, `find`, `findIndex`, `flatMap` or `for…of`. The callback is an arrow function or a function expression that cannot change the array, see above. Any other use of the parameter, such as `signals.length` or `signals.push(…)`, does not count. A method that uses the name `arguments` does not count either.
+- The file does not use the method in any other way. A call on another object, a read that is not a call, a key of an object with the name, and a `this[…]` with a computed key anywhere in the file are other uses.
+- No other file that edgefit reads mentions the word `register`.
+
+edgefit does not see a call from a file that it does not read, such as your own code when you run `edgefit package`. It does not see a call that reaches the method through a computed key, such as `object[name](…)`, either. See [Limitations](/guide/limitations).
+
+The list also gives the keys of a computed read in the method, as in `for (const name of names) fs[name]()`. So a `node:fs[<expression>]` warning can become the error for the exact API.
 
 The call of `process.on` is not part of the handler. An import at the top of the file is not part of it either. They stay findings where they are findings today. edgefit does not guard the code of a handler on Bun, Deno, Deno Deploy and Netlify Edge Functions, so a finding in it stays there. Deno calls a handler when a signal arrives, and Netlify Edge Functions run Deno.
 
 The code stays a finding when:
 
-- the event is not a string in quotes that starts with `SIG`, such as `exit`, a variable or a template literal
+- the event can be a string that does not start with `SIG`, such as `exit`, or is not known. An event is not known when it is a `let`, a parameter of a function, a member of an object, a `?:` expression, or a template literal with an unknown part
+- the event comes from a list that has a name, as in `const signals = ['SIGINT']; signals.forEach(…)`. Other code can change a named list, for example with `signals.push('exit')`
+- the list comes from a method that does not meet the conditions above
 - the handler is not a function written in the call or the name of a local function. A call such as `make()` runs at once. A `?:` expression, a member such as `this.stop` and a name from another file are not read
 - a local function that is a handler is also called, exported or passed to other code, see [Functions that only checked code uses](#functions-that-only-checked-code-uses)
 - a function only a handler calls, see [Limitations](/guide/limitations)

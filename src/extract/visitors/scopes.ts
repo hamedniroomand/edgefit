@@ -6,6 +6,7 @@ import {
   bindCallbackKeys,
   bindLoopKeys,
   bindParameterKeys,
+  bindParameterLists,
   collectKnown,
 } from '@/extract/key-bindings.ts';
 import { factoryModule } from '@/extract/main-only.ts';
@@ -42,7 +43,8 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
     if (plain.type === 'Identifier') scope.parameters.add(plain.name);
   }
   bindCallbackKeys(node, context.parent(), scope, context.scope);
-  bindParameterKeys(node, context.callKeys.get(node), scope);
+  bindParameterKeys(node, context.calls.keys.get(node), scope);
+  bindParameterLists(node, context.calls.lists.get(node), scope);
   const module = factoryModule(node, context.parent(), context.functions);
   if (module !== undefined) {
     scope.modules.add(module);

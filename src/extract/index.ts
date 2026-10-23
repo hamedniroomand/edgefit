@@ -37,6 +37,8 @@ export interface ExtractOptions {
   optionPaths?: readonly string[];
   /** The tracked globals that only a read at load fails, such as `document` on a server runtime. */
   loadOnlyGlobals?: ReadonlySet<string>;
+  /** The methods of a class that another file of the graph mentions, so their calls are not all in this file. */
+  sharedMethods?: ReadonlySet<string>;
 }
 
 export interface ExtractedModule {
@@ -53,15 +55,18 @@ export interface ExtractedModule {
   strings: ReadonlyMap<string, string>;
   /** The exports that are a `const` holding a check, by exported name. */
   checks: UsageCollector['importedChecks'];
+  /** The methods of a class that got a list of strings from their one call, see `findCallLists`. */
+  listMethods: readonly string[];
 }
 
 function finish(
   collector: UsageCollector,
   shape?: ModuleShape,
   optionsSet: readonly string[] = [],
+  listMethods: readonly string[] = [],
 ): ExtractedModule {
   const { usages, offsets, aliases, strings, checks } = collector;
-  return { usages, offsets, aliases, strings, checks, optionsSet, shape };
+  return { usages, offsets, aliases, strings, checks, optionsSet, shape, listMethods };
 }
 
 /** Parses a file and returns every runtime API use in it, and where each one is. */
@@ -94,7 +99,7 @@ export function extractModule(
     options.keepUnusedImports === true || !isTypeScript(file)
       ? new Set<string>()
       : typeOnlyImports(body);
-  const { functions, callKeys } = findFunctions(body);
+  const { functions, callKeys, callLists } = findFunctions(body, options.sharedMethods);
   const walker = new Walker(
     collector,
     options.globals,
@@ -104,7 +109,7 @@ export function extractModule(
     findImportWrappers(body),
     functions,
     findSuppliedLoads(body, functions),
-    callKeys,
+    { keys: callKeys, lists: callLists.lists },
     options.imported,
   );
   walker.visit(result.program);
@@ -112,7 +117,7 @@ export function extractModule(
   collector.guardFunctions(body, functions, walker.functionReads);
   const shape =
     options.shape === true ? collectShape(body, result.module.hasModuleSyntax, dropped) : undefined;
-  return finish(collector, shape, findAssignedOptions(body, options.optionPaths));
+  return finish(collector, shape, findAssignedOptions(body, options.optionPaths), callLists.names);
 }
 
 /** Parses a file and returns every runtime API use in it. */

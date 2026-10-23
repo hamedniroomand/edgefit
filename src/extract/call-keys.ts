@@ -6,6 +6,8 @@ import { collectKnown } from './key-bindings.ts';
 import { keysOf } from './known-values.ts';
 import { declarationCounts, findLocalFunctions, isPropertyName } from './local-functions.ts';
 import type { LocalFunction } from './local-functions.ts';
+import { findCallLists, namesAreUnique } from './method-lists.ts';
+import type { MethodLists, ProgramValues } from './method-lists.ts';
 import { createScope, declare } from './scope.ts';
 import type { Scope } from './scope.ts';
 
@@ -47,16 +49,6 @@ function callsOf(body: readonly Node[], functions: ReadonlyMap<string, LocalFunc
   );
 }
 
-/** Whether every name in an expression is declared once in the file, so no inner name hides one of the program. */
-function namesAreUnique(node: Node, counts: ReadonlyMap<string, number>): boolean {
-  const pending = [node];
-  for (let item = pending.pop(); item !== undefined; item = pending.pop()) {
-    if (item.type === 'Identifier' && (counts.get(item.name) ?? 0) > 1) return false;
-    pending.push(...childNodes(item));
-  }
-  return true;
-}
-
 function argumentKeys(
   calls: readonly Node[],
   index: number,
@@ -76,6 +68,14 @@ function argumentKeys(
     : undefined;
 }
 
+/** The scope of the program with the values that the file knows, and how often it declares each name. */
+function programValues(body: readonly Node[]): ProgramValues {
+  const scope = createScope();
+  declare(scope, collectBlockNames(body));
+  collectKnown(body, scope, []);
+  return { scope, counts: declarationCounts(body) };
+}
+
 /**
  * The strings that a parameter holds, for a function of the file that is only called by name and
  * where every call passes a known string. The arguments are read in the scope of the program, so
@@ -89,10 +89,7 @@ export function findCallKeys(
   const result = new Map<LocalFunction, Map<number, readonly string[]>>();
   const calls = callsOf(body, functions);
   if (calls.size === 0) return result;
-  const scope = createScope();
-  declare(scope, collectBlockNames(body));
-  collectKnown(body, scope, []);
-  const counts = declarationCounts(body);
+  const { scope, counts } = programValues(body);
   for (const [name, list] of calls) {
     const fn = functions.get(name);
     const keys = new Map<number, readonly string[]>();
@@ -106,11 +103,22 @@ export function findCallKeys(
   return result;
 }
 
-/** The local functions of a file, and the strings that their parameters hold. */
-export function findFunctions(body: readonly Node[]): {
+/**
+ * The local functions of a file, the strings that their parameters hold, and the lists that the
+ * methods of its classes get. `shared` names the methods that another file mentions.
+ */
+export function findFunctions(
+  body: readonly Node[],
+  shared?: ReadonlySet<string>,
+): {
   functions: Map<string, LocalFunction>;
   callKeys: CallKeys;
+  callLists: MethodLists;
 } {
   const functions = findLocalFunctions(body);
-  return { functions, callKeys: findCallKeys(body, functions) };
+  return {
+    functions,
+    callKeys: findCallKeys(body, functions),
+    callLists: findCallLists(body, () => programValues(body), shared),
+  };
 }
