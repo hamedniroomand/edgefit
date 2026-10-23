@@ -20,4 +20,4 @@ body:
   - type: markdown
     attributes:
       value: |
-        A maintainer adds the package with a pull request that adds one line to `table/packages.json`. CI runs `edgefit package` on it, so the result is on the pull request. When the package fails on a runtime, the pull request also needs a reach script. [Verified rows](https://edgefit.kitdev.space/guide/packages#verified-rows) says when. You can also open that pull request yourself.
+        A maintainer adds the package with a pull request that adds one line to `table/packages.json`. CI runs `edgefit package` on it, so the result is on the pull request. When the package fails on a runtime, the pull request also needs a `notes` field that says why, and a reach script. [Verified rows](https://edgefit.kitdev.space/guide/packages#verified-rows) says when. You can also open that pull request yourself.
