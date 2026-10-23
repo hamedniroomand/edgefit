@@ -34,6 +34,11 @@ describe('a `?.` link right after a property of the global object', () => {
       env,
     ],
     [
+      'a `const` that holds the global object',
+      'const g = globalThis;\nexport function f() { return g.Deno?.env.toObject() || {}; }',
+      env,
+    ],
+    [
       'a global in parentheses',
       'export const e = () => (globalThis.Deno)?.env.toObject() || {};',
       env,
@@ -141,13 +146,15 @@ describe('a `?.` that does not follow a property of the global object', () => {
     expect(usages.join('\n')).not.toContain('has Deno');
   });
 
-  it('does not guard an alias of the global object', () => {
-    const code =
-      'const g = globalThis;\nexport function f() { return g.Deno?.env.toObject() || {}; }';
-    const usages = globalsOf(code, names);
-    expect(usages).toContainEqual(expect.stringMatching(/^Deno\.[\w.]+$/u));
-    expect(usages.join('\n')).not.toContain('has Deno');
-  });
+  it.each(['let', 'var'])(
+    'does not guard a chain through a `%s` that holds the global object',
+    kind => {
+      const code = `${kind} g = globalThis;\nexport function f() { return g.Deno?.env.toObject() || {}; }`;
+      const usages = globalsOf(code, names);
+      expect(usages).toContainEqual(expect.stringMatching(/^Deno\.[\w.]+$/u));
+      expect(usages.join('\n')).not.toContain('has Deno');
+    },
+  );
 
   it('does not guard a bare name, because it throws a ReferenceError when it is not declared', () => {
     const code = 'export function f() { return Deno?.env.toObject() || {}; }';
