@@ -2,8 +2,8 @@
   "version": 2,
   "package": "itty-router",
   "resolved": "5.0.24",
-  "checkedAt": "2026-10-23T10:36:32.358Z",
-  "edgefit": "0.16.1",
+  "checkedAt": "2026-10-23T11:38:44.076Z",
+  "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -445,7 +445,7 @@
       }
     }
   ],
-  "durationMs": 2602,
+  "durationMs": 2369,
   "verified": {
     "bun": {
       "outcome": "verified",

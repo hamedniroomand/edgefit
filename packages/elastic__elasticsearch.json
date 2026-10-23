@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@elastic/elasticsearch",
   "resolved": "9.5.1",
-  "checkedAt": "2026-10-23T10:40:16.799Z",
-  "edgefit": "0.16.1",
+  "checkedAt": "2026-10-23T11:42:08.659Z",
+  "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -88,7 +88,7 @@
     }
   ],
   "notes": "The client sends requests with undici, and workerd rejects the ALPNProtocols option of node:tls.connect that undici sets; call the Elasticsearch REST API with fetch on Workers.",
-  "durationMs": 8856,
+  "durationMs": 9080,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "undici",
   "resolved": "8.12.3",
-  "checkedAt": "2026-10-23T10:36:50.298Z",
-  "edgefit": "0.16.1",
+  "checkedAt": "2026-10-23T11:38:47.404Z",
+  "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -114,7 +114,7 @@
     }
   ],
   "notes": "undici fails on workerd because node:tls.connect rejects its ALPNProtocols option; use the global fetch on Workers.",
-  "durationMs": 5152,
+  "durationMs": 5019,
   "verified": {
     "bun": {
       "outcome": "verified",

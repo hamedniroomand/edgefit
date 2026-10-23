@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@azure/storage-blob",
   "resolved": "12.34.0",
-  "checkedAt": "2026-10-23T10:40:31.612Z",
-  "edgefit": "0.16.1",
+  "checkedAt": "2026-10-23T11:42:01.458Z",
+  "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -76,7 +76,7 @@
     }
   ],
   "notes": "On Workers, @azure/core-xml loads its browser build, which needs document, DOMParser, Node and XMLSerializer as it loads, and workerd has none of them; use the Blob REST API with fetch on Workers.",
-  "durationMs": 8807,
+  "durationMs": 10156,
   "verified": {
     "bun": {
       "outcome": "verified",

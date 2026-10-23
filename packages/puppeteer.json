@@ -2,8 +2,8 @@
   "version": 2,
   "package": "puppeteer",
   "resolved": "25.16.0",
-  "checkedAt": "2026-10-23T10:36:57.283Z",
-  "edgefit": "0.16.1",
+  "checkedAt": "2026-10-23T11:39:50.328Z",
+  "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -133,7 +133,7 @@
     }
   ],
   "notes": "puppeteer starts the browser as a child process, which workerd does not implement; use @cloudflare/puppeteer with Browser Run on Workers.",
-  "durationMs": 8489,
+  "durationMs": 9049,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "mysql2",
   "resolved": "3.24.6",
-  "checkedAt": "2026-10-23T10:36:36.122Z",
-  "edgefit": "0.16.1",
+  "checkedAt": "2026-10-23T11:38:49.462Z",
+  "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -147,7 +147,7 @@
       }
     }
   ],
-  "durationMs": 8519,
+  "durationMs": 6599,
   "verified": {
     "bun": {
       "outcome": "verified",

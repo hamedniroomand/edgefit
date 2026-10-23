@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@sentry/node",
-  "resolved": "11.8.0",
-  "checkedAt": "2026-10-23T10:38:30.983Z",
-  "edgefit": "0.16.1",
+  "resolved": "11.9.0",
+  "checkedAt": "2026-10-23T11:41:23.951Z",
+  "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -58,7 +58,7 @@
         "workerd": {
           "status": "fail",
           "errors": 8,
-          "warnings": 4,
+          "warnings": 3,
           "findings": [
             {
               "api": "node:child_process.execFile",
@@ -125,19 +125,19 @@
               "category": "unknown",
               "level": "warning",
               "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "node:tty.isatty",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
             }
           ],
           "exports": [
             {
               "name": "eveInstrumentation",
-              "level": "warning",
+              "level": "error",
               "findings": [
+                {
+                  "api": "node:module.Module.prototype._compile",
+                  "category": "unsupported",
+                  "level": "error",
+                  "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+                },
                 {
                   "api": "node:worker_threads.threadId",
                   "category": "unknown",
@@ -160,8 +160,14 @@
             },
             {
               "name": "init",
-              "level": "warning",
+              "level": "error",
               "findings": [
+                {
+                  "api": "node:module.Module.prototype._compile",
+                  "category": "unsupported",
+                  "level": "error",
+                  "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+                },
                 {
                   "api": "node:worker_threads.threadId",
                   "category": "unknown",
@@ -184,8 +190,14 @@
             },
             {
               "name": "initWithoutDefaultIntegrations",
-              "level": "warning",
+              "level": "error",
               "findings": [
+                {
+                  "api": "node:module.Module.prototype._compile",
+                  "category": "unsupported",
+                  "level": "error",
+                  "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+                },
                 {
                   "api": "node:worker_threads.threadId",
                   "category": "unknown",
@@ -208,8 +220,14 @@
             },
             {
               "name": "NodeClient",
-              "level": "warning",
+              "level": "error",
               "findings": [
+                {
+                  "api": "node:module.Module.prototype._compile",
+                  "category": "unsupported",
+                  "level": "error",
+                  "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+                },
                 {
                   "api": "node:worker_threads.threadId",
                   "category": "unknown",
@@ -271,18 +289,18 @@
       "specifier": "@sentry/node/import",
       "results": {
         "workerd": {
-          "status": "warn",
-          "errors": 0,
-          "warnings": 2,
+          "status": "fail",
+          "errors": 1,
+          "warnings": 1,
           "findings": [
             {
-              "api": "node:worker_threads.MessageChannel",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
+              "api": "node:module.Module.prototype._compile",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
             },
             {
-              "api": "node:tty.isatty",
+              "api": "node:worker_threads.MessageChannel",
               "category": "unknown",
               "level": "warning",
               "detail": "is not covered by the compatibility data"
@@ -719,7 +737,7 @@
     }
   ],
   "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement; use @sentry/cloudflare or @sentry/bun.",
-  "durationMs": 119473,
+  "durationMs": 127312,
   "verified": {
     "workerd": {
       "outcome": "verified",

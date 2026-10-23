@@ -2,8 +2,8 @@
   "version": 2,
   "package": "ai",
   "resolved": "7.0.150",
-  "checkedAt": "2026-10-23T10:36:56.508Z",
-  "edgefit": "0.16.1",
+  "checkedAt": "2026-10-23T11:39:08.303Z",
+  "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -109,7 +109,7 @@
       }
     }
   ],
-  "durationMs": 20486,
+  "durationMs": 17005,
   "verified": {
     "bun": {
       "outcome": "verified",

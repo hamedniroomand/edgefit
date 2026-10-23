@@ -2,8 +2,8 @@
   "version": 2,
   "package": "better-auth",
   "resolved": "1.7.12",
-  "checkedAt": "2026-10-23T10:39:03.736Z",
-  "edgefit": "0.16.1",
+  "checkedAt": "2026-10-23T11:41:43.789Z",
+  "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -1333,7 +1333,7 @@
       }
     }
   ],
-  "durationMs": 140989,
+  "durationMs": 165079,
   "verified": {
     "bun": {
       "outcome": "verified",

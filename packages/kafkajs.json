@@ -2,8 +2,8 @@
   "version": 2,
   "package": "kafkajs",
   "resolved": "2.2.4",
-  "checkedAt": "2026-10-23T10:39:46.661Z",
-  "edgefit": "0.16.1",
+  "checkedAt": "2026-10-23T11:41:49.322Z",
+  "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 3398,
+  "durationMs": 3094,
   "verified": {
     "bun": {
       "outcome": "verified",
