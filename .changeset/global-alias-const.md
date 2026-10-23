@@ -1,5 +1,0 @@
----
-'edgefit': patch
----
-
-A check of an API through a `let` or a `var` that holds the global object no longer guards the code after it. A check of the runtime already read only `globalThis`, `self`, `global` and a `const` that holds one of them, and a check of an API now follows the same rule for a `let` and a `var`. Example: `let scope = globalThis;` at the top of a file, and `if (!scope.FileList) return false; return scope.FileList.prototype;` in a function, was guarded on Workers. Now edgefit reports `FileList.prototype` as an error. This also holds for a `var` that holds `typeof window !== 'undefined' ? window : globalThis`, for a `const` that copies a `let`, and for a name that holds a member of a `let`, such as `const w = g.Worker`. A `const` that holds `globalThis`, `self`, `global` or a conditional of them still guards a check of an API, also when the conditional has `window`. A store through a `const` that copies a `let`, as in `let g = globalThis; const h = g; h.fetch ??= value`, no longer counts as a polyfill store.
