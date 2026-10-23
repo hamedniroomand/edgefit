@@ -1,10 +1,11 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import process from 'node:process';
 
 import { install } from '@scripts/package-table/verify/install.mjs';
 import type { NpmInstall } from '@scripts/package-table/verify/install.mjs';
-import { describe, expect, it } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
 const manifest = {
   name: 'zustand',
@@ -91,4 +92,31 @@ describe('a peer that a note names and that does not install', () => {
       error: 'npm install failed: no network',
     });
   });
+});
+
+describe('the environment of the install of a package', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  // A `npm` in front of the real one in PATH records the variables that it gets, one line for each
+  // call, and installs the package. The fake is a shell script, and `spawnSync('npm')` cannot start
+  // `npm.cmd` on Windows.
+  it.skipIf(process.platform === 'win32')(
+    'skips the browser download of puppeteer for each install, also when the user turned it on',
+    () => {
+      const bin = mkdtempSync(path.join(tmpdir(), 'edgefit-npm-'));
+      const recorded = path.join(bin, 'recorded');
+      const script = `#!/bin/sh\nprintf '%s:%s\\n' "$PUPPETEER_SKIP_DOWNLOAD" "$EDGEFIT_INSTALL_MARKER" >> "${recorded}"\nmkdir -p node_modules/zustand\nprintf '%s' '${JSON.stringify(manifest)}' > node_modules/zustand/package.json\n`;
+      writeFileSync(path.join(bin, 'npm'), script);
+      chmodSync(path.join(bin, 'npm'), 0o755);
+      vi.stubEnv('PATH', `${bin}${path.delimiter}${process.env.PATH ?? ''}`);
+      vi.stubEnv('PUPPETEER_SKIP_DOWNLOAD', 'false');
+      vi.stubEnv('EDGEFIT_INSTALL_MARKER', 'kept');
+      const installed = install(work(), 'zustand', 'zustand', '5.0.15', [note('react')]);
+      expect(installed).toMatchObject({ peerFailures: [] });
+      // One call installs the package, and one installs the peer.
+      expect(readFileSync(recorded, 'utf8')).toBe('true:kept\ntrue:kept\n');
+    },
+  );
 });

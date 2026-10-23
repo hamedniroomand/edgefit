@@ -59,7 +59,7 @@ The results for the popular libraries are in the [npm package compatibility tabl
 
 ## Verified rows
 
-A static result can be wrong in two ways: the data about a runtime can be wrong, or the trace can miss or add a finding. A run on the real runtime is a second, independent check. After each table run, CI installs each package with its install scripts and runs it on Bun, Deno and workerd. A cell that the run agrees with gets a ✔ mark. The mark describes one resolved version. Netlify Edge and Vercel Edge have no local runtime, so they are not run.
+A static result can be wrong in two ways: the data about a runtime can be wrong, or the trace can miss or add a finding. A run on the real runtime is a second, independent check. After each table run, CI installs each package with its install scripts and runs it on Bun, Deno and workerd. CI sets `PUPPETEER_SKIP_DOWNLOAD` for each install, so the install script of `puppeteer` does not download a browser. No run needs a browser. A cell that the run agrees with gets a ✔ mark. The mark describes one resolved version. Netlify Edge and Vercel Edge have no local runtime, so they are not run.
 
 A cell can have one of these outcomes:
 
