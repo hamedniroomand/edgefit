@@ -2,7 +2,7 @@
   "version": 2,
   "package": "dotenv",
   "resolved": "18.0.9",
-  "checkedAt": "2026-10-23T05:58:07.477Z",
+  "checkedAt": "2026-10-23T06:07:51.750Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -109,7 +109,7 @@
       }
     }
   ],
-  "durationMs": 1534,
+  "durationMs": 1563,
   "verified": {
     "bun": {
       "outcome": "verified",

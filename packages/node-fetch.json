@@ -2,7 +2,7 @@
   "version": 2,
   "package": "node-fetch",
   "resolved": "3.3.2",
-  "checkedAt": "2026-10-23T05:55:00.714Z",
+  "checkedAt": "2026-10-23T06:04:58.075Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1205,
+  "durationMs": 1875,
   "verified": {
     "bun": {
       "outcome": "verified",

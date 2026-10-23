@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@google-cloud/storage",
   "resolved": "8.4.0",
-  "checkedAt": "2026-10-23T05:57:06.442Z",
+  "checkedAt": "2026-10-23T06:06:51.871Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -82,7 +82,7 @@
     }
   ],
   "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run.",
-  "durationMs": 4478,
+  "durationMs": 6540,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@anthropic-ai/sdk",
   "resolved": "1.1.0",
-  "checkedAt": "2026-10-23T05:55:34.273Z",
+  "checkedAt": "2026-10-23T06:04:49.698Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -739,7 +739,7 @@
       }
     }
   ],
-  "durationMs": 27731,
+  "durationMs": 41239,
   "verified": {
     "bun": {
       "outcome": "verified",

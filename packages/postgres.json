@@ -2,7 +2,7 @@
   "version": 2,
   "package": "postgres",
   "resolved": "3.4.9",
-  "checkedAt": "2026-10-23T05:54:40.388Z",
+  "checkedAt": "2026-10-23T06:04:33.383Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 828,
+  "durationMs": 1154,
   "verified": {
     "bun": {
       "outcome": "verified",

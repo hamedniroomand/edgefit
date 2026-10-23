@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@supabase/supabase-js",
   "resolved": "2.118.0",
-  "checkedAt": "2026-10-23T05:55:57.772Z",
+  "checkedAt": "2026-10-23T06:06:05.303Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -118,7 +118,7 @@
       }
     }
   ],
-  "durationMs": 2607,
+  "durationMs": 3921,
   "verified": {
     "bun": {
       "outcome": "verified",

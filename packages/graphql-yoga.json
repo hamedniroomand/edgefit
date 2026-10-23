@@ -2,7 +2,7 @@
   "version": 2,
   "package": "graphql-yoga",
   "resolved": "6.0.0",
-  "checkedAt": "2026-10-23T05:55:30.022Z",
+  "checkedAt": "2026-10-23T06:05:29.676Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 5311,
+  "durationMs": 7652,
   "verified": {
     "bun": {
       "outcome": "verified",

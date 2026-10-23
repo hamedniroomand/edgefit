@@ -2,7 +2,7 @@
   "version": 2,
   "package": "semver",
   "resolved": "7.8.5",
-  "checkedAt": "2026-10-23T05:57:54.387Z",
+  "checkedAt": "2026-10-23T06:07:34.153Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 795,
+  "durationMs": 858,
   "verified": {
     "bun": {
       "outcome": "verified",

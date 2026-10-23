@@ -2,7 +2,7 @@
   "version": 2,
   "package": "sqlite3",
   "resolved": "6.0.1",
-  "checkedAt": "2026-10-23T05:57:22.634Z",
+  "checkedAt": "2026-10-23T06:06:46.566Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -76,7 +76,7 @@
     }
   ],
   "notes": "Native addon.",
-  "durationMs": 1944,
+  "durationMs": 2031,
   "verified": {
     "bun": {
       "outcome": "verified",

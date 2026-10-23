@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@sentry/cloudflare",
   "resolved": "11.8.0",
-  "checkedAt": "2026-10-23T05:56:21.729Z",
+  "checkedAt": "2026-10-23T06:06:05.293Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -142,7 +142,7 @@
       }
     }
   ],
-  "durationMs": 24020,
+  "durationMs": 33248,
   "verified": {
     "bun": {
       "outcome": "verified",

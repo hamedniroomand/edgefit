@@ -2,7 +2,7 @@
   "version": 2,
   "package": "axios",
   "resolved": "1.20.0",
-  "checkedAt": "2026-10-23T05:56:47.225Z",
+  "checkedAt": "2026-10-23T06:05:18.536Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -349,7 +349,7 @@
       }
     }
   ],
-  "durationMs": 8193,
+  "durationMs": 8192,
   "verified": {
     "bun": {
       "outcome": "verified",

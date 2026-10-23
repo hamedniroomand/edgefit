@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@noble/curves",
   "resolved": "2.4.0",
-  "checkedAt": "2026-10-23T05:56:32.872Z",
+  "checkedAt": "2026-10-23T06:05:09.852Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -531,7 +531,7 @@
     }
   ],
   "notes": "The root entry throws on purpose and asks for an import of a submodule, so the row checks secp256k1, the most used one.",
-  "durationMs": 6668,
+  "durationMs": 8732,
   "verified": {
     "bun": {
       "outcome": "verified",

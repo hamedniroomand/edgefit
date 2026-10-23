@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@libsql/client",
   "resolved": "0.18.0",
-  "checkedAt": "2026-10-23T05:56:25.609Z",
+  "checkedAt": "2026-10-23T06:05:16.485Z",
   "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -230,7 +230,7 @@
       }
     }
   ],
-  "durationMs": 3817,
+  "durationMs": 5374,
   "verified": {
     "bun": {
       "outcome": "verified",
