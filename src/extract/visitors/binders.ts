@@ -4,14 +4,32 @@ import { staticKey, staticString, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { fileMembers, wholeExport } from '@/extract/bindings.ts';
 import type { VisitContext } from '@/extract/context.ts';
+import { patternNames } from '@/extract/declarations.ts';
 import { displayRef, isGlobalRoot, memberRef, moduleRef } from '@/extract/refs.ts';
-import { assign } from '@/extract/scope.ts';
+import { assign, isTracked, lookup, throughMutableAlias } from '@/extract/scope.ts';
 import { destructuredLoad, requireOf } from '@/trace/dynamic-imports.ts';
 import type { ApiRef } from '@/types.ts';
 
 import { visitDefault } from './patterns.ts';
 
 type DestructuredProperty = NodeOf<'ObjectPattern'>['properties'][number];
+
+/**
+ * Marks the names that code binds or assigns from `init` when `init` reads the global object
+ * through a `let` or a `var` alias, for example `const w = g.Worker`, `const { Worker } = g`,
+ * `w = g.Worker` and `({ Worker } = g)`. A check of such a name guards nothing.
+ */
+export function markMutable(target: Node, init: Node | null, context: VisitContext): void {
+  if (init === null || !throughMutableAlias(init, context.scope)) {
+    return;
+  }
+  for (const name of patternNames(target, [], true)) {
+    const binding = lookup(context.scope, name);
+    if (isTracked(binding)) {
+      binding.mutable = true;
+    }
+  }
+}
 
 export function bindTarget(
   target: Node,

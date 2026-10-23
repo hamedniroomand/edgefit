@@ -8,7 +8,7 @@ import type { BindingContext } from './bindings.ts';
 import type { AbsentGuard, ApiGuard, GlobalGuard, Guard } from './guard-stack.ts';
 import { memberRef, normalizeRef } from './refs.ts';
 import { globalName } from './runtimes.ts';
-import { isParameter, isTracked, lookup } from './scope.ts';
+import { isParameter, isTracked, lookup, throughMutableAlias } from './scope.ts';
 import type { Scope } from './scope.ts';
 
 /** A value that only a module sets, so a truthy value shows that the module exists. */
@@ -53,7 +53,7 @@ export function runtimeGuard(runtime: Runtime | undefined, present: boolean): Gu
 /** The guard that says `node`, or its member `key`, exists. */
 export function guardFor(node: Node, context: BindingContext, key?: string): ApiGuard[] {
   const binding = resolveBinding(node, context);
-  if (!isTracked(binding)) {
+  if (!isTracked(binding) || throughMutableAlias(node, context.scope)) {
     return [];
   }
   const name = rootName(node);
@@ -69,7 +69,7 @@ export const apiGuard = (ref: ApiRef) =>
 /** The guard that says `node`, or its member `key`, is missing. */
 export function absentGuard(node: Node, context: BindingContext, key?: string): AbsentGuard[] {
   const binding = resolveBinding(node, context);
-  if (!isTracked(binding)) {
+  if (!isTracked(binding) || throughMutableAlias(node, context.scope)) {
     return [];
   }
   return [

@@ -238,7 +238,7 @@ The guard applies to:
 - each API and native addon in the value
 - the code of a local function that only the store names, see [Functions that only checked code uses](#functions-that-only-checked-code-uses)
 
-The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. The global object must be `globalThis`, `self` or `global` by its own name, or a `const` declared as `const g = globalThis` (or `self` or `global`). A store through a `let` or `var` alias, such as `let g = globalThis; g.fetch ??= value`, does not count.
+The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. The global object must be `globalThis`, `self` or `global` by its own name, or a `const` declared as `const g = globalThis` (or `self` or `global`). A store through a `let` or `var` alias, such as `let g = globalThis; g.fetch ??= value`, does not count. A `const` that copies such an alias does not count either.
 
 The value stays a finding when:
 
@@ -272,7 +272,7 @@ The minified form of a `typeof` check, such as `typeof Deno < "u"`, names a runt
 
 The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
 
-These checks also work through a `const` that holds the global object, as in `const g = globalThis; if (typeof g.Bun !== 'undefined') { … }`. The `const` can hold `globalThis`, `self`, `global`, another such `const`, or a conditional of them. A `let`, a `var`, a parameter, a name from another file and `window` are not read as the global object, so a check through them guards nothing. See [Limitations](/guide/limitations).
+These checks also work through a `const` that holds the global object, as in `const g = globalThis; if (typeof g.Bun !== 'undefined') { … }`. The `const` can hold `globalThis`, `self`, `global`, another such `const`, or a conditional of them. A `let`, a `var`, a parameter, a name from another file, a name from a destructuring and `window` are not read as the global object, so a check through them guards nothing. A `let` or a `var` does not count even when the code never writes it again. A `const` that copies one of them does not count either. See [Limitations](/guide/limitations).
 
 ### Signal handlers
 
@@ -334,7 +334,7 @@ if (!global.crypto) {
 }
 ```
 
-The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding. For a global that the data lists as read at load, such as `document` or `DOMParser`, only `typeof X` is a check of the bare name, see [Browser globals by their bare name](#browser-globals-by-their-bare-name). The global object can also be a `const` that holds it, as in `const g = globalThis; if (!g.FileList) { … }`. See [Runtime checks](#runtime-checks) for the names that count.
+The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding. For a global that the data lists as read at load, such as `document` or `DOMParser`, only `typeof X` is a check of the bare name, see [Browser globals by their bare name](#browser-globals-by-their-bare-name). The global object can also be a `const` that holds it, as in `const g = globalThis; if (!g.FileList) { … }`. A `let`, a `var`, a parameter and a name from a destructuring do not count, also when the code never writes them again, because code that edgefit cannot see may write them. A `const` that copies one of them, or that holds a member of one, as in `const w = g.Worker`, does not count either. See [Runtime checks](#runtime-checks) for the names that count.
 
 `undefined` and `NaN` exist on every target, but a value test can see them as missing. `undefined` looks missing to each value test, also to `=== undefined` and `typeof … === 'undefined'`. `NaN` looks missing only to a truthiness test, such as `!globalThis.NaN` or `globalThis.NaN || x`. So the code that such a test runs is not guarded, see [Polyfills](#polyfills). `typeof globalThis.NaN`, `globalThis.NaN === undefined` and `globalThis.NaN ?? x` still decide the branch.
 
@@ -360,7 +360,7 @@ The use is a finding in these cases:
 - the `?.` comes after a plain `.` read of the global, as in `globalThis.Deno.env?.toObject()`
 - the chain starts at a module, as in `fs?.watch('.')`, because a missing module does not always leave `undefined` in the name
 - the other operand of the `||` or `??` is `null` or `undefined`, as in `(globalThis.Deno?.env.toObject() ?? null).x`, because the value can be nullish. This does not apply where nothing reads the value, as in `null ?? globalThis.Deno?.core.print('x');`
-- the chain starts at a name that is not read as the global object, such as a `let`, a `var` or a parameter, as in `let g = globalThis; g.Deno?.env.toObject()`
+- the chain starts at a name that is not read as the global object, such as a `let`, a `var`, a parameter or a `const` that copies one of them, as in `let g = globalThis; g.Deno?.env.toObject()`
 - the target has `Deno` and lacks `env.toObject`
 
 A chain that starts at a bare name, as in `Deno?.env.toObject()`, is not part of this rule, because the `?.` does not stop a ReferenceError when `Deno` is not declared. edgefit reports a bare read only when it runs as the module loads, see [Browser globals by their bare name](#browser-globals-by-their-bare-name).

@@ -2,7 +2,9 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef } from '@/types.ts';
 
+import { strip } from './ast.ts';
 import type { HeldGuards } from './guard-stack.ts';
+import { isGlobalRoot } from './refs.ts';
 
 /**
  * What a name refers to: a runtime API, a `require` made by `module.createRequire`,
@@ -15,8 +17,10 @@ export type Binding =
       ref: ApiRef;
       recorded: boolean;
       members?: ReadonlyMap<string, ApiRef>;
-      /** Set for a `const`, which the code cannot write again. */
+      /** Set for a `const` that does not read the global object through a `let` or a `var` alias. */
       constant?: true;
+      /** Set for a name that the code read through a `let` or a `var` alias of the global object. */
+      mutable?: true;
     }
   | 'require'
   | null;
@@ -242,6 +246,29 @@ export function isTracked(
   binding: Binding | undefined,
 ): binding is { ref: ApiRef; recorded: boolean; members?: ReadonlyMap<string, ApiRef> } {
   return typeof binding === 'object' && binding !== null;
+}
+
+/**
+ * Whether `node` reads the global object, or a member of it, through a name that another value may
+ * replace: a `let`, a `var`, or a name that was read through one. A check through such a name must
+ * not guard code. The member chain and each result of a conditional are followed down to their
+ * root names.
+ */
+export function throughMutableAlias(node: Node, scope: Scope | undefined): boolean {
+  const inner = strip(node);
+  if (inner.type === 'MemberExpression') {
+    return throughMutableAlias(inner.object, scope);
+  }
+  if (inner.type === 'ConditionalExpression') {
+    return (
+      throughMutableAlias(inner.consequent, scope) || throughMutableAlias(inner.alternate, scope)
+    );
+  }
+  const binding = inner.type === 'Identifier' ? lookup(scope, inner.name) : undefined;
+  return (
+    isTracked(binding) &&
+    (binding.mutable === true || (isGlobalRoot(binding.ref) && binding.constant !== true))
+  );
 }
 
 export function isBound(binding: Binding | undefined): binding is Exclude<Binding, null> {

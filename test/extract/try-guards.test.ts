@@ -40,11 +40,11 @@ describe('a guard clause at the top level of a try block', () => {
   it('ends when the name that the check started from is written after the try', () => {
     const body = (write: string): string =>
       fn(
-        `let scope = globalThis;\ntry { if (!scope.FileList) return false; } catch (_) { return false; }\n${write}\nreturn scope.FileList.prototype;`,
+        `let list = FileList;\ntry { if (!list.of) return false; } catch (_) { return false; }\n${write}\nreturn list.of();`,
       );
-    expect(reads(body(''))).toContain('api FileList.prototype [guarded]');
-    expect(reads(body('scope = other;'))).toContain('api FileList.prototype');
-    expect(reads(body('scope = other;'))).not.toContain('api FileList.prototype [guarded]');
+    expect(reads(body(''))).toContain('api FileList.of [guarded]');
+    expect(reads(body('list = other;'))).toContain('api FileList.of');
+    expect(reads(body('list = other;'))).not.toContain('api FileList.of [guarded]');
   });
 });
 
