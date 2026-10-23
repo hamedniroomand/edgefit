@@ -21,11 +21,11 @@ const resultOf = (code: string): [string[], string[]] => [
 function itGivesTheSourceResult(sources: [string, string][]): void {
   it.each(
     sources.flatMap(([label, source]) =>
-      [false, true].map(minify => [label, source, minify] as const),
+      [false, true].map(minify => [label, minify, source] as const),
     ),
   )(
     'gives the result of its source form for %s, as esbuild writes it, minify: %s',
-    (_label, source, minify) => {
+    (_label, minify, source) => {
       expect(resultOf(esbuild(source, minify))).toEqual(resultOf(source));
     },
   );
