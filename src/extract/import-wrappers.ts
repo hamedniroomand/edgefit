@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, staticString, strip } from './ast.ts';
+import { append, childNodes, staticString, strip } from './ast.ts';
 import { findLoaderObjects } from './loader-objects.ts';
 import type { Loader } from './loader-objects.ts';
 
@@ -188,7 +188,7 @@ function collect(body: readonly Node[]): Found {
       found.exported.add(name);
     }
     if (node.type === 'Identifier') {
-      found.references.set(node.name, [...(found.references.get(node.name) ?? []), node]);
+      append(found.references, node.name, node);
     }
     const callee = node.type === 'CallExpression' ? strip(node.callee) : undefined;
     if (node.type === 'CallExpression' && callee?.type === 'Identifier') {
@@ -223,10 +223,18 @@ export function findImportWrappers(body: readonly Node[]): ImportWrappers {
     requireCalls: new Map<Node, { specifier: string; caught: boolean }>(),
     requires: new Set<Node>(),
   };
+  const callsByName = new Map<string, Call[]>();
+  for (const call of calls) {
+    append(callsByName, call.name, call);
+  }
+  const candidateCounts = new Map<string, number>();
+  for (const { name } of candidates) {
+    candidateCounts.set(name, (candidateCounts.get(name) ?? 0) + 1);
+  }
   for (const { name, declaration, importNode, required } of candidates) {
-    const mine = calls.filter(call => call.name === name);
+    const mine = callsByName.get(name) ?? [];
     const accounted = new Set<Node>([declaration, ...mine.map(call => call.callee)]);
-    const unique = candidates.filter(other => other.name === name).length === 1;
+    const unique = candidateCounts.get(name) === 1;
     // A function that gives a module is called with nothing; an import wrapper is called with a literal.
     const used =
       mine.length > 0 &&
