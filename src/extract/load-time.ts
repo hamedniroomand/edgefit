@@ -34,6 +34,11 @@ function defers(parent: Node, child: Node): boolean {
   return loops.has(parent.type) && 'body' in parent && child === parent.body;
 }
 
+/** Whether a function sits around the code at the top of `stack`. The function may never run. */
+export function insideFunction(stack: readonly Node[]): boolean {
+  return stack.some(node => isFunction(node));
+}
+
 /**
  * Whether the code at the top of `stack`, the ancestors of a node from the program down, runs when
  * the module loads: no function, branch, loop, `try` or `switch` case sits around it.

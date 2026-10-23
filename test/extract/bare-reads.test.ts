@@ -96,6 +96,26 @@ describe('a read of a missing global after the file sets it on the global object
     expect(whenOf(source)).toBe('later');
   });
 
+  it.each([
+    [
+      'a function that may never run',
+      'function shim() { globalThis.document = {}; }\ndocument.title;',
+    ],
+    ['an arrow function', 'const shim = () => { globalThis.document = {}; };\ndocument.title;'],
+    ['a method', 'class A { m() { globalThis.document = {}; } }\ndocument.title;'],
+  ])('is a read at load when only %s sets the global', (_name, source) => {
+    expect(whenOf(source)).toBe('load');
+  });
+
+  it.each([
+    ['an if branch', 'if (a) { globalThis.document = {}; }\ndocument.title;'],
+    ['a try block', 'try { globalThis.document = {}; } catch {}\ndocument.title;'],
+    ['a loop', 'for (const a of b) { globalThis.document = {}; }\ndocument.title;'],
+    ['a switch case', 'switch (a) { case 1: globalThis.document = {}; }\ndocument.title;'],
+  ])('is not a read at load when a top-level write sits in %s', (_name, source) => {
+    expect(whenOf(source)).toBe('later');
+  });
+
   it('is a read at load before the file sets the global, and for another name', () => {
     expect(whenOf('document.title;\nglobalThis.document = {};')).toBe('load');
     expect(whenOf('globalThis.window = {};\ndocument.title;')).toBe('load');

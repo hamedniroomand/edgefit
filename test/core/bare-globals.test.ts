@@ -60,6 +60,13 @@ describe('a read of a browser global after the file sets it', () => {
   });
 });
 
+describe('a read of a browser global when only a function sets it', () => {
+  it.each(withData)('is a finding on %s, because the function may never run', async target => {
+    const [findings] = await reported('shim-in-function.mjs', target);
+    expect(findings).toEqual(['document.title']);
+  });
+});
+
 describe('a check of a missing global that the data does not mark as read at load', () => {
   it.each(['workerd', 'bun'] as const)(
     'is no finding in a function on %s, as before',
