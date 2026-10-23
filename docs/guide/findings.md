@@ -130,7 +130,7 @@ When the target does not have the API, or the data does not cover it, a usage th
 
 A use of an API that the data does not cover, outside a check, such as `const s = v8.startupSnapshot`, is still an `unknown` warning, also when the code uses a member of it after a check. A use of the module itself, such as its import, is the exception: when the code uses the module's members only after a check, edgefit does not report the module. It is not a guarded finding either, so the report does not count it.
 
-A check does not protect an API that exists and throws or does nothing, such as `fs.watch` on Workers, because the check passes and the call still fails. Those stay findings, and so do `mocked` and `mismatch` results. Code that does not run at all on the target is the exception, see [Runtime checks](#runtime-checks) and [Signal handlers](#signal-handlers).
+A check does not protect an API that exists and throws or does nothing, such as `fs.watch` on Workers, because the check passes and the call still fails. Those stay findings, and so do `mocked` and `mismatch` results. Code that does not run at all on the target is the exception, see [Runtime checks](#runtime-checks), [Signal handlers](#signal-handlers) and [Functions sent to a browser page](#functions-sent-to-a-browser-page).
 
 ### Checks for an API
 
@@ -268,6 +268,30 @@ The code stays a finding when:
 - a local function that is a handler is also called, exported or passed to other code, see [Functions that only checked code uses](#functions-that-only-checked-code-uses)
 - a function only a handler calls, see [Limitations](/guide/limitations)
 
+### Functions sent to a browser page
+
+Browser automation tools, such as Puppeteer, send a function to a page and run it there. The code of that function never runs on the runtime that makes the call, so everything in it is guarded, an API that exists and throws included:
+
+```js
+await page.evaluate(name => {
+  return globalThis[name].args; // Guarded on Workers, Bun and Deno
+}, bindingName);
+```
+
+A page function is a function expression or an arrow function that is the first argument of a call of a method with the name `evaluate`, `evaluateHandle` or `evaluateOnNewDocument`. The call itself and its other arguments are code of the caller, so they stay findings where they are findings today. A function that only a page function calls, such as `read` in `page.evaluate(() => read(key))`, is guarded too, see [Functions that only checked code uses](#functions-that-only-checked-code-uses).
+
+The code stays a finding when:
+
+- the function is not written in the call, as in `page.evaluate(read)`. The code of `read` is checked where it is declared
+- the first argument is another expression, such as a `?:` expression or a call like `wrap(() => …)`, or the function is not the first argument
+- the call is an optional call, as in `page.evaluate?.(() => …)`. A call through an optional chain, as in `page?.evaluate(() => …)`, is read
+- the call is not a method call with one of these names, such as `evaluate(() => …)`, `page.evaluate.call(page, () => …)` or `page.$eval(selector, () => …)`
+- a function only another function calls, see [Limitations](/guide/limitations)
+
+A file that the function loads with `import()` or `require()` is still checked, because the load adds the file to the check. An import at the top of the file is checked too.
+
+edgefit does not read what the method does. A method of your own with one of these names that calls the function on the runtime still gets the findings in the function guarded. See [Limitations](/guide/limitations).
+
 ### Checks for a global
 
 A check for a global decides which branch runs when the target data says if the target has the global. The code that does not run is guarded, and it is not a finding:
@@ -379,7 +403,7 @@ function downloadSaveAs(blob) {
 }
 ```
 
-A use as a [signal handler](#signal-handlers) also counts as a use behind a check. So does a use in a [polyfill store](#polyfills), such as `globalThis.fetch ??= myFetch`. The check of a polyfill store depends on the target. On a target that lacks the global, or whose data does not mark it as supported, the store runs, so the code in the function is not behind a check. A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
+A use as a [signal handler](#signal-handlers) or in a [page function](#functions-sent-to-a-browser-page) also counts as a use behind a check. So does a use in a [polyfill store](#polyfills), such as `globalThis.fetch ??= myFetch`. The check of a polyfill store depends on the target. On a target that lacks the global, or whose data does not mark it as supported, the store runs, so the code in the function is not behind a check. A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
 
 - one use has no check
 - the file exports the function in any form: `export`, `export default`, `exports.x` or `module.exports`, also inside a check
