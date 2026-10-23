@@ -92,6 +92,13 @@
       }
     },
     {
+      "provider": "dom-globals",
+      "url": "https://github.com/microsoft/TypeScript/blob/v5.9.3/src/lib/dom.generated.d.ts",
+      "license": "Apache-2.0",
+      "versions": { "typescript": "5.9.3" },
+      "note": "The global names that lib.dom.d.ts of TypeScript 5.9.3 declares as a var, let, const, function or class and lib.webworker.d.ts does not, without `toString`. The column of a runtime lists the names that the runtime also has. The workerd, Bun and Deno columns come from `typeof globalThis[name]` on the versions that the data pins: workerd 1.20260929.1, Bun 1.4.2 and Deno 2.9.7. Deno Deploy uses the Deno column. The Netlify column is the list of these names in the production witness of 2026-10-03 for a Netlify Edge Function. Deno 2.3.1 has the same names, except `window`. Vercel Edge has no column, so no name is present there. No name is in the middleware names of the Vercel witness or in `@edge-runtime/vm` 5.0.0. The Vercel edge route does not show its own names."
+    },
+    {
       "provider": "runtime-compat-data",
       "url": "https://www.npmjs.com/package/runtime-compat-data/v/0.0.5",
       "commit": "b964f92b2d6810bb4f4911785c123dce97601c63",

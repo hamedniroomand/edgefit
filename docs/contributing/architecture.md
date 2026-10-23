@@ -39,6 +39,7 @@ For `--built`, `built/` then maps each usage through the sourcemaps to its origi
 - `providers/matrix.ts` reads the workers-nodejs-compat-matrix dumps and compares each runtime with the Node baseline.
 - `providers/overrides.ts` applies the curated override file for the target.
 - `providers/runtime-compat-data.ts` answers for Web APIs the matrix does not describe.
+- `providers/dom-globals.ts` answers for the DOM globals that a runtime lacks.
 - `compat-index.ts` merges them into one lookup, where the more precise source wins.
 
 ## Design rules

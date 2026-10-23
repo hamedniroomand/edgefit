@@ -22,7 +22,7 @@ Run `edgefit targets` to print this list along with the exact data versions:
 ```
 workerd  Cloudflare Workers
   conditions workerd, worker, browser
-  data workers-nodejs-compat-matrix@ee58120 (workerd 1.20260929.1), curated overrides from https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node, Web APIs from runtime-compat-data@b964f92 (npm 0.0.5)
+  data workers-nodejs-compat-matrix@ee58120 (workerd 1.20260929.1), curated overrides from https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node, Web APIs from runtime-compat-data@b964f92 (npm 0.0.5), DOM globals from dom-globals (typescript 5.9.3)
 ```
 
 ## The layers
@@ -45,6 +45,18 @@ The matrix only knows whether something exists. It cannot tell that `fs.watch` o
 
 Globals such as `caches`, `FileReader` and `navigator.gpu` are checked against [runtime-compat-data](https://www.npmjs.com/package/runtime-compat-data) 0.0.5 (CC0-1.0). It only fills in what the matrix does not describe, and its findings get their own `web` category at warning level because the data is generated automatically.
 
+### DOM globals
+
+A window has about 640 globals that a worker scope does not. Examples are `DOMParser`, `Node`, `HTMLElement` and `XMLSerializer`. A server runtime has few of them, and a read of a missing one by its plain name throws a `ReferenceError`. The list is `data/dom-globals.json`. It holds the names that `lib.dom.d.ts` of TypeScript 5.9.3 declares as a `var`, `let`, `const`, `function` or `class`, and `lib.webworker.d.ts` does not. A runtime can also have some of these names, such as `alert` on Bun and Deno and `localStorage` on Deno. A name that the runtime has is not missing on it.
+
+Each runtime has its own column of the names that it has:
+
+- The workerd, Bun and Deno columns come from `typeof globalThis[name]` on the versions that the data pins: workerd 1.20260929.1, Bun 1.4.2 and Deno 2.9.7. Deno Deploy uses the Deno column.
+- The Netlify column is the list of these names in the production witness of a Netlify Edge Function. Deno 2.3.1 has the same names, except `window`.
+- Vercel Edge has no column, so no name is present there. No name is in the middleware names of the Vercel witness or in `@edge-runtime/vm` 5.0.0.
+
+The web API data and the overrides win for a name that they also describe. A finding for one of these names is reported only when the code reads the plain name as the module loads, see [Browser globals by their bare name](/guide/findings#browser-globals-by-their-bare-name). The list ends at TypeScript 5.9.3, so a global that a later release adds is not in it, see [Limitations](/guide/limitations#the-data-has-an-age).
+
 ### Target settings
 
 Last, each target applies its own settings: the compatibility date and flags on workerd, the pinned version on Bun, the import map on Deno and Netlify.
@@ -61,4 +73,4 @@ The cost is that data can lag behind runtime releases. A scheduled workflow in t
 
 ## Licenses
 
-The vendored compatibility matrix is © Cloudflare, Inc., under the MIT license. The runtime-compat-data files are CC0-1.0. Both licenses ship with the package under `data/`. The Vercel Edge data is API names and hashes read from Vercel's documentation, which has no open license; it lists `none`, and no text is copied.
+The vendored compatibility matrix is © Cloudflare, Inc., under the MIT license. The runtime-compat-data files are CC0-1.0. Both licenses ship with the package under `data/`. The DOM global names are read from the type declarations of TypeScript (Apache-2.0), and no declaration text is copied. The Vercel Edge data is API names and hashes read from Vercel's documentation, which has no open license; it lists `none`, and no text is copied.

@@ -81,4 +81,4 @@ Bug reports, data corrections and pull requests are welcome. See [CONTRIBUTING.m
 
 ## License
 
-[MIT](https://github.com/hamedniroomand/edgefit/blob/main/LICENSE) © Hamed Niroomand. The vendored compatibility data is © Cloudflare, Inc. (MIT) and runtime-compat-data (CC0-1.0); both licenses ship in [`data`](https://github.com/hamedniroomand/edgefit/tree/main/data).
+[MIT](https://github.com/hamedniroomand/edgefit/blob/main/LICENSE) © Hamed Niroomand. The vendored compatibility data is © Cloudflare, Inc. (MIT) and runtime-compat-data (CC0-1.0); both licenses ship in [`data`](https://github.com/hamedniroomand/edgefit/tree/main/data). The DOM global names are read from the type declarations of TypeScript (Apache-2.0), and no declaration text is copied.

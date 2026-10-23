@@ -44,7 +44,7 @@ The issue has up to four lists per runtime.
 
 ### Marked missing in the data, but present in the latest release
 
-The matrix says the API does not exist, and the newest release has it. This is the clearest sign the data is behind, and it is fixed by regenerating the runtime's dump (see [Bumping the data](#bumping-the-data)). A whole module of new members, such as `constants`, usually comes from one runtime release.
+The matrix says the API does not exist, and the newest release has it. This is the clearest sign the data is behind, and it is fixed by regenerating the runtime's dump (see [Bumping the data](#bumping-the-data)). A whole module of new members, such as `constants`, usually comes from one runtime release. A DOM global that a runtime gains is in this list too. For it, the data is `data/dom-globals.json`, and the fix is to add the name to the `presentOn` column of that runtime.
 
 ### Curated stubs that now work
 
@@ -216,15 +216,16 @@ Add `guards` to an entry of `data/unreached.json` when the condition that the re
 
 A data bump touches more than JSON:
 
-| Where                                     | What to update                                                                                                          |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `src/targets/workerd/gates.ts`            | `flagsSource` points at the compatibility flags at a tag. Compare the gates first (below)                               |
-| `test/targets/{workerd,bun,deno}.test.ts` | Versions and dates in expected text, curated examples that were removed or changed                                      |
-| `test/cli/run.test.ts`                    | The version strings in `edgefit targets` and the "older than the data" notes                                            |
-| `test/core/check.test.ts`                 | Web API findings per target (Deno gained `navigator.locks` in 2.9, for example)                                         |
-| `docs/`                                   | The sample reports and the version numbers in `targets/*.md`, `getting-started.md`, `reference/*.md`                    |
-| `docs/guide/status.md`, `README.md`       | The runtime versions, dump date and compatibility date. `test/docs/status.test.ts` fails until they match `source.json` |
-| `CHANGELOG.md`                            | A **Data** section that says what users will notice                                                                     |
+| Where                                     | What to update                                                                                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/targets/workerd/gates.ts`            | `flagsSource` points at the compatibility flags at a tag. Compare the gates first (below)                                                   |
+| `test/targets/{workerd,bun,deno}.test.ts` | Versions and dates in expected text, curated examples that were removed or changed                                                          |
+| `test/cli/run.test.ts`                    | The version strings in `edgefit targets` and the "older than the data" notes                                                                |
+| `test/core/check.test.ts`                 | Web API findings per target (Deno gained `navigator.locks` in 2.9, for example)                                                             |
+| `data/dom-globals.json`                   | The `presentOn` column of each runtime that changed, probed with `typeof globalThis[name]`. `test/data/dom-globals.test.ts` checks the file |
+| `docs/`                                   | The sample reports and the version numbers in `targets/*.md`, `getting-started.md`, `reference/*.md`                                        |
+| `docs/guide/status.md`, `README.md`       | The runtime versions, dump date and compatibility date. `test/docs/status.test.ts` fails until they match `source.json`                     |
+| `CHANGELOG.md`                            | A **Data** section that says what users will notice                                                                                         |
 
 ### Compatibility gates
 

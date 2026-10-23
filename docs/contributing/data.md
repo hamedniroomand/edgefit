@@ -15,6 +15,7 @@ Everything is in `data`:
 | `source.json`                   | Every data source with its URL, version, commit and license                            |
 | `workers-nodejs-compat-matrix/` | The vendored matrix: a Node baseline and one dump per runtime                          |
 | `runtime-compat-data/`          | The vendored Web API data, as published                                                |
+| `dom-globals.json`              | The DOM globals, and the names of them that each runtime has                           |
 | `overrides/<target>.json`       | Curated corrections per target                                                         |
 | `suggestions.json`              | Reviewed fixes for packages and APIs, see [Suggested fixes](/contributing/suggestions) |
 | `allowlists/<target>.json`      | For a runtime with no dump: what its documentation allows                              |
@@ -88,6 +89,12 @@ Vercel Edge has no matrix dump, so `allowlists/vercel-edge.json` lists what its 
 
 A list that falls behind the platform reports an API as missing that exists, never the reverse, so a mistake here shows to users as a false error. Keep the `source.json` date in step with the page you read.
 
+## DOM globals
+
+`dom-globals.json` has two parts. `names` holds each global that `lib.dom.d.ts` of TypeScript declares as a `var`, `let`, `const`, `function` or `class`, and `lib.webworker.d.ts` does not, without `toString`, which every object has. `presentOn` holds, for each runtime, the names from `names` that the runtime also has. Build `presentOn` with `typeof globalThis[name]` on the version that `source.json` pins for the runtime. Build the `netlify` list from the production witness, see [Production witness](#production-witness). Name each version in the `note` of the source.
+
+A name in `names` that a runtime does not list in `presentOn` is a missing global for that runtime. edgefit reports a read of it only when the read runs as the module loads. A name that `runtime-compat-data` also lists is decided by that data. For workerd, Bun and Deno, the weekly probe looks the missing names up, so a runtime that adds a DOM global shows in the drift issue. The Netlify and Vercel columns are not probed.
+
 ## Runtime probes
 
 Reading source by hand is slow and misses things, so a workflow checks the overrides against the real runtimes. It lives in `.github/workflows/probe.yml` and runs weekly and on demand.
@@ -105,10 +112,10 @@ Dangerous APIs such as `process.exit`, `child_process.*` and `fs` writes are onl
 
 The workflow runs twice per runtime:
 
-- **pinned** probes the versions in `source.json` and lists every disagreement with the overrides and the matrix in the job summary.
+- **pinned** probes the versions in `source.json` and lists every disagreement with the overrides, the matrix, the Web API data and the DOM globals data in the job summary.
 - **latest** probes the newest release and lists what differs from the pinned data. For workerd it uses the newest compatibility date that release accepts, since newer dates turn features on.
 
-Both channels also look up every API the runtime's data marks as missing (Web APIs like `crypto.subtle.getPublicKey` included, and each global counted once), without calling it. They also look up each module that `present` records. A `missing` API that exists in the newest release is the clearest sign that the data is behind. The latest channel reports four kinds of drift:
+Both channels also look up every API the runtime's data marks as missing (Web APIs like `crypto.subtle.getPublicKey` included, and each global counted once), without calling it. For workerd, Bun and Deno this includes each DOM global that the runtime lacks according to `dom-globals.json`, such as `DOMParser`, except the ones that the Web API data decides. They also look up each module that `present` records. A `missing` API that exists in the newest release is the clearest sign that the data is behind. The latest channel reports four kinds of drift:
 
 - APIs the data marks missing that now exist
 - curated stubs that now work, which means the probe got an argument error from real code (an inconclusive result is not counted)
@@ -152,5 +159,5 @@ The matrix provider's repository may lag behind the runtimes. Check its newest c
 3. Copy the three dumps to `data/workers-nodejs-compat-matrix`, keeping the file formatting.
 4. In `source.json`, update `generatedAt`, the runtime versions, the workerd compatibility date, and the override sources' tags. Say in `note` how the data was generated.
 5. Check that every override `source` still exists at the new tag. Files move: Bun's `src/bun.js` became `src/jsc`.
-6. Review every override against the new source, and run a `pinned` probe on the new versions (see below). It lists overrides that no longer match. A stub that now works is removed, and one that changed is corrected. A stub that validates its arguments before it throws gets `"validatesFirst": true`, so the probe does not read its argument error as a working implementation.
+6. Probe the DOM globals again with `typeof globalThis[name]` on the new version, and update its column in `data/dom-globals.json`, see [DOM globals](#dom-globals). Then review every override against the new source, and run a `pinned` probe on the new versions (see below). It lists overrides that no longer match. A stub that now works is removed, and one that changed is corrected. A stub that validates its arguments before it throws gets `"validatesFirst": true`, so the probe does not read its argument error as a working implementation.
 7. Run the tests and compare results on the fixture projects. Explain every change in the pull request.

@@ -39,9 +39,10 @@ export interface LookupResult {
   /**
    * A finding only when the code reads the plain name, such as `document`, as the module loads.
    * Any other read of the plain name may sit behind a check that edgefit cannot read. A read
-   * through `globalThis` is a finding wherever it is.
+   * through `globalThis` is a finding wherever it is. `true` also limits a read through
+   * `globalThis` to the same case: only the plain name at load is a finding.
    */
-  loadOnly?: 'bare';
+  loadOnly?: true | 'bare';
   /** The options that make a call fail. A call that passes none of them is not a finding. */
   options?: readonly OptionMatch[];
   /** A change to a setting that makes the result go away. The caller adds the target. */
