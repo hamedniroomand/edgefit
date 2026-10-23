@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ohash",
   "resolved": "2.0.12",
-  "checkedAt": "2026-10-23T00:18:34.656Z",
+  "checkedAt": "2026-10-23T01:23:11.181Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -108,7 +108,7 @@
       }
     }
   ],
-  "durationMs": 879,
+  "durationMs": 843,
   "verified": {
     "bun": {
       "outcome": "verified",

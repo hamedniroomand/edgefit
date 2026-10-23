@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.8.0",
-  "checkedAt": "2026-10-23T00:24:04.230Z",
+  "checkedAt": "2026-10-23T01:28:47.333Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -64,7 +64,7 @@
         "workerd": {
           "status": "fail",
           "errors": 8,
-          "warnings": 5,
+          "warnings": 4,
           "findings": [
             {
               "api": "node:child_process.execFile",
@@ -137,12 +137,6 @@
               "category": "unknown",
               "level": "warning",
               "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "require(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
             }
           ],
           "exports": [
@@ -241,7 +235,7 @@
         "bun": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3,
+          "warnings": 2,
           "findings": [
             {
               "api": "node:inspector.url",
@@ -254,12 +248,6 @@
               "category": "unknown",
               "level": "warning",
               "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "require(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
             }
           ],
           "exports": [
@@ -316,7 +304,7 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 3,
+          "warnings": 2,
           "findings": [
             {
               "api": "node:fs.promises",
@@ -329,12 +317,6 @@
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
-            },
-            {
-              "api": "require(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
             }
           ]
         }
@@ -801,7 +783,7 @@
     }
   ],
   "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement, and its ./import hook calls node:module.register, which Bun mocks; use @sentry/cloudflare or @sentry/bun.",
-  "durationMs": 474548,
+  "durationMs": 479936,
   "verified": {
     "workerd": {
       "outcome": "verified",

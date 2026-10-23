@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ajv",
   "resolved": "8.20.0",
-  "checkedAt": "2026-10-23T00:18:16.667Z",
+  "checkedAt": "2026-10-23T01:21:31.116Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -66,7 +66,7 @@
       }
     }
   ],
-  "durationMs": 2208,
+  "durationMs": 2440,
   "verified": {
     "bun": {
       "outcome": "verified",

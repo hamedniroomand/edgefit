@@ -2,7 +2,7 @@
   "version": 2,
   "package": "passport",
   "resolved": "0.7.0",
-  "checkedAt": "2026-10-23T00:17:56.643Z",
+  "checkedAt": "2026-10-23T01:22:06.178Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -66,7 +66,7 @@
       }
     }
   ],
-  "durationMs": 673,
+  "durationMs": 648,
   "verified": {
     "bun": {
       "outcome": "verified",

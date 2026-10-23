@@ -2,7 +2,7 @@
   "version": 2,
   "package": "meilisearch",
   "resolved": "0.62.0",
-  "checkedAt": "2026-10-23T00:19:14.676Z",
+  "checkedAt": "2026-10-23T01:22:49.478Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -87,7 +87,7 @@
       }
     }
   ],
-  "durationMs": 977,
+  "durationMs": 755,
   "verified": {
     "bun": {
       "outcome": "verified",

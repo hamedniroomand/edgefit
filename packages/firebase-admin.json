@@ -2,7 +2,7 @@
   "version": 2,
   "package": "firebase-admin",
   "resolved": "14.5.0",
-  "checkedAt": "2026-10-23T00:19:07.794Z",
+  "checkedAt": "2026-10-23T01:23:40.421Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -706,7 +706,7 @@
     }
   ],
   "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process.",
-  "durationMs": 101523,
+  "durationMs": 108823,
   "verified": {
     "bun": {
       "outcome": "verified",

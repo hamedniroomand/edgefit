@@ -2,7 +2,7 @@
   "version": 2,
   "package": "stripe",
   "resolved": "23.0.1",
-  "checkedAt": "2026-10-23T00:17:03.228Z",
+  "checkedAt": "2026-10-23T01:21:14.584Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -66,7 +66,7 @@
       }
     }
   ],
-  "durationMs": 2796,
+  "durationMs": 2910,
   "verified": {
     "bun": {
       "outcome": "verified",

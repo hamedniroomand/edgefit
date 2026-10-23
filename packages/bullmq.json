@@ -2,7 +2,7 @@
   "version": 2,
   "package": "bullmq",
   "resolved": "6.4.0",
-  "checkedAt": "2026-10-23T00:19:27.723Z",
+  "checkedAt": "2026-10-23T01:22:14.027Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -96,7 +96,7 @@
     }
   ],
   "notes": "bullmq runs a processor file in a child process or a worker thread, which workerd does not implement; use Cloudflare Queues on Workers.",
-  "durationMs": 5416,
+  "durationMs": 3838,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "amqplib",
   "resolved": "2.2.0",
-  "checkedAt": "2026-10-23T00:17:20.823Z",
+  "checkedAt": "2026-10-23T01:23:42.488Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -87,7 +87,7 @@
       }
     }
   ],
-  "durationMs": 2582,
+  "durationMs": 2634,
   "verified": {
     "bun": {
       "outcome": "verified",

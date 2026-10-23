@@ -2,7 +2,7 @@
   "version": 2,
   "package": "nanoid",
   "resolved": "6.0.2",
-  "checkedAt": "2026-10-23T00:19:08.240Z",
+  "checkedAt": "2026-10-23T01:22:54.729Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -87,7 +87,7 @@
       }
     }
   ],
-  "durationMs": 682,
+  "durationMs": 582,
   "verified": {
     "bun": {
       "outcome": "verified",

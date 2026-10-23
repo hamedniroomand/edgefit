@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@trpc/server",
   "resolved": "11.19.0",
-  "checkedAt": "2026-10-23T00:17:26.215Z",
+  "checkedAt": "2026-10-23T01:21:32.103Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -363,7 +363,7 @@
       }
     }
   ],
-  "durationMs": 5141,
+  "durationMs": 6455,
   "verified": {
     "bun": {
       "outcome": "verified",
