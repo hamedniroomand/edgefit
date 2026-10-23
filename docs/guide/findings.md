@@ -321,6 +321,25 @@ A global that the target lacks is `undefined` on the global object. So these use
 - a comparison with `===`, `!==`, `==` or `!=`
 - the value of a `const` with a plain name that the file does not export in any form, as in `const doc = globalThis.document`. The same list applies to each use of `doc`. Destructuring, as in `const { version } = globalThis.Deno`, throws on a missing global.
 
+A `?.` right behind the global guards the rest of the chain, as in `globalThis.Deno?.env.toObject()`. The chain stops when `Deno` is missing, so the call does not run. The use is guarded when the value of the chain goes into one of these places:
+
+- the test of an `if` or `?:`, the left side of `&&`, the operand of `typeof` or `!`, or a comparison with `undefined` or `null`
+- an operand of `||` or `??`. The right operand counts when the left one is an API, see [Checks for an API](#checks-for-an-api)
+- a statement of its own
+
+The use is a finding in these cases:
+
+- the value is assigned, returned, passed to a call, awaited or used in another way
+- the `?.` comes after a plain `.` read of the global, as in `globalThis.Deno.env?.toObject()`
+- the chain starts at a module, as in `fs?.watch('.')`, because a missing module does not always leave `undefined` in the name
+- the other operand of the `||` or `??` is `null` or `undefined`, as in `(globalThis.Deno?.env.toObject() ?? null).x`, because the value can be nullish
+- the chain starts at an alias of the global object, as in `const g = globalThis; g.Deno?.env.toObject()`
+- the target has `Deno` and lacks `env.toObject`
+
+A chain that starts at a bare name, as in `Deno?.env.toObject()`, is not part of this rule. edgefit does not record the use of most bare global names, see [Only some guards are understood](/guide/limitations#only-some-guards-are-understood).
+
+The guard follows the data of the target. Code that fills the global, in this file or in another one, is not followed, see [Only some guards are understood](/guide/limitations#only-some-guards-are-understood).
+
 Every other use is a finding when no check protects it. Examples are a call, `new`, a member (`globalThis.document.title`, or `doc.title`), `instanceof`, `extends`, a spread, `for…of`, `.call`, `.apply`, `.bind`, a `return`, an export, and an argument of a call other than `Boolean`.
 
 ### Browser globals by their bare name

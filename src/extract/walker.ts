@@ -4,6 +4,7 @@ import type { ApiRef } from '@/types.ts';
 
 import { childNodes, isTypeOnly } from './ast.ts';
 import {
+  apiGuard,
   callPassedKeys,
   computedKey,
   followChain,
@@ -13,6 +14,7 @@ import {
   isPresentRead,
   isReturned,
   isSafeRead,
+  optionalGlobalGuards,
 } from './chain.ts';
 import type { VisitContext } from './context.ts';
 import {
@@ -21,7 +23,6 @@ import {
   extendedReason,
   findParameterReads,
   isAwaitedCall,
-  normalizeRef,
   isBareGlobal,
   isTypeofName,
   isGlobalRoot,
@@ -36,9 +37,6 @@ import { addPassedKeys } from './usage-collector.ts';
 import type { UsageCollector } from './usage-collector.ts';
 import { visitorFor } from './visitors/index.ts';
 import { visitPattern } from './visitors/patterns.ts';
-
-const apiGuard = (ref: ApiRef) =>
-  ({ kind: 'api', ref: normalizeRef(ref), root: undefined, active: true }) as const;
 
 export class Walker implements VisitContext {
   public readonly imported: boolean;
@@ -274,7 +272,8 @@ export class Walker implements VisitContext {
     if (recordBare || chain.extended) {
       const safe = isSafeRead(chain.ref, node, parent, this.#outer(node), this.#scope);
       const read = safe ? [apiGuard(chain.ref)] : [];
-      this.collector.guards.within(read, () => {
+      const optional = optionalGlobalGuards(node, parent, this.#outer(node), this);
+      this.collector.guards.within([...read, ...optional], () => {
         const usage = this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
         if (usage !== undefined && keys !== undefined) {
           addPassedKeys(usage, keys);
