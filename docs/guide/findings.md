@@ -128,7 +128,7 @@ When the target does not have the API, or the data does not cover it, a usage th
 
 A use of an API that the data does not cover, outside a check, such as `const s = v8.startupSnapshot`, is still an `unknown` warning, also when the code uses a member of it after a check. A use of the module itself, such as its import, is the exception: when the code uses the module's members only after a check, edgefit does not report the module. It is not a guarded finding either, so the report does not count it.
 
-A check does not protect an API that exists and throws or does nothing, such as `fs.watch` on Workers, because the check passes and the call still fails. Those stay findings, and so do `mocked` and `mismatch` results. Code that does not run at all on the target is the exception, see [Runtime checks](#runtime-checks).
+A check does not protect an API that exists and throws or does nothing, such as `fs.watch` on Workers, because the check passes and the call still fails. Those stay findings, and so do `mocked` and `mismatch` results. Code that does not run at all on the target is the exception, see [Runtime checks](#runtime-checks) and [Signal handlers](#signal-handlers).
 
 ### Checks for an API
 
@@ -238,6 +238,27 @@ These checks name a runtime:
 The minified form of a `typeof` check, such as `typeof Deno < "u"`, names a runtime too. See [Checks for an API](#checks-for-an-api).
 
 The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
+
+### Signal handlers
+
+edgefit assumes that no signal arrives on Workers, Netlify Edge Functions and Vercel Edge. So the code of a signal handler never runs there, and everything in it is guarded, an API that exists and throws included:
+
+```js
+process.on('SIGTERM', () => {
+  process.kill(process.pid, 'SIGTERM'); // Guarded on Workers
+});
+```
+
+A handler is the function in a call of `process.on`, `process.once` or `process.addListener`, when the event is a string in quotes that starts with `SIG`. The function can be written in the call, or it can be a local function that the call names. A local function gets the same guards when its only uses are these two: a handler in such a call, and a call of `process.off` or `process.removeListener` that removes it. The event of a `process.off` call is not checked.
+
+The call of `process.on` is not part of the handler. An import at the top of the file is not part of it either. They stay findings where they are findings today. edgefit does not guard on Bun, Deno and Deno Deploy, so the findings stay there.
+
+The code stays a finding when:
+
+- the event is not a string in quotes that starts with `SIG`, such as `exit`, a variable or a template literal
+- the handler is not a function written in the call or the name of a local function. A call such as `make()` runs at once. A `?:` expression, a member such as `this.stop` and a name from another file are not read
+- a local function that is a handler is also called, exported or passed to other code, see [Functions that only checked code uses](#functions-that-only-checked-code-uses)
+- a function only a handler calls, see [Limitations](/guide/limitations)
 
 ### Checks for a global
 
@@ -350,7 +371,7 @@ function downloadSaveAs(blob) {
 }
 ```
 
-A use in a [polyfill store](#polyfills), such as `globalThis.fetch ??= myFetch`, also counts as a use behind a check. This check depends on the target. On a target that lacks the global, or whose data does not mark it as supported, the store runs, so the code in the function is not behind a check. A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
+A use as a [signal handler](#signal-handlers) also counts as a use behind a check. So does a use in a [polyfill store](#polyfills), such as `globalThis.fetch ??= myFetch`. The check of a polyfill store depends on the target. On a target that lacks the global, or whose data does not mark it as supported, the store runs, so the code in the function is not behind a check. A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
 
 - one use has no check
 - the file exports the function in any form: `export`, `export default`, `exports.x` or `module.exports`, also inside a check

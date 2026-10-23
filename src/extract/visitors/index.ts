@@ -1,5 +1,6 @@
 import type { Node } from 'oxc-parser';
 
+import type { NodeOf } from '@/extract/ast.ts';
 import type { Visitor } from '@/extract/context.ts';
 
 import { visitCall, visitImportExpression, visitNew } from './calls.ts';
@@ -33,6 +34,14 @@ import {
   visitProgram,
   visitSwitch,
 } from './scopes.ts';
+import { visitSignalHandler } from './signals.ts';
+
+/** A call that sets or takes away a signal handler is visited as one, and any other call as a call. */
+const visitCallExpression: Visitor<NodeOf<'CallExpression'>> = (node, context) => {
+  if (!visitSignalHandler(node, context)) {
+    visitCall(node, context);
+  }
+};
 
 type VisitorMap = { [Type in Node['type']]?: Visitor<Extract<Node, { type: Type }>> };
 
@@ -59,7 +68,7 @@ const visitors: VisitorMap = {
   TryStatement: visitTry,
   ConditionalExpression: visitConditional,
   LogicalExpression: visitLogical,
-  CallExpression: visitCall,
+  CallExpression: visitCallExpression,
   NewExpression: visitNew,
   ImportExpression: visitImportExpression,
   VariableDeclaration: visitDeclaration,
