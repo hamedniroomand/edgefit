@@ -2,7 +2,7 @@
   "version": 2,
   "package": "yaml",
   "resolved": "2.9.1",
-  "checkedAt": "2026-10-22T22:10:42.694Z",
+  "checkedAt": "2026-10-22T23:50:41.485Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -87,6 +87,7 @@
       }
     }
   ],
+  "durationMs": 2360,
   "verified": {
     "bun": {
       "outcome": "verified",

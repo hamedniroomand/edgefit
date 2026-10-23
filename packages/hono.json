@@ -2,7 +2,7 @@
   "version": 2,
   "package": "hono",
   "resolved": "4.13.13",
-  "checkedAt": "2026-10-22T22:10:02.439Z",
+  "checkedAt": "2026-10-22T23:50:22.227Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -1641,6 +1641,7 @@
       }
     }
   ],
+  "durationMs": 6883,
   "verified": {
     "bun": {
       "outcome": "verified",

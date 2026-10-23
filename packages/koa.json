@@ -2,7 +2,7 @@
   "version": 2,
   "package": "koa",
   "resolved": "3.2.1",
-  "checkedAt": "2026-10-22T22:11:17.962Z",
+  "checkedAt": "2026-10-22T23:50:39.128Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -27,6 +27,12 @@
     "bun": "pass",
     "deno": "pass"
   },
+  "skipped": [
+    {
+      "subpath": "./package",
+      "reason": "the target of this subpath is a JSON file, which holds no code to check"
+    }
+  ],
   "context": {
     "workerd": {
       "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
@@ -66,6 +72,7 @@
       }
     }
   ],
+  "durationMs": 1916,
   "verified": {
     "bun": {
       "outcome": "verified",

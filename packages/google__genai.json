@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@google/genai",
   "resolved": "2.30.0",
-  "checkedAt": "2026-10-22T22:11:11.069Z",
+  "checkedAt": "2026-10-22T23:50:49.260Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -205,6 +205,7 @@
       }
     }
   ],
+  "durationMs": 12994,
   "verified": {
     "bun": {
       "outcome": "verified",
