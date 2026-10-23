@@ -2,7 +2,7 @@
   "version": 2,
   "package": "immer",
   "resolved": "11.2.9",
-  "checkedAt": "2026-10-23T00:05:51.974Z",
+  "checkedAt": "2026-10-23T00:17:34.187Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -66,7 +66,7 @@
       }
     }
   ],
-  "durationMs": 965,
+  "durationMs": 886,
   "verified": {
     "bun": {
       "outcome": "verified",

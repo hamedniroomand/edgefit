@@ -2,7 +2,7 @@
   "version": 2,
   "package": "better-sqlite3",
   "resolved": "13.0.3",
-  "checkedAt": "2026-10-23T00:05:36.211Z",
+  "checkedAt": "2026-10-23T00:18:28.152Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -361,7 +361,7 @@
     }
   ],
   "notes": "Native addon. On workerd, process.report.getReport() returns an empty object with no header. The package reads header.glibcVersionRuntime, so the run throws a TypeError before it reaches the native addon.",
-  "durationMs": 2512,
+  "durationMs": 2447,
   "verified": {
     "bun": {
       "outcome": "verified",

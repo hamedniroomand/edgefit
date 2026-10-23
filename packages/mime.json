@@ -2,7 +2,7 @@
   "version": 2,
   "package": "mime",
   "resolved": "4.1.1",
-  "checkedAt": "2026-10-23T00:06:26.478Z",
+  "checkedAt": "2026-10-23T00:19:35.724Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -129,7 +129,7 @@
       }
     }
   ],
-  "durationMs": 1035,
+  "durationMs": 1069,
   "verified": {
     "bun": {
       "outcome": "verified",

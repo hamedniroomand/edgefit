@@ -2,7 +2,7 @@
   "version": 2,
   "package": "joi",
   "resolved": "18.3.0",
-  "checkedAt": "2026-10-23T00:06:24.493Z",
+  "checkedAt": "2026-10-23T00:18:36.951Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -66,7 +66,7 @@
       }
     }
   ],
-  "durationMs": 2394,
+  "durationMs": 2318,
   "verified": {
     "bun": {
       "outcome": "verified",

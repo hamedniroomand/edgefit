@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@aws-sdk/client-s3",
   "resolved": "3.1156.0",
-  "checkedAt": "2026-10-23T00:05:12.615Z",
+  "checkedAt": "2026-10-23T00:16:34.600Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -66,7 +66,7 @@
       }
     }
   ],
-  "durationMs": 6776,
+  "durationMs": 7360,
   "verified": {
     "bun": {
       "outcome": "verified",

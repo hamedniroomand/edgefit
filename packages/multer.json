@@ -2,7 +2,7 @@
   "version": 2,
   "package": "multer",
   "resolved": "2.5.0",
-  "checkedAt": "2026-10-23T00:06:30.597Z",
+  "checkedAt": "2026-10-23T00:17:23.114Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -66,7 +66,7 @@
       }
     }
   ],
-  "durationMs": 1493,
+  "durationMs": 1287,
   "verified": {
     "bun": {
       "outcome": "verified",
