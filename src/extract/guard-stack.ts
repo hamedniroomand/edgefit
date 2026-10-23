@@ -81,6 +81,10 @@ export class GuardStack {
   #missing: ReadonlySet<string> = new Set();
   /** The modules that a load in an enclosing `try` block read, where the `catch` stops the error of a missing module. */
   #loaded: readonly string[] = [];
+  /** What the last `scoped` block still held when it ended, for `exitOf`. */
+  #exit: readonly Guard[] = [];
+  /** What each `try` statement leaves for the code after it, see `leaveAfterTry`. */
+  readonly #afterTry = new WeakMap<object, readonly Guard[]>();
 
   /** Runs `body` with `guards` added, and removes them afterwards. */
   public readonly within = (guards: readonly Guard[], body: () => void): void => {
@@ -100,10 +104,30 @@ export class GuardStack {
       body(guards => {
         this.#guards.push(...guards);
       });
+      this.#exit = this.#guards.slice(depth);
     } finally {
       this.#guards.length = depth;
     }
   };
+
+  /**
+   * Runs `body`, which visits a block, and returns the guards that the block still held at its end:
+   * what its guard clauses left. The guards are made in the scope of the block, so a name that the
+   * block declares keeps its meaning.
+   */
+  public readonly exitOf = (body: () => void): readonly Guard[] => {
+    this.#exit = [];
+    body();
+    return this.#exit;
+  };
+
+  /** Records the guards that hold after `node`, a `try` statement whose `catch` has a jump at its top level. */
+  public readonly leaveAfterTry = (node: object, guards: readonly Guard[]): void => {
+    this.#afterTry.set(node, guards);
+  };
+
+  /** The guards that hold after `node`, a `try` statement. */
+  public readonly afterTry = (node: object): readonly Guard[] => this.#afterTry.get(node) ?? [];
 
   /** Runs `body` where a `catch` stops a missing module with one of `codes`, and not every error. */
   public readonly withinMissing = (codes: ReadonlySet<string>, body: () => void): void => {
