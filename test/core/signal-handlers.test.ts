@@ -5,8 +5,8 @@ import type { TargetKey } from '@/types.ts';
 import { fixture } from '~/helpers.ts';
 
 const fork = 'node:cluster.fork';
-const withoutSignals = ['workerd', 'netlify-edge', 'vercel-edge'] as const;
-const withSignals = ['deno-deploy', 'bun'] as const;
+const withoutSignals = ['workerd', 'vercel-edge'] as const;
+const withSignals = ['netlify-edge', 'deno-deploy', 'bun'] as const;
 
 /** What `check` reports for `cluster.fork` in an entry of the fixture, by target. */
 async function reports(
@@ -47,7 +47,7 @@ describe('a handler of a signal, for each target', () => {
     async name => {
       const found = await reports(`${name}.mjs`);
       for (const target of withSignals) {
-        expect(found[target]?.found).toBe(true);
+        expect(found[target]).toEqual({ found: true, guarded: false });
       }
     },
   );

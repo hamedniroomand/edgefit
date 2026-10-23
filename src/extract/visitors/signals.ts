@@ -12,10 +12,15 @@ import { isTracked } from '@/extract/scope.ts';
 const addMethods = new Set(['on', 'once', 'addListener']);
 const removeMethods = new Set(['off', 'removeListener']);
 
-/** No signal reaches the code on these runtimes: workerd, Netlify Edge and Vercel Edge. */
-const noSignalRuntimes: readonly Guard[] = (['workerd', 'netlify', 'vercel-edge'] as const).map(
-  runtime => ({ kind: 'runtime', condition: { runtime, present: false } }),
-);
+/**
+ * The runtimes where the code of a handler does not run: workerd, where a real signal does not
+ * call a handler, and Vercel Edge, which has only `process.env`. Netlify Edge Functions run Deno,
+ * which calls a handler when a signal arrives.
+ */
+const noSignalRuntimes: readonly Guard[] = (['workerd', 'vercel-edge'] as const).map(runtime => ({
+  kind: 'runtime',
+  condition: { runtime, present: false },
+}));
 
 /** The method of `process` that a call uses, such as `on`. */
 function processMethod(node: NodeOf<'CallExpression'>, context: VisitContext): string | undefined {

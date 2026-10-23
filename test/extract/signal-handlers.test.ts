@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vite-plus/test';
 import { usagesOf } from '~/helpers.ts';
 
 const kill = 'process.kill(process.pid)';
-const noSignals = ' [not workerd] [not netlify] [not vercel-edge]';
+const noSignals = ' [not workerd] [not vercel-edge]';
 const guarded = [`api node:process.kill${noSignals}`];
 const plain = ['api node:process.kill'];
 

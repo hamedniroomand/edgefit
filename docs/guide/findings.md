@@ -276,17 +276,17 @@ These checks also work through a `const` that holds the global object, as in `co
 
 ### Signal handlers
 
-edgefit assumes that no signal arrives on Workers, Netlify Edge Functions and Vercel Edge. So the code of a signal handler never runs there, and everything in it is guarded, an API that exists and throws included:
+edgefit guards the code of a signal handler on Workers and Vercel Edge, for two reasons. On Workers, a real SIGTERM did not call a handler in the workerd version that edgefit pins. On Vercel Edge, the data allows only `process.env`, see [process](/targets/vercel-edge#process), and a call of `process.on`, `process.once` or `process.addListener` fails there, so no handler is set. So the code of a signal handler does not run there, unless the code emits the event itself, see [Limitations](/guide/limitations). Everything in it is guarded, an API that exists and throws included:
 
 ```js
 process.on('SIGTERM', () => {
-  process.kill(process.pid, 'SIGTERM'); // Guarded on Workers
+  process.kill(process.pid, 'SIGTERM'); // Guarded on Workers and Vercel Edge
 });
 ```
 
 A handler is the function in a call of `process.on`, `process.once` or `process.addListener`, when the event is a string in quotes that starts with `SIG`. The function can be written in the call, or it can be a local function that the call names. A local function gets the same guards when its only uses are these two: a handler in such a call, and a call of `process.off` or `process.removeListener` that removes it. The event of a `process.off` call is not checked.
 
-The call of `process.on` is not part of the handler. An import at the top of the file is not part of it either. They stay findings where they are findings today. edgefit does not guard on Bun, Deno and Deno Deploy, so the findings stay there.
+The call of `process.on` is not part of the handler. An import at the top of the file is not part of it either. They stay findings where they are findings today. edgefit does not guard the code of a handler on Bun, Deno, Deno Deploy and Netlify Edge Functions, so a finding in it stays there. Deno calls a handler when a signal arrives, and Netlify Edge Functions run Deno.
 
 The code stays a finding when:
 
