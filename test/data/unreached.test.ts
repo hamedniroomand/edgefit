@@ -5,7 +5,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { collectFindings, defaultLevels } from '@/core/findings.ts';
-import type { ModuleUsages } from '@/core/findings.ts';
+import type { FindingOptions, ModuleUsages } from '@/core/findings.ts';
 import {
   fileInPackage,
   findUnreached,
@@ -13,6 +13,8 @@ import {
   unreachedOptionPaths,
 } from '@/data/unreached.ts';
 import type { UnreachedEntry, UnreachedQuery } from '@/data/unreached.ts';
+import type { Target } from '@/targets/index.ts';
+import type { TargetKey } from '@/types.ts';
 import { makeUsage, stubTarget } from '~/helpers.ts';
 
 const entry: UnreachedEntry = {
@@ -247,5 +249,49 @@ describe('an entry that names an option path', () => {
     expect(unreachedOptionPaths(loadUnreached())).toEqual(
       expect.arrayContaining(['auth.lock', 'realtime.worker']),
     );
+  });
+});
+
+describe('a computed read in code that only runs in a browser page', () => {
+  const utils = 'node_modules/puppeteer-core/lib/puppeteer/cdp/utils.js';
+  const read = (file: string): ModuleUsages => ({
+    file,
+    package: { name: 'puppeteer-core', version: '25.16.0' },
+    chain: ['index.js', 'puppeteer-core'],
+    usages: [
+      makeUsage(undefined, {
+        kind: 'dynamic',
+        display: 'globalThis[<expression>]',
+        reason: 'accessed with a computed property',
+        location: { file, line: 197, column: 46 },
+      }),
+    ],
+  });
+  const on = (key: TargetKey): Target => ({
+    ...stubTarget(),
+    info: { ...stubTarget().info, key },
+  });
+  const options = (key: TargetKey): FindingOptions => ({
+    levels: defaultLevels,
+    ignore: [],
+    target: on(key),
+    unreached: loadUnreached(),
+  });
+
+  it.each(['workerd', 'bun', 'deno', 'deno-deploy', 'netlify-edge'] as const)(
+    'is guarded by the shipped entry for addPageBinding on %s',
+    key => {
+      const { findings, guarded } = collectFindings([read(utils)], options(key));
+      expect(findings).toEqual([]);
+      expect(guarded).toMatchObject([{ level: 'warning', category: 'unknown', guarded: true }]);
+      expect(guarded[0]?.unreached).toBeDefined();
+    },
+  );
+
+  it('is still a finding in another file of the package', () => {
+    const other = 'node_modules/puppeteer-core/lib/puppeteer/cdp/Binding.js';
+    const { findings, guarded } = collectFindings([read(other)], options('bun'));
+    expect(findings).toMatchObject([{ level: 'warning', category: 'unknown' }]);
+    expect(guarded).toEqual([]);
   });
 });

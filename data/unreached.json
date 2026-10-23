@@ -205,6 +205,56 @@
       "target": "workerd",
       "reason": "Runs only when a project sets the `http2` option, which is off by default. `got` then opens the TLS connection itself, in its HTTP/2 client. With an `h2session`, `got` uses the session of the project and opens no connection.",
       "source": "https://github.com/sindresorhus/got/blob/v16.1.0/source/core/options.ts#L3777-L3779"
+    },
+    {
+      "package": "puppeteer-core",
+      "versions": { "min": "25.16.0", "max": "25.16.0" },
+      "file": "lib/puppeteer/cdp/utils.js",
+      "guards": ["lib/puppeteer/cdp/ExecutionContext.js"],
+      "apis": ["globalThis[<expression>]"],
+      "target": "workerd",
+      "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
+      "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.16.0/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L150-L155"
+    },
+    {
+      "package": "puppeteer-core",
+      "versions": { "min": "25.16.0", "max": "25.16.0" },
+      "file": "lib/puppeteer/cdp/utils.js",
+      "guards": ["lib/puppeteer/cdp/ExecutionContext.js"],
+      "apis": ["globalThis[<expression>]"],
+      "target": "bun",
+      "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
+      "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.16.0/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L150-L155"
+    },
+    {
+      "package": "puppeteer-core",
+      "versions": { "min": "25.16.0", "max": "25.16.0" },
+      "file": "lib/puppeteer/cdp/utils.js",
+      "guards": ["lib/puppeteer/cdp/ExecutionContext.js"],
+      "apis": ["globalThis[<expression>]"],
+      "target": "deno",
+      "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
+      "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.16.0/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L150-L155"
+    },
+    {
+      "package": "puppeteer-core",
+      "versions": { "min": "25.16.0", "max": "25.16.0" },
+      "file": "lib/puppeteer/cdp/utils.js",
+      "guards": ["lib/puppeteer/cdp/ExecutionContext.js"],
+      "apis": ["globalThis[<expression>]"],
+      "target": "deno-deploy",
+      "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
+      "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.16.0/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L150-L155"
+    },
+    {
+      "package": "puppeteer-core",
+      "versions": { "min": "25.16.0", "max": "25.16.0" },
+      "file": "lib/puppeteer/cdp/utils.js",
+      "guards": ["lib/puppeteer/cdp/ExecutionContext.js"],
+      "apis": ["globalThis[<expression>]"],
+      "target": "netlify-edge",
+      "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
+      "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.16.0/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L150-L155"
     }
   ]
 }
