@@ -2,8 +2,8 @@
   "version": 2,
   "package": "markdown-it",
   "resolved": "15.0.3",
-  "checkedAt": "2026-10-23T05:46:55.469Z",
-  "edgefit": "0.15.6",
+  "checkedAt": "2026-10-23T05:57:52.105Z",
+  "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -88,7 +88,7 @@
       }
     }
   ],
-  "durationMs": 2524,
+  "durationMs": 2236,
   "verified": {
     "bun": {
       "outcome": "verified",

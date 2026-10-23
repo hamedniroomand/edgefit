@@ -2,8 +2,8 @@
   "version": 2,
   "package": "bcrypt",
   "resolved": "6.0.0",
-  "checkedAt": "2026-10-23T05:45:04.376Z",
-  "edgefit": "0.15.6",
+  "checkedAt": "2026-10-23T05:55:37.913Z",
+  "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -76,7 +76,7 @@
     }
   ],
   "notes": "Native addon; bcryptjs is the pure-JS alternative.",
-  "durationMs": 676,
+  "durationMs": 729,
   "verified": {
     "bun": {
       "outcome": "verified",

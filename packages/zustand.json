@@ -2,8 +2,8 @@
   "version": 2,
   "package": "zustand",
   "resolved": "5.0.16",
-  "checkedAt": "2026-10-23T05:45:19.254Z",
-  "edgefit": "0.15.6",
+  "checkedAt": "2026-10-23T05:54:42.711Z",
+  "edgefit": "0.16.0",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -76,7 +76,7 @@
       }
     }
   ],
-  "durationMs": 1000,
+  "durationMs": 915,
   "verified": {
     "bun": {
       "outcome": "verified",
