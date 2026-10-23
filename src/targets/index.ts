@@ -35,4 +35,16 @@ export function createTarget(key: TargetKey, root: string, config: EdgefitConfig
   return factories[key](root, config);
 }
 
+/**
+ * The tracked globals that the target lacks and that only a read at load fails, such as `document`.
+ * A read of one by its plain name throws where the global is missing, whatever the code does with it.
+ */
+export function loadOnlyGlobals(target: Target): Set<string> {
+  return new Set(
+    [...target.globals].filter(
+      name => target.lookup({ module: '*globals*', path: [name] }).loadOnly !== undefined,
+    ),
+  );
+}
+
 export type { Target, TargetInfo } from './target.ts';

@@ -154,3 +154,45 @@ describe('override options', () => {
     );
   });
 });
+
+describe('overrides provider, entries that only a read at load fails', () => {
+  const load = (entry: Record<string, unknown>): CompatEntry[] =>
+    overridesProvider('workerd').load(
+      dataDirectoryWith({
+        'source.json': {
+          sources: [
+            { provider: 'overrides/workerd', url, license: 'MIT', versions: { workerd: '1' } },
+          ],
+        },
+        'overrides/workerd.json': {
+          modules: {},
+          apis: {
+            '*globals*.document': {
+              status: 'unsupported',
+              note: 'missing',
+              source: 'x.md',
+              ...entry,
+            },
+          },
+        },
+      }),
+    );
+
+  it('keeps the loadOnly of an entry that is absent', () => {
+    expect(load({ absent: true, loadOnly: 'bare' })[0]).toMatchObject({
+      absent: true,
+      loadOnly: 'bare',
+    });
+    expect(load({ absent: true })[0]).not.toHaveProperty('loadOnly');
+  });
+
+  it.each([
+    ['a value other than "bare"', { absent: true, loadOnly: true }],
+    ['an entry that is not absent', { loadOnly: 'bare' }],
+    ['an entry with another status', { status: 'mocked', absent: true, loadOnly: 'bare' }],
+  ])('rejects a loadOnly on %s', (_name, entry) => {
+    expect(() => load(entry)).toThrow(
+      'overrides/workerd.json: the loadOnly of *globals*.document must be "bare", and only with the status unsupported and absent.',
+    );
+  });
+});

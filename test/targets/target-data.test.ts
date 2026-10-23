@@ -105,6 +105,27 @@ describe('target data layers', () => {
   });
 });
 
+describe('target data with a global that only an override lists', () => {
+  const absent = dataDirectoryWith({
+    ...files,
+    'overrides/deno.json': {
+      modules: {},
+      apis: {
+        '*globals*.document': {
+          ...override('unsupported', 'missing'),
+          absent: true,
+          loadOnly: 'bare',
+        },
+      },
+    },
+  });
+
+  it('tracks the global, because a plain read of it fails', () => {
+    expect(loadTargetData('deno', [], absent).globals.has('document')).toBe(true);
+    expect(loadTargetData('deno', [], dataDirectory).globals.has('document')).toBe(false);
+  });
+});
+
 describe('target data globals', () => {
   it('tracks a global whose only problem is an entry with options', () => {
     const options = dataDirectoryWith({

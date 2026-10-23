@@ -51,6 +51,7 @@ export function loadTargetData(
   );
   const globals = new Set([
     ...alwaysTrackedGlobals,
+    ...index.curatedLoadOnlyGlobals(),
     ...index
       .globalNames()
       .filter(name => index.hasProblemsBelow({ module: '*globals*', path: [name] }, true)),

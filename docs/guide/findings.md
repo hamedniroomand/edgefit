@@ -307,7 +307,7 @@ if (!global.crypto) {
 }
 ```
 
-The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding. The global object can also be a `const` that holds it, as in `const g = globalThis; if (!g.FileList) { … }`. See [Runtime checks](#runtime-checks) for the names that count.
+The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding. For a global that the data lists as read at load, such as `document`, only `typeof X` is a check of the bare name, see [Browser globals by their bare name](#browser-globals-by-their-bare-name). The global object can also be a `const` that holds it, as in `const g = globalThis; if (!g.FileList) { … }`. See [Runtime checks](#runtime-checks) for the names that count.
 
 `undefined` and `NaN` exist on every target, but a value test can see them as missing. `undefined` looks missing to each value test, also to `=== undefined` and `typeof … === 'undefined'`. `NaN` looks missing only to a truthiness test, such as `!globalThis.NaN` or `globalThis.NaN || x`. So the code that such a test runs is not guarded, see [Polyfills](#polyfills). `typeof globalThis.NaN`, `globalThis.NaN === undefined` and `globalThis.NaN ?? x` still decide the branch.
 
@@ -323,7 +323,25 @@ A global that the target lacks is `undefined` on the global object. So these use
 
 Every other use is a finding when no check protects it. Examples are a call, `new`, a member (`globalThis.document.title`, or `doc.title`), `instanceof`, `extends`, a spread, `for…of`, `.call`, `.apply`, `.bind`, a `return`, an export, and an argument of a call other than `Boolean`.
 
-edgefit does not report a browser global that the code uses by its bare name, such as `document.title`. This can hide a real failure. See [Limitations](/guide/limitations).
+### Browser globals by their bare name
+
+A name that no scope declares throws a `ReferenceError` where the global is missing, whatever the code does with it. Only `typeof document` is safe. edgefit follows this rule for the globals that the data lists as read at load: `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` on Workers, and `document`, `HTMLAnchorElement` and `Bun` on Netlify Edge Functions. For them, `!document`, `if (document)`, `document && x`, `document ?? x`, `document == null` and `document?.x` are not checks. Each one reads the name, and the read is a use of it.
+
+Each of these two modules fails on Workers:
+
+```js
+if (!document) throw new Error('needs a browser'); // `document` is missing
+```
+
+```js
+const doc = document.implementation.createDocument(null, null, null);
+```
+
+Code after `if (!document) throw …` is guarded, because the throw stops it.
+
+edgefit reports a read of one of these globals by its bare name only when the read runs as the module loads. No function, instance field, `if` or `?:` branch, right side of `&&`, `||`, `??` or a logical assignment, loop body, `try` statement (with its `catch` and `finally`) or `switch` case sits around it. Such a read stops the module when it loads. A read in other code may run later or never, for example in a function that only a browser calls, or behind an environment check that edgefit cannot read. edgefit cannot tell, so it does not report the read. This can hide a real failure. A read after the file sets the global itself outside a function, as in `globalThis.document = {}`, is not reported either. See [Limitations](/guide/limitations).
+
+A read through the global object, such as `globalThis.document.title`, is a finding in any code, also in a function or a branch, when no check protects it. A check through the global object protects a later bare read: after `if (!globalThis.document) throw …`, the read `document.title` is guarded.
 
 ### Code a package ships and the target does not run
 

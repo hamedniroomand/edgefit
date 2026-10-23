@@ -3,6 +3,7 @@ import type { NodeOf } from '@/extract/ast.ts';
 import { staticKey, strip } from '@/extract/ast.ts';
 import { resolveBinding, wholeExport } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
+import { insideFunction } from '@/extract/load-time.ts';
 import { globalAliases, globalRef, isGlobalRoot, normalizeRef } from '@/extract/refs.ts';
 import { isTracked, lookup } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
@@ -142,6 +143,14 @@ export const visitAssignment: Visitor<NodeOf<'AssignmentExpression'>> = (node, c
     context.collector.guards.within([{ kind: 'polyfill', ref: polyfill }], () => {
       context.visit(node.right);
     });
+  }
+  if (target.type === 'MemberExpression' && isGlobalObjectName(target.object, context)) {
+    const written = staticKey(target.property, target.computed);
+    // A write in a branch or a `try` may run, and then the read after it may find the global. A
+    // write in a function may never run, and edgefit reports only a read that certainly fails.
+    if (written !== undefined && !insideFunction(context.collector.stack)) {
+      context.collector.written.add(written);
+    }
   }
 };
 

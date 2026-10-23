@@ -36,6 +36,12 @@ export interface LookupResult {
   category?: Category;
   /** The API is missing on the target, so a check for it fails. False for one that exists and throws. */
   absent?: true;
+  /**
+   * A finding only when the code reads the plain name, such as `document`, as the module loads.
+   * Any other read of the plain name may sit behind a check that edgefit cannot read. A read
+   * through `globalThis` is a finding wherever it is.
+   */
+  loadOnly?: 'bare';
   /** The options that make a call fail. A call that passes none of them is not a finding. */
   options?: readonly OptionMatch[];
   /** A change to a setting that makes the result go away. The caller adds the target. */

@@ -24,6 +24,8 @@ interface OverrideEntry {
    * Only with status `unsupported`: a mocked or mismatched API exists.
    */
   absent?: true;
+  /** A finding only for a read of the plain name that runs as the module loads, see `LookupResult.loadOnly`. Only with `absent`. */
+  loadOnly?: 'bare';
   /** The options that make a call fail. Only with status `mismatch`. */
   options?: OptionMatch[];
 }
@@ -98,6 +100,46 @@ function optionsOf(file: string, key: string, entry: OverrideEntry): OptionMatch
   return options as OptionMatch[];
 }
 
+/** The hand-written `loadOnly` of an entry, after a check of its value and its status. */
+function loadOnlyOf(file: string, key: string, entry: OverrideEntry): 'bare' | undefined {
+  const loadOnly: unknown = entry.loadOnly;
+  if (loadOnly === undefined) {
+    return undefined;
+  }
+  if (loadOnly !== 'bare' || entry.absent !== true || entry.status !== 'unsupported') {
+    throw new Error(
+      `${file}: the loadOnly of ${key} must be "bare", and only with the status unsupported and absent.`,
+    );
+  }
+  return loadOnly;
+}
+
+type Origin = { target: TargetKey; name: string; version: string; url: string };
+
+/** The entry of the compatibility data for one hand-written override. */
+function entryOf(
+  { target, name, version, url }: Origin,
+  module: string,
+  path: string[],
+  entry: OverrideEntry,
+  status: CompatEntry['status'],
+): CompatEntry {
+  const key = [module, ...path].join('.');
+  const options = optionsOf(`overrides/${target}.json`, key, entry);
+  const loadOnly = loadOnlyOf(`overrides/${target}.json`, key, entry);
+  return {
+    target,
+    module,
+    path,
+    status,
+    ...(status === 'supported' ? {} : { note: entry.note }),
+    ...(status === 'unsupported' && entry.absent === true ? { absent: true as const } : {}),
+    ...(loadOnly === undefined ? {} : { loadOnly }),
+    ...(status === 'mismatch' && options !== undefined ? { options } : {}),
+    source: { provider: name, version, url: new URL(entry.source, `${url}/`).href },
+  };
+}
+
 /**
  * Curated results from `data/overrides/<target>.json` for APIs that exist but throw or
  * no-op when called, or that a platform build lacks although the matrix has them (`absent`).
@@ -112,24 +154,13 @@ export function overridesProvider(target: TargetKey): CompatProvider<CompatEntry
       const file = readDataFile<OverridesFile>(dataDirectory, `overrides/${target}.json`);
       const version = versions[target] ?? 'unknown';
 
+      const origin = { target, name, version, url };
       const toEntry = (
         module: string,
         path: string[],
         entry: OverrideEntry,
         status: CompatEntry['status'] = entry.status,
-      ): CompatEntry => {
-        const options = optionsOf(`overrides/${target}.json`, [module, ...path].join('.'), entry);
-        return {
-          target,
-          module,
-          path,
-          status,
-          ...(status === 'supported' ? {} : { note: entry.note }),
-          ...(status === 'unsupported' && entry.absent === true ? { absent: true as const } : {}),
-          ...(status === 'mismatch' && options !== undefined ? { options } : {}),
-          source: { provider: name, version, url: new URL(entry.source, `${url}/`).href },
-        };
-      };
+      ): CompatEntry => entryOf(origin, module, path, entry, status);
       const moduleEntries = Object.entries(file.modules).flatMap(([module, entry]) =>
         (entry.except ?? [])
           .map(member => toEntry(module, [member], entry, 'supported'))

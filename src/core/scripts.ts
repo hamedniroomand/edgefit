@@ -31,6 +31,8 @@ export interface ScanOptions {
   byExport?: boolean;
   /** The options that the data names as a path, such as `auth.lock`. A file lists each one that it sets. */
   optionPaths?: readonly string[];
+  /** The tracked globals that only a read at load fails. A check of one by its plain name throws there. */
+  loadOnlyGlobals?: ReadonlySet<string>;
 }
 
 // esbuild's metafile also lists JSON and asset inputs, which hold no code.
@@ -101,6 +103,7 @@ function extractOne(
     importedStrings,
     importedChecks,
     optionPaths: options.optionPaths,
+    loadOnlyGlobals: options.loadOnlyGlobals,
   });
 }
 

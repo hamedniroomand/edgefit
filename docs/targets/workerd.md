@@ -63,7 +63,7 @@ A module that is not native at your date and flags is reported as `mocked`, beca
 
 An entry with the status `mismatch` can name the options that make a call fail. Then only a call that passes one of them is a finding, and an option that fails only from a compatibility date follows your date and flags.
 
-The overrides also say that the globals `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing, so code behind a check such as `typeof window !== 'undefined'` is guarded. A call, a construction or a member of one of these globals through the global object, such as `globalThis.document.title`, is a finding when no check protects it.
+The overrides also say that the globals `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing, so code behind a check such as `typeof window !== 'undefined'` is guarded. A call, a construction or a member of one of these globals through the global object, such as `globalThis.document.title`, is a finding when no check protects it. A read of one of them by its bare name, such as `document.title`, is a finding only when it runs as the module loads, see [Browser globals by their bare name](/guide/findings#browser-globals-by-their-bare-name).
 
 The matrix does not list `node:cluster`, `domain`, `inspector`, `punycode`, `repl`, `tty`, `v8`, `vm`, `wasi` and `worker_threads`. The overrides record that each of them loads with `nodejs_compat` at compatibility date 2026-09-29, so an import of one gives no finding at a date from which the module is native (see the gates above). Their members are not measured, so a use of a member is an `unknown` warning, unless an `apis` entry covers it.
 

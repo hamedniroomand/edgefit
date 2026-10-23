@@ -378,6 +378,10 @@
       "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run."
     },
     {
+      "name": "@azure/storage-blob",
+      "notes": "On Workers, @azure/core-xml loads its browser build, which needs document, DOMParser, Node and XMLSerializer as it loads, and workerd has none of them; use the Blob REST API with fetch on Workers."
+    },
+    {
       "name": "mssql",
       "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either. Tedious calls an @azure/identity credential only after a SQL Server accepts the login, so a run without one cannot reach the child_process calls. The UDP lookup for a named instance does not throw on workerd, and the connection times out."
     },

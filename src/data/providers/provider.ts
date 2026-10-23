@@ -19,6 +19,8 @@ export interface CompatEntry {
   category?: Category;
   /** The API does not exist on the target, so a use that checks for it first is not a finding. */
   absent?: true;
+  /** A finding only for a read that runs as the module loads, see `LookupResult.loadOnly`. */
+  loadOnly?: 'bare';
   /** The options that make a call fail. A call that passes none of them is not a finding. */
   options?: readonly OptionMatch[];
   /** Applies to this API alone. What is below it is not described, so a member stays uncovered. */

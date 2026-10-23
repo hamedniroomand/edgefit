@@ -8,6 +8,8 @@ export interface OverrideEntry {
   missingHarmless?: true;
   /** The API does not exist on the target. Only with status `unsupported`. */
   absent?: true;
+  /** A finding only when the code reads the plain name, such as `document`, as the module loads. Only with `absent`. */
+  loadOnly?: 'bare';
   /** The options that make a call fail. Only with status `mismatch`. */
   options?: (
     | string

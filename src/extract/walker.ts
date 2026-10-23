@@ -7,12 +7,12 @@ import {
   callPassedKeys,
   computedKey,
   followChain,
+  isCheck,
+  isCheckedRead,
   isCheckedOperand,
-  isOptionalRead,
   isPresentRead,
   isReturned,
   isSafeRead,
-  isTestedChain,
 } from './chain.ts';
 import type { VisitContext } from './context.ts';
 import {
@@ -20,9 +20,10 @@ import {
   escapes,
   extendedReason,
   findParameterReads,
-  isFeatureCheck,
   isAwaitedCall,
   normalizeRef,
+  isBareGlobal,
+  isTypeofName,
   isGlobalRoot,
   memberRef,
   isOnlyTested,
@@ -35,14 +36,6 @@ import { addPassedKeys } from './usage-collector.ts';
 import type { UsageCollector } from './usage-collector.ts';
 import { visitorFor } from './visitors/index.ts';
 import { visitPattern } from './visitors/patterns.ts';
-
-/** A read that only tests for the API, so it is not a use. */
-function isCheck(node: Node, parent: Node | undefined, outer: readonly Node[]): boolean {
-  return (
-    (parent !== undefined && (isFeatureCheck(node, parent) || isTestedChain(parent, outer))) ||
-    isOptionalRead(node, parent, outer)
-  );
-}
 
 const apiGuard = (ref: ApiRef) =>
   ({ kind: 'api', ref: normalizeRef(ref), root: undefined, active: true }) as const;
@@ -82,6 +75,7 @@ export class Walker implements VisitContext {
   ) {
     this.imported = imported;
     this.collector = collector;
+    collector.stack = this.#stack;
     this.globals = globals;
     this.nodeEnv = nodeEnv;
     this.typeOnlyImports = typeOnlyImports;
@@ -204,6 +198,26 @@ export class Walker implements VisitContext {
     }
   };
 
+  /** Whether the read is a check, which is no use. Every check but `typeof name` reads the global. */
+  readonly #isCheckRead = (
+    chain: Extract<ReturnType<typeof followChain>, { kind: 'static' }>,
+    offset: number,
+  ): boolean => {
+    const { node, parent, ref } = chain;
+    if (!isBareGlobal(ref) || !this.collector.loadOnlyGlobals.has(ref.path[0] ?? '')) {
+      return (
+        isCheck(node, parent, this.#outer(node)) ||
+        (parent !== undefined && this.#recordChecked(ref, chain.offset, node, parent))
+      );
+    }
+    const checked =
+      !isTypeofName(node, parent) && isCheckedRead(node, parent, this.#outer(node), this);
+    if (checked) {
+      this.collector.api({ ...ref, path: ref.path.slice(0, 1) }, offset);
+    }
+    return checked || isTypeofName(node, parent);
+  };
+
   /** The read of an operand of `||` or `??` checks for the API, and the value goes on: absence is handled, a throw is not. */
   readonly #recordChecked = (ref: ApiRef, offset: number, node: Node, parent: Node): boolean => {
     if (!isCheckedOperand(node, parent, this.#outer(node), this)) {
@@ -245,10 +259,7 @@ export class Walker implements VisitContext {
       return;
     }
     const { node, parent } = chain;
-    if (isGlobalRoot(chain.ref) || isCheck(node, parent, this.#outer(node))) {
-      return;
-    }
-    if (parent !== undefined && this.#recordChecked(chain.ref, chain.offset, node, parent)) {
+    if (isGlobalRoot(chain.ref) || this.#isCheckRead(chain, offset)) {
       return;
     }
     if (parent !== undefined && isMemberWrite(node, parent)) {
