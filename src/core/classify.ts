@@ -49,7 +49,7 @@ function isOptionMiss(usage: Usage, result: LookupResult): boolean {
 /**
  * Whether a usage says nothing about support: a call that only counts for options, or an API
  * that fails only for some options, so a call that passes none of them is not a proof. A read of a
- * plain global name that only counts at load says nothing when it does not run at load.
+ * global that only counts at load says nothing when it does not run at load.
  */
 export function dependsOnOptions(usage: Usage, target: Target): boolean {
   if (usage.api === undefined) {
@@ -60,13 +60,19 @@ export function dependsOnOptions(usage: Usage, target: Target): boolean {
 }
 
 /**
- * A read of a plain global name that the target lacks, in code that does not run as the module
- * loads, when the data says that only a read at load is a finding. Such a read often sits behind
- * an environment check that edgefit cannot read: the module loads, and the read runs only on a
- * runtime that has the global.
+ * A read of a global that the target lacks, when the data says that only a read of the plain name
+ * as the module loads is a finding. Such a read often sits behind an environment check that
+ * edgefit cannot read: the module loads, and the read runs only on a runtime that has the global.
+ * `loadOnly: 'bare'` limits a read of the plain name to a read at load. `loadOnly: true` also
+ * limits every other read, because a read through the global object gives `undefined` and does
+ * not throw.
  */
 function isLazyRead(usage: Usage, result: LookupResult): boolean {
-  return result.loadOnly === 'bare' && usage.bare === true && usage.atLoad !== true;
+  const { loadOnly } = result;
+  if (loadOnly === 'bare') {
+    return usage.bare === true && usage.atLoad !== true;
+  }
+  return loadOnly === true && !(usage.bare === true && usage.atLoad === true);
 }
 
 function classifyApi(usage: Usage, target: Target): Classification | undefined {

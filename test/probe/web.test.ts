@@ -1,7 +1,8 @@
-import { webMissingApis } from '@scripts/probe/web.mjs';
+import { domMissingApis, webMissingApis } from '@scripts/probe/web.mjs';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { findDataDirectory } from '@/data/data-directory.ts';
+import { domGlobalsProvider } from '@/data/providers/dom-globals.ts';
 import { runtimeCompatDataProvider } from '@/data/providers/runtime-compat-data.ts';
 
 const statement = (support: unknown): { __compat: { support: unknown } } => ({
@@ -54,6 +55,52 @@ describe('webMissingApis against the target data', () => {
         .sort();
       expect(missing.length).toBeGreaterThan(0);
       expect(webMissingApis(runtime)).toEqual(missing);
+    },
+  );
+});
+
+describe('domMissingApis', () => {
+  const dom = {
+    names: ['DOMParser', 'Location', 'alert', 'window'],
+    presentOn: { bun: ['alert'] },
+  };
+  const web = {
+    api: {
+      Location: statement({ bun: { version_added: false }, deno: { version_added: true } }),
+      window: statement({ bun: { version_added: null } }),
+    },
+  };
+
+  it('lists the names that the column of the runtime lacks, as lookups', () => {
+    expect(domMissingApis('bun', dom, web)).toEqual(['*globals*.DOMParser', '*globals*.window']);
+  });
+
+  it('leaves out a name that the Web API data decides for the runtime', () => {
+    expect(domMissingApis('deno', dom, web)).toEqual([
+      '*globals*.DOMParser',
+      '*globals*.alert',
+      '*globals*.window',
+    ]);
+  });
+});
+
+describe('domMissingApis against the target data', () => {
+  it.each(['workerd', 'bun', 'deno'] as const)(
+    'names the same APIs as the provider for %s, except the ones that Web API data decides',
+    runtime => {
+      const directory = findDataDirectory();
+      const decided = new Set(
+        runtimeCompatDataProvider(runtime)
+          .load(directory)
+          .filter(entry => entry.path.length === 1)
+          .map(entry => entry.path[0]),
+      );
+      const expected = domGlobalsProvider(runtime)
+        .load(directory)
+        .filter(entry => !decided.has(entry.path[0] ?? ''))
+        .map(entry => `*globals*.${entry.path[0]}`);
+      expect(expected.length).toBeGreaterThan(0);
+      expect(domMissingApis(runtime)).toEqual(expected);
     },
   );
 });

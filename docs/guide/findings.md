@@ -16,13 +16,13 @@ error    unsupported  node:fs.watch  (workerd)
        see https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node/internal/internal_fs_callback.ts
 ```
 
-| Line                              | What it tells you                                                                                   |
-| --------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `error unsupported node:fs.watch` | Level, category and the API                                                                         |
-| second line                       | What goes wrong on this target                                                                      |
-| `chokidar@4.0.1 …:5:13`           | The package that owns the code, and the first place it uses the API. `your code` for your own files |
-| `via …`                           | The import chain from your entry point                                                              |
-| `see …`                           | The runtime source the result was read from, for curated entries                                    |
+| Line                              | What it tells you                                                                                             |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `error unsupported node:fs.watch` | Level, category and the API                                                                                   |
+| second line                       | What goes wrong on this target                                                                                |
+| `chokidar@4.0.1 …:5:13`           | The package that owns the code, and the first place it uses the API. `your code` for your own files           |
+| `via …`                           | The import chain from your entry point                                                                        |
+| `see …`                           | The source of the result: the runtime source for a curated entry, the TypeScript declaration for a DOM global |
 
 When a package uses the same API in several places, the report shows the first one and adds `(+3 more)`. The JSON report lists them all under `otherLocations`.
 
@@ -307,11 +307,11 @@ if (!global.crypto) {
 }
 ```
 
-The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding. For a global that the data lists as read at load, such as `document`, only `typeof X` is a check of the bare name, see [Browser globals by their bare name](#browser-globals-by-their-bare-name). The global object can also be a `const` that holds it, as in `const g = globalThis; if (!g.FileList) { … }`. See [Runtime checks](#runtime-checks) for the names that count.
+The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding. For a global that the data lists as read at load, such as `document` or `DOMParser`, only `typeof X` is a check of the bare name, see [Browser globals by their bare name](#browser-globals-by-their-bare-name). The global object can also be a `const` that holds it, as in `const g = globalThis; if (!g.FileList) { … }`. See [Runtime checks](#runtime-checks) for the names that count.
 
 `undefined` and `NaN` exist on every target, but a value test can see them as missing. `undefined` looks missing to each value test, also to `=== undefined` and `typeof … === 'undefined'`. `NaN` looks missing only to a truthiness test, such as `!globalThis.NaN` or `globalThis.NaN || x`. So the code that such a test runs is not guarded, see [Polyfills](#polyfills). `typeof globalThis.NaN`, `globalThis.NaN === undefined` and `globalThis.NaN ?? x` still decide the branch.
 
-The data of `workerd` says that `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing. The data of `netlify-edge` says that `document`, `HTMLAnchorElement` and `Bun` are missing. So code behind `typeof window !== 'undefined'` is guarded on Workers. Netlify Edge Functions have a `window` global, so there the check decides nothing.
+A check such as `typeof window !== 'undefined'` guards the code behind it on a target where the global is missing. The data says that `window`, `document` and the other DOM globals are missing on every target, except the names that a target has, see [DOM globals](/targets/#dom-globals). `Bun` is missing on every target except Bun, and `Deno` is missing on every target except Deno, Deno Deploy and Netlify Edge Functions. Netlify Edge Functions have a `window` global, so there a check of `typeof window` decides nothing.
 
 A global that the target lacks is `undefined` on the global object. So these uses of `globalThis.X`, `self.X` or `global.X` do not fail, and they are guarded on a target that lacks `X`:
 
@@ -344,7 +344,7 @@ Every other use is a finding when no check protects it. Examples are a call, `ne
 
 ### Browser globals by their bare name
 
-A name that no scope declares throws a `ReferenceError` where the global is missing, whatever the code does with it. Only `typeof document` is safe. edgefit follows this rule for the globals that the data lists as read at load: `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` on Workers, and `document`, `HTMLAnchorElement` and `Bun` on Netlify Edge Functions. For them, `!document`, `if (document)`, `document && x`, `document ?? x`, `document == null` and `document?.x` are not checks. Each one reads the name, and the read is a use of it.
+A name that no scope declares throws a `ReferenceError` where the global is missing, whatever the code does with it. Only `typeof document` is safe. edgefit follows this rule for two groups of globals. The first group is the globals that the overrides name as missing: `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` on Workers, and `document`, `HTMLAnchorElement` and `Bun` on Netlify Edge Functions. The second group is each DOM global that the target lacks, such as `DOMParser`, `Node` and `XMLSerializer`, see [DOM globals](/targets/#dom-globals). For these globals, `!document`, `if (document)`, `document && x`, `document ?? x`, `document == null` and `document?.x` are not checks. Each one reads the name, and the read is a use of it.
 
 Each of these two modules fails on Workers:
 
@@ -360,7 +360,7 @@ Code after `if (!document) throw …` is guarded, because the throw stops it.
 
 edgefit reports a read of one of these globals by its bare name only when the read runs as the module loads. No function, instance field, `if` or `?:` branch, right side of `&&`, `||`, `??` or a logical assignment, loop body, `try` statement (with its `catch` and `finally`) or `switch` case sits around it. Such a read stops the module when it loads. A read in other code may run later or never, for example in a function that only a browser calls, or behind an environment check that edgefit cannot read. edgefit cannot tell, so it does not report the read. This can hide a real failure. A read after the file sets the global itself outside a function, as in `globalThis.document = {}`, is not reported either. See [Limitations](/guide/limitations).
 
-A read through the global object, such as `globalThis.document.title`, is a finding in any code, also in a function or a branch, when no check protects it. A check through the global object protects a later bare read: after `if (!globalThis.document) throw …`, the read `document.title` is guarded.
+For a global that the overrides name, a read through the global object, such as `globalThis.document.title`, is a finding in any code, also in a function or a branch, when no check protects it. For another DOM global, such as `DOMParser`, edgefit does not report a read through the global object, because a read of a missing global gives `undefined` and does not throw a `ReferenceError`. A member of it, as in `new globalThis.DOMParser()`, throws a `TypeError`, and edgefit does not report that either. A check through the global object protects a later bare read: after `if (!globalThis.document) throw …`, the read `document.title` is guarded.
 
 ### Code a package ships and the target does not run
 

@@ -7,7 +7,7 @@ import { compareOutcomes, proposeOverrides } from './compare.mjs';
 import { pinnedVersion, readMatrix, readOverrides } from './data.mjs';
 import { summarizeDisagreements } from './disagreements.mjs';
 import { driftFor } from './drift.mjs';
-import { webMissingApis } from './web.mjs';
+import { domMissingApis, webMissingApis } from './web.mjs';
 
 const [runtime, channel, resultsFile, probesDirectory] = process.argv.slice(2);
 const { version, outcomes, mocked } = JSON.parse(readFileSync(resultsFile, 'utf8'));
@@ -61,6 +61,7 @@ if (channel === 'latest') {
     overrides,
     readMatrix(runtime),
     new Set(webMissingApis(runtime)),
+    new Set(domMissingApis(runtime)),
   );
   lines = [heading, '', ...intro, ...summarizeDisagreements(disagreements, outcomes), ...proposed];
 }

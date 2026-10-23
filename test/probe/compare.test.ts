@@ -84,6 +84,19 @@ describe('compareOutcomes against the matrix', () => {
     ]);
   });
 
+  it('names dom-globals for a DOM global that the runtime now has', () => {
+    const domMissing = new Set(['*globals*.DOMParser']);
+    expect(
+      compareOutcomes({ '*globals*.DOMParser': 'present' }, {}, {}, new Set(), domMissing),
+    ).toEqual([
+      {
+        api: '*globals*.DOMParser',
+        message: 'dom-globals says `missing`, probe says `present`',
+        dataSaysPresent: false,
+      },
+    ]);
+  });
+
   it('ignores a denied API that exists', () => {
     expect(
       compareOutcomes(

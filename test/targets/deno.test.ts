@@ -92,7 +92,8 @@ describe('deno target info', () => {
     expect(info.data).toBe(
       'workers-nodejs-compat-matrix@ee58120 (deno 2.9.7), curated overrides from ' +
         'https://github.com/denoland/deno/tree/v2.9.7/ext/node/polyfills, ' +
-        'Web APIs from runtime-compat-data@b964f92 (npm 0.0.5)',
+        'Web APIs from runtime-compat-data@b964f92 (npm 0.0.5), ' +
+        'DOM globals from dom-globals (typescript 5.9.3)',
     );
     expect(info.conditions).toEqual(['deno', 'node']);
     expect(info.settings).toBe('Deno 2.9.7, import map from deno.jsonc');

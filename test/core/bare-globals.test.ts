@@ -17,7 +17,7 @@ async function reported(entry: string, target: TargetKey): Promise<[string[], st
   ];
 }
 
-const withData = ['workerd', 'netlify-edge'] as const;
+const withData = ['workerd', 'bun', 'deno', 'netlify-edge', 'vercel-edge'] as const;
 
 describe('a read of a browser global by its bare name that runs as the module loads', () => {
   it.each(withData)('is a finding on %s', async target => {
@@ -30,26 +30,16 @@ describe('a read of a browser global by its bare name that runs as the module lo
     expect(findings).toEqual(['document']);
   });
 
-  it.each(['workerd', 'netlify-edge'] as const)(
-    'is guarded on %s behind a typeof guard clause',
-    async target => {
-      const [findings, guarded] = await reported('guard-clause.mjs', target);
-      expect(findings).toEqual([]);
-      expect(guarded).toEqual(['document.title']);
-    },
-  );
+  it.each(withData)('is guarded on %s behind a typeof guard clause', async target => {
+    const [findings, guarded] = await reported('guard-clause.mjs', target);
+    expect(findings).toEqual([]);
+    expect(guarded).toEqual(['document.title']);
+  });
 
   it('is a finding for Bun on workerd, where Bun is missing', async () => {
     const [findings] = await reported('bun-read.mjs', 'workerd');
     expect(findings).toEqual(['Bun']);
     expect((await reported('bun-read.mjs', 'bun'))[0]).toEqual([]);
-  });
-
-  it('is no finding on a target whose data does not list the global as missing', async () => {
-    const results = await Promise.all(
-      (['bun', 'deno'] as const).map(async target => (await reported('load.mjs', target))[0]),
-    );
-    expect(results).toEqual([[], []]);
   });
 });
 
@@ -95,5 +85,45 @@ describe('a read of a browser global that does not run as the module loads', () 
   it('is a finding through the global object, wherever it is', async () => {
     const [findings] = await reported('global-this.mjs', 'workerd');
     expect(findings).toEqual(['document.title']);
+  });
+});
+
+describe('a read of a DOM global by its bare name', () => {
+  it.each([
+    ['workerd', ['DOMParser', 'localStorage.getItem']],
+    ['vercel-edge', ['DOMParser', 'localStorage.getItem']],
+    ['deno', ['DOMParser']],
+    ['bun', ['DOMParser', 'localStorage.getItem']],
+  ] as const)('at load is a finding on %s only for a global it lacks', async (target, expected) => {
+    const [findings] = await reported('dom-load.mjs', target);
+    expect(findings).toEqual(expected);
+  });
+
+  it.each(withData)('in a function or behind a typeof check is no finding on %s', async target => {
+    const [findings, guarded] = await reported('dom-lazy.mjs', target);
+    expect(findings).toEqual([]);
+    expect(guarded).toEqual([]);
+  });
+
+  it.each(withData)('through the global object is no finding on %s', async target => {
+    const [findings] = await reported('dom-global-object.mjs', target);
+    expect(findings).toEqual([]);
+  });
+
+  it('names the missing global when the code reads a member of it', async () => {
+    const { reports } = await check({
+      root: fixture('bare-globals-app'),
+      config: { targets: ['bun'], entry: 'dom-member.mjs' },
+    });
+    expect(reports[0]?.findings.map(finding => finding.message)).toEqual([
+      'window.scroll needs the window global, which the target does not have, so a read of it throws a ReferenceError',
+    ]);
+  });
+
+  it('guards the code after a check of a missing global, whatever the code reads', async () => {
+    const [findings, guarded] = await reported('audio-guard.mjs', 'workerd');
+    expect(findings).toEqual([]);
+    expect(guarded).toEqual(['URL.createObjectURL']);
+    expect((await reported('audio-guard.mjs', 'bun'))[1]).toEqual([]);
   });
 });

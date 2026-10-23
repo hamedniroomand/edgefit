@@ -19,12 +19,13 @@ Every result comes from data that is pinned to these releases. `edgefit targets`
 | `netlify-edge` | Deno 2.3.1          | Measured on Netlify by the production witness, with a layer for blocked subprocesses and file writes outside `/tmp`                                      |
 | `vercel-edge`  | Docs of 2026-08-03  | Experimental: Vercel's documented allowlist, not a runtime dump. Members from `next` 16.3.8 and `@vercel/node` 17.0.0. Emulator `@edge-runtime/vm` 5.0.0 |
 
-| Data                      | Version                                                                |
-| ------------------------- | ---------------------------------------------------------------------- |
-| Node API baseline         | Node 20.20.2, 22.22.2 and 24.15.0, merged                              |
-| Node compatibility matrix | workers-nodejs-compat-matrix at `ee58120`, runtime dumps of 2026-09-29 |
-| Curated overrides         | Read from each runtime's source at the versions above                  |
-| Web API data              | runtime-compat-data 0.0.5, published March 2024                        |
+| Data                      | Version                                                                                                                                                     |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node API baseline         | Node 20.20.2, 22.22.2 and 24.15.0, merged                                                                                                                   |
+| Node compatibility matrix | workers-nodejs-compat-matrix at `ee58120`, runtime dumps of 2026-09-29                                                                                      |
+| Curated overrides         | Read from each runtime's source at the versions above                                                                                                       |
+| Web API data              | runtime-compat-data 0.0.5, published March 2024                                                                                                             |
+| DOM globals               | TypeScript 5.9.3 `lib.dom` without `lib.webworker`; probed on workerd, Bun and Deno at the versions above, and read from the production witness for Netlify |
 
 The runtime dumps were made on Linux without a terminal, the way the matrix provider makes them.
 
