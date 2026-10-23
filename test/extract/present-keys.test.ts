@@ -55,7 +55,7 @@ describe('a key that no `in` test proved present', () => {
   it('stays unknown when an inner function declares the name again', () => {
     const code = jsdom('([name]) => name in global').replace(
       'window[name] = global[name];',
-      'window.f = function (name) {\n      return global[name]();\n    };',
+      'window.f = function (name) {\n      void global[name];\n    };',
     );
     expect(usages(code)).toContain(unknown);
   });
