@@ -24,11 +24,38 @@ const droppedPlaces: [string, Place][] = [
   ['the right side of `||`', value => `export function f(n) { n || ${value}; }`],
   ['a branch of `?:`', value => `export function f(n) { n ? ${value} : g(); }`],
   ['the body of an `if`', value => `export function f(n) { if (n) ${value}; }`],
+  ['the operand of `void`', value => `export function f() { void ${value}; }`],
+  ['a `void` that is returned', value => `export function f() { return void ${value}; }`],
+  ['the init of a `for`', value => `export function f() { for (${value}; ; ) break; }`],
+  ['the update of a `for`', value => `export function f() { for (; ; ${value}) break; }`],
   [
     'a branch inside the right side of `&&`',
     value => `export function f(n, m) { n && (m ? ${value} : g()); }`,
   ],
 ];
+
+/** A place where the chain is the right side of an `&&` whose value goes into a check. */
+const testedPlaces: [string, Place][] = [
+  ['the test of an `if`', value => `export function f(n) { if (n && ${value}) h(); }`],
+  [
+    'the test of an `if` with two `&&`',
+    value => `export function f(n) { if (n && ${value} && g()) h(); }`,
+  ],
+  [
+    'the test of an `if` behind another `&&`',
+    value => `export function f(n, m) { if (n && (m && ${value})) h(); }`,
+  ],
+  [
+    'the left side of another `&&`',
+    value => `export function f(n) { return n && ${value} && g(); }`,
+  ],
+  ['the test of `?:`', value => `export function f(n) { return n && ${value} ? 1 : 2; }`],
+  ['the left side of `||`', value => `export function f(n, m) { return (n && ${value}) || m; }`],
+  ['a `typeof` operand', value => `export function f(n) { return typeof (n && ${value}); }`],
+  ['a `!` operand', value => `export function f(n) { return !(n && ${value}); }`],
+];
+
+const guardedPlaces = [...droppedPlaces, ...testedPlaces];
 
 /** A place where something reads the value of the chain. */
 const readPlaces: [string, Place][] = [
@@ -47,21 +74,43 @@ const readPlaces: [string, Place][] = [
     value => `export function f(n) { const v = n ? ${value} : 1; return v; }`,
   ],
   ['an item of a list in an argument', value => `export function f() { g((h(), ${value})); }`],
+  [
+    'the right side of `&&` that is assigned',
+    value => `export function f(n) { const v = n && ${value}; return v; }`,
+  ],
+  [
+    'the right side of `&&` that is passed to a call',
+    value => `export function f(n) { g(n && ${value}); }`,
+  ],
+  [
+    'the right side of `&&` with a nullish fallback',
+    value => `export function f(n) { return (n && ${value}) ?? null; }`,
+  ],
+  [
+    'the right side of `&&` that is the right side of `||`',
+    value => `export function f(n, m) { return m || (n && ${value}); }`,
+  ],
+  ['a `for` test', value => `export function f() { for (; ${value}; ) break; }`],
+  ['the right side of `||` in a test', value => `export function f(n) { if (n || ${value}) h(); }`],
+  [
+    'an awaited `&&` in a test',
+    value => `export async function f(n) { if (await (n && ${value})) h(); }`,
+  ],
 ];
 
-describe('a `?.` chain where nothing reads the value', () => {
-  it.each(droppedPlaces)('guards the use in %s', (_label, place) => {
+describe('a `?.` chain whose value does no harm', () => {
+  it.each(guardedPlaces)('guards the use in %s', (_label, place) => {
     expect(globalsOf(place(call), names)).toEqual(['Deno.core.print [has Deno]']);
   });
 
-  it.each(droppedPlaces)('guards the use in %s, as TypeScript writes it', (_label, place) => {
+  it.each(guardedPlaces)('guards the use in %s, as TypeScript writes it', (_label, place) => {
     expect(globalsOf(`var _a;\n${place(compiledCall)}`, names)).toEqual([
       'Deno.core.print [has Deno]',
     ]);
   });
 
   it.each(
-    droppedPlaces.flatMap(([label, place]) =>
+    guardedPlaces.flatMap(([label, place]) =>
       [false, true].map(minify => [label, minify, place] as const),
     ),
   )('guards the use in %s, as esbuild writes it, minify: %s', (_label, minify, place) => {

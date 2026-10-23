@@ -40,10 +40,11 @@ export function isStatementUse(node: Node, ancestors: readonly Node[]): boolean 
 }
 
 /**
- * Whether the value of `node` is dropped. That holds when `node` is a whole statement, or an item of
- * a comma list other than the last. It holds too for the last item of a comma list, the right side
- * of `&&`, `||` or `??`, and a branch of `?:`, when that expression is dropped as well. Parentheses,
- * type wrappers and `await` pass the value on. `ancestors` holds the parents of `node`, root first.
+ * Whether the value of `node` is dropped. That holds when `node` is a whole statement, an item of a
+ * comma list other than the last, the operand of `void`, or the `init` or the `update` of a `for`.
+ * It holds too for the last item of a comma list, the right side of `&&`, `||` or `??`, and a branch
+ * of `?:`, when that expression is dropped as well. Parentheses, type wrappers and `await` pass the
+ * value on. `ancestors` holds the parents of `node`, root first.
  */
 export function isDiscarded(node: Node, ancestors: readonly Node[]): boolean {
   let current = node;
@@ -51,9 +52,16 @@ export function isDiscarded(node: Node, ancestors: readonly Node[]): boolean {
     if (parent.type === 'ExpressionStatement') {
       return parent.expression === current;
     }
-    // The comma operator drops every value but the last.
-    if (parent.type === 'SequenceExpression' && parent.expressions.at(-1) !== current) {
+    // The comma operator drops every value but the last. `void` drops its operand. A `for` reads
+    // only its test.
+    if (
+      (parent.type === 'SequenceExpression' && parent.expressions.at(-1) !== current) ||
+      (parent.type === 'UnaryExpression' && parent.operator === 'void')
+    ) {
       return true;
+    }
+    if (parent.type === 'ForStatement') {
+      return parent.init === current || parent.update === current;
     }
     const passes =
       parent.type === 'SequenceExpression' ||

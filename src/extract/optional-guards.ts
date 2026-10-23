@@ -9,7 +9,7 @@ import { parens } from './lowered-tests.ts';
 import { isFeatureCheck } from './refs.ts';
 import { isDiscarded } from './statement-use.ts';
 
-/** The whole optional chain that holds a use, and what receives its value. */
+/** A value and what receives it. The value is the whole optional chain that holds a use, or an `&&` that holds the chain. */
 type Consumer = { value: Node; parent: Node; outer: readonly Node[] };
 
 /** A temp that a compiler writes, as in `(_a = x?.y)?.z`, holds the chain before it, so the chain goes on through it. */
@@ -91,11 +91,40 @@ function chainConsumer(
 const hasNullishOperand = (parent: Node): boolean =>
   parent.type === 'LogicalExpression' && (isNullish(parent.left) || isNullish(parent.right));
 
-/** Whether the value of the chain goes where `undefined` does no harm: a check, an operand of `||` or `??`, or a place where nothing reads the value. */
-const handlesAbsence = ({ value, parent, outer }: Consumer, context: BindingContext): boolean =>
-  isDiscarded(value, [...outer.toReversed(), parent]) ||
-  isFeatureCheck(value, parent) ||
-  (isCheckedOperand(value, parent, outer, context) && !hasNullishOperand(parent));
+/** The place that receives `value`, above the wrappers that pass it on, as in `(n && x)` or `x!`. */
+function throughWrappers(value: Node, outer: readonly Node[]): Consumer | undefined {
+  let current = value;
+  let index = 0;
+  for (let next = outer[0]; next !== undefined; next = outer[index]) {
+    if (next.type === 'AwaitExpression' || unwrap(next) !== current) {
+      return { value: current, parent: next, outer: outer.slice(index + 1) };
+    }
+    current = next;
+    index += 1;
+  }
+  return undefined;
+}
+
+/**
+ * Whether the value of the chain goes where `undefined` does no harm: a check, an operand of `||` or `??`, or a place where nothing reads the value.
+ * The value of `n && X` is `X` or a falsy `n`, so `X` goes where the `&&` goes. A place that tests the
+ * `&&`, or that takes it as an operand of `||` or `??`, handles an absent `X` too.
+ */
+function handlesAbsence(consumer: Consumer, context: BindingContext): boolean {
+  const { value, parent, outer } = consumer;
+  if (
+    isDiscarded(value, [...outer.toReversed(), parent]) ||
+    isFeatureCheck(value, parent) ||
+    (isCheckedOperand(value, parent, outer, context) && !hasNullishOperand(parent))
+  ) {
+    return true;
+  }
+  if (parent.type !== 'LogicalExpression' || parent.operator !== '&&' || parent.right !== value) {
+    return false;
+  }
+  const next = throughWrappers(parent, outer);
+  return next !== undefined && handlesAbsence(next, context);
+}
 
 /**
  * A `?.` link right after a property of the global object stops the rest of its chain when the
