@@ -2,7 +2,7 @@
   "version": 2,
   "package": "express",
   "resolved": "5.3.0",
-  "checkedAt": "2026-10-22T23:52:25.471Z",
+  "checkedAt": "2026-10-23T00:05:07.783Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -75,7 +75,7 @@
       }
     }
   ],
-  "durationMs": 2621,
+  "durationMs": 3985,
   "verified": {
     "bun": {
       "outcome": "verified",

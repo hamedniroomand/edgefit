@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.8.0",
-  "checkedAt": "2026-10-22T23:57:09.445Z",
+  "checkedAt": "2026-10-23T00:11:38.659Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -801,7 +801,7 @@
     }
   ],
   "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement, and its ./import hook calls node:module.register, which Bun mocks; use @sentry/cloudflare or @sentry/bun.",
-  "durationMs": 322746,
+  "durationMs": 466418,
   "verified": {
     "workerd": {
       "outcome": "verified",

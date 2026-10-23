@@ -2,7 +2,7 @@
   "version": 2,
   "package": "date-fns",
   "resolved": "4.4.0",
-  "checkedAt": "2026-10-22T23:51:44.096Z",
+  "checkedAt": "2026-10-23T00:05:02.059Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15585,7 +15585,7 @@
       }
     }
   ],
-  "durationMs": 37853,
+  "durationMs": 68370,
   "verified": {
     "bun": {
       "outcome": "verified",

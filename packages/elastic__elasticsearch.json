@@ -1,0 +1,109 @@
+{
+  "version": 2,
+  "package": "@elastic/elasticsearch",
+  "resolved": "9.5.1",
+  "checkedAt": "2026-10-23T00:06:49.448Z",
+  "edgefit": "0.15.6",
+  "data": {
+    "node": "20.20.2, 22.22.2, 24.15.0",
+    "workerd": "1.20260929.1",
+    "bun": "1.4.2",
+    "deno": "2.9.7",
+    "unenv": "2.0.0-rc.24",
+    "deno-deploy": "2.5.0",
+    "netlify-edge": "2.3.1",
+    "vercel-edge": "2026-08-03",
+    "next": "16.3.8",
+    "@vercel/node": "17.0.0",
+    "npm": "0.0.5"
+  },
+  "targets": [
+    "workerd",
+    "bun",
+    "deno"
+  ],
+  "summary": {
+    "workerd": "fail",
+    "bun": "pass",
+    "deno": "pass"
+  },
+  "context": {
+    "workerd": {
+      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "notes": [
+        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+      ]
+    },
+    "bun": {
+      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), entries from --entry or the config, NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    },
+    "deno": {
+      "settings": "Deno 2.9.7, no import map (no deno.json found), entries from --entry or the config, NODE_ENV not fixed, so both branches of a check are followed",
+      "notes": []
+    }
+  },
+  "entries": [
+    {
+      "subpath": ".",
+      "specifier": "@elastic/elasticsearch",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 2,
+          "findings": [
+            {
+              "api": "node:http2.connect",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:tls.connect",
+              "category": "mismatch",
+              "level": "warning",
+              "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
+            },
+            {
+              "api": "node:worker_threads.markAsUncloneable",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            }
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    }
+  ],
+  "notes": "The client sends requests with undici, and workerd rejects the ALPNProtocols option of node:tls.connect that undici sets; call the Elasticsearch REST API with fetch on Workers.",
+  "durationMs": 9070,
+  "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.2"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
+    "workerd": {
+      "outcome": "confirmed",
+      "kind": "reach",
+      "runtime": "workerd 1.20260929.1",
+      "error": "ConnectionError: The options.ALPNProtocols option is not implemented, at Connection.request (bundle.mjs:31224:21)"
+    }
+  }
+}

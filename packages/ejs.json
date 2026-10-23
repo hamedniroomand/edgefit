@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ejs",
   "resolved": "7.0.2",
-  "checkedAt": "2026-10-22T23:54:02.813Z",
+  "checkedAt": "2026-10-23T00:05:41.992Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -66,7 +66,7 @@
       }
     }
   ],
-  "durationMs": 744,
+  "durationMs": 613,
   "verified": {
     "bun": {
       "outcome": "verified",
