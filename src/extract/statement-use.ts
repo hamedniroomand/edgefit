@@ -38,3 +38,32 @@ export function isStatementUse(node: Node, ancestors: readonly Node[]): boolean 
   // The root is a `Program`, which the loop stops at.
   return false;
 }
+
+/**
+ * Whether the value of `node` is dropped. That holds when `node` is a whole statement, or an item of
+ * a comma list other than the last. It holds too for the last item of a comma list, the right side
+ * of `&&`, `||` or `??`, and a branch of `?:`, when that expression is dropped as well. Parentheses,
+ * type wrappers and `await` pass the value on. `ancestors` holds the parents of `node`, root first.
+ */
+export function isDiscarded(node: Node, ancestors: readonly Node[]): boolean {
+  let current = node;
+  for (const parent of ancestors.toReversed()) {
+    if (parent.type === 'ExpressionStatement') {
+      return parent.expression === current;
+    }
+    // The comma operator drops every value but the last.
+    if (parent.type === 'SequenceExpression' && parent.expressions.at(-1) !== current) {
+      return true;
+    }
+    const passes =
+      parent.type === 'SequenceExpression' ||
+      (parent.type === 'LogicalExpression' && parent.right === current) ||
+      (parent.type === 'ConditionalExpression' && parent.test !== current) ||
+      unwrap(parent) === current;
+    if (!passes) {
+      return false;
+    }
+    current = parent;
+  }
+  return false;
+}
