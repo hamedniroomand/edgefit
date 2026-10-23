@@ -141,6 +141,10 @@
       "name": "cheerio"
     },
     {
+      "name": "puppeteer",
+      "notes": "puppeteer starts the browser as a child process, which workerd does not implement; use @cloudflare/puppeteer with Browser Run on Workers."
+    },
+    {
       "name": "marked"
     },
     {
