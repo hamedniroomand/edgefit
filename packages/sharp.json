@@ -2,7 +2,7 @@
   "version": 2,
   "package": "sharp",
   "resolved": "0.35.5",
-  "checkedAt": "2026-10-23T01:22:51.699Z",
+  "checkedAt": "2026-10-23T05:45:27.076Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15,6 +15,7 @@
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
+    "typescript": "5.9.3",
     "npm": "0.0.5"
   },
   "targets": [
@@ -93,7 +94,7 @@
     }
   ],
   "notes": "Native addon.",
-  "durationMs": 2717,
+  "durationMs": 2291,
   "verified": {
     "bun": {
       "outcome": "verified",

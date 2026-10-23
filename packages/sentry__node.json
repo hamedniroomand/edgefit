@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.8.0",
-  "checkedAt": "2026-10-23T01:28:47.333Z",
+  "checkedAt": "2026-10-23T05:49:53.260Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15,6 +15,7 @@
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
+    "typescript": "5.9.3",
     "npm": "0.0.5"
   },
   "targets": [
@@ -29,14 +30,7 @@
   },
   "worst": {
     "bun": {
-      "subpath": "./import",
-      "status": "fail"
-    }
-  },
-  "worstExport": {
-    "bun": {
-      "subpath": ".",
-      "name": "eveInstrumentation",
+      "subpath": "./vite",
       "status": "fail"
     }
   },
@@ -249,56 +243,6 @@
               "level": "warning",
               "detail": "is not covered by the compatibility data"
             }
-          ],
-          "exports": [
-            {
-              "name": "eveInstrumentation",
-              "level": "error",
-              "findings": [
-                {
-                  "api": "node:module.register",
-                  "category": "mocked",
-                  "level": "error",
-                  "detail": "does nothing; use Bun.plugin for loader hooks"
-                }
-              ]
-            },
-            {
-              "name": "init",
-              "level": "error",
-              "findings": [
-                {
-                  "api": "node:module.register",
-                  "category": "mocked",
-                  "level": "error",
-                  "detail": "does nothing; use Bun.plugin for loader hooks"
-                }
-              ]
-            },
-            {
-              "name": "initWithoutDefaultIntegrations",
-              "level": "error",
-              "findings": [
-                {
-                  "api": "node:module.register",
-                  "category": "mocked",
-                  "level": "error",
-                  "detail": "does nothing; use Bun.plugin for loader hooks"
-                }
-              ]
-            },
-            {
-              "name": "NodeClient",
-              "level": "error",
-              "findings": [
-                {
-                  "api": "node:module.register",
-                  "category": "mocked",
-                  "level": "error",
-                  "detail": "does nothing; use Bun.plugin for loader hooks"
-                }
-              ]
-            }
           ]
         },
         "deno": {
@@ -346,17 +290,9 @@
           ]
         },
         "bun": {
-          "status": "fail",
-          "errors": 1,
-          "warnings": 0,
-          "findings": [
-            {
-              "api": "node:module.register",
-              "category": "mocked",
-              "level": "error",
-              "detail": "does nothing; use Bun.plugin for loader hooks"
-            }
-          ]
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
         },
         "deno": {
           "status": "pass",
@@ -782,8 +718,8 @@
       }
     }
   ],
-  "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement, and its ./import hook calls node:module.register, which Bun mocks; use @sentry/cloudflare or @sentry/bun.",
-  "durationMs": 479936,
+  "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement; use @sentry/cloudflare or @sentry/bun.",
+  "durationMs": 337972,
   "verified": {
     "workerd": {
       "outcome": "verified",

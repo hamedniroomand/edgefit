@@ -2,7 +2,7 @@
   "version": 2,
   "package": "sqlite3",
   "resolved": "6.0.1",
-  "checkedAt": "2026-10-23T01:22:53.387Z",
+  "checkedAt": "2026-10-23T05:46:29.304Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15,6 +15,7 @@
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
+    "typescript": "5.9.3",
     "npm": "0.0.5"
   },
   "targets": [
@@ -75,7 +76,7 @@
     }
   ],
   "notes": "Native addon.",
-  "durationMs": 2057,
+  "durationMs": 2290,
   "verified": {
     "bun": {
       "outcome": "verified",

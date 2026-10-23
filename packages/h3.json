@@ -2,7 +2,7 @@
   "version": 2,
   "package": "h3",
   "resolved": "2.0.8",
-  "checkedAt": "2026-10-23T01:21:01.744Z",
+  "checkedAt": "2026-10-23T05:44:31.004Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15,6 +15,7 @@
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
+    "typescript": "5.9.3",
     "npm": "0.0.5"
   },
   "targets": [
@@ -320,7 +321,7 @@
       }
     }
   ],
-  "durationMs": 12876,
+  "durationMs": 13688,
   "verified": {
     "bun": {
       "outcome": "verified",

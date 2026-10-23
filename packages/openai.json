@@ -2,7 +2,7 @@
   "version": 2,
   "package": "openai",
   "resolved": "7.43.0",
-  "checkedAt": "2026-10-23T01:21:15.540Z",
+  "checkedAt": "2026-10-23T05:44:51.979Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15,6 +15,7 @@
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
+    "typescript": "5.9.3",
     "npm": "0.0.5"
   },
   "targets": [
@@ -843,7 +844,7 @@
       }
     }
   ],
-  "durationMs": 31054,
+  "durationMs": 34436,
   "verified": {
     "bun": {
       "outcome": "verified",

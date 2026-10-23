@@ -2,7 +2,7 @@
   "version": 2,
   "package": "posthog-node",
   "resolved": "5.57.0",
-  "checkedAt": "2026-10-23T01:22:10.197Z",
+  "checkedAt": "2026-10-23T05:46:13.636Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15,6 +15,7 @@
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
+    "typescript": "5.9.3",
     "npm": "0.0.5"
   },
   "targets": [
@@ -156,7 +157,7 @@
       }
     }
   ],
-  "durationMs": 4043,
+  "durationMs": 4239,
   "verified": {
     "bun": {
       "outcome": "verified",

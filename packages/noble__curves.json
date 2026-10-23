@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@noble/curves",
   "resolved": "2.4.0",
-  "checkedAt": "2026-10-23T01:22:05.506Z",
+  "checkedAt": "2026-10-23T05:47:41.253Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15,6 +15,7 @@
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
+    "typescript": "5.9.3",
     "npm": "0.0.5"
   },
   "targets": [
@@ -530,7 +531,7 @@
     }
   ],
   "notes": "The root entry throws on purpose and asks for an import of a submodule, so the row checks secp256k1, the most used one.",
-  "durationMs": 5270,
+  "durationMs": 9578,
   "verified": {
     "bun": {
       "outcome": "verified",

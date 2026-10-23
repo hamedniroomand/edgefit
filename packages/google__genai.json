@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@google/genai",
   "resolved": "2.31.0",
-  "checkedAt": "2026-10-23T01:23:35.490Z",
+  "checkedAt": "2026-10-23T05:46:09.389Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15,6 +15,7 @@
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
+    "typescript": "5.9.3",
     "npm": "0.0.5"
   },
   "targets": [
@@ -205,7 +206,7 @@
       }
     }
   ],
-  "durationMs": 20133,
+  "durationMs": 13488,
   "verified": {
     "bun": {
       "outcome": "verified",

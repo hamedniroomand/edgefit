@@ -2,7 +2,7 @@
   "version": 2,
   "package": "firebase",
   "resolved": "13.1.0",
-  "checkedAt": "2026-10-23T01:22:24.204Z",
+  "checkedAt": "2026-10-23T05:46:01.263Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15,6 +15,7 @@
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
+    "typescript": "5.9.3",
     "npm": "0.0.5"
   },
   "targets": [
@@ -31,7 +32,7 @@
   "worst": {
     "workerd": {
       "subpath": "./ai",
-      "status": "fail"
+      "status": "warn"
     },
     "bun": {
       "subpath": "./messaging/sw",
@@ -479,16 +480,10 @@
       "specifier": "firebase/ai",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 1,
+          "status": "warn",
+          "errors": 0,
           "warnings": 1,
           "findings": [
-            {
-              "api": "URL.createObjectURL",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "exists, but throws: not implemented"
-            },
             {
               "api": "createImageBitmap",
               "category": "web",
@@ -779,7 +774,7 @@
     }
   ],
   "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin.",
-  "durationMs": 52531,
+  "durationMs": 41824,
   "verified": {
     "bun": {
       "outcome": "verified",

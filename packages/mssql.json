@@ -2,7 +2,7 @@
   "version": 2,
   "package": "mssql",
   "resolved": "12.7.11",
-  "checkedAt": "2026-10-23T01:22:29.817Z",
+  "checkedAt": "2026-10-23T05:50:23.343Z",
   "edgefit": "0.15.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -15,6 +15,7 @@
     "vercel-edge": "2026-08-03",
     "next": "16.3.8",
     "@vercel/node": "17.0.0",
+    "typescript": "5.9.3",
     "npm": "0.0.5"
   },
   "targets": [
@@ -123,7 +124,7 @@
     }
   ],
   "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either. Tedious calls an @azure/identity credential only after a SQL Server accepts the login, so a run without one cannot reach the child_process calls. The UDP lookup for a named instance does not throw on workerd, and the connection times out.",
-  "durationMs": 8777,
+  "durationMs": 13173,
   "verified": {
     "bun": {
       "outcome": "verified",
