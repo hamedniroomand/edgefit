@@ -245,6 +245,8 @@ The minified form of a `typeof` check, such as `typeof Deno < "u"`, names a runt
 
 The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
 
+These checks also work through a `const` that holds the global object, as in `const g = globalThis; if (typeof g.Bun !== 'undefined') { … }`. The `const` can hold `globalThis`, `self`, `global`, another such `const`, or a conditional of them. A `let`, a `var`, a parameter, a name from another file and `window` are not read as the global object, so a check through them guards nothing. See [Limitations](/guide/limitations).
+
 ### Signal handlers
 
 edgefit assumes that no signal arrives on Workers, Netlify Edge Functions and Vercel Edge. So the code of a signal handler never runs there, and everything in it is guarded, an API that exists and throws included:
@@ -281,7 +283,7 @@ if (!global.crypto) {
 }
 ```
 
-The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding.
+The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding. The global object can also be a `const` that holds it, as in `const g = globalThis; if (!g.FileList) { … }`. See [Runtime checks](#runtime-checks) for the names that count.
 
 `undefined` and `NaN` exist on every target, but a value test can see them as missing. `undefined` looks missing to each value test, also to `=== undefined` and `typeof … === 'undefined'`. `NaN` looks missing only to a truthiness test, such as `!globalThis.NaN` or `globalThis.NaN || x`. So the code that such a test runs is not guarded, see [Polyfills](#polyfills). `typeof globalThis.NaN`, `globalThis.NaN === undefined` and `globalThis.NaN ?? x` still decide the branch.
 

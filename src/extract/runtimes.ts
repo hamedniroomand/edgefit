@@ -5,6 +5,7 @@ import type { Runtime } from '@/types.ts';
 import { isEquality, isInequality, staticKey, strip, stringLiteral } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
+import { heldCheck } from './checks.ts';
 import { globalAliases } from './refs.ts';
 import { isFactoryModule, isTracked, lookup } from './scope.ts';
 
@@ -61,8 +62,47 @@ export function globalName(node: Node, context: BindingContext, key?: string): s
     : undefined;
 }
 
-function isGlobalObject(node: Node, context: BindingContext): boolean {
-  return [...globalAliases].some(name => isUnbound(node, name, context));
+// ponytail: a chain of `const` names or conditionals longer than this is not followed, so the
+// name is not read as the global object. It also ends a loop of consts that name each other.
+const maxAliasDepth = 8;
+
+/**
+ * The global object: `globalThis`, `self` or `global` by its own name, or a `const` that holds it,
+ * as `g` does in `const g = globalThis`. A conditional counts when both of its results do. A `let`,
+ * a `var`, a parameter, a name from another file and `window` do not count, because another value
+ * may replace them, so a check through them must not hide any code.
+ */
+function isGlobalObject(node: Node, context: BindingContext, depth = 0): boolean {
+  const inner = strip(node);
+  if ([...globalAliases].some(name => isUnbound(inner, name, context))) {
+    return true;
+  }
+  if (depth >= maxAliasDepth) {
+    return false;
+  }
+  if (inner.type === 'ConditionalExpression') {
+    return (
+      isGlobalObject(inner.consequent, context, depth + 1) &&
+      isGlobalObject(inner.alternate, context, depth + 1)
+    );
+  }
+  const held = inner.type === 'Identifier' ? heldCheck(context.scope, inner.name) : undefined;
+  return (
+    held !== undefined &&
+    !held.call &&
+    held.region === undefined &&
+    isGlobalObject(
+      held.test,
+      {
+        imported: context.imported,
+        scope: held.scope,
+        globals: context.globals,
+        nodeEnv: context.nodeEnv,
+        wrappers: context.wrappers,
+      },
+      depth + 1,
+    )
+  );
 }
 
 /** The global `name`, or the same property of the global object, as in `globalThis.Deno`. */
