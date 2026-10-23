@@ -241,7 +241,11 @@ function resolveCall(node: NodeOf<'CallExpression'>, context: BindingContext): B
   return argument === undefined ? undefined : resolveBinding(argument, context);
 }
 
-/** Whether `node` is the global object under any of its names, even a name the target lacks. */
+/**
+ * Whether `node` is the global object under any of its names, even a name the target lacks. A check
+ * of the runtime reads the global object more strictly: see `isGlobalObject` in runtimes.ts, where
+ * `window` does not count.
+ */
 function isGlobalObject(node: Node, context: BindingContext): boolean {
   if (node.type === 'Identifier' && lookup(context.scope, node.name) === undefined) {
     return node.name === 'window' || globalAliases.has(node.name);
