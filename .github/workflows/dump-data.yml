@@ -13,7 +13,7 @@ on:
         description: workerd version, for example 1.20260929.1
         required: true
       bun:
-        description: Bun version, for example 1.4.2
+        description: Bun version, for example 1.4.4
         required: true
       deno:
         description: Deno version, for example 2.9.7

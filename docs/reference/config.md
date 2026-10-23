@@ -13,7 +13,7 @@ export default defineConfig({
   targets: ['workerd'],
   entry: 'src/index.ts',
   workerd: { compatibilityDate: '2026-04-01', compatibilityFlags: ['nodejs_compat'] },
-  bun: { version: '1.4.2' },
+  bun: { version: '1.4.4' },
   deno: { configFile: 'deno.json' },
   ignore: [{ package: 'chokidar', reason: 'dev server only' }],
   levels: { mocked: 'error', unknown: 'warning' },

@@ -19,7 +19,7 @@ export function runScript(command, args, directory) {
     : { run: result };
 }
 
-/** The version that `command --version` prints: `1.4.2`, or `deno 2.9.7 (stable, …)`. */
+/** The version that `command --version` prints: `1.4.4`, or `deno 2.9.7 (stable, …)`. */
 export function versionOf(command) {
   const run = spawnSync(command, ['--version'], { encoding: 'utf8' });
   const words = (run.stdout ?? '').split('\n')[0].trim().split(' ');

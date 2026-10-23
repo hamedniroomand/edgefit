@@ -74,7 +74,7 @@
       "apis": ["FileReader"],
       "target": "bun",
       "reason": "Runs only when `blob.arrayBuffer` is missing. Bun has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
-      "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.2/packages/bun-types/globals.d.ts#L1527"
+      "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.4/packages/bun-types/globals.d.ts#L1560"
     },
     {
       "package": "postal-mime",
@@ -92,7 +92,7 @@
       "apis": ["FileReader"],
       "target": "bun",
       "reason": "Runs only when `blob.arrayBuffer` is missing. Bun has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
-      "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.2/packages/bun-types/globals.d.ts#L1527"
+      "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.4/packages/bun-types/globals.d.ts#L1560"
     },
     {
       "package": "postal-mime",
@@ -110,7 +110,7 @@
       "apis": ["FileReader"],
       "target": "bun",
       "reason": "Runs only when `blob.arrayBuffer` is missing. Bun has `Blob.prototype.arrayBuffer`, so the function always returns before it reaches `FileReader`.",
-      "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.2/packages/bun-types/globals.d.ts#L1527"
+      "source": "https://github.com/oven-sh/bun/blob/bun-v1.4.4/packages/bun-types/globals.d.ts#L1560"
     },
     {
       "package": "nodemailer",

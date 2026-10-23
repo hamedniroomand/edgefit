@@ -114,7 +114,7 @@ The Node baseline (`baseline.json`) stays as it is. Only the runtimes change, an
 Run the **Dump data** workflow, which does this with the provider's own scripts at the commit in `source.json`:
 
 ```sh
-gh workflow run dump-data.yml -f workerd=1.20260929.1 -f bun=1.4.2 -f deno=2.9.7
+gh workflow run dump-data.yml -f workerd=1.20260929.1 -f bun=1.4.4 -f deno=2.9.7
 gh run download <run id> -n runtime-dumps -D /tmp/dumps
 ```
 

@@ -69,7 +69,7 @@ For a package that is not on the table, build the package, run `npx edgefit pack
 
 ## Status
 
-edgefit is a 0.x release and reads your code statically, so a clean run is not a guarantee: see the [limitations](https://edgefit.kitdev.space/guide/limitations). Its data is pinned to workerd 1.20260929.1, Bun 1.4.2 and Deno 2.9.7 and compared with the newest releases every week: see the [status page](https://edgefit.kitdev.space/guide/status).
+edgefit is a 0.x release and reads your code statically, so a clean run is not a guarantee: see the [limitations](https://edgefit.kitdev.space/guide/limitations). Its data is pinned to workerd 1.20260929.1, Bun 1.4.4 and Deno 2.9.7 and compared with the newest releases every week: see the [status page](https://edgefit.kitdev.space/guide/status).
 
 ## Documentation
 
