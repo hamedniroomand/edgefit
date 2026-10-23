@@ -2,6 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import { globalGuard, isNullish } from './api-guards.ts';
 import { chainTemps, strip, unwrap } from './ast.ts';
+import type { NodeOf } from './ast.ts';
 import type { BindingContext } from './bindings.ts';
 import { isCheckedOperand } from './checked-operands.ts';
 import type { GlobalGuard } from './guard-stack.ts';
@@ -12,14 +13,28 @@ import { isDiscarded } from './statement-use.ts';
 /** A value and what receives it. The value is the whole optional chain that holds a use, or an `&&` that holds the chain. */
 type Consumer = { value: Node; parent: Node; outer: readonly Node[] };
 
+/** A temp that a compiler writes for a chain and its value, as `_b` in `(_b = (_a = x)?.y())?.z`. */
+const holdsChain = (node: Node): boolean => {
+  const temp = parens(node);
+  return (
+    temp.type === 'AssignmentExpression' &&
+    chainTemps.has(temp) &&
+    parens(temp.right).type === 'ChainExpression'
+  );
+};
+
 /** A temp that a compiler writes, as in `(_a = x?.y)?.z`, holds the chain before it, so the chain goes on through it. */
-function throughTemp(object: Node): Node {
-  const temp = parens(object);
+function throughTemp(link: NodeOf<'MemberExpression'>): Node {
+  const temp = parens(link.object);
   if (temp.type !== 'AssignmentExpression' || !chainTemps.has(temp)) {
-    return object;
+    return link.object;
   }
   const value = parens(temp.right);
-  return value.type === 'ChainExpression' ? value.expression : value;
+  if (value.type !== 'ChainExpression') {
+    return value;
+  }
+  // The temp of `(x?.y).z` holds a whole chain, and the `.z` ends it.
+  return link.optional ? value.expression : link.object;
 }
 
 /**
@@ -28,7 +43,7 @@ function throughTemp(object: Node): Node {
  */
 function firstOptionalObject(node: Node): Node | undefined {
   let found: Node | undefined;
-  for (let link = node; link.type === 'MemberExpression'; link = throughTemp(link.object)) {
+  for (let link = node; link.type === 'MemberExpression'; link = throughTemp(link)) {
     if (link.optional) {
       found = link.object;
     }
@@ -54,13 +69,23 @@ function chainEnd(node: Node): Node | undefined {
 
 /** Whether `ancestor` is the next link of the chain: `.y` or `()` on `value`. */
 const isLink = (ancestor: Node, value: Node): boolean =>
-  (ancestor.type === 'MemberExpression' && ancestor.object === value) ||
-  (ancestor.type === 'CallExpression' && ancestor.callee === value);
+  ((ancestor.type === 'MemberExpression' && ancestor.object === value) ||
+    (ancestor.type === 'CallExpression' && ancestor.callee === value)) &&
+  (ancestor.optional || !holdsChain(value));
+
+/**
+ * A compiler writes a temp for the value of a chain that goes on behind a call, as in `x.y?.z()?.w`.
+ * The restored tree is `(_b = (_a = x.y)?.z())?.w`. The temp and the `ChainExpression` inside it are not
+ * wrappers of the source, so they do not end the chain.
+ */
+const isCompilerTemp = (node: Node | undefined): boolean =>
+  node?.type === 'AssignmentExpression' && chainTemps.has(node);
 
 /**
  * What receives the value of the chain that ends at `node`. The links of the chain come first. Then
  * come the wrappers that pass the value on: the `ChainExpression`, the parentheses and the temp
- * that a compiler writes. A link behind a wrapper is not part of the chain, as in `(a?.b).c`.
+ * that a compiler writes. A link behind a wrapper is not part of the chain, as in `(a?.b).c`. A
+ * temp that holds a chain is the exception for a `?.` link, as in `(_a = x?.y)?.z`.
  * `outer` holds the ancestors above `parent`.
  */
 function chainConsumer(
@@ -70,14 +95,17 @@ function chainConsumer(
 ): Consumer | undefined {
   const above = parent === undefined ? [] : [parent, ...outer];
   let value = node;
-  let inChain = unwrap(node) === undefined;
+  const inner = unwrap(node);
+  let inChain = inner === undefined || isCompilerTemp(inner);
   let index = 0;
   for (let next = above[0]; next !== undefined; next = above[index]) {
     const isWrapper = next.type !== 'AwaitExpression' && unwrap(next) === value;
     if (!(inChain && isLink(next, value)) && !isWrapper) {
       break;
     }
-    inChain = inChain && !isWrapper;
+    const inTemp =
+      isCompilerTemp(next) || isCompilerTemp(above[index + 1]) || isCompilerTemp(value);
+    inChain = inChain && (!isWrapper || inTemp);
     value = next;
     index += 1;
   }
