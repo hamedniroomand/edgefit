@@ -14,9 +14,10 @@ import type { ComputedKey } from './chain.ts';
 import { GuardStack } from './guard-stack.ts';
 import type { Guard, HeldGuards } from './guard-stack.ts';
 import { functionGuards } from './guarded-functions.ts';
+import { runsAtLoad } from './load-time.ts';
 import type { LocalFunction } from './local-functions.ts';
 import { omitMainFunctions } from './main-only.ts';
-import { isPromiseApi, normalizeRef } from './refs.ts';
+import { isBareGlobal, isPromiseApi, normalizeRef } from './refs.ts';
 
 /** Adds the keys of a call to its usage. A name imported once may be called more than once. */
 export function addPassedKeys(usage: Usage, keys: readonly PassedKey[]): void {
@@ -82,6 +83,12 @@ export class UsageCollector {
   public readonly importedChecks: ReadonlyMap<string, HeldGuards>;
   /** Imported local names that another module of the graph exports as a Node.js module. */
   public readonly importedModules: ReadonlyMap<string, ApiRef>;
+  /** The tracked globals that only a read at load fails. */
+  public readonly loadOnlyGlobals: ReadonlySet<string>;
+  /** The names that the file has set on the global object so far, such as `globalThis.document = {}`. */
+  public readonly written = new Set<string>();
+  /** The ancestors of the node that the walker visits, from the program down. The walker sets it. */
+  public stack: readonly Node[] = [];
   /** Specifiers that resolve to a native addon. */
   readonly #nativeSpecifiers: ReadonlyMap<string, string>;
   readonly #file: string;
@@ -93,12 +100,16 @@ export class UsageCollector {
     lazyNodeImports = false,
     nativeSpecifiers: ReadonlyMap<string, string> = new Map(),
     imported: Partial<
-      Pick<UsageCollector, 'importedModules' | 'importedStrings' | 'importedChecks'>
+      Pick<
+        UsageCollector,
+        'importedModules' | 'importedStrings' | 'importedChecks' | 'loadOnlyGlobals'
+      >
     > = {},
   ) {
     this.importedModules = imported.importedModules ?? new Map();
     this.importedStrings = imported.importedStrings ?? new Map();
     this.importedChecks = imported.importedChecks ?? new Map();
+    this.loadOnlyGlobals = imported.loadOnlyGlobals ?? new Set();
     this.#file = file;
     this.#nativeSpecifiers = nativeSpecifiers;
     this.lazyNodeImports = lazyNodeImports;
@@ -138,6 +149,10 @@ export class UsageCollector {
     // A rejected promise that nothing awaits is not an error of the `try`.
     const caught = this.guards.isCaught() && (awaited || !isPromiseApi(api));
     const afterLoad = api.path.length > 0 && this.guards.afterLoad(api);
+    const name = api.path[0] ?? '';
+    const loadOnly = api.module === '*globals*' && this.loadOnlyGlobals.has(name);
+    // A file that sets the global itself may have defined it before this read.
+    const atLoad = loadOnly && !this.written.has(name) && runsAtLoad(this.stack);
     const usage: Usage = {
       kind: 'api',
       api,
@@ -146,6 +161,8 @@ export class UsageCollector {
       ...(guarded ? { guarded: true as const } : {}),
       ...(caught ? { caught: true as const } : {}),
       ...(afterLoad ? { afterLoad: true as const } : {}),
+      ...(atLoad ? { atLoad: true as const } : {}),
+      ...(loadOnly && isBareGlobal(ref) ? { bare: true as const } : {}),
       ...this.#polyfill(),
       ...this.#runtimes(),
       ...this.#globals(),

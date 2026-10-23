@@ -1,7 +1,18 @@
 name: Unreached data
 
-# data/unreached.json says which code a package ships but a target never runs. It was read in
-# one release, so each week it is checked against the latest one.
+# data/unreached.json and data/stored-modules.json say which code a package ships but a target
+# never runs, and which modules a package file stores. They were read in one release each, so each
+# week they are checked against the latest one.
+#
+# When every file that the newest range of a package names, and every file that those entries list
+# in `guards`, has the same bytes in the latest release and in the last release of the range, the
+# check widens the range itself, and the last step opens one pull request with the change. When a
+# named file or a guard file changed or is missing, the check fails and a person reads the entry and
+# its files. See docs/contributing/maintenance.md.
+#
+# A pull request opened with GITHUB_TOKEN does not start other workflows, so CI would not run on
+# it. Set the RELEASE_PR_TOKEN secret (fine-grained token, contents and pull requests: write) to
+# get CI on the pull request; without it, close and reopen the pull request.
 on:
   workflow_dispatch:
   schedule:
@@ -14,6 +25,9 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -22,3 +36,26 @@ jobs:
         with:
           node-version: '24'
       - run: node scripts/unreached/check.mjs
+        env:
+          PR_BODY_FILE: ${{ runner.temp }}/unreached-pr-body.md
+      # The check writes the body file only when it widened a range. The check also fails when a
+      # package has a changed file, so this step runs after a failure too.
+      - id: widened
+        if: ${{ !cancelled() }}
+        env:
+          PR_BODY_FILE: ${{ runner.temp }}/unreached-pr-body.md
+        run: if [ -s "$PR_BODY_FILE" ]; then echo 'found=true' >> "$GITHUB_OUTPUT"; fi
+      # A run that widened no range skips this step, so it never closes a pull request that is open.
+      # It runs on the main branch of this repository only, and not on a pull request.
+      - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        if: ${{ !cancelled() && steps.widened.outputs.found == 'true' && github.repository_owner == 'hamedniroomand' && github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
+        with:
+          token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+          branch: fix/unreached-ranges
+          commit-message: 'fix(data): widen the unreached ranges to the latest releases'
+          title: 'fix(data): widen the unreached ranges to the latest releases'
+          body-path: ${{ runner.temp }}/unreached-pr-body.md
+          add-paths: |
+            data/unreached.json
+            data/stored-modules.json
+            .changeset/unreached-ranges-*.md

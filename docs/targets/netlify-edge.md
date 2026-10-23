@@ -16,11 +16,12 @@ Netlify Edge Functions run in a [Deno](https://docs.netlify.com/build/edge-funct
 
 - **Node API data** is the compatibility matrix's Deno dump, the same one the [`deno` target](/targets/deno) uses.
 - **Web API data** comes from the `netlify` column of runtime-compat-data instead of its `deno` column. The two differ on a few features, such as `Storage`.
+- **DOM globals** come from the `netlify` column of `data/dom-globals.json`, which is the list of these names in the production witness.
 - **Curated overrides** come from edgefit's [production witness](/contributing/data#production-witness), a function deployed on Netlify, because Netlify's documentation lists no blocked Node.js modules. The witness answer is committed in the repository, and each entry links it.
   - `child_process` is an error: Netlify does not grant run access, so starting a subprocess throws `NotCapable`.
   - The `fs` write APIs (`writeFile`, `mkdir`, `rm`, `rename` and the others, also in `fs/promises`) are errors: Netlify grants write access to `/tmp` only, and a write anywhere else throws `NotCapable`. A write to `/tmp` works, but edgefit cannot see the path, so it reports the call. Dismiss the finding if your code writes to `/tmp`. A write through a file descriptor, `fs.open` with a write flag and then `fs.write`, is not reported, because edgefit cannot see the flag.
   - About 120 APIs that Deno 2.3.1 has and later Deno releases removed, such as `util.isString`, are supported.
-  - The globals `document`, `HTMLAnchorElement` and `Bun` are missing, so code behind a check of them is guarded. Netlify has a `window` global, so a check of `typeof window` decides nothing here.
+  - The globals `document`, `HTMLAnchorElement` and `Bun` are missing. The [DOM globals](/targets/#dom-globals) list adds the DOM globals that the witness does not list, such as `DOMParser`. Code behind a check of a missing global is guarded. Netlify has a `window` global, so a check of `typeof window` decides nothing here. A read of one of them by its bare name is a finding only when it runs as the module loads, see [Browser globals by their bare name](/guide/findings#browser-globals-by-their-bare-name).
 - Netlify's [limits page](https://docs.netlify.com/build/edge-functions/limits) covers bundle size, memory and CPU time, which edgefit does not check.
 
 ## The Deno version
@@ -49,7 +50,7 @@ Netlify reads its import map from a separate file that `netlify.toml` names, and
 
 ```toml
 [functions]
-  deno_import_map = "./import_map.json"
+deno_import_map = "./import_map.json"
 ```
 
 edgefit applies that file to your own code, so this target ignores `deno.json` and the `deno` config option.

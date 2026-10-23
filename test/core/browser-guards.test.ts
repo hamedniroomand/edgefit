@@ -82,7 +82,7 @@ describe('a read of a global that workerd lacks, through the global object', () 
     expect(apis(report?.findings)).toEqual(['document']);
   });
 
-  it('does not report a bare browser global yet, a known gap', async () => {
+  it('does not report a bare browser global that is read in a function', async () => {
     const report = await run('bare-reads.mjs');
     expect(apis(report?.findings)).toEqual([]);
   });

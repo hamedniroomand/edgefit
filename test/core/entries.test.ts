@@ -135,6 +135,7 @@ describe('a target without an entry', () => {
 
 describe('entry text', () => {
   it('names one entry, a few, and shortens a long list', () => {
+    expect(describeEntries([])).toBe('no server code');
     expect(describeEntries(['a.ts'])).toBe('entry a.ts');
     expect(describeEntries(['a.ts', 'b.ts', 'c.ts'])).toBe('entries a.ts, b.ts, c.ts');
     expect(describeEntries(['a.ts', 'b.ts', 'c.ts', 'd.ts', 'e.ts'])).toBe(

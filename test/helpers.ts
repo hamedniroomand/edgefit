@@ -82,11 +82,12 @@ export function usagesOf(
     lazyNodeImports?: boolean;
     keepUnusedImports?: boolean;
     nodeEnv?: string | undefined;
+    loadOnlyGlobals?: ReadonlySet<string>;
   } = {},
 ): string[] {
   return extractUsages(file, source, { globals, nodeEnv: 'production', ...options }).map(
     usage =>
-      `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${usage.afterLoad === true ? ' [after load]' : ''}${polyfillTag(usage)}${runtimeTags(usage)}${optionTag(usage)}`,
+      `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${usage.afterLoad === true ? ' [after load]' : ''}${polyfillTag(usage)}${runtimeTags(usage)}${optionTag(usage)}${usage.atLoad === true ? ' [at load]' : ''}${usage.bare === true ? ' [bare]' : ''}`,
   );
 }
 

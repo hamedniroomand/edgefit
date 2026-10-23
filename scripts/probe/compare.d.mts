@@ -13,5 +13,6 @@ export function compareOutcomes(
   overrides: Record<string, OverrideEntry>,
   matrix: Record<string, unknown>,
   webMissing?: ReadonlySet<string>,
+  domMissing?: ReadonlySet<string>,
 ): Disagreement[];
 export function implementedMocks(mocked: Record<string, string>): string[];

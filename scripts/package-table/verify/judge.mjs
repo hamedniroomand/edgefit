@@ -146,9 +146,19 @@ export function missingPackage(error) {
  * The outcome of one run on one target. `status` is the status of the row on the target,
  * `findings` its findings there. Only a pass or a fail row can be verified.
  */
-export function judge({ status, run, findings, optionalPeers = [] }) {
-  // An optional peer is not installed with the package, so a load that needs it says nothing. A
-  // missing regular dependency means a broken package, and stays a mismatch.
+export function judge({ status, run, findings, optionalPeers = [], peerFailures = [] }) {
+  // The run lacks a peer that the row names, so a ✔ would claim more than the run showed.
+  if (peerFailures.length > 0) {
+    return {
+      outcome: 'absent',
+      kind: 'load',
+      reason: 'peer not installed',
+      error: peerFailures.join('; '),
+    };
+  }
+  // A load that needs an optional peer that is not installed says nothing. A peer that is
+  // installed is not in `optionalPeers`, so a load that fails on it is judged like any other
+  // load. A missing regular dependency means a broken package, and stays a mismatch.
   const missing = run.load.ok ? undefined : missingPackage(run.load);
   if (missing !== undefined && optionalPeers.includes(missing)) {
     return {

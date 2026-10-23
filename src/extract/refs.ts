@@ -70,6 +70,21 @@ export function globalRef(name: string): ApiRef {
   return { module: '*globals*', path: [name] };
 }
 
+/**
+ * A global that the code names on its own, such as `document`, not as a member of `globalThis`.
+ * Reading a name that no scope declares throws where the global is missing, whatever the code does
+ * with the value.
+ */
+export function isBareGlobal(ref: ApiRef): boolean {
+  return ref.module === '*globals*' && ref.path.length > 0 && !globalAliases.has(ref.path[0] ?? '');
+}
+
+/** `typeof name`: the one read of a name that no scope declares that does not throw. */
+export function isTypeofName(node: Node, parent: Node | undefined): boolean {
+  const named = strip(node).type === 'Identifier';
+  return named && parent?.type === 'UnaryExpression' && parent.operator === 'typeof';
+}
+
 /** True for `globalThis` and its aliases on their own, which say nothing about the API used. */
 export function isGlobalRoot(ref: ApiRef): boolean {
   return ref.module === '*globals*' && ref.path.every(segment => globalAliases.has(segment));

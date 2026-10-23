@@ -27,7 +27,7 @@ import {
 
 /** Re-exported so the check reads the shipped suggestions through the same module that applies them. */
 export { loadSuggestions } from '@/data/suggestions.ts';
-export { loadUnreached } from '@/data/unreached.ts';
+export { loadUnreached, unreachedOptionPaths } from '@/data/unreached.ts';
 export { readStoredModules } from './stored-modules.ts';
 export { findingKey } from './finding-groups.ts';
 
@@ -56,6 +56,11 @@ export interface FindingOptions {
   suggestions?: SuggestionData;
   /** Cases of code a package ships that the target never runs. Matching findings are guarded. */
   unreached?: readonly UnreachedEntry[];
+  /**
+   * The options that a file of the project sets. An entry of the unreached data that names
+   * options reads it. Empty for build output. Without it, such an entry always applies.
+   */
+  optionsSet?: ReadonlySet<string>;
 }
 
 /** A reached API the target fully supports. */
@@ -136,6 +141,8 @@ function suggest(
   });
 }
 
+const noOptionsSet: ReadonlySet<string> = new Set();
+
 function unreachedFor(
   module: ModuleUsages,
   usage: Usage,
@@ -151,6 +158,7 @@ function unreachedFor(
     file: usage.location.file,
     api: usage.display,
     target: options.target.info.key,
+    optionsSet: options.optionsSet ?? noOptionsSet,
   });
 }
 

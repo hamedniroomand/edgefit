@@ -3,15 +3,18 @@ import type { Node } from 'oxc-parser';
 import type { ApiRef, PassedKey } from '@/types.ts';
 
 import { invokers, isSymbolKey, staticKey, strip, unwrap } from './ast.ts';
-import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
-import { isFallbackRead } from './fallback-reads.ts';
+import { isCheckedOperand } from './checked-operands.ts';
 import { keysOf, passedKeysOf } from './known-values.ts';
-import { memberRef, passesOn } from './refs.ts';
-import { declaringScope, isTracked, lookupPresent, lookupSymbol } from './scope.ts';
+import { isOptionalRead } from './optional-reads.ts';
+import { isFeatureCheck, memberRef, passesOn } from './refs.ts';
+import { declaringScope, lookupPresent, lookupSymbol } from './scope.ts';
 import type { Scope } from './scope.ts';
 
+export { apiGuard } from './api-guards.ts';
+export { isCheckedOperand } from './checked-operands.ts';
 export { isOptionalRead } from './optional-reads.ts';
+export { optionalGlobalGuards } from './optional-guards.ts';
 export { isSafeRead } from './safe-reads.ts';
 
 export type ChainResult =
@@ -146,50 +149,29 @@ export function isTestedChain(parent: Node, outer: readonly Node[]): boolean {
   return false;
 }
 
-const logicalChecks = new Set(['||', '??']);
-
-/** Whether the value of `node` is an API, or the last one of a chain of `||` and `??` that holds an API. */
-function isApiValue(node: Node, context: BindingContext): boolean {
-  const inner = strip(node);
-  return inner.type === 'LogicalExpression' && logicalChecks.has(inner.operator)
-    ? isApiValue(inner.right, context)
-    : isTracked(resolveBinding(inner, context));
-}
-
 /**
- * Whether `node` is an operand of `||` or `??`, as in `a.b ?? a.c`. A missing member gives
- * `undefined` and the operator moves on, so the read is a check. The right operand counts when the
- * left one is an API too: `a.b || a.c` looks for a name. In `options.x || process.platform` the right
- * operand is the value that the code uses. It is a use when the value is called in place, as in
- * `(a.b || c)()`, because a present `b` that throws still fails.
+ * Whether the value of `node` only goes back to the caller: `return x`, or the body of `() => x`,
+ * through wrappers such as `(x)`, `x!` and `(0, x)`. `await x` is not one of these, so a read that is
+ * awaited stays unknown.
  * `outer` holds the ancestors above `parent`, nearest first.
  */
-export function isCheckedOperand(
-  node: Node,
-  parent: Node,
-  outer: readonly Node[],
-  context: BindingContext,
-): boolean {
-  if (isFallbackRead(node, parent, outer)) {
-    return true;
-  }
-  if (parent.type !== 'LogicalExpression' || !logicalChecks.has(parent.operator)) {
-    return false;
-  }
-  if (parent.right === node && !isApiValue(parent.left, context)) {
-    return false;
-  }
-  let value: Node = parent;
-  for (const ancestor of outer) {
-    const passes =
-      (ancestor.type === 'LogicalExpression' && logicalChecks.has(ancestor.operator)) ||
-      (ancestor.type !== 'AwaitExpression' && unwrap(ancestor) === value);
-    if (!passes) {
-      return !(ancestor.type === 'CallExpression' && ancestor.callee === value);
+export function isReturned(node: Node, parent: Node, outer: readonly Node[]): boolean {
+  let value = node;
+  for (const ancestor of [parent, ...outer]) {
+    if (ancestor.type === 'ReturnStatement') {
+      return true;
+    }
+    // The walker gives the default value of a parameter the arrow function as its parent, so only
+    // the body counts.
+    if (ancestor.type === 'ArrowFunctionExpression') {
+      return ancestor.body === value;
+    }
+    if (ancestor.type === 'AwaitExpression' || !passesOn(ancestor, value)) {
+      return false;
     }
     value = ancestor;
   }
-  return true;
+  return false;
 }
 
 /**
@@ -252,4 +234,22 @@ export function callPassedKeys(
     .map(argument => passedKeysOf(argument, scope))
     .findLast(keys => keys !== undefined);
   return options === undefined || options.length === 0 ? undefined : [...options];
+}
+
+/** A read that only tests for the API, so it is not a use. */
+export const isCheck = (node: Node, parent: Node | undefined, outer: readonly Node[]): boolean =>
+  (parent !== undefined && (isFeatureCheck(node, parent) || isTestedChain(parent, outer))) ||
+  isOptionalRead(node, parent, outer);
+
+/** A read that tests the global or takes a fallback when it is missing. It still reads the name. */
+export function isCheckedRead(
+  node: Node,
+  parent: Node | undefined,
+  outer: readonly Node[],
+  context: BindingContext,
+): boolean {
+  return (
+    isCheck(node, parent, outer) ||
+    (parent !== undefined && isCheckedOperand(node, parent, outer, context))
+  );
 }

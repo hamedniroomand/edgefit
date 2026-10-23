@@ -49,7 +49,13 @@ function overrideDisagreement(override, outcome) {
  * Lists where probe outcomes and curated data disagree. Matrix disagreements are only reported for
  * APIs without an override, since an override exists to correct the matrix.
  */
-export function compareOutcomes(outcomes, overrides, matrix, webMissing = new Set()) {
+export function compareOutcomes(
+  outcomes,
+  overrides,
+  matrix,
+  webMissing = new Set(),
+  domMissing = new Set(),
+) {
   const disagreements = [];
   for (const [api, outcome] of Object.entries(outcomes)) {
     // Denied APIs are never called, so an existing one says nothing about the override.
@@ -60,7 +66,7 @@ export function compareOutcomes(outcomes, overrides, matrix, webMissing = new Se
     const override = overrides[api] ?? overrides[api.replace('.default.', '.')];
     const found = override
       ? overrideDisagreement(override, outcome)
-      : matrixDisagreement(matrix, api, outcome, webMissing);
+      : matrixDisagreement(matrix, api, outcome, { webMissing, domMissing });
     if (found) {
       disagreements.push({ api, ...found });
     }
@@ -68,18 +74,25 @@ export function compareOutcomes(outcomes, overrides, matrix, webMissing = new Se
   return disagreements;
 }
 
-function matrixDisagreement(matrix, api, outcome, webMissing) {
+function matrixDisagreement(matrix, api, outcome, { webMissing, domMissing }) {
   const inMatrix = matrixHas(matrix, api);
   const probed = outcome !== 'missing';
   if (inMatrix === probed) {
     return undefined;
   }
-  // The matrix has no entry for a Web API, so the target takes the Web API data, which names it.
-  const source = !inMatrix && webMissing.has(api) ? 'runtime-compat-data' : 'matrix';
+  // The matrix has no entry for a Web API or a DOM global, so the target takes the data that names it.
+  const source = inMatrix ? 'matrix' : sourceOfMissing(api, { webMissing, domMissing });
   return {
     message: `${source} says \`${inMatrix ? 'present' : 'missing'}\`, probe says \`${outcome}\``,
     dataSaysPresent: inMatrix,
   };
+}
+
+function sourceOfMissing(api, { webMissing, domMissing }) {
+  if (webMissing.has(api)) {
+    return 'runtime-compat-data';
+  }
+  return domMissing.has(api) ? 'dom-globals' : 'matrix';
 }
 
 /** Probed `unsupported` APIs that no override covers, as candidates for a person to review. */

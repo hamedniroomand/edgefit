@@ -4,6 +4,7 @@ import {
   namesFrom,
   planOf,
   rowFindings,
+  rowNotes,
   scriptOf,
   scriptProblem,
 } from '@scripts/package-table/verify/scripts.mjs';
@@ -119,5 +120,16 @@ describe('the plan of a package on a runtime', () => {
 
   it('finds no script for a package without one', () => {
     expect(scriptOf(fixture('verify/scripts'), 'chokidar')).toBeUndefined();
+  });
+});
+
+describe('the notes of a row on a runtime', () => {
+  const note = 'peer react not installed, checked in your project';
+
+  it('come from the main entry on the runtime of the plan', () => {
+    const row = result('pass', { notes: [note] });
+    expect(planOf(row, 'workerd')?.notes).toEqual([note]);
+    expect(rowNotes(row, 'bun')).toEqual([]);
+    expect(planOf(result('pass'), 'workerd')?.notes).toEqual([]);
   });
 });

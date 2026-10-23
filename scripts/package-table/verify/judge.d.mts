@@ -48,6 +48,8 @@ export function judge(input: {
   status: string;
   run: Run;
   findings: readonly RowFinding[];
-  /** The peers that the package marks optional in `peerDependenciesMeta`. */
+  /** The peers that the package marks optional in `peerDependenciesMeta` and that are not installed. */
   optionalPeers?: readonly string[];
+  /** The peers that a note names and that did not install. Any of them gives no outcome. */
+  peerFailures?: readonly string[];
 }): Cell;

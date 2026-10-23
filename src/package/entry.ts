@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 export interface PackageManifest {
   name?: string;
   version?: string;
@@ -13,61 +15,95 @@ export interface PackageEntry {
   specifier: string;
 }
 
-// Targets that are not code an entry can import.
-const nonCodeSuffixes = ['.json', '.css', '.node', '.wasm', '.d.ts', '.d.mts', '.d.cts', '.md'];
+/** What a package result keeps about a subpath that is not checked. */
+export interface SkippedSubpath {
+  subpath: string;
+  reason: string;
+}
+
+// The extensions of a script. A target with no extension counts as a script too: Node loads it.
+const scriptExtensions = new Set(['.js', '.mjs', '.cjs', '.jsx', '.ts', '.mts', '.cts', '.tsx']);
+
+const declarationFile = /\.d\.[cm]?ts$/iu;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/** Whether a condition tree ends in at least one JavaScript file. `null` blocks the subpath. */
-function hasCodeTarget(value: unknown): boolean {
+/** The strings at the end of a condition tree. `null` blocks a subpath, so it has none. */
+function targetsOf(value: unknown): string[] {
   if (typeof value === 'string') {
-    return !nonCodeSuffixes.some(suffix => value.endsWith(suffix));
+    return [value];
   }
   if (Array.isArray(value)) {
-    return value.some(item => hasCodeTarget(item));
+    return value.flatMap(item => targetsOf(item));
   }
-  if (isRecord(value)) {
-    return Object.values(value).some(item => hasCodeTarget(item));
-  }
-  return false;
+  return isRecord(value) ? Object.values(value).flatMap(item => targetsOf(item)) : [];
 }
 
-function subpathsOf(exports: unknown): string[] {
+/** The extension of a target, in lower case. A type declaration file has `.d.ts`, not `.ts`. */
+function extensionOf(target: string): string {
+  return (declarationFile.exec(target)?.[0] ?? path.posix.extname(target)).toLowerCase();
+}
+
+const isScript = (target: string): boolean => {
+  const extension = extensionOf(target);
+  return extension === '' || scriptExtensions.has(extension);
+};
+
+/** Why a subpath with these targets is not checked. A JSON file gets its own sentence. */
+function reasonFor(targets: readonly string[]): string {
+  const extensions = [...new Set(targets.map(target => extensionOf(target)))];
+  return extensions.join() === '.json'
+    ? 'the target of this subpath is a JSON file, which holds no code to check'
+    : `no target of this subpath is a script file (${extensions.join(', ')})`;
+}
+
+/** The subpaths of `exports` with their targets. A string, an array or a bare condition object is the sugar for `.`. */
+function declaredOf(exports: unknown): { subpath: string; targets: string[] }[] {
   if (isRecord(exports) && Object.keys(exports).some(key => key.startsWith('.'))) {
     return Object.entries(exports)
-      .filter(([key, value]) => key.startsWith('.') && hasCodeTarget(value))
-      .map(([key]) => key);
+      .filter(([key]) => key.startsWith('.'))
+      .map(([subpath, value]) => ({ subpath, targets: targetsOf(value) }));
   }
-  // A string, an array or a bare condition object is the sugar for the "." entry.
-  return hasCodeTarget(exports) ? ['.'] : [];
+  return [{ subpath: '.', targets: targetsOf(exports) }];
 }
 
 /**
- * The public entry points to check. Patterns (`./*`) and `./package.json` are skipped. Without an
- * `exports` field the package is imported through `main` or `module`, or its `index.js`.
+ * The public entry points to check, and the subpaths left out because no target of them is a
+ * script, such as a sourcemap. Patterns (`./*`) and `./package.json` are left out without a
+ * note, as is a subpath that the package blocks with `null`. Without an `exports` field the
+ * package is imported through `main` or `module`, or its `index.js`.
  */
 export function packageEntries(
   manifest: PackageManifest,
   name: string,
   options: { skip?: readonly string[]; only?: readonly string[] } = {},
-): PackageEntry[] {
+): { entries: PackageEntry[]; skipped: SkippedSubpath[] } {
   const declared =
     manifest.exports === undefined || manifest.exports === null
-      ? ['.']
-      : subpathsOf(manifest.exports);
-  const subpaths = declared.filter(
-    subpath =>
+      ? [{ subpath: '.', targets: ['./index.js'] }]
+      : declaredOf(manifest.exports);
+  const wanted = declared.filter(
+    ({ subpath }) =>
       subpath !== './package.json' &&
       !subpath.includes('*') &&
       !(options.skip ?? []).includes(subpath) &&
       (options.only === undefined || options.only.length === 0 || options.only.includes(subpath)),
   );
-  return subpaths.map(subpath => ({
-    subpath,
-    specifier: subpath === '.' ? name : `${name}${subpath.slice(1)}`,
-  }));
+  const isChecked = ({ targets }: { targets: readonly string[] }): boolean =>
+    targets.some(target => isScript(target));
+  return {
+    entries: wanted
+      .filter(item => isChecked(item))
+      .map(({ subpath }) => ({
+        subpath,
+        specifier: subpath === '.' ? name : `${name}${subpath.slice(1)}`,
+      })),
+    skipped: wanted
+      .filter(item => item.targets.length > 0 && !isChecked(item))
+      .map(({ subpath, targets }) => ({ subpath, reason: reasonFor(targets) })),
+  };
 }
 
 /** The entry file: every export is used, the worst case for "I import this entry point". */

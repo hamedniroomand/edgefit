@@ -65,7 +65,7 @@ On pull requests, with the GitHub Action:
 [![edgefit](https://edgefit.kitdev.space/packages/badges/<name>.svg)](https://edgefit.kitdev.space/packages/#<name>)
 ```
 
-For a package that is not on the table, run `npx edgefit package . --badge badge.svg` and commit the result.
+For a package that is not on the table, build the package, run `npx edgefit package . --badge badge.svg` and commit the result.
 
 ## Status
 
@@ -81,4 +81,4 @@ Bug reports, data corrections and pull requests are welcome. See [CONTRIBUTING.m
 
 ## License
 
-[MIT](https://github.com/hamedniroomand/edgefit/blob/main/LICENSE) © Hamed Niroomand. The vendored compatibility data is © Cloudflare, Inc. (MIT) and runtime-compat-data (CC0-1.0); both licenses ship in [`data`](https://github.com/hamedniroomand/edgefit/tree/main/data).
+[MIT](https://github.com/hamedniroomand/edgefit/blob/main/LICENSE) © Hamed Niroomand. The vendored compatibility data is © Cloudflare, Inc. (MIT) and runtime-compat-data (CC0-1.0); both licenses ship in [`data`](https://github.com/hamedniroomand/edgefit/tree/main/data). The DOM global names are read from the type declarations of TypeScript (Apache-2.0), and no declaration text is copied.

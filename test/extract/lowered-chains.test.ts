@@ -74,6 +74,20 @@ const cases: [string, string][] = [
     `const v = ${deno}?.cwd;\nconst w = ${deno}?.args;`,
     `const v = ${chain(deno, '.cwd')};\nconst w = ${chain(deno, '.args')};`,
   ],
+  [
+    `const v = ${deno}?.env.toObject() || {};`,
+    `const v = (${chain(deno, '.env.toObject()')}) || {};`,
+  ],
+  [
+    `const v = ${deno}?.env.toObject() ?? {};`,
+    `const v = (_b = ${chain(deno, '.env.toObject()')}) !== null && _b !== void 0 ? _b : {};`,
+  ],
+  [
+    `const v = typeof ${deno}?.env.toObject();`,
+    `const v = typeof (${chain(deno, '.env.toObject()')});`,
+  ],
+  [`const v = !${deno}?.env.toObject();`, `const v = !(${chain(deno, '.env.toObject()')});`],
+  [`${deno}?.env.toObject().x;`, `${chain(deno, '.env.toObject().x')};`],
   [`${fs}fs?.watch;`, `${fs}${chain('fs', '.watch')};`],
   [`${fs}fs.promises?.watch;`, `${fs}${chain('fs.promises', '.watch')};`],
   [
@@ -87,6 +101,14 @@ describe('a compiled optional chain or nullish fallback', () => {
   it.each(cases)('gives the result of its source form, as esbuild writes it: %s', source => {
     const compiled = esbuild(source);
     expect(compiled).toMatch(/[!=]= null \?/u);
+    expect(compiled).not.toMatch(/\?[.?]/u);
+    expect(usagesOf(compiled)).toEqual(usagesOf(source));
+    expect(globalsOf(compiled)).toEqual(globalsOf(source));
+  });
+
+  it.each(cases)('gives the result of its source form, as esbuild minifies it: %s', source => {
+    const compiled = esbuild(source, true);
+    expect(compiled).toMatch(/[!=]=null[?&|]/u);
     expect(compiled).not.toMatch(/\?[.?]/u);
     expect(usagesOf(compiled)).toEqual(usagesOf(source));
     expect(globalsOf(compiled)).toEqual(globalsOf(source));

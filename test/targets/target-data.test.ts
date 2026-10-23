@@ -31,7 +31,17 @@ const files = {
         license: 'CC0-1.0',
         versions: { npm: '1' },
       },
+      {
+        provider: 'dom-globals',
+        url: 'https://example.com/dom',
+        license: 'Apache-2.0',
+        versions: { typescript: '5' },
+      },
     ],
+  },
+  'dom-globals.json': {
+    names: ['DOMParser', 'alert', 'caches'],
+    presentOn: { deno: ['alert'] },
   },
   'workers-nodejs-compat-matrix/baseline.json': {
     '*globals*': { BroadcastChannel: 'class' },
@@ -100,8 +110,54 @@ describe('target data layers', () => {
     expect(deploy.description).toBe(
       'workers-nodejs-compat-matrix@0123456 (deno 2), curated overrides from ' +
         'https://example.com/deno and https://example.com/deploy, ' +
-        'Web APIs from runtime-compat-data@abcdef0 (npm 1)',
+        'Web APIs from runtime-compat-data@abcdef0 (npm 1), ' +
+        'DOM globals from dom-globals (typescript 5)',
     );
+  });
+});
+
+describe('target data with DOM globals', () => {
+  const { index, globals } = loadTargetData('deno', [], dataDirectory);
+
+  it('reports a DOM global that the runtime lacks as a missing global, read at load only', () => {
+    expect(index.lookup({ module: '*globals*', path: ['DOMParser'] })).toMatchObject({
+      status: 'unsupported',
+      absent: true,
+      loadOnly: true,
+    });
+    expect(globals.has('DOMParser')).toBe(true);
+  });
+
+  it('leaves out a DOM global that the runtime has', () => {
+    expect(index.lookup({ module: '*globals*', path: ['alert'] }).status).not.toBe('unsupported');
+    expect(globals.has('alert')).toBe(false);
+  });
+
+  it('lets the Web API data win for a name that both list', () => {
+    expect(index.lookup({ module: '*globals*', path: ['caches'] })).toMatchObject({
+      category: 'web',
+    });
+  });
+});
+
+describe('target data with a global that only an override lists', () => {
+  const absent = dataDirectoryWith({
+    ...files,
+    'overrides/deno.json': {
+      modules: {},
+      apis: {
+        '*globals*.document': {
+          ...override('unsupported', 'missing'),
+          absent: true,
+          loadOnly: 'bare',
+        },
+      },
+    },
+  });
+
+  it('tracks the global, because a plain read of it fails', () => {
+    expect(loadTargetData('deno', [], absent).globals.has('document')).toBe(true);
+    expect(loadTargetData('deno', [], dataDirectory).globals.has('document')).toBe(false);
   });
 });
 

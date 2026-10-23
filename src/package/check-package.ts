@@ -7,7 +7,7 @@ import type { TargetKey } from '@/types.ts';
 
 import { checkEntry, inSequence } from './check-entry.ts';
 import { packageEntries } from './entry.ts';
-import type { PackageEntry } from './entry.ts';
+import type { PackageEntry, SkippedSubpath } from './entry.ts';
 import { packageResultVersion, summarize } from './result.ts';
 import type { PackageResult } from './result.ts';
 import { parsePackageSpec } from './spec.ts';
@@ -43,6 +43,17 @@ function assertMain(
   }
 }
 
+/** When every subpath is skipped, the reasons tell the user more than the `--export` hint does. */
+function noEntryHint(
+  skipped: readonly SkippedSubpath[],
+  only: readonly string[] | undefined,
+): string | undefined {
+  if (skipped.length > 0) {
+    return `Skipped ${skipped.map(item => `${item.subpath}: ${item.reason}`).join('; ')}.`;
+  }
+  return only === undefined ? undefined : 'Check the --export subpaths.';
+}
+
 /**
  * Installs a package into a throwaway project without running any of its code, then checks each
  * public entry point with every export treated as used.
@@ -62,14 +73,14 @@ export async function checkPackage(
     if (options.keep === true) {
       options.onKeep?.(workspace.root);
     }
-    const entries = packageEntries(workspace.manifest, workspace.name, {
+    const { entries, skipped } = packageEntries(workspace.manifest, workspace.name, {
       skip: options.skip,
       only: options.subpaths,
     });
     if (entries.length === 0) {
       throw new EdgefitError(
         `${workspace.name} has no public entry point to check.`,
-        options.subpaths === undefined ? undefined : 'Check the --export subpaths.',
+        noEntryHint(skipped, options.subpaths),
       );
     }
     assertMain(workspace.name, entries, options.main);
@@ -88,6 +99,7 @@ export async function checkPackage(
       targets,
       ...(options.main === undefined ? {} : { main: options.main }),
       ...summarize(rows, targets, options.main),
+      ...(skipped.length > 0 ? { skipped } : {}),
       context,
       entries: rows,
     };

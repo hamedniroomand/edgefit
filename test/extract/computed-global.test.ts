@@ -49,3 +49,59 @@ describe('a computed read of the global object', () => {
     ]);
   });
 });
+
+describe('a computed read of the global object that is returned', () => {
+  const unknown = ['dynamic globalThis[<expression>]'];
+
+  it.each([
+    [
+      'in a try block',
+      'export function f(n) {\n  try {\n    return globalThis[n];\n  } catch {}\n  return "";\n}',
+    ],
+    ['as the body of an arrow function', 'export const f = n => globalThis[n];'],
+    [
+      'through parentheses and a comma',
+      'export function f(n) {\n  return (0, (globalThis[n]));\n}',
+    ],
+    ['for `self`', 'export const f = n => self[n];'],
+    ['for `global`', 'export const f = n => global[n];'],
+  ])('is not unknown %s', (_name, code) => {
+    expect(usagesOf(code)).toEqual([]);
+  });
+
+  it.each([
+    ['called', 'return globalThis[n]();'],
+    ['read for a member', 'return globalThis[n].y;'],
+    ['used with `new`', 'return new globalThis[n]();'],
+    ['passed to a call', 'return use(globalThis[n]);'],
+    ['awaited', 'return await globalThis[n];'],
+    ['assigned to a name', 'const value = globalThis[n];\n  return value;'],
+    ['in a branch of a condition', 'return c ? globalThis[n] : 1;'],
+    ['in a template', 'return `${globalThis[n]}`;'],
+  ])('is unknown when it is %s', (_name, body) => {
+    expect(usagesOf(`export async function f(n, c) {\n  ${body}\n}`)).toEqual(unknown);
+  });
+});
+
+describe('a computed read of the global object that is not a plain return', () => {
+  const unknown = ['dynamic globalThis[<expression>]'];
+
+  it('is unknown when it is the default value of a parameter that the function calls', () => {
+    expect(usagesOf('export const f = (n, x = globalThis[n]) => x();')).toEqual(unknown);
+    expect(usagesOf('export const f = (n, x = (globalThis[n])) => x();')).toEqual(unknown);
+    expect(usagesOf('export const f = ({ x = globalThis[n] }, n) => x();')).toEqual(unknown);
+  });
+
+  it('is a use of each key it may be when the keys are known', () => {
+    const source = "for (const k of ['document', 'window']) {\n    return globalThis[k];\n  }";
+    expect(usagesOf(`export function f() {\n  ${source}\n}`)).toEqual([
+      'api document',
+      'api window',
+    ]);
+  });
+
+  it('is unknown for a module that is not the global object', () => {
+    const code = "import fs from 'node:fs';\nexport const f = n => fs[n];";
+    expect(usagesOf(code)).toContain('dynamic node:fs[<expression>]');
+  });
+});

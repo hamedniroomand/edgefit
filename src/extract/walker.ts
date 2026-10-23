@@ -4,14 +4,17 @@ import type { ApiRef } from '@/types.ts';
 
 import { childNodes, isTypeOnly } from './ast.ts';
 import {
+  apiGuard,
   callPassedKeys,
   computedKey,
   followChain,
+  isCheck,
+  isCheckedRead,
   isCheckedOperand,
-  isOptionalRead,
   isPresentRead,
+  isReturned,
   isSafeRead,
-  isTestedChain,
+  optionalGlobalGuards,
 } from './chain.ts';
 import type { VisitContext } from './context.ts';
 import {
@@ -19,9 +22,9 @@ import {
   escapes,
   extendedReason,
   findParameterReads,
-  isFeatureCheck,
   isAwaitedCall,
-  normalizeRef,
+  isBareGlobal,
+  isTypeofName,
   isGlobalRoot,
   memberRef,
   isOnlyTested,
@@ -34,17 +37,6 @@ import { addPassedKeys } from './usage-collector.ts';
 import type { UsageCollector } from './usage-collector.ts';
 import { visitorFor } from './visitors/index.ts';
 import { visitPattern } from './visitors/patterns.ts';
-
-/** A read that only tests for the API, so it is not a use. */
-function isCheck(node: Node, parent: Node | undefined, outer: readonly Node[]): boolean {
-  return (
-    (parent !== undefined && (isFeatureCheck(node, parent) || isTestedChain(parent, outer))) ||
-    isOptionalRead(node, parent, outer)
-  );
-}
-
-const apiGuard = (ref: ApiRef) =>
-  ({ kind: 'api', ref: normalizeRef(ref), root: undefined, active: true }) as const;
 
 export class Walker implements VisitContext {
   public readonly imported: boolean;
@@ -62,7 +54,7 @@ export class Walker implements VisitContext {
   public readonly wrappers: VisitContext['wrappers'];
   public readonly functions: VisitContext['functions'];
   public readonly supplied: VisitContext['supplied'];
-  public readonly callKeys: VisitContext['callKeys'];
+  public readonly calls: VisitContext['calls'];
   readonly #stack: Node[] = [];
   #scope: Scope = createScope();
   #bound: ReadonlySet<Node> = new Set();
@@ -76,11 +68,12 @@ export class Walker implements VisitContext {
     wrappers: VisitContext['wrappers'],
     functions: VisitContext['functions'],
     supplied: VisitContext['supplied'],
-    callKeys: VisitContext['callKeys'],
+    calls: VisitContext['calls'],
     imported = false,
   ) {
     this.imported = imported;
     this.collector = collector;
+    collector.stack = this.#stack;
     this.globals = globals;
     this.nodeEnv = nodeEnv;
     this.typeOnlyImports = typeOnlyImports;
@@ -88,7 +81,7 @@ export class Walker implements VisitContext {
     this.wrappers = wrappers;
     this.functions = functions;
     this.supplied = supplied;
-    this.callKeys = callKeys;
+    this.calls = calls;
   }
 
   public get scope(): Scope {
@@ -180,6 +173,7 @@ export class Walker implements VisitContext {
     const { member, memberParent } = chain;
     const global = isGlobalRoot(chain.ref) && memberParent !== undefined;
     const written = global && isMemberWrite(member, memberParent);
+    const returned = global && isReturned(member, memberParent, this.#outer(member));
     const checked =
       isPresentRead(member, memberParent, this.scope) ||
       (global && isCheckedOperand(member, memberParent, this.#outer(member), this));
@@ -192,7 +186,7 @@ export class Walker implements VisitContext {
           this.collector.api(ref, chain.propertyOffset, false, through);
         });
       }
-    } else if (!(tested || written || checked)) {
+    } else if (!(tested || written || checked || returned)) {
       this.collector.dynamic(
         chain.ref,
         `${displayRef(chain.ref)}[<expression>]`,
@@ -200,6 +194,26 @@ export class Walker implements VisitContext {
         chain.propertyOffset,
       );
     }
+  };
+
+  /** Whether the read is a check, which is no use. Every check but `typeof name` reads the global. */
+  readonly #isCheckRead = (
+    chain: Extract<ReturnType<typeof followChain>, { kind: 'static' }>,
+    offset: number,
+  ): boolean => {
+    const { node, parent, ref } = chain;
+    if (!isBareGlobal(ref) || !this.collector.loadOnlyGlobals.has(ref.path[0] ?? '')) {
+      return (
+        isCheck(node, parent, this.#outer(node)) ||
+        (parent !== undefined && this.#recordChecked(ref, chain.offset, node, parent))
+      );
+    }
+    const checked =
+      !isTypeofName(node, parent) && isCheckedRead(node, parent, this.#outer(node), this);
+    if (checked) {
+      this.collector.api({ ...ref, path: ref.path.slice(0, 1) }, offset);
+    }
+    return checked || isTypeofName(node, parent);
   };
 
   /** The read of an operand of `||` or `??` checks for the API, and the value goes on: absence is handled, a throw is not. */
@@ -243,10 +257,7 @@ export class Walker implements VisitContext {
       return;
     }
     const { node, parent } = chain;
-    if (isGlobalRoot(chain.ref) || isCheck(node, parent, this.#outer(node))) {
-      return;
-    }
-    if (parent !== undefined && this.#recordChecked(chain.ref, chain.offset, node, parent)) {
+    if (isGlobalRoot(chain.ref) || this.#isCheckRead(chain, offset)) {
       return;
     }
     if (parent !== undefined && isMemberWrite(node, parent)) {
@@ -261,7 +272,8 @@ export class Walker implements VisitContext {
     if (recordBare || chain.extended) {
       const safe = isSafeRead(chain.ref, node, parent, this.#outer(node), this.#scope);
       const read = safe ? [apiGuard(chain.ref)] : [];
-      this.collector.guards.within(read, () => {
+      const optional = optionalGlobalGuards(node, parent, this.#outer(node), this);
+      this.collector.guards.within([...read, ...optional], () => {
         const usage = this.collector.api(chain.ref, chain.offset, this.#awaited(node, parent));
         if (usage !== undefined && keys !== undefined) {
           addPassedKeys(usage, keys);

@@ -1,6 +1,6 @@
 import { findDataDirectory, readDataFile } from '@/data/data-directory.ts';
 import { targetKeys } from '@/data/suggestions.ts';
-import { inRange } from '@/data/version-range.ts';
+import { inRange, semver } from '@/data/version-range.ts';
 import type { VersionRange } from '@/data/version-range.ts';
 import type { TargetKey } from '@/types.ts';
 
@@ -11,8 +11,22 @@ export type UnreachedEntry = {
   versions: { min: string; max: string };
   /** The file inside the package, such as `dist/esm/server/app-render/cache-signal.js`. */
   file: string;
+  /**
+   * The other files of the package that hold the condition that the reason names. edgefit does not
+   * use this field when it checks a project. Only the weekly check reads it: it widens a range only
+   * when each of these files has the same bytes in both releases. The loader checks the shape.
+   */
+  guards?: string[];
   /** APIs as shown in reports. */
   apis: string[];
+  /**
+   * The options that make the code run. The entry applies only when no file of the project sets
+   * one of them. In build output it always applies. An entry without `options` applies to every
+   * project. An item is a name, such as `http2`, which a property of an object literal or an
+   * assigned member sets, or a path, such as `auth.lock`, which is the property `lock` of an object
+   * literal that is the value of the property `auth`.
+   */
+  options?: string[];
   target: TargetKey;
   /** Why the code does not run on the target. */
   reason: string;
@@ -27,10 +41,11 @@ export type UnreachedQuery = {
   file: string;
   api: string;
   target: TargetKey;
+  /** The options that a file of the project sets. A package file does not count. Empty in build output. */
+  optionsSet: ReadonlySet<string>;
 };
 
 const fileVersion = 1;
-const semver = /^\d+\.\d+\.\d+$/u;
 
 /** The fields that every reviewed entry of a data file has. */
 export type EntryBase = {
@@ -80,9 +95,46 @@ export function readEntries<TEntry>(
   return file.entries;
 }
 
+function validNames(names: unknown): names is string[] {
+  return (
+    Array.isArray(names) &&
+    names.length > 0 &&
+    names.every(name => typeof name === 'string' && name.trim() !== '')
+  );
+}
+
+/** An option is a name or a path of names, such as `auth.lock`, with no empty name in it. */
+function validOptions(options: unknown): options is string[] {
+  return (
+    validNames(options) && options.every(name => name.split('.').every(part => part.trim() !== ''))
+  );
+}
+
+/** A list of paths from the package root: not absolute, and with no `..` segment. */
+function validGuards(guards: unknown): boolean {
+  return (
+    validNames(guards) &&
+    guards.every(guard => !guard.startsWith('/') && !guard.split('/').includes('..'))
+  );
+}
+
 function checkEntry(where: string, entry: UnreachedEntry): void {
   if (!hasText(entry) || entry.apis.length === 0) {
     invalidEntry('unreached.json', where, 'package, file, apis and reason are required');
+  }
+  if (entry.options !== undefined && !validOptions(entry.options)) {
+    invalidEntry(
+      'unreached.json',
+      where,
+      'options must be a list of one or more option names or paths, such as `http2` or `auth.lock`',
+    );
+  }
+  if (entry.guards !== undefined && !validGuards(entry.guards)) {
+    invalidEntry(
+      'unreached.json',
+      where,
+      'guards must be a list of one or more paths from the package root, with no leading `/` and no `..` segment',
+    );
   }
   if (!targetKeys.has(entry.target)) {
     invalidEntry('unreached.json', where, 'target must be a known target key');
@@ -104,6 +156,12 @@ export function loadUnreached(dataDirectory?: string): UnreachedEntry[] {
   return entries;
 }
 
+/** The options of the entries that are paths, such as `auth.lock`. The scan reads these in addition to every plain name. */
+export function unreachedOptionPaths(entries: readonly UnreachedEntry[]): string[] {
+  const paths = entries.flatMap(entry => (entry.options ?? []).filter(name => name.includes('.')));
+  return [...new Set(paths)].toSorted();
+}
+
 /** The part of a path below `node_modules/<package>/`, or `undefined` when it is not in that package. */
 export function fileInPackage(file: string, name: string): string | undefined {
   const marker = `node_modules/${name}/`;
@@ -121,6 +179,7 @@ export function findUnreached(
       entry.package === query.package &&
       entry.apis.includes(query.api) &&
       inRange(query.version, entry.versions) &&
-      fileInPackage(query.file, entry.package) === entry.file,
+      fileInPackage(query.file, entry.package) === entry.file &&
+      !(entry.options ?? []).some(name => query.optionsSet.has(name)),
   );
 }

@@ -3,6 +3,7 @@ import { findDataDirectory } from '@/data/data-directory.ts';
 import { describeSource, findSource } from '@/data/manifest.ts';
 import type { DataSource } from '@/data/manifest.ts';
 import { allowlistProvider } from '@/data/providers/allowlist.ts';
+import { domGlobalsProvider } from '@/data/providers/dom-globals.ts';
 import { matrixProvider } from '@/data/providers/matrix.ts';
 import type { MatrixRuntime } from '@/data/providers/matrix.ts';
 import { overridesProvider } from '@/data/providers/overrides.ts';
@@ -42,15 +43,19 @@ export function loadTargetData(
     runtime === 'vercel-edge' ? allowlistProvider(runtime) : matrixProvider(runtime);
   const overrides = [runtime, ...extraLayers].map(layer => overridesProvider(layer));
   const web = runtimeCompatDataProvider(runtime, webKey);
+  const dom = domGlobalsProvider(runtime, webKey);
   const matrixSource = findSource(dataDirectory, matrix.name);
   const webSource = findSource(dataDirectory, web.name);
+  const domSource = findSource(dataDirectory, dom.name);
   const index = new CompatIndex(
     matrix.load(dataDirectory),
     overrides.flatMap(layer => layer.load(dataDirectory)),
-    web.load(dataDirectory),
+    // The web API data comes last, so its result wins for a name that both list.
+    [...dom.load(dataDirectory), ...web.load(dataDirectory)],
   );
   const globals = new Set([
     ...alwaysTrackedGlobals,
+    ...index.curatedLoadOnlyGlobals(),
     ...index
       .globalNames()
       .filter(name => index.hasProblemsBelow({ module: '*globals*', path: [name] }, true)),
@@ -63,7 +68,8 @@ export function loadTargetData(
     description:
       `${describeSource(matrixSource, [runtime])}, ` +
       `curated overrides from ${overrideSources.map(source => source.url).join(' and ')}, ` +
-      `Web APIs from ${describeSource(webSource)}`,
+      `Web APIs from ${describeSource(webSource)}, ` +
+      `DOM globals from ${describeSource(domSource)}`,
     globals,
   };
 }

@@ -16,13 +16,13 @@ error    unsupported  node:fs.watch  (workerd)
        see https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node/internal/internal_fs_callback.ts
 ```
 
-| Line                              | What it tells you                                                                                   |
-| --------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `error unsupported node:fs.watch` | Level, category and the API                                                                         |
-| second line                       | What goes wrong on this target                                                                      |
-| `chokidar@4.0.1 …:5:13`           | The package that owns the code, and the first place it uses the API. `your code` for your own files |
-| `via …`                           | The import chain from your entry point                                                              |
-| `see …`                           | The runtime source the result was read from, for curated entries                                    |
+| Line                              | What it tells you                                                                                             |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `error unsupported node:fs.watch` | Level, category and the API                                                                                   |
+| second line                       | What goes wrong on this target                                                                                |
+| `chokidar@4.0.1 …:5:13`           | The package that owns the code, and the first place it uses the API. `your code` for your own files           |
+| `via …`                           | The import chain from your entry point                                                                        |
+| `see …`                           | The source of the result: the runtime source for a curated entry, the TypeScript declaration for a DOM global |
 
 When a package uses the same API in several places, the report shows the first one and adds `(+3 more)`. The JSON report lists them all under `otherLocations`.
 
@@ -68,7 +68,7 @@ A feature check such as `if ('gpu' in navigator)` is not reported for `navigator
 
 edgefit could not determine what is used. Typical causes:
 
-- `require(name)` or `import(name)` with a computed module name
+- `require(name)` or `import(name)` with a computed module name. One case is read: a call that a `try` block catches, with a name that is a conditional expression of strings. See [Try blocks](#try-blocks)
 - computed member access on a module that has unsupported members, such as `fs[method]`
 - a module that the compatibility data does not list. An exception: the curated data can record that the module loads. A member of such a module is still not covered, unless another entry covers it
 - a `jsr:` import on Deno
@@ -79,7 +79,9 @@ A `require()` or `import()` of a name that the user of the code gives, such as a
 
 Symbol keys such as `x[Symbol.iterator]` are never reported, since a symbol cannot name an API. The global object on its own (`globalThis`, `self`) is not reported either, and neither is `globalThis['crypto']`, which is read like `globalThis.crypto`. A computed write to the global object, as in `globalThis[key] = value`, is not reported, because it does not read an API. A computed read with a fallback, as in `globalThis[key] || Fallback` or `globalThis[key] ?? Fallback`, is not reported either, because the code works when the global is missing. The same holds when the read is the value of `x = globalThis[key]` or `let x = globalThis[key]` and the next statement is `if (typeof x !== 'function') x = Fallback;`, `if (!x) x = Fallback;` or `if (x == null) x = Fallback;`.
 
-A key that is a parameter of a function of the file is each string that the calls pass, when the function is only called by name, every call passes the argument, and edgefit knows each argument. An argument can be a string, a name that holds known strings, or a member of each object of a known list, as in `map[i].name`. A function that is exported, passed on, or called with an unknown value keeps the key as `unknown`.
+A computed read that a function only returns is not an `unknown` finding. Examples are `return globalThis[key]` and `key => globalThis[key]`. The function does not use the value, and edgefit does not follow the value into the code that calls the function, see [Only some guards are understood](/guide/limitations#only-some-guards-are-understood). A read that the function uses in any other way stays `unknown`. Examples are a call, `new`, `await`, an argument of a call, and an assignment to a name. An assignment is not reported when a check follows, as described above.
+
+A key that is a parameter of a function of the file is each string that the calls pass, when the function is only called by name, every call passes the argument, and edgefit knows each argument. An argument can be a string, a name that holds known strings, or a member of each object of a known list, as in `map[i].name`. A function that is exported, passed on, or called with an unknown value keeps the key as `unknown`. The parameter of a method of a class is read too, from its one call, see [Signal handlers](#signal-handlers).
 
 A key from a loop over a list is a key that the object has, when the list is a `const` made by `.filter` with a test `name in obj`, as in `Object.entries(x).filter(([name]) => name in obj)`, and the loop reads `obj[name]` on the same binding of `obj`. The read cannot use an API that the target lacks, so it is not reported as `unknown`. A negated test, a test of another object, a loop that writes the name, and a `let` list keep the key as `unknown`.
 
@@ -128,7 +130,7 @@ When the target does not have the API, or the data does not cover it, a usage th
 
 A use of an API that the data does not cover, outside a check, such as `const s = v8.startupSnapshot`, is still an `unknown` warning, also when the code uses a member of it after a check. A use of the module itself, such as its import, is the exception: when the code uses the module's members only after a check, edgefit does not report the module. It is not a guarded finding either, so the report does not count it.
 
-A check does not protect an API that exists and throws or does nothing, such as `fs.watch` on Workers, because the check passes and the call still fails. Those stay findings, and so do `mocked` and `mismatch` results. Code that does not run at all on the target is the exception, see [Runtime checks](#runtime-checks).
+A check does not protect an API that exists and throws or does nothing, such as `fs.watch` on Workers, because the check passes and the call still fails. Those stay findings, and so do `mocked` and `mismatch` results. Code that does not run at all on the target is the exception, see [Runtime checks](#runtime-checks), [Signal handlers](#signal-handlers) and [Functions sent to a browser page](#functions-sent-to-a-browser-page).
 
 ### Checks for an API
 
@@ -138,7 +140,28 @@ These checks are understood:
 - `x.y && x.y()`, `!x.y || x.y()` and `x.y ? x.y() : fallback`
 - `x.y` in any place of an `&&` or `||` chain that is the test of an `if`, a loop or `?:`, or the operand of `!`, such as `if (a && x.y && b)`
 - `x.y?.()`, and `if (x.y?.z)` or `if (x.y?.z?.())`, which also protect `x.y`
-- a guard clause such as `if (!x.y) throw …` or `return`, for the rest of the block
+- a guard clause such as `if (!x.y) throw …`, `return`, `break` or `continue`, for the rest of the block
+
+A guard clause at the top level of a `try` block also protects the code after the `try` statement. This holds when the `catch` has a `return`, `throw`, `break` or `continue` at its top level. Then the code after the `try` runs only when the block ended without an error or a jump. So the test of the clause was false:
+
+```js
+export function config() {
+  try {
+    if (!globalThis.FileList) return false;
+  } catch (_) {
+    return false;
+  }
+  return globalThis.FileList.prototype; // guarded
+}
+```
+
+The clause does not protect the code after the `try` in these cases:
+
+- The `catch` has no jump at its top level, as in `catch (_) { log(_); }`, `catch (_) { if (a) return; else throw _; }` or `catch (_) { process.exit(1); }`. The code after the `try` can then run after an error. The error can come from the test of the clause or from code before it.
+- The `try` has a `finally` block.
+- The clause is in a nested block, in a branch or in a function. It then protects the rest of that block only. A `try` inside a `try` is the exception: the code after the outer `try` is protected when both `catch` blocks have a jump at their top level.
+
+This holds for each check that a guard clause understands, such as `typeof Deno === 'undefined'`.
 
 A minifier writes `typeof x.y === 'undefined'` as `typeof x.y > "u"`. It writes `typeof x.y !== 'undefined'` as `typeof x.y < "u"`. edgefit reads both as the long form. It reads them with the sides swapped too: `"u" < typeof x.y` means `=== 'undefined'`, and `"u" > typeof x.y` means `!== 'undefined'`.
 
@@ -157,13 +180,23 @@ A read with `?.`, such as `x?.y`, gives `undefined` when `x` is missing, so it i
 
 A call, as in `x?.y()`, is also a use: it throws when `x` exists but has no `y`.
 
-A compiler can write `x.y?.z` and `x.y ?? z` in another form when the code is compiled for ES2019 or older. edgefit reads that output as the source, so it is the same check. TypeScript, Babel and esbuild write `(_a = x.y) == null ? void 0 : _a.z`, `(_a = x.y) === null || _a === void 0 ? void 0 : _a.z`, `(_a = x.y) != null ? _a : z` and `(_a = x.y) !== null && _a !== void 0 ? _a : z`. A minified test is `(_a = x.y) != null && _a.z`. A call `x.y?.()` is `_a.call(x)`, and `(x.y?.z)()` is `(…).call(_a)`. A strict compare alone, as in `(_a = x.y) === null ? void 0 : _a.z`, is not one of them, because it lets `undefined` through. A chain on a plain name has no temp, as in `x == null ? void 0 : x.y`. Its compare is a check like any other, with one exception. The exception is a statement that is only a read of a member of the chain, or a direct call of the chain, as in `(x == null ? void 0 : x.y).z;` or `(x == null ? void 0 : x.y)();`. More reads and direct calls can follow, as in `(x == null ? void 0 : x.y).z.w();`. Such a statement throws when `x` is missing. So edgefit reads it as `(x?.y).z;`, and the read is a use. A statement that is a list of such reads joined with commas, as minified code writes it, counts too. The chain must be one or more reads of `x` with fixed names, such as `x.y`, `x.y.z` or `x['y']`. Each compiled form of the compare counts, such as `x == null ? void 0 : …`, `x === null || x === void 0 ? void 0 : …` or `x != null ? … : void 0`. These keep the compare as a check:
+A compiler can write `x.y?.z` and `x.y ?? z` in another form when the code is compiled for ES2019 or older. edgefit reads that output as the source, so it is the same check. TypeScript, Babel and esbuild write `(_a = x.y) == null ? void 0 : _a.z`, `(_a = x.y) === null || _a === void 0 ? void 0 : _a.z`, `(_a = x.y) != null ? _a : z` and `(_a = x.y) !== null && _a !== void 0 ? _a : z`. A minified test is `(_a = x.y) != null && _a.z`.
+
+A minified statement is `(_a = x.y) == null || _a.z;`. It can also have two strict compares: `(_a = x.y) === null || _a === void 0 || _a.z;`. This `||` gives `true` when `x.y` is missing, but `x.y?.z` gives `undefined`. So edgefit reads it as `x.y?.z` in these places only: a statement, an item of a list joined with commas that is not the last item, the operand of `void`, and the init and the update of a `for` loop. It also reads it as `x.y?.z` as the last item of such a list, as the right side of `&&`, `||` or `??`, and as a branch of `?:`, when the expression around it is in one of these places. In any other place, the read of `x.y` stays a use. Examples are a declaration, a `return`, an argument, a test, and the body of an arrow function that has no braces. Then the rule for a `?.` after a global applies to the chain, as it does to the source, see [Checks for a global](#checks-for-a-global).
+
+A chain can have a `?.` after a call, as in `x.y?.z()?.w`. It can also have an optional call after a member, as in `x.y?.z?.()`. A compiler writes a temp for the value of the first part, as in `(_b = (_a = x.y) == null ? void 0 : _a.z()) == null ? void 0 : _b.w` and `(_b = (_a = x.y) == null ? void 0 : _a.z) == null ? void 0 : _b.call(_a)`. edgefit reads each of them as one chain, so the rule for a `?.` after a global applies, see [Checks for a global](#checks-for-a-global). A parenthesis in the source still ends the chain, as in `(x.y?.z()).w?.()`.
+
+A minifier writes the statement `x.y ?? z()` as `(_a = x.y) != null || z()`. edgefit reads it as `x.y ?? z()` in the places listed above where the value is dropped. It does not read it when `z()` uses `_a`, because the fallback of `x.y ?? z()` cannot use `_a`. A minifier writes `n ?? x.y?.z` as the flat `n != null || (_a = x.y) == null || _a.z`. edgefit reads it as `n != null || x.y?.z` in the same places. It does not read a flat `||` that has a second test `!= null`, as in `n != null || (_a = x.y) != null || z()`. There the read of `x.y` stays a use.
+
+A compiler writes `delete x.y?.z` as `(_a = x.y) == null ? true : delete _a.z`. A minifier writes `!0` for `true`, or writes the form `(_a = x.y) == null || delete _a.z`. edgefit reads all of them as `delete x.y?.z`, in every place, because `true` is also the value of `delete x.y?.z` when `x.y` is missing. It does not read the flat `||` of a minifier, as in `n != null || (_a = x.y) == null || delete _a.z`. There the read of `x.y` stays a use.
+
+A call `x.y?.()` is `_a.call(x)`, and `(x.y?.z)()` is `(…).call(_a)`. A strict compare alone, as in `(_a = x.y) === null ? void 0 : _a.z` or `(_a = x.y) === null || _a.z;`, is not read as `x.y?.z`, because it lets `undefined` through. A chain on a plain name has no temp, as in `x == null ? void 0 : x.y`. Its compare is a check like any other, with one exception. The exception is a statement that is only a read of a member of the chain, or a direct call of the chain, as in `(x == null ? void 0 : x.y).z;` or `(x == null ? void 0 : x.y)();`. More reads and direct calls can follow, as in `(x == null ? void 0 : x.y).z.w();`. Such a statement throws when `x` is missing. So edgefit reads it as `(x?.y).z;`, and the read is a use. A statement that is a list of such reads joined with commas, as minified code writes it, counts too. The chain must be one or more reads of `x` with fixed names, such as `x.y`, `x.y.z` or `x['y']`. Each compiled form of the compare counts, such as `x == null ? void 0 : …`, `x === null || x === void 0 ? void 0 : …` or `x != null ? … : void 0`. These keep the compare as a check:
 
 - a read in a declaration, a `return`, an argument, a test or a longer expression
 - a read with `?.` or with a key that is not a fixed name, as in `(x == null ? void 0 : x.y)?.z` or `(x == null ? void 0 : x.y)[k]`
 - a call through `.call`, `.apply` or `.bind`, a `new`, and destructuring
 - a chain with a call inside, as in `(x == null ? void 0 : x.y()).z;`
-- the form `x != null && x.y`, which code also has when nobody compiled it
+- the forms `x != null && x.y` and `x == null || x.y`, which code also has when nobody compiled it
 
 A check only covers the API it names, and anything below it. `if (fs.watchFile)` does not guard `fs.watch`.
 
@@ -187,6 +220,12 @@ Usages in the `try` block are guarded, for the APIs the target lacks and for the
 - a function defined in the block, which may run after the block has ended, and a class body
 - an `import()` that nothing awaits, since its error does not reach the block. `await import(…)` does
 
+A guard clause at the top level of a `try` block protects the code after the `try`, see [Checks for an API](#checks-for-an-api).
+
+A `require()` or an `import()` in a `try` block that guards can name its module with a conditional expression of strings, such as `require(flag ? 'a' : 'b')`. The `import()` must follow `await` directly. A `const` can hold the expression, but a `let` or a `var` cannot. Each branch can be a string, a `const` that holds a string, or strings that a template literal or a `+` joins. A branch can also be `undefined`, `null` or `void 0`, which loads nothing. When every branch is one of these, edgefit reads one `require()` or `import()` for each string, and it does not report `require(<expression>)` or `import(<expression>)`. A Node.js module that a string names is then reported by name, as for a plain call. A test such as `typeof Deno !== 'undefined'` limits its branch to that runtime, as in an `if`. See [Runtime checks](#runtime-checks). Edgefit does not read the code of a package that a string names when a `const` holds the expression or `createRequire` makes the call. It does not read it for a `const` that holds one string either.
+
+Edgefit reports the call as before when one branch is something else, such as a variable or a call, when only `undefined` and `null` are left, when the `catch` throws again, and when no `try` block guards the call. An unguarded `require` is `unknown`, and it is an error on `vercel-edge`.
+
 ### Polyfills
 
 Code can set a global only when the global is missing, as in `globalThis.x ??= value`. This is a polyfill store. The value does not run on a target that has the global and whose data marks it as supported, so the value is guarded on that target:
@@ -205,7 +244,7 @@ The guard applies to:
 - each API and native addon in the value
 - the code of a local function that only the store names, see [Functions that only checked code uses](#functions-that-only-checked-code-uses)
 
-The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. The global object must be `globalThis`, `self` or `global` by its own name, or a `const` declared as `const g = globalThis` (or `self` or `global`). A store through a `let` or `var` alias, such as `let g = globalThis; g.fetch ??= value`, does not count.
+The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. The global object must be `globalThis`, `self` or `global` by its own name, or a `const` declared as `const g = globalThis` (or `self` or `global`). A store through a `let` or `var` alias, such as `let g = globalThis; g.fetch ??= value`, does not count. A `const` that copies such an alias does not count either.
 
 The value stays a finding when:
 
@@ -239,6 +278,92 @@ The minified form of a `typeof` check, such as `typeof Deno < "u"`, names a runt
 
 The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
 
+These checks also work through a `const` that holds the global object, as in `const g = globalThis; if (typeof g.Bun !== 'undefined') { … }`. The `const` can hold `globalThis`, `self`, `global`, another such `const`, or a conditional of them. A `let`, a `var`, a parameter, a name from another file, a name from a destructuring and `window` are not read as the global object, so a check through them guards nothing. A `let` or a `var` does not count even when the code never writes it again. A `const` that copies one of them does not count either. See [Limitations](/guide/limitations).
+
+### Signal handlers
+
+edgefit guards the code of a signal handler on Workers and Vercel Edge, for two reasons. On Workers, a real SIGTERM did not call a handler in the workerd version that edgefit pins. On Vercel Edge, the data allows only `process.env`, see [process](/targets/vercel-edge#process), and a call of `process.on`, `process.once` or `process.addListener` fails there, so no handler is set. So the code of a signal handler does not run there, unless the code emits the event itself, see [Limitations](/guide/limitations). Everything in it is guarded, an API that exists and throws included:
+
+```js
+process.on('SIGTERM', () => {
+  process.kill(process.pid, 'SIGTERM'); // Guarded on Workers and Vercel Edge
+});
+```
+
+A handler is the function in a call of `process.on`, `process.once` or `process.addListener`, when the event is a string that starts with `SIG` and no code can change it. The event can be:
+
+- a string in quotes
+- a `const` that holds a string, or a template literal or a `+` that joins such strings
+- the loop variable of an array that the code writes in place, as in `for (const signal of ['SIGINT', 'SIGTERM'])` or `['SIGINT', 'SIGTERM'].forEach(signal => …)`
+- the loop variable of the list that a method gets, see below
+
+The callback of `forEach` and the other iterators gets the array as its third argument. So a callback with a third parameter, a rest parameter or the name `arguments` can change the array, and its event does not count.
+
+The function can be written in the call, or it can be a local function that the call names. A local function gets the same guards when its only uses are these two: a handler in such a call, and a call of `process.off` or `process.removeListener` that removes it. The event of a `process.off` call is not checked.
+
+A list can come from the parameter of a method:
+
+```js
+class Server {
+  start() {
+    this.register(['SIGINT', 'SIGTERM']);
+  }
+
+  register(signals) {
+    const stop = () => process.kill(process.pid); // Guarded on Workers and Vercel Edge
+    signals.forEach(signal => process.on(signal, stop));
+  }
+}
+```
+
+The loop variable holds the strings of the list that the one call passes. This holds when all of these are true:
+
+- The class defines the method once, as a method of its instances with a plain name. A static method, a private method and a field that holds an arrow function do not count.
+- The file has one call `this.register(…)`, and `this` in it is the instance. The call can be in a method, or in an arrow function in a method. A call in a function, a field initializer, a static block or another class does not count.
+- The argument is an array of strings that the call writes in place. A name that holds the array does not count, because other code can change it.
+- The method only walks the parameter, with `forEach`, `map`, `filter`, `some`, `every`, `find`, `findIndex`, `flatMap` or `for…of`. The callback is an arrow function or a function expression that cannot change the array, see above. Any other use of the parameter, such as `signals.length` or `signals.push(…)`, does not count. A method that uses the name `arguments` does not count either.
+- The file does not use the method in any other way. A call on another object, a read that is not a call, a key of an object with the name, and a `this[…]` with a computed key anywhere in the file are other uses.
+- No other file that edgefit reads mentions the word `register`.
+
+edgefit does not see a call from a file that it does not read, such as your own code when you run `edgefit package`. It does not see a call that reaches the method through a computed key, such as `object[name](…)`, either. See [Limitations](/guide/limitations).
+
+The list also gives the keys of a computed read in the method, as in `for (const name of names) fs[name]()`. So a `node:fs[<expression>]` warning can become the error for the exact API.
+
+The call of `process.on` is not part of the handler. An import at the top of the file is not part of it either. They stay findings where they are findings today. edgefit does not guard the code of a handler on Bun, Deno, Deno Deploy and Netlify Edge Functions, so a finding in it stays there. Deno calls a handler when a signal arrives, and Netlify Edge Functions run Deno.
+
+The code stays a finding when:
+
+- the event can be a string that does not start with `SIG`, such as `exit`, or is not known. An event is not known when it is a `let`, a parameter of a function, a member of an object, a `?:` expression, or a template literal with an unknown part
+- the event comes from a list that has a name, as in `const signals = ['SIGINT']; signals.forEach(…)`. Other code can change a named list, for example with `signals.push('exit')`
+- the list comes from a method that does not meet the conditions above
+- the handler is not a function written in the call or the name of a local function. A call such as `make()` runs at once. A `?:` expression, a member such as `this.stop` and a name from another file are not read
+- a local function that is a handler is also called, exported or passed to other code, see [Functions that only checked code uses](#functions-that-only-checked-code-uses)
+- a function only a handler calls, see [Limitations](/guide/limitations)
+
+### Functions sent to a browser page
+
+Browser automation tools, such as Puppeteer, send a function to a page and run it there. The code of that function never runs on the runtime that makes the call, so everything in it is guarded, an API that exists and throws included:
+
+```js
+await page.evaluate(name => {
+  return globalThis[name].args; // Guarded on Workers, Bun and Deno
+}, bindingName);
+```
+
+A page function is a function expression or an arrow function that is the first argument of a call of a method with the name `evaluate`, `evaluateHandle` or `evaluateOnNewDocument`. The call itself and its other arguments are code of the caller, so they stay findings where they are findings today. A function that only a page function calls, such as `read` in `page.evaluate(() => read(key))`, is guarded too, see [Functions that only checked code uses](#functions-that-only-checked-code-uses).
+
+The code stays a finding when:
+
+- the function is not written in the call, as in `page.evaluate(read)`. The code of `read` is checked where it is declared
+- the first argument is another expression, such as a `?:` expression or a call like `wrap(() => …)`, or the function is not the first argument
+- the call is an optional call, as in `page.evaluate?.(() => …)`. A call through an optional chain, as in `page?.evaluate(() => …)`, is read
+- the call is not a method call with one of these names, such as `evaluate(() => …)`, `page.evaluate.call(page, () => …)` or `page.$eval(selector, () => …)`
+- a function only another function calls, see [Limitations](/guide/limitations)
+
+A file that the function loads with `import()` or `require()` is still checked, because the load adds the file to the check. An import at the top of the file is checked too.
+
+edgefit does not read what the method does. A method of your own with one of these names that calls the function on the runtime still gets the findings in the function guarded. See [Limitations](/guide/limitations).
+
 ### Checks for a global
 
 A check for a global decides which branch runs when the target data says if the target has the global. The code that does not run is guarded, and it is not a finding:
@@ -254,11 +379,11 @@ if (!global.crypto) {
 }
 ```
 
-The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding.
+The forms are `typeof X`, a test of `X`, `'X' in globalThis` and `globalThis.X`, in an `if`, `?:`, `&&`, `||`, `??`, an `else` branch and a guard clause. The minified form of a `typeof` check counts too, see [Checks for an API](#checks-for-an-api). A global that the data does not name decides nothing. On a target where the code can run, it stays a finding. For a global that the data lists as read at load, such as `document` or `DOMParser`, only `typeof X` is a check of the bare name, see [Browser globals by their bare name](#browser-globals-by-their-bare-name). The global object can also be a `const` that holds it, as in `const g = globalThis; if (!g.FileList) { … }`. A `let`, a `var`, a parameter and a name from a destructuring do not count, also when the code never writes them again, because code that edgefit cannot see may write them. A `const` that copies one of them, or that holds a member of one, as in `const w = g.Worker`, does not count either. See [Runtime checks](#runtime-checks) for the names that count.
 
 `undefined` and `NaN` exist on every target, but a value test can see them as missing. `undefined` looks missing to each value test, also to `=== undefined` and `typeof … === 'undefined'`. `NaN` looks missing only to a truthiness test, such as `!globalThis.NaN` or `globalThis.NaN || x`. So the code that such a test runs is not guarded, see [Polyfills](#polyfills). `typeof globalThis.NaN`, `globalThis.NaN === undefined` and `globalThis.NaN ?? x` still decide the branch.
 
-The data of `workerd` says that `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing. The data of `netlify-edge` says that `document`, `HTMLAnchorElement` and `Bun` are missing. So code behind `typeof window !== 'undefined'` is guarded on Workers. Netlify Edge Functions have a `window` global, so there the check decides nothing.
+A check such as `typeof window !== 'undefined'` guards the code behind it on a target where the global is missing. The data says that `window`, `document` and the other DOM globals are missing on every target, except the names that a target has, see [DOM globals](/targets/#dom-globals). `Bun` is missing on every target except Bun, and `Deno` is missing on every target except Deno, Deno Deploy and Netlify Edge Functions. Netlify Edge Functions have a `window` global, so there a check of `typeof window` decides nothing.
 
 A global that the target lacks is `undefined` on the global object. So these uses of `globalThis.X`, `self.X` or `global.X` do not fail, and they are guarded on a target that lacks `X`:
 
@@ -268,13 +393,52 @@ A global that the target lacks is `undefined` on the global object. So these use
 - a comparison with `===`, `!==`, `==` or `!=`
 - the value of a `const` with a plain name that the file does not export in any form, as in `const doc = globalThis.document`. The same list applies to each use of `doc`. Destructuring, as in `const { version } = globalThis.Deno`, throws on a missing global.
 
+A `?.` right behind the global guards the rest of the chain, as in `globalThis.Deno?.env.toObject()`. The global object can be `globalThis`, `self`, `global` or a `const` that holds one of them, see [Runtime checks](#runtime-checks). The chain stops when `Deno` is missing, so the call does not run. The use is guarded when the value of the chain goes into one of these places:
+
+- the test of an `if` or `?:`, the left side of `&&`, the operand of `typeof` or `!`, or a comparison with `undefined` or `null`
+- an operand of `||` or `??`. The right operand counts when the left one is an API, see [Checks for an API](#checks-for-an-api)
+- a place where nothing reads the value. These places are a statement of its own, an item of a list joined with commas that is not the last item, the operand of `void`, and the init and the update of a `for` loop. They are also the last item of such a list, the right side of `&&`, `||` or `??`, and a branch of `?:`, when the expression around it is one of these places. A call with `await` before it counts too, as in `await globalThis.Deno?.core.read();`. The list is closed. A use in the test of a `for`, `while` or `do` loop is a finding. A use in a declaration in the init of a `for` loop, as in `for (let i = globalThis.Deno?.core.read(); ; )`, is a finding too, because the declaration assigns the value
+
+The right side of an `&&` goes to the same place as the `&&`. So `if (n && globalThis.Deno?.core.read())` is guarded. `const v = n && globalThis.Deno?.core.read()` and `while (n && globalThis.Deno?.core.read())` are findings.
+
+The use is a finding in these cases:
+
+- the value is assigned, returned, passed to a call or used in another way. This holds also when `await` comes first, even for a test, as in `if (await globalThis.Deno?.core.read())`. The one exception is an awaited call in a place where nothing reads the value, as in the list above
+- the `?.` comes after a plain `.` read of the global, as in `globalThis.Deno.env?.toObject()`
+- the chain starts at a module, as in `fs?.watch('.')`, because a missing module does not always leave `undefined` in the name
+- the other operand of the `||` or `??` is `null` or `undefined`, as in `(globalThis.Deno?.env.toObject() ?? null).x`, because the value can be nullish. This does not apply where nothing reads the value, as in `null ?? globalThis.Deno?.core.print('x');`
+- the chain starts at a name that is not read as the global object, such as a `let`, a `var`, a parameter or a `const` that copies one of them, as in `let g = globalThis; g.Deno?.env.toObject()`
+- the target has `Deno` and lacks `env.toObject`
+
+A chain that starts at a bare name, as in `Deno?.env.toObject()`, is not part of this rule, because the `?.` does not stop a ReferenceError when `Deno` is not declared. edgefit reports a bare read only when it runs as the module loads, see [Browser globals by their bare name](#browser-globals-by-their-bare-name).
+
+The guard follows the data of the target. Code that fills the global, in this file or in another one, is not followed, see [Only some guards are understood](/guide/limitations#only-some-guards-are-understood).
+
 Every other use is a finding when no check protects it. Examples are a call, `new`, a member (`globalThis.document.title`, or `doc.title`), `instanceof`, `extends`, a spread, `for…of`, `.call`, `.apply`, `.bind`, a `return`, an export, and an argument of a call other than `Boolean`.
 
-edgefit does not report a browser global that the code uses by its bare name, such as `document.title`. This can hide a real failure. See [Limitations](/guide/limitations).
+### Browser globals by their bare name
+
+A name that no scope declares throws a `ReferenceError` where the global is missing, whatever the code does with it. Only `typeof document` is safe. edgefit follows this rule for two groups of globals. The first group is the globals that the overrides name as missing: `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` on Workers, and `document`, `HTMLAnchorElement` and `Bun` on Netlify Edge Functions. The second group is each DOM global that the target lacks, such as `DOMParser`, `Node` and `XMLSerializer`, see [DOM globals](/targets/#dom-globals). For these globals, `!document`, `if (document)`, `document && x`, `document ?? x`, `document == null` and `document?.x` are not checks. Each one reads the name, and the read is a use of it.
+
+Each of these two modules fails on Workers:
+
+```js
+if (!document) throw new Error('needs a browser'); // `document` is missing
+```
+
+```js
+const doc = document.implementation.createDocument(null, null, null);
+```
+
+Code after `if (!document) throw …` is guarded, because the throw stops it.
+
+edgefit reports a read of one of these globals by its bare name only when the read runs as the module loads. No function, instance field, `if` or `?:` branch, right side of `&&`, `||`, `??` or a logical assignment, loop body, `try` statement (with its `catch` and `finally`) or `switch` case sits around it. Such a read stops the module when it loads. A read in other code may run later or never, for example in a function that only a browser calls, or behind an environment check that edgefit cannot read. edgefit cannot tell, so it does not report the read. This can hide a real failure. A read after the file sets the global itself outside a function, as in `globalThis.document = {}`, is not reported either. See [Limitations](/guide/limitations).
+
+For a global that the overrides name, a read through the global object, such as `globalThis.document.title`, is a finding in any code, also in a function or a branch, when no check protects it. For another DOM global, such as `DOMParser`, edgefit does not report a read through the global object, because a read of a missing global gives `undefined` and does not throw a `ReferenceError`. A member of it, as in `new globalThis.DOMParser()`, throws a `TypeError`, and edgefit does not report that either. A check through the global object protects a later bare read: after `if (!globalThis.document) throw …`, the read `document.title` is guarded.
 
 ### Code a package ships and the target does not run
 
-A bundle can hold code that a target never runs, and that no check in the code shows. Next.js's Edge bundle holds the code for Cache Components, which Next turns off on the Edge runtime, and a timing call that only `next dev` makes. edgefit keeps a reviewed list of such cases in `data/unreached.json`: the package, the releases it was read in, the file, the APIs, the target, why the code does not run and where that is stated. A finding in a listed file is guarded and shows the reason:
+A bundle can hold code that a target never runs, and that no check in the code shows. Next.js's Edge bundle holds the code for Cache Components, which Next turns off on the Edge runtime, and a timing call that only `next dev` makes. edgefit keeps a reviewed list of such cases in `data/unreached.json`: the package, the releases it was read in, the file, the other files that hold the condition when it is not in that file, the APIs, the options that make the code run when the entry names any, the target, why the code does not run and where that is stated. A finding in a listed file is guarded and shows the reason, unless the project sets an option that the entry names (see [Options of the package](#options-of-the-package)):
 
 ```
 guarded  unsupported  setImmediate  (vercel-edge)
@@ -282,15 +446,26 @@ guarded  unsupported  setImmediate  (vercel-edge)
        not reached: Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.
 ```
 
-It applies to a check of the source and of build output alike. A release outside the listed range is checked as usual, so a new release is not assumed to behave the same. A weekly check reads the latest release and flags an entry whose file or APIs no longer match.
+An entry applies to a check of the source and of build output alike. An entry that names options is read in a different way in the two: see [Options of the package](#options-of-the-package). A release outside the listed range is checked as usual, so a new release is not assumed to behave the same. A weekly check reads the latest release and flags an entry whose files or APIs no longer match. The new release is checked as usual until a maintainer merges a pull request that widens the range. The check opens that pull request when every file that the newest range of the package names, and every file that its entries list as holding the condition, has the same bytes in the new release and in the last release of that range.
 
 ### A module that a package file stores
 
-Some code keeps a Node.js module in a lookup table and reads it later, as `follow-redirects` does for `node:http` and `node:https`. A check cannot follow a module that is stored this way, so it reports the module as `unknown`. edgefit keeps a reviewed list of such files in `data/stored-modules.json`: the package, the releases it was read in, the file, the modules, the members that the file reads of them, why those are the only ones, and where that is stated. A listed file counts as a use of those members of the module, and the module is no longer `unknown`. This also covers a module that one file stores in a property of another module's export object and a third file reads, which no rule follows. A release below the listed range, another file, or a member that the list does not hold is checked as usual. A weekly check reads the latest release and flags an entry whose file or members no longer match.
+Some code keeps a Node.js module in a lookup table and reads it later, as `follow-redirects` does for `node:http` and `node:https`. A check cannot follow a module that is stored this way, so it reports the module as `unknown`. edgefit keeps a reviewed list of such files in `data/stored-modules.json`: the package, the releases it was read in, the file, the modules, the members that the file reads of them, why those are the only ones, and where that is stated. A listed file counts as a use of those members of the module, and the module is no longer `unknown`. This also covers a module that one file stores in a property of another module's export object and a third file reads, which no rule follows. A release below the listed range, another file, or a member that the list does not hold is checked as usual. A weekly check reads the latest release and flags an entry whose file or members no longer match. The new release is checked as usual until a maintainer merges a pull request that widens the range. The check opens that pull request when every file that the newest range of the package names has the same bytes in the new release and in the last release of that range.
 
 ### Options of the package
 
-Some code in a package runs only when the project sets an option of its API, as `fastify` does for `http2: true`. A usage that sits behind a test of an option that its function gets, such as `if (options.http2)`, `options.http2 === true`, `options.http2 ? a : b` or `if (!options.http2) return` before the code, is guarded when no file of the graph sets that option to a value other than `false`, `0`, `null`, `undefined` or `''`. A property of an object literal, a member assignment, and a value that is not a literal count as a setting. The verbose list says `runs only when the option `http2` is set`. When the project sets the option, the usage is an ordinary finding, so run `edgefit check` on your app. An option that a function reads through a destructured parameter, or through `this`, is not recognized.
+Some code in a package runs only when the project sets an option of its API, as `fastify` does for `http2: true`. A usage that sits behind a test of an option that its function gets, such as `if (options.http2)`, `options.http2 === true`, `options.http2 ? a : b` or `if (!options.http2) return` before the code, is guarded when no file of the graph sets that option to a value other than `false`, `0`, `null`, `undefined` or `''`. A property of an object literal, a member assignment, and a value that is not a literal count as a setting. A destructuring pattern in your code, such as `const { http2 } = env` or `function f({ http2 }) {}`, reads the name and sets nothing, so it does not count, also when it gives the name a default value, as in `{ http2 = true }`. An object literal on the right side, as in `const { a } = { http2: true }`, still counts, and so does a pattern that assigns to a member, as in `({ a: target.http2 } = env)`. The verbose list says `runs only when the option `http2` is set`. When the project sets the option, the usage is an ordinary finding, so run `edgefit check` on your app. An option that a package function reads through a destructured parameter, or through `this`, is not recognized.
+
+An entry of the [list of code that a target does not run](#code-a-package-ships-and-the-target-does-not-run) can name the options that make the code run. It applies only when no file of your own code in the graph sets one of them. A setting is as described above, and a name matches by name only, so a property with the same name for another call also counts. So `got(url, { http2: true })` gives an ordinary finding, and `got(url)` gives a guarded one.
+
+An entry can also name an option as a path, such as `auth.lock` for `@supabase/auth-js`. `createClient` of `@supabase/supabase-js` takes this option as `{ auth: { lock: navigatorLock } }`. A file sets a path when a property `lock` is in an object literal that is the value of a property `auth`. Other objects can enclose the object of `auth`, so `{ supabase: { auth: { lock } } }` also sets it. The value follows the same rule as for a name. These do not set the path, so the finding stays guarded:
+
+- A property `lock` that is not directly in the object that is the value of `auth`, such as `{ lock }` or `{ auth: { other: { lock } } }`.
+- A value of `auth` that is not an object literal, such as `const auth = { lock }`, an array, a call, or `options.auth = { lock }`.
+- A member assignment, such as `settings.auth.lock = fn`.
+- A destructuring pattern.
+
+Three more cases do not bring the finding back. A file of a package does not count, because a package forwards the option that its own user sets. A nested property, such as `{ hooks: { http2: true } }`, does not set the plain name `http2`, and the finding stays guarded. Only an entry that names the path can read it. In build output edgefit does not read the options, so the entry applies also when the project sets one. The code of the project and of its packages is in the same files there.
 
 ### Production builds
 
@@ -339,7 +514,7 @@ function downloadSaveAs(blob) {
 }
 ```
 
-A use in a [polyfill store](#polyfills), such as `globalThis.fetch ??= myFetch`, also counts as a use behind a check. This check depends on the target. On a target that lacks the global, or whose data does not mark it as supported, the store runs, so the code in the function is not behind a check. A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
+A use as a [signal handler](#signal-handlers) or in a [page function](#functions-sent-to-a-browser-page) also counts as a use behind a check. So does a use in a [polyfill store](#polyfills), such as `globalThis.fetch ??= myFetch`. The check of a polyfill store depends on the target. On a target that lacks the global, or whose data does not mark it as supported, the store runs, so the code in the function is not behind a check. A use in code that never runs, such as a branch that `NODE_ENV` rules out, does not count. A use inside the function itself does not count. The function gets no checks when:
 
 - one use has no check
 - the file exports the function in any form: `export`, `export default`, `exports.x` or `module.exports`, also inside a check

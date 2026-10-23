@@ -1,6 +1,6 @@
 import { readMatrix, readOverrides } from './data.mjs';
 import { missingApis } from './drift.mjs';
-import { webMissingApis } from './web.mjs';
+import { domMissingApis, webMissingApis } from './web.mjs';
 
 /** Flattens a matrix tree into `module.member.path` names with their kind. */
 export function flattenMatrix(tree) {
@@ -72,6 +72,7 @@ export function buildSpec(
         ...missingApis(readMatrix(runtime), baseline, overrides),
         // edgefit reads the Web API data only for an API that the baseline lacks.
         ...webMissingApis(runtime).filter(api => !inBaseline(baseline, api)),
+        ...domMissingApis(runtime),
       ]
     : [];
   // A bare module name is a namespace, which cannot be called, so it is only looked up.

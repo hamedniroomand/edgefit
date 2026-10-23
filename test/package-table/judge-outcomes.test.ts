@@ -120,6 +120,28 @@ describe('the text of an error', () => {
   });
 });
 
+describe('a peer that a note names and that did not install', () => {
+  const peerFailures = ['react: No matching version'];
+
+  it('gives no outcome for a pass row, although the load passed', () => {
+    const cell = judge({ status: 'pass', run: { load: { ok: true } }, findings: [], peerFailures });
+    expect(cell).toEqual({
+      outcome: 'absent',
+      kind: 'load',
+      reason: 'peer not installed',
+      error: 'react: No matching version',
+    });
+  });
+
+  it('gives no outcome for a fail row too', () => {
+    const run = { load: error({ message: 'boom' }) };
+    expect(judge({ status: 'fail', run, findings: [], peerFailures })).toMatchObject({
+      outcome: 'absent',
+      reason: 'peer not installed',
+    });
+  });
+});
+
 describe('a load that needs a package that is not installed', () => {
   const bun = error({
     code: 'ERR_MODULE_NOT_FOUND',

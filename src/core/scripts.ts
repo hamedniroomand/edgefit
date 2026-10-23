@@ -9,7 +9,7 @@ import type { ApiRef, Usage } from '@/types.ts';
 
 import { dropFollowed, followAliases } from './aliases.ts';
 import { NativePackages } from './native-packages.ts';
-import { followChecks, followStrings } from './string-imports.ts';
+import { followChecks, followStrings, sharedMethods } from './string-imports.ts';
 import { uncheckedImports } from './unchecked-imports.ts';
 
 export function toPosix(file: string): string {
@@ -29,6 +29,10 @@ export interface ScanOptions {
   leaveOutMissingPeers?: boolean;
   /** Name the exports of the entry's package that reach a usage, when only some of them do. */
   byExport?: boolean;
+  /** The options that the data names as a path, such as `auth.lock`. A file lists each one that it sets. */
+  optionPaths?: readonly string[];
+  /** The tracked globals that only a read at load fails. A check of one by its plain name throws there. */
+  loadOnlyGlobals?: ReadonlySet<string>;
 }
 
 // esbuild's metafile also lists JSON and asset inputs, which hold no code.
@@ -85,6 +89,7 @@ function extractOne(
   importedModules?: ReadonlyMap<string, ApiRef>,
   importedStrings?: ReadonlyMap<string, string>,
   importedChecks?: ExtractedModule['checks'],
+  sharedMethods?: ReadonlySet<string>,
 ): ExtractedModule {
   return extractModule(toPosix(file), source, {
     globals,
@@ -98,6 +103,9 @@ function extractOne(
     importedModules,
     importedStrings,
     importedChecks,
+    sharedMethods,
+    optionPaths: options.optionPaths,
+    loadOnlyGlobals: options.loadOnlyGlobals,
   });
 }
 
@@ -116,10 +124,30 @@ function uncheckedOf(
   );
 }
 
+type First = {
+  file: string;
+  module: GraphModule;
+  source: string;
+  found: ExtractedModule;
+  /** How many specifiers of the file are native addons before the second pass. */
+  natives: number;
+};
+
+function firstPass(context: Extraction, graph: ModuleGraph): First[] {
+  return [...graph.modules]
+    .filter(([file]) => scriptFile.test(file))
+    .map(([file, module]) => {
+      const source = readFileSync(path.resolve(context.root, file), 'utf8');
+      const found = extractOne(context, file, module, source);
+      return { file, module, source, found, natives: context.native.specifiers(file, module).size };
+    });
+}
+
 /**
  * Extracts every script of the graph. A Node.js module that a file exports under a name is that
  * module in the files that import the name, so those files are extracted again with it. So are
  * the files that import a package that is native because it finds its addon with a computed `require`.
+ * A file is also extracted again when another file mentions a method that its classes get a list for.
  */
 export function extractScripts(
   graph: ModuleGraph,
@@ -136,13 +164,7 @@ export function extractScripts(
     native,
     entries: new Set(graph.entries),
   };
-  const first = [...graph.modules]
-    .filter(([file]) => scriptFile.test(file))
-    .map(([file, module]) => {
-      const source = readFileSync(path.resolve(root, file), 'utf8');
-      const found = extractOne(context, file, module, source);
-      return { file, module, source, found, natives: native.specifiers(file, module).size };
-    });
+  const first = firstPass(context, graph);
   native.findBy(
     first.filter(({ found }) => found.usages.some(isComputedRequire)).map(({ file }) => file),
   );
@@ -150,6 +172,7 @@ export function extractScripts(
   const aliases = options.trace ? followAliases(graph, firstFound) : undefined;
   const strings = options.trace ? followStrings(graph, firstFound) : undefined;
   const checks = options.trace ? followChecks(graph, firstFound) : undefined;
+  const shared = sharedMethods(first);
   return first.map(({ file, module, source, found, natives }) => {
     const seeds = aliases?.seeds.get(file);
     const texts = strings?.get(file);
@@ -158,8 +181,11 @@ export function extractScripts(
       seeds !== undefined ||
       texts !== undefined ||
       held !== undefined ||
+      shared.has(file) ||
       native.specifiers(file, module).size !== natives;
-    const second = again ? extractOne(context, file, module, source, seeds, texts, held) : found;
+    const second = again
+      ? extractOne(context, file, module, source, seeds, texts, held, shared.get(file))
+      : found;
     return {
       file,
       found: withoutLoaderRequires(

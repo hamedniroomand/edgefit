@@ -55,6 +55,23 @@ describe('buildSpec drift against the Node baseline', () => {
   });
 });
 
+describe('buildSpec drift and the DOM globals', () => {
+  const lookups = (runtime: 'bun' | 'deno' | 'workerd'): string[] =>
+    buildSpec(runtime, { drift: true })
+      .apis.filter(entry => entry.lookup === true)
+      .map(entry => entry.api);
+
+  it('looks up a DOM global that the data marks missing', () => {
+    expect(lookups('workerd')).toContain('*globals*.DOMParser');
+    expect(lookups('bun')).toContain('*globals*.DOMParser');
+  });
+
+  it('leaves out a DOM global that the runtime has', () => {
+    expect(lookups('deno')).not.toContain('*globals*.localStorage');
+    expect(lookups('bun')).not.toContain('*globals*.alert');
+  });
+});
+
 describe('buildSpec and modules recorded as present', () => {
   it('looks up, and never calls, each module', () => {
     expect(buildSpec('workerd').apis).toContainEqual({ api: 'v8', lookup: true });

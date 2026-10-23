@@ -1,5 +1,8 @@
 // No `@/` imports here: scripts/unreached/entries.mjs loads this file with plain node.
 
+/** A release as `major.minor.patch`, the only form that a range of the data files holds. */
+export const semver = /^\d+\.\d+\.\d+$/u;
+
 /** The releases an entry was read in. A missing `max` has no upper end. */
 export type VersionRange = { min: string; max?: string };
 

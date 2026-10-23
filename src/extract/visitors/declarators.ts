@@ -7,7 +7,7 @@ import { foldedString, resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { moduleRef } from '@/extract/refs.ts';
 import { isGlobal } from '@/extract/runtimes.ts';
-import { assign, isBound, lookup } from '@/extract/scope.ts';
+import { assign, isBound, lookup, throughMutableAlias } from '@/extract/scope.ts';
 import type { Binding } from '@/extract/scope.ts';
 import type { ApiRef } from '@/types.ts';
 
@@ -17,6 +17,7 @@ import {
   bindLoadedNames,
   bindTarget,
   bindWholeExport,
+  markMutable,
 } from './binders.ts';
 
 /** What `let c;` holds, when `c = value` is the one write to `c` in the file. */
@@ -104,7 +105,12 @@ export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, con
   }
   if (id.type === 'Identifier') {
     const declaration = context.parent();
-    const constant = declaration?.type === 'VariableDeclaration' && declaration.kind === 'const';
+    // A `const` that reads the global object through a `let` or a `var` alias is not marked constant,
+    // so a check through it guards nothing.
+    const constant =
+      declaration?.type === 'VariableDeclaration' &&
+      declaration.kind === 'const' &&
+      !(init !== null && throughMutableAlias(init, context.scope));
     assign(
       context.scope,
       id.name,
@@ -112,6 +118,7 @@ export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, con
         ? binding
         : { ref: binding.ref, recorded: false, ...(constant ? { constant } : {}) },
     );
+    markMutable(id, init, context);
     if (init !== null) {
       if (isBound(initial)) {
         context.visitBound(init);
@@ -124,6 +131,7 @@ export const visitDeclarator: Visitor<NodeOf<'VariableDeclarator'>> = (node, con
   context.visit(init);
   if (binding !== 'require' && id.type === 'ObjectPattern') {
     bindDestructured(id, binding.ref, context);
+    markMutable(id, init, context);
   } else {
     context.visitPattern(id);
   }
@@ -147,6 +155,7 @@ export function bindDestructuredAssignment(
   }
   context.visit(node.right);
   bindDestructured(node.left, binding.ref, context);
+  markMutable(node.left, node.right, context);
   return true;
 }
 
@@ -172,6 +181,7 @@ export function bindAssigned(node: NodeOf<'AssignmentExpression'>, context: Visi
   if (context.parent()?.type !== 'ExpressionStatement') {
     return false;
   }
+  markMutable(left, right, context);
   context.visitBound(right);
   return true;
 }

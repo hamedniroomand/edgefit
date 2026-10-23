@@ -1,5 +1,4 @@
 import { builtinName } from '@/data/builtins.ts';
-import { memberPath } from '@/data/compat-index.ts';
 import { staticKey, stringLiteral, strip } from '@/extract/ast.ts';
 import type { NodeOf } from '@/extract/ast.ts';
 import { interopArgument, isRequire, moduleSpecifier, resolveBinding } from '@/extract/bindings.ts';
@@ -7,9 +6,10 @@ import type { VisitContext, Visitor } from '@/extract/context.ts';
 import { moduleRef } from '@/extract/refs.ts';
 import { isGlobal } from '@/extract/runtimes.ts';
 import { isTracked, isWasmImport } from '@/extract/scope.ts';
+import { recordBranches } from '@/extract/specifier-branches.ts';
 
 import { visitOptionalCallee } from './guards.ts';
-import { visitParentClass } from './inheritance.ts';
+import { visitInherits } from './inheritance.ts';
 
 // The call of the `Function` constructor with code in a string, which Vercel's Edge runtime
 // disables. Shown as `Function(string)`.
@@ -89,54 +89,47 @@ function recordMissing(
   }
 }
 
+/** Records the load of `specifier` that a `require` call makes. */
+function recordRequire(specifier: string, offset: number, context: VisitContext): void {
+  recordMissing(specifier, 'require', context, () => {
+    context.collector.native(specifier, offset);
+    const module = builtinName(specifier);
+    if (module !== undefined) {
+      context.useRef(moduleRef(module), offset);
+    }
+  });
+}
+
 function visitRequire(node: NodeOf<'CallExpression'>, context: VisitContext): void {
   const [argument] = node.arguments;
   if (argument === undefined) {
     return;
   }
   const specifier = moduleSpecifier(argument, context.scope);
-  if (specifier === undefined) {
+  if (specifier !== undefined) {
+    recordRequire(specifier, argument.start, context);
+    return;
+  }
+  const caught = context.collector.guards.isCaught();
+  // Only a caught call is read branch by branch. An uncaught `require` that is left for runtime
+  // is an error on Vercel's Edge runtime, and it keeps that result.
+  const read =
+    caught &&
+    recordBranches(argument, context, name => {
+      recordRequire(name, argument.start, context);
+    });
+  if (!read) {
     // A `try` catches the error of a `require` that fails, so a caught one is only unknown.
-    const ref = context.collector.guards.isCaught() ? undefined : dynamicRequire;
     context.collector.dynamic(
-      ref,
+      caught ? undefined : dynamicRequire,
       'require(<expression>)',
       computedModuleReason,
       node.start,
       false,
       context.supplied.has(node),
     );
-    context.visit(argument);
-    return;
   }
-  recordMissing(specifier, 'require', context, () => {
-    context.collector.native(specifier, argument.start);
-    const module = builtinName(specifier);
-    if (module !== undefined) {
-      context.useRef(moduleRef(module), argument.start);
-    }
-  });
-}
-
-/** `util.inherits(Child, Parent)` makes `Parent` the parent class of `Child`. */
-function visitInherits(node: NodeOf<'CallExpression'>, context: VisitContext): boolean {
-  const callee = resolveBinding(node.callee, context);
-  const [child, parent, ...rest] = node.arguments;
-  if (
-    !isTracked(callee) ||
-    callee.ref.module !== 'util' ||
-    memberPath(callee.ref).join('.') !== 'inherits' ||
-    child === undefined ||
-    parent === undefined ||
-    parent.type === 'SpreadElement'
-  ) {
-    return false;
-  }
-  context.visit(node.callee);
-  context.visitAll([child]);
-  visitParentClass(parent, context);
-  context.visitAll(rest);
-  return true;
+  context.visit(argument);
 }
 
 /** Records the load of a module by a function that only returns a `require()` of it. */
@@ -229,7 +222,18 @@ export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node,
     return;
   }
   const specifier = moduleSpecifier(node.source, context.scope);
-  if (specifier === undefined) {
+  if (specifier !== undefined) {
+    recordImport(specifier, node.source.start, context);
+    return;
+  }
+  // As for `require`, only an awaited call that a `catch` stops is read branch by branch.
+  const read =
+    context.collector.guards.isCaught() &&
+    context.parent()?.type === 'AwaitExpression' &&
+    recordBranches(node.source, context, name => {
+      recordImport(name, node.source.start, context);
+    });
+  if (!read) {
     context.collector.dynamic(
       undefined,
       'import(<expression>)',
@@ -238,10 +242,8 @@ export const visitImportExpression: Visitor<NodeOf<'ImportExpression'>> = (node,
       false,
       context.supplied.has(node),
     );
-    context.visitChildren(node);
-    return;
   }
-  recordImport(specifier, node.source.start, context);
+  context.visitChildren(node);
 };
 
 export const visitNew: Visitor<NodeOf<'NewExpression'>> = (node, context) => {

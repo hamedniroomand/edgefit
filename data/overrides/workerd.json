@@ -702,31 +702,36 @@
       "status": "unsupported",
       "note": "workerd has no window global",
       "source": "../workerd/api/global-scope.h#L866-L1185",
-      "absent": true
+      "absent": true,
+      "loadOnly": "bare"
     },
     "*globals*.document": {
       "status": "unsupported",
       "note": "workerd has no document global",
       "source": "../workerd/api/global-scope.h#L866-L1185",
-      "absent": true
+      "absent": true,
+      "loadOnly": "bare"
     },
     "*globals*.HTMLAnchorElement": {
       "status": "unsupported",
       "note": "workerd has no HTMLAnchorElement global",
       "source": "../workerd/api/global-scope.h#L866-L1185",
-      "absent": true
+      "absent": true,
+      "loadOnly": "bare"
     },
     "*globals*.Deno": {
       "status": "unsupported",
       "note": "workerd has no Deno global",
       "source": "../workerd/api/global-scope.h#L866-L1185",
-      "absent": true
+      "absent": true,
+      "loadOnly": "bare"
     },
     "*globals*.Bun": {
       "status": "unsupported",
       "note": "workerd has no Bun global",
       "source": "../workerd/api/global-scope.h#L866-L1185",
-      "absent": true
+      "absent": true,
+      "loadOnly": "bare"
     }
   }
 }

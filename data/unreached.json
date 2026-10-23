@@ -1,60 +1,62 @@
 {
   "version": 1,
-  "description": "Code that a package ships and a bundler includes, but that does not run on the target. A finding in a listed file for a listed API is reported as guarded, with the reason, and never fails a check. Each entry names the package, the versions it was read in, the file inside the package, the APIs as shown in reports, the target, why the code is not reached, and where the reason is stated. The weekly check flags an entry whose file or APIs no longer match, and a release that no entry covers.",
+  "description": "Code that a package ships and a bundler includes, but that does not run on the target. A finding in a listed file for a listed API is reported as guarded, with the reason, and never fails a check. Each entry names the package, the versions it was read in, the file inside the package, the APIs as shown in reports, the target, why the code is not reached, and where the reason is stated. An entry can also name `options` that make the code run. An option is a name, such as `http2`, or a path, such as `auth.lock`, which is a property `lock` in an object literal that is the value of the property `auth`. A project that sets one of them gets the ordinary finding instead, and the entry applies to every other project. In build output the entry always applies. An entry can also list `guards`: the other files of the package that hold the condition that the reason names. The weekly check flags an entry whose file, guard files or APIs no longer match, and a release that no entry covers. It opens a pull request that widens the newest range of a package when every file that range names, and every file that those entries list in `guards`, has the same bytes in the new release and in the last release of the range.",
   "entries": [
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/esm/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
       "reason": "Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/crates/next-core/src/next_edge/context.rs#L128"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/crates/next-core/src/next_edge/context.rs#L128"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
       "reason": "Only used with Cache Components, and Next.js turns the Edge runtime off for projects that enable it, except for Middleware, so a route on Vercel Edge never reaches it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/crates/next-core/src/next_edge/context.rs#L128"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/crates/next-core/src/next_edge/context.rs#L128"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/esm/build/templates/app-route.js",
+      "guards": ["dist/esm/server/route-modules/route-module.js"],
       "apis": ["node:process.hrtime.bigint"],
       "target": "vercel-edge",
       "reason": "Runs only when routeModule.isDev is true. isDev is set from __NEXT_DEV_SERVER, which only next dev sets, so a deployed build never runs it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/build/templates/app-route.ts#L117"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/packages/next/src/build/templates/app-route.ts#L117"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/build/templates/app-route.js",
+      "guards": ["dist/server/route-modules/route-module.js"],
       "apis": ["node:process.hrtime.bigint"],
       "target": "vercel-edge",
       "reason": "Runs only when routeModule.isDev is true. isDev is set from __NEXT_DEV_SERVER, which only next dev sets, so a deployed build never runs it.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/build/templates/app-route.ts#L117"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/packages/next/src/build/templates/app-route.ts#L117"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/esm/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
       "reason": "Runs only inside `if (registry)`, and `registry` is set only when `globalThis.FinalizationRegistry` exists. Vercel edge functions have no FinalizationRegistry, so the branch never runs there.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/server/lib/clone-response.ts#L5"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/packages/next/src/server/lib/clone-response.ts#L5"
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.1" },
+      "versions": { "min": "16.3.8", "max": "16.4.2" },
       "file": "dist/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
       "reason": "Runs only inside `if (registry)`, and `registry` is set only when `globalThis.FinalizationRegistry` exists. Vercel edge functions have no FinalizationRegistry, so the branch never runs there.",
-      "source": "https://github.com/vercel/next.js/blob/v16.4.1/packages/next/src/server/lib/clone-response.ts#L5"
+      "source": "https://github.com/vercel/next.js/blob/v16.4.2/packages/next/src/server/lib/clone-response.ts#L5"
     },
     {
       "package": "postal-mime",
@@ -76,7 +78,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.6" },
+      "versions": { "min": "4.0.2", "max": "4.1.4" },
       "file": "dist/esm/decode-strings.js",
       "apis": ["FileReader"],
       "target": "workerd",
@@ -85,7 +87,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.6" },
+      "versions": { "min": "4.0.2", "max": "4.1.4" },
       "file": "dist/esm/decode-strings.js",
       "apis": ["FileReader"],
       "target": "bun",
@@ -94,7 +96,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.6" },
+      "versions": { "min": "4.0.2", "max": "4.1.4" },
       "file": "dist/cjs/decode-strings.js",
       "apis": ["FileReader"],
       "target": "workerd",
@@ -103,7 +105,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.0.6" },
+      "versions": { "min": "4.0.2", "max": "4.1.4" },
       "file": "dist/cjs/decode-strings.js",
       "apis": ["FileReader"],
       "target": "bun",
@@ -112,17 +114,31 @@
     },
     {
       "package": "nodemailer",
-      "versions": { "min": "10.0.13", "max": "10.1.1" },
+      "versions": { "min": "10.0.13", "max": "10.2.1" },
       "file": "dist/esm/sendmail-transport/index.js",
+      "guards": ["dist/esm/nodemailer.js"],
       "apis": ["node:child_process", "node:child_process.spawn"],
+      "options": ["sendmail"],
       "target": "workerd",
       "reason": "Runs only with the sendmail transport, which starts a local `sendmail` binary. A Worker sends mail with the SMTP transport.",
-      "source": "https://github.com/nodemailer/nodemailer/blob/v10.1.1/src/sendmail-transport/index.ts#L154"
+      "source": "https://github.com/nodemailer/nodemailer/blob/v10.2.0/src/sendmail-transport/index.ts#L150"
+    },
+    {
+      "package": "nodemailer",
+      "versions": { "min": "10.0.13", "max": "10.2.1" },
+      "file": "dist/cjs/sendmail-transport/index.js",
+      "guards": ["dist/cjs/nodemailer.js"],
+      "apis": ["node:child_process", "node:child_process.spawn"],
+      "options": ["sendmail"],
+      "target": "workerd",
+      "reason": "Runs only with the sendmail transport, which starts a local `sendmail` binary. A Worker sends mail with the SMTP transport.",
+      "source": "https://github.com/nodemailer/nodemailer/blob/v10.2.0/src/sendmail-transport/index.ts#L150"
     },
     {
       "package": "mongodb",
       "versions": { "min": "7.6.0", "max": "7.7.0" },
       "file": "lib/client-side-encryption/mongocryptd_manager.js",
+      "guards": ["lib/client-side-encryption/auto_encrypter.js", "lib/connection_string.js"],
       "apis": ["node:child_process", "node:child_process.spawn"],
       "target": "workerd",
       "reason": "Runs only in `MongocryptdManager.spawn()`, which starts a local `mongocryptd` process for automatic encryption. A driver without automatic encryption does not call it.",
@@ -130,39 +146,115 @@
     },
     {
       "package": "@supabase/auth-js",
-      "versions": { "min": "2.117.2", "max": "2.117.3" },
+      "versions": { "min": "2.117.2", "max": "2.118.0" },
       "file": "dist/module/lib/locks.js",
+      "guards": ["dist/module/GoTrueClient.js"],
       "apis": ["navigator.locks.request"],
+      "options": ["auth.lock"],
       "target": "workerd",
       "reason": "Runs only when a project passes `navigatorLock` as the deprecated `lock` option. The client coordinates session refreshes without a lock by default and does not use `navigator.locks`.",
-      "source": "https://github.com/supabase/supabase-js/blob/v2.117.3/packages/core/auth-js/src/GoTrueClient.ts#L465"
+      "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/auth-js/src/GoTrueClient.ts#L465"
     },
     {
       "package": "@supabase/auth-js",
-      "versions": { "min": "2.117.2", "max": "2.117.3" },
+      "versions": { "min": "2.117.2", "max": "2.118.0" },
       "file": "dist/module/lib/locks.js",
+      "guards": ["dist/module/GoTrueClient.js"],
       "apis": ["navigator.locks.request"],
+      "options": ["auth.lock"],
       "target": "bun",
       "reason": "Runs only when a project passes `navigatorLock` as the deprecated `lock` option. The client coordinates session refreshes without a lock by default and does not use `navigator.locks`.",
-      "source": "https://github.com/supabase/supabase-js/blob/v2.117.3/packages/core/auth-js/src/GoTrueClient.ts#L465"
+      "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/auth-js/src/GoTrueClient.ts#L465"
     },
     {
       "package": "@supabase/realtime-js",
-      "versions": { "min": "2.117.2", "max": "2.117.3" },
+      "versions": { "min": "2.117.2", "max": "2.118.0" },
       "file": "dist/module/RealtimeClient.js",
       "apis": ["Worker", "URL.createObjectURL"],
+      "options": ["realtime.worker"],
       "target": "workerd",
       "reason": "Runs only with the `worker` option, which defaults to false. It starts the heartbeat in a Web Worker.",
-      "source": "https://github.com/supabase/supabase-js/blob/v2.117.3/packages/core/realtime-js/src/RealtimeClient.ts#L813"
+      "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/realtime-js/src/RealtimeClient.ts#L813"
     },
     {
       "package": "@supabase/realtime-js",
-      "versions": { "min": "2.117.2", "max": "2.117.3" },
+      "versions": { "min": "2.117.2", "max": "2.118.0" },
       "file": "dist/module/RealtimeClient.js",
       "apis": ["Worker", "URL.createObjectURL"],
+      "options": ["realtime.worker"],
       "target": "bun",
       "reason": "Runs only with the `worker` option, which defaults to false. It starts the heartbeat in a Web Worker.",
-      "source": "https://github.com/supabase/supabase-js/blob/v2.117.3/packages/core/realtime-js/src/RealtimeClient.ts#L813"
+      "source": "https://github.com/supabase/supabase-js/blob/v2.118.0/packages/core/realtime-js/src/RealtimeClient.ts#L813"
+    },
+    {
+      "package": "@grpc/grpc-js",
+      "versions": { "min": "1.14.0", "max": "1.14.6" },
+      "file": "build/src/server.js",
+      "apis": ["node:http2.constants.HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE"],
+      "target": "deno",
+      "reason": "Runs only in `Server#_verifyContentType`, when a gRPC server gets a request that has no gRPC content type. A gRPC client never runs it. On Deno the constant is `undefined`, and the server answers that request with status 200 and keeps running.",
+      "source": "https://github.com/grpc/grpc-node/blob/@grpc/grpc-js@1.14.6/packages/grpc-js/src/server.ts#L1272-L1294"
+    },
+    {
+      "package": "got",
+      "versions": { "min": "16.1.0", "max": "16.1.0" },
+      "file": "dist/source/core/utils/http2-client.js",
+      "guards": ["dist/source/core/options.js"],
+      "apis": ["node:tls.connect"],
+      "options": ["http2"],
+      "target": "workerd",
+      "reason": "Runs only when a project sets the `http2` option, which is off by default. `got` then opens the TLS connection itself, in its HTTP/2 client. With an `h2session`, `got` uses the session of the project and opens no connection.",
+      "source": "https://github.com/sindresorhus/got/blob/v16.1.0/source/core/options.ts#L3777-L3779"
+    },
+    {
+      "package": "puppeteer-core",
+      "versions": { "min": "25.16.0", "max": "25.16.0" },
+      "file": "lib/puppeteer/cdp/utils.js",
+      "guards": ["lib/puppeteer/cdp/ExecutionContext.js"],
+      "apis": ["globalThis[<expression>]"],
+      "target": "workerd",
+      "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
+      "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.16.0/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L150-L155"
+    },
+    {
+      "package": "puppeteer-core",
+      "versions": { "min": "25.16.0", "max": "25.16.0" },
+      "file": "lib/puppeteer/cdp/utils.js",
+      "guards": ["lib/puppeteer/cdp/ExecutionContext.js"],
+      "apis": ["globalThis[<expression>]"],
+      "target": "bun",
+      "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
+      "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.16.0/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L150-L155"
+    },
+    {
+      "package": "puppeteer-core",
+      "versions": { "min": "25.16.0", "max": "25.16.0" },
+      "file": "lib/puppeteer/cdp/utils.js",
+      "guards": ["lib/puppeteer/cdp/ExecutionContext.js"],
+      "apis": ["globalThis[<expression>]"],
+      "target": "deno",
+      "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
+      "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.16.0/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L150-L155"
+    },
+    {
+      "package": "puppeteer-core",
+      "versions": { "min": "25.16.0", "max": "25.16.0" },
+      "file": "lib/puppeteer/cdp/utils.js",
+      "guards": ["lib/puppeteer/cdp/ExecutionContext.js"],
+      "apis": ["globalThis[<expression>]"],
+      "target": "deno-deploy",
+      "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
+      "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.16.0/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L150-L155"
+    },
+    {
+      "package": "puppeteer-core",
+      "versions": { "min": "25.16.0", "max": "25.16.0" },
+      "file": "lib/puppeteer/cdp/utils.js",
+      "guards": ["lib/puppeteer/cdp/ExecutionContext.js"],
+      "apis": ["globalThis[<expression>]"],
+      "target": "netlify-edge",
+      "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
+      "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.16.0/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L150-L155"
     }
   ]
 }

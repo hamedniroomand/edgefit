@@ -4,18 +4,19 @@ description: 'Keeping the edgefit compatibility data current: the weekly check, 
 
 # Keeping the data current
 
-edgefit is only as good as its picture of the runtimes, and the runtimes move every week. This page is the runbook for keeping up: how the weekly check works, how to read its issue, how to decide what each entry means, and which code and tests change with a data bump.
+edgefit is only as good as its picture of the runtimes, and the runtimes move every week. This page is the runbook for keeping up: how the weekly check works, how to read its issue, how to decide what each entry means, how the weekly check of the unreached data widens a range, and which code and tests change with a data bump.
 
 ## The moving parts
 
-| Piece                                      | What it is                                                                               |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| `data/workers-nodejs-compat-matrix/*.json` | One dump of Node's API tree per runtime (`bun`, `deno`, `workerd`) and a Node `baseline` |
-| `data/overrides/<target>.json`             | What the matrix cannot say: APIs that exist but throw, do nothing, or differ             |
-| `data/source.json`                         | The versions, commit and date every file was made from. `edgefit targets` prints it      |
-| `scripts/probe`                            | Runs real runtimes and compares them with the data                                       |
-| `.github/workflows/probe.yml`              | The weekly run. Its last job keeps one issue up to date                                  |
-| `.github/workflows/witness.yml`            | Deploys the production witness to Netlify and Vercel, by hand                            |
+| Piece                                      | What it is                                                                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `data/workers-nodejs-compat-matrix/*.json` | One dump of Node's API tree per runtime (`bun`, `deno`, `workerd`) and a Node `baseline`                                 |
+| `data/overrides/<target>.json`             | What the matrix cannot say: APIs that exist but throw, do nothing, or differ                                             |
+| `data/source.json`                         | The versions, commit and date every file was made from. `edgefit targets` prints it                                      |
+| `scripts/probe`                            | Runs real runtimes and compares them with the data                                                                       |
+| `.github/workflows/probe.yml`              | The weekly run. Its last job keeps one issue up to date                                                                  |
+| `.github/workflows/witness.yml`            | Deploys the production witness to Netlify and Vercel, by hand                                                            |
+| `.github/workflows/unreached.yml`          | The weekly check of `data/unreached.json` and `data/stored-modules.json`. It opens a pull request when a range can widen |
 
 The matrix answers "does this API exist?". The overrides answer "what happens when it is called?". The probe checks both against the real thing, and never changes data by itself.
 
@@ -43,7 +44,7 @@ The issue has up to four lists per runtime.
 
 ### Marked missing in the data, but present in the latest release
 
-The matrix says the API does not exist, and the newest release has it. This is the clearest sign the data is behind, and it is fixed by regenerating the runtime's dump (see [Bumping the data](#bumping-the-data)). A whole module of new members, such as `constants`, usually comes from one runtime release.
+The matrix says the API does not exist, and the newest release has it. This is the clearest sign the data is behind, and it is fixed by regenerating the runtime's dump (see [Bumping the data](#bumping-the-data)). A whole module of new members, such as `constants`, usually comes from one runtime release. A DOM global that a runtime gains is in this list too. For it, the data is `data/dom-globals.json`, and the fix is to add the name to the `presentOn` column of that runtime.
 
 ### Curated stubs that now work
 
@@ -197,19 +198,34 @@ Some calls block for ever with no arguments. `inspector.waitForDebugger` waits f
 - **Exact lookups.** The matrix records a module's named exports and its `default` separately. A lookup-only check therefore does not fall back to `default` for a name the namespace lacks. Calls still do.
 - **Validate-first stubs and bare calls.** See above. A `mismatch` override is not compared with a bare call either, since a partial implementation cannot be confirmed that way.
 
+## The unreached data
+
+Each entry of `data/unreached.json` and `data/stored-modules.json` names a package, a file in the package and the releases in which a person read the file. Every Monday the **Unreached data** workflow reads the latest release of each package that an entry names. It checks the entries against that release.
+
+When the latest release is outside every range of a package, there are three cases:
+
+- **The named files and the guard files have the same bytes.** The check takes the entries with the highest `max`, which are the newest range. It compares each file that these entries name, in the latest release, with the same file in the release at that `max`. It does the same for each file that they list in `guards`. When every file has the same bytes, the check sets `max` of those entries to the latest release and adds a changeset. The workflow opens one pull request with this change. The check does not change `source`, and an older range of the package stays as it is. The pull request lists the files of the package that differ between the two releases, 30 names at most, and gives the `npm diff` command for the full list. Read the diff and the list before you merge.
+- **A named file or a guard file changed or is missing.** The check fails with `is outside every range`. When a guard file changed or is missing, the message names it. A person compares the file with the reason of the entry. When the reason is still true, set `max` to the latest release and change the version in the `source` link to that release. When the reason is not true, change or remove the entry. When some of these files have the same bytes and others changed, the check widens nothing for the package, so a person reads all its entries together.
+- **The latest release is a pre-release, or is older than the newest range.** The check widens nothing and fails in the same way.
+
+The check compares only the latest release and the release at `max`. It does not read the releases between them, so a file that changed and then changed back in between is not seen. It does not read other files of the package, such as a file that decides whether a named file runs, unless the entry lists that file in `guards`. It does not read the code that `source` points to, which can be in another file or outside the package. The check looks for each API of an entry in the text of the file, and it names an API that the file no longer holds as `no longer uses <api>.`. For an API that a report shows with a computed part, such as `globalThis[<expression>]`, it looks for the text before `<expression>`, here `globalThis[`. The file must hold that text as the report shows it, so a read through another name, such as `self[` or a variable, is not found. The match ignores letter case, so `createRequire(` counts for `require(<expression>)`. An entry without a `max` has no end, so the check never widens it. The weekly check does not read `options`. When you add an entry, check that each name or path is the option that the reason names. Use the name that a user passes directly in a call. For an option that a user passes in a nested object, use the path, such as `auth.lock`. edgefit ignores any other nested property and a file of a package. The check writes the data files and a changeset in the folder where it runs, so run it in a clean working tree.
+
+Add `guards` to an entry of `data/unreached.json` when the condition that the reason names is in a file other than `file`. For example, `nodemailer` builds the sendmail transport only under `options.sendmail`. That test is in `nodemailer.js` of each build, and the transport file has no such condition. List the files that hold the condition, as paths from the package root. Do not add `guards` when `file` holds the whole condition: the test and each value that it reads. The check then widens the range only when each guard file has the same bytes too. It fails when a guard file is not a file in the latest release. When it does, find the file that holds the condition in that release, and change `guards`. A change in a guard file stops the widening, even when it does not touch the condition. So list only the files that hold the condition.
+
 ## Code and tests that change with the data
 
 A data bump touches more than JSON:
 
-| Where                                     | What to update                                                                                                          |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `src/targets/workerd/gates.ts`            | `flagsSource` points at the compatibility flags at a tag. Compare the gates first (below)                               |
-| `test/targets/{workerd,bun,deno}.test.ts` | Versions and dates in expected text, curated examples that were removed or changed                                      |
-| `test/cli/run.test.ts`                    | The version strings in `edgefit targets` and the "older than the data" notes                                            |
-| `test/core/check.test.ts`                 | Web API findings per target (Deno gained `navigator.locks` in 2.9, for example)                                         |
-| `docs/`                                   | The sample reports and the version numbers in `targets/*.md`, `getting-started.md`, `reference/*.md`                    |
-| `docs/guide/status.md`, `README.md`       | The runtime versions, dump date and compatibility date. `test/docs/status.test.ts` fails until they match `source.json` |
-| `CHANGELOG.md`                            | A **Data** section that says what users will notice                                                                     |
+| Where                                     | What to update                                                                                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/targets/workerd/gates.ts`            | `flagsSource` points at the compatibility flags at a tag. Compare the gates first (below)                                                   |
+| `test/targets/{workerd,bun,deno}.test.ts` | Versions and dates in expected text, curated examples that were removed or changed                                                          |
+| `test/cli/run.test.ts`                    | The version strings in `edgefit targets` and the "older than the data" notes                                                                |
+| `test/core/check.test.ts`                 | Web API findings per target (Deno gained `navigator.locks` in 2.9, for example)                                                             |
+| `data/dom-globals.json`                   | The `presentOn` column of each runtime that changed, probed with `typeof globalThis[name]`. `test/data/dom-globals.test.ts` checks the file |
+| `docs/`                                   | The sample reports and the version numbers in `targets/*.md`, `getting-started.md`, `reference/*.md`                                        |
+| `docs/guide/status.md`, `README.md`       | The runtime versions, dump date and compatibility date. `test/docs/status.test.ts` fails until they match `source.json`                     |
+| `CHANGELOG.md`                            | A **Data** section that says what users will notice                                                                                         |
 
 ### Compatibility gates
 

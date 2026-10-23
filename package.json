@@ -1,6 +1,6 @@
 {
   "name": "edgefit",
-  "version": "0.15.5",
+  "version": "0.16.2",
   "description": "Node.js compatibility checker for Cloudflare Workers, Bun, Deno, Netlify and Vercel Edge. Check your code and every npm package it imports before you deploy.",
   "keywords": [
     "bun",
@@ -61,13 +61,13 @@
   "dependencies": {
     "confbox": "~0.3.1",
     "esbuild": "^0.28.2",
-    "oxc-parser": "^0.153.0"
+    "oxc-parser": "^0.155.0"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^1.0.1",
     "@changesets/cli": "^3.0.3",
-    "@commitlint/cli": "^21.2.3",
-    "@commitlint/config-conventional": "^21.2.3",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@types/node": "^22.20.4",
     "@vitest/coverage-v8": "catalog:",
     "ajv": "^8.20.0",
@@ -77,5 +77,5 @@
   "engines": {
     "node": ">=22.18.0"
   },
-  "packageManager": "pnpm@12.10.1"
+  "packageManager": "pnpm@12.15.0"
 }

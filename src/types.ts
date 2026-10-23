@@ -74,6 +74,14 @@ export interface Usage {
   /** Set when the code only runs if the API exists, for example inside `if (x.y)`. */
   guarded?: true;
   /**
+   * Set for a read of a global that only a read at load fails (`loadOnly` in the data), when the
+   * read runs as the module loads: no function, branch, loop body, `try` or `switch` case sits
+   * around it.
+   */
+  atLoad?: true;
+  /** Set for a read of such a global when the code names it on its own, such as `document`, not as a member of `globalThis`. */
+  bare?: true;
+  /**
    * Set for code that the bundler wrote, such as Turbopack's module for a Node.js built-in. A
    * sourcemap can give it the file of the code before it, so edgefit does not map it through a
    * sourcemap.

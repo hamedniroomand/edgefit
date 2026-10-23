@@ -957,19 +957,22 @@
       "status": "unsupported",
       "note": "the Deno 2.3.1 build Netlify runs has no document global",
       "source": "netlify-2026-10-03.json",
-      "absent": true
+      "absent": true,
+      "loadOnly": "bare"
     },
     "*globals*.HTMLAnchorElement": {
       "status": "unsupported",
       "note": "the Deno 2.3.1 build Netlify runs has no HTMLAnchorElement global",
       "source": "netlify-2026-10-03.json",
-      "absent": true
+      "absent": true,
+      "loadOnly": "bare"
     },
     "*globals*.Bun": {
       "status": "unsupported",
       "note": "the Deno 2.3.1 build Netlify runs has no Bun global",
       "source": "netlify-2026-10-03.json",
-      "absent": true
+      "absent": true,
+      "loadOnly": "bare"
     }
   },
   "docs": {

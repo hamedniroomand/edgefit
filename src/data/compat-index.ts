@@ -21,6 +21,7 @@ function toResult(entry: CompatEntry): LookupResult {
     category: entry.category,
     // A Web API the data lists as missing is missing, not stubbed.
     ...(entry.absent === true || entry.category === 'web' ? { absent: true as const } : {}),
+    ...(entry.loadOnly === undefined ? {} : { loadOnly: entry.loadOnly }),
     ...(entry.options === undefined ? {} : { options: entry.options }),
   };
 }
@@ -96,6 +97,17 @@ export class CompatIndex {
       entry.module === '*globals*' ? entry.path.slice(0, 1) : [],
     );
     return [...new Set([...treeNames, ...fallbackNames])];
+  }
+
+  /**
+   * The globals that only a curated entry says the target lacks, and that only a read at load fails,
+   * such as `document`. The tree and the web API data do not list them, so `globalNames` has no name
+   * for them.
+   */
+  public curatedLoadOnlyGlobals(): string[] {
+    return [...this.#entries.values()].flatMap(entry =>
+      entry.module === '*globals*' && entry.loadOnly !== undefined ? entry.path.slice(0, 1) : [],
+    );
   }
 
   public lookup(api: ApiRef): LookupResult {

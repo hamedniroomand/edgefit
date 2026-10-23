@@ -13,6 +13,11 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    # The job writes one comment on the pull request. A pull request from a fork gets a read-only
+    # token whatever this says, so the comment step then prints a notice and the job goes on.
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -27,14 +32,40 @@ jobs:
         run: node scripts/package-table/list.mjs
       - run: vp pack
       # Only packages this pull request adds are installed, so a request cannot make the job
-      # install the whole list or anything that is not in it.
+      # install the whole list or anything that is not in it. A row that fails does not stop this
+      # step: the next step reads the results and decides.
       - name: Check the added packages
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: |
           node scripts/package-table/added.mjs "$BASE" > added.txt
           cat added.txt
+          mkdir results
           while read -r name; do
             npm view "$name" name > /dev/null || { echo "::error::$name is not on npm"; exit 1; }
-            { echo "### $name"; echo '```'; node dist/cli/main.mjs package "$name" --no-color || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+            file=$(node --input-type=module -e "import { fileNameOf } from './scripts/package-table/list.mjs'; console.log(fileNameOf(process.argv[1]))" "$name")
+            mapfile -t args < <(node scripts/package-table/args.mjs "$name")
+            node dist/cli/main.mjs "${args[@]}" > "results/$file.json" 2> "results/$file.err" || true
           done < added.txt
+      # The job fails for a row that has no result, and for a row that fails or cannot be checked
+      # and has no notes. Each row runs with the arguments that the table uses (args.mjs), so the
+      # mark here is the mark in the table.
+      - name: Report the cells and check the notes
+        run: node scripts/package-table/report.mjs added.txt results --markdown comment.md
+      - name: Add the cells to the summary
+        if: always() && hashFiles('comment.md') != ''
+        run: cat comment.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Post the cells to the pull request
+        if: always() && hashFiles('comment.md') != ''
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          marker=$(head -n 1 comment.md)
+          id=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate --jq ".[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\"))) | .id" | head -n 1)
+          if [ -n "$id" ]; then
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$id" --field body=@comment.md > /dev/null
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --field body=@comment.md > /dev/null
+          fi || echo "::notice::The cells are not in a comment: the token cannot comment, as for a pull request from a fork, or the call failed, see the error above. The cells are in the job summary."

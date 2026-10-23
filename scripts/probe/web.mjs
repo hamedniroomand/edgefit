@@ -59,3 +59,24 @@ export function webMissingApis(runtime, data = readData('runtime-compat-data/dat
   }
   return [...found].sort();
 }
+
+/** Whether runtime-compat-data says something about the runtime, so edgefit reads it and not the DOM list. */
+const decides = (statement, runtime) => {
+  const support = statement?.support?.[runtime];
+  return (Array.isArray(support) ? support[0] : support)?.version_added != null;
+};
+
+/**
+ * The DOM globals that `dom-globals.json` marks missing for the runtime, except those that
+ * `runtime-compat-data` decides: edgefit reads the Web API data first for those.
+ */
+export function domMissingApis(
+  runtime,
+  dom = readData('dom-globals.json'),
+  web = readData('runtime-compat-data/data.json'),
+) {
+  const present = new Set(dom.presentOn[runtime]);
+  return dom.names
+    .filter(name => !present.has(name) && !decides(web.api[name]?.__compat, runtime))
+    .map(name => `*globals*.${name}`);
+}

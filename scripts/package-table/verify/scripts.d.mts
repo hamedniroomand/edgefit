@@ -12,6 +12,8 @@ export interface Plan {
   resolved: string;
   status: 'pass' | 'fail';
   findings: RowFinding[];
+  /** The notes of the main entry on the runtime. A note names one optional peer, or no peer. */
+  notes: string[];
   kind: 'load' | 'reach';
   script?: string;
   /** Why the reach script was rejected. The run is then a load only. */
@@ -21,6 +23,7 @@ export interface Plan {
 export function importsOf(source: string, file?: string): ScriptImport[];
 export function namesFrom(imports: readonly ScriptImport[], name: string): string[];
 export function rowFindings(result: unknown, target: string): RowFinding[];
+export function rowNotes(result: unknown, target: string): string[];
 export function scriptProblem(
   imports: readonly ScriptImport[],
   name: string,

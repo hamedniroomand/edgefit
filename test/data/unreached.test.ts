@@ -5,9 +5,16 @@ import path from 'node:path';
 import { describe, expect, it } from 'vite-plus/test';
 
 import { collectFindings, defaultLevels } from '@/core/findings.ts';
-import type { ModuleUsages } from '@/core/findings.ts';
-import { fileInPackage, findUnreached, loadUnreached } from '@/data/unreached.ts';
+import type { FindingOptions, ModuleUsages } from '@/core/findings.ts';
+import {
+  fileInPackage,
+  findUnreached,
+  loadUnreached,
+  unreachedOptionPaths,
+} from '@/data/unreached.ts';
 import type { UnreachedEntry, UnreachedQuery } from '@/data/unreached.ts';
+import type { Target } from '@/targets/index.ts';
+import type { TargetKey } from '@/types.ts';
 import { makeUsage, stubTarget } from '~/helpers.ts';
 
 const entry: UnreachedEntry = {
@@ -27,6 +34,7 @@ const query: UnreachedQuery = {
   file,
   api: 'node:fs.watch',
   target: 'workerd',
+  optionsSet: new Set(),
 };
 
 function dataWith(overrides: Record<string, unknown>): string {
@@ -46,6 +54,10 @@ describe('the shipped unreached data', () => {
       expect(item.versions.min).toMatch(/^\d+\.\d+\.\d+$/u);
       expect(item.source).toMatch(/^https:\/\//u);
       expect(item.file).not.toMatch(/^\/|node_modules/u);
+      for (const guard of item.guards ?? []) {
+        expect(guard).not.toMatch(/^\/|node_modules|\.\./u);
+        expect(guard).not.toBe(item.file);
+      }
     }
   });
 
@@ -59,6 +71,20 @@ describe('the shipped unreached data', () => {
       'versions must be major.minor.patch',
     ],
     ['a source that is not a link', { source: 'next' }, 'source must be an https link'],
+    ['an empty list of options', { options: [] }, 'options must be a list of one or more'],
+    ['a blank option name', { options: [' '] }, 'options must be a list of one or more'],
+    ['an option that is not text', { options: [1] }, 'options must be a list of one or more'],
+    ['options that are not a list', { options: 'http2' }, 'options must be a list of one or more'],
+    ['an empty list of guards', { guards: [] }, 'guards must be a list of one or more paths'],
+    ['a blank guard', { guards: [' '] }, 'guards must be a list of one or more paths'],
+    ['a guard that is not text', { guards: [1] }, 'guards must be a list of one or more paths'],
+    [
+      'guards that are not a list',
+      { guards: 'a.js' },
+      'guards must be a list of one or more paths',
+    ],
+    ['an absolute guard', { guards: ['/dist/a.js'] }, 'guards must be a list of one or more paths'],
+    ['a guard with a .. segment', { guards: ['dist/../a.js'] }, 'guards must be a list of one or'],
   ])('rejects %s', (_name, overrides, message) => {
     expect(() => loadUnreached(dataWith(overrides))).toThrow(message);
   });
@@ -85,6 +111,30 @@ describe('matching an entry', () => {
     ['another target', { target: 'bun' }],
   ])('does not match %s', (_name, change) => {
     expect(findUnreached([entry], { ...query, ...change })).toBeUndefined();
+  });
+
+  describe('an entry that names options', () => {
+    const withOptions: UnreachedEntry = { ...entry, options: ['http2', 'h2'] };
+    it.each<[string, string[]]>([
+      ['no file sets an option', []],
+      ['a file sets another option', ['http3']],
+    ])('matches when %s', (_name, names) => {
+      const optionsSet = new Set(names);
+      expect(findUnreached([withOptions], { ...query, optionsSet })).toBe(withOptions);
+    });
+
+    it.each<[string, string[]]>([
+      ['the project sets the first option', ['http2']],
+      ['the project sets the second option', ['h2']],
+      ['the project sets both options', ['h2', 'http2']],
+    ])('does not match when %s', (_name, names) => {
+      const optionsSet = new Set(names);
+      expect(findUnreached([withOptions], { ...query, optionsSet })).toBeUndefined();
+    });
+
+    it('matches an entry without options whatever the project sets', () => {
+      expect(findUnreached([entry], { ...query, optionsSet: new Set(['http2']) })).toBe(entry);
+    });
   });
 
   it('finds the file below the package inside a pnpm store path', () => {
@@ -129,5 +179,119 @@ describe('findings in code that is not reached', () => {
       collectFindings([module('16.4.0')], { ...base, unreached: [entry] }).findings,
     ).toHaveLength(1);
     expect(collectFindings([module('16.3.8')], base).findings).toHaveLength(1);
+  });
+});
+
+describe('a warning in code that is not reached', () => {
+  const gotFile = 'node_modules/got/dist/source/core/utils/http2-client.js';
+  const target = stubTarget({
+    'tls.connect': { status: 'mismatch', note: 'throws for some options' },
+  });
+  const usage = makeUsage(
+    { module: 'tls', path: ['connect'] },
+    { location: { file: gotFile, line: 235, column: 15 } },
+  );
+  const module: ModuleUsages = {
+    file: gotFile,
+    package: { name: 'got', version: '16.1.0' },
+    chain: ['index.js', 'got'],
+    usages: [usage],
+  };
+  const base = { target, levels: defaultLevels, ignore: [] };
+
+  it('is guarded by the shipped entry for the HTTP/2 client of got', () => {
+    expect(collectFindings([module], base).findings).toMatchObject([
+      { level: 'warning', category: 'mismatch' },
+    ]);
+    const { findings, guarded } = collectFindings([module], {
+      ...base,
+      unreached: loadUnreached(),
+    });
+    expect(findings).toEqual([]);
+    expect(guarded).toMatchObject([{ level: 'warning', category: 'mismatch', guarded: true }]);
+    expect(guarded[0]?.unreached).toBeDefined();
+  });
+});
+
+describe('an entry that names an option path', () => {
+  const withPath: UnreachedEntry = { ...entry, options: ['auth.lock'] };
+
+  it.each(['a..b', '.lock', 'auth.'])('rejects the path %s', path => {
+    expect(() => loadUnreached(dataWith({ options: [path] }))).toThrow('option names or paths');
+  });
+
+  it('is read from the data file', () => {
+    expect(loadUnreached(dataWith({ options: ['auth.lock', 'http2'] }))[0]?.options).toEqual([
+      'auth.lock',
+      'http2',
+    ]);
+  });
+
+  it('matches until the project sets the path, and a plain name does not set it', () => {
+    expect(findUnreached([withPath], { ...query, optionsSet: new Set(['lock', 'auth']) })).toBe(
+      withPath,
+    );
+    expect(findUnreached([withPath], { ...query, optionsSet: new Set(['auth.lock']) })).toBe(
+      undefined,
+    );
+  });
+
+  it('lists each path once, sorted, and no plain name', () => {
+    const entries = [
+      { ...entry, options: ['http2', 'auth.lock'] },
+      { ...entry, options: ['auth.lock', 'a.b.c'] },
+      entry,
+    ];
+    expect(unreachedOptionPaths(entries)).toEqual(['a.b.c', 'auth.lock']);
+  });
+
+  it('lists the paths of the shipped data', () => {
+    expect(unreachedOptionPaths(loadUnreached())).toEqual(
+      expect.arrayContaining(['auth.lock', 'realtime.worker']),
+    );
+  });
+});
+
+describe('a computed read in code that only runs in a browser page', () => {
+  const utils = 'node_modules/puppeteer-core/lib/puppeteer/cdp/utils.js';
+  const read = (file: string): ModuleUsages => ({
+    file,
+    package: { name: 'puppeteer-core', version: '25.16.0' },
+    chain: ['index.js', 'puppeteer-core'],
+    usages: [
+      makeUsage(undefined, {
+        kind: 'dynamic',
+        display: 'globalThis[<expression>]',
+        reason: 'accessed with a computed property',
+        location: { file, line: 197, column: 46 },
+      }),
+    ],
+  });
+  const on = (key: TargetKey): Target => ({
+    ...stubTarget(),
+    info: { ...stubTarget().info, key },
+  });
+  const options = (key: TargetKey): FindingOptions => ({
+    levels: defaultLevels,
+    ignore: [],
+    target: on(key),
+    unreached: loadUnreached(),
+  });
+
+  it.each(['workerd', 'bun', 'deno', 'deno-deploy', 'netlify-edge'] as const)(
+    'is guarded by the shipped entry for addPageBinding on %s',
+    key => {
+      const { findings, guarded } = collectFindings([read(utils)], options(key));
+      expect(findings).toEqual([]);
+      expect(guarded).toMatchObject([{ level: 'warning', category: 'unknown', guarded: true }]);
+      expect(guarded[0]?.unreached).toBeDefined();
+    },
+  );
+
+  it('is still a finding in another file of the package', () => {
+    const other = 'node_modules/puppeteer-core/lib/puppeteer/cdp/Binding.js';
+    const { findings, guarded } = collectFindings([read(other)], options('bun'));
+    expect(findings).toMatchObject([{ level: 'warning', category: 'unknown' }]);
+    expect(guarded).toEqual([]);
   });
 });

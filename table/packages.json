@@ -50,6 +50,9 @@
       "name": "@upstash/redis"
     },
     {
+      "name": "@upstash/ratelimit"
+    },
+    {
       "name": "stripe"
     },
     {
@@ -59,7 +62,16 @@
       "name": "@anthropic-ai/sdk"
     },
     {
+      "name": "ai"
+    },
+    {
+      "name": "@ai-sdk/openai"
+    },
+    {
       "name": "@aws-sdk/client-s3"
+    },
+    {
+      "name": "@aws-sdk/client-dynamodb"
     },
     {
       "name": "lodash"
@@ -113,6 +125,9 @@
       "name": "cors"
     },
     {
+      "name": "helmet"
+    },
+    {
       "name": "jsonwebtoken"
     },
     {
@@ -126,6 +141,10 @@
       "name": "cheerio"
     },
     {
+      "name": "puppeteer",
+      "notes": "puppeteer starts the browser as a child process, which workerd does not implement; use @cloudflare/puppeteer with Browser Run on Workers."
+    },
+    {
       "name": "marked"
     },
     {
@@ -135,10 +154,14 @@
       "name": "zustand"
     },
     {
+      "name": "immer"
+    },
+    {
       "name": "ky"
     },
     {
-      "name": "got"
+      "name": "got",
+      "notes": "With the http2 option, got calls node:tls.connect with options that Workers reject, and the default options work."
     },
     {
       "name": "undici",
@@ -149,6 +172,9 @@
     },
     {
       "name": "graphql-yoga"
+    },
+    {
+      "name": "graphql-request"
     },
     {
       "name": "@trpc/server"
@@ -163,7 +189,10 @@
     },
     {
       "name": "@sentry/node",
-      "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement, and its ./import hook calls node:module.register, which Bun mocks; use @sentry/cloudflare or @sentry/bun."
+      "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement; use @sentry/cloudflare or @sentry/bun."
+    },
+    {
+      "name": "@sentry/cloudflare"
     },
     {
       "name": "mongodb"
@@ -173,7 +202,7 @@
     },
     {
       "name": "better-sqlite3",
-      "notes": "Native addon."
+      "notes": "Native addon. On workerd, process.report.getReport() returns an empty object with no header. The package reads header.glibcVersionRuntime, so the run throws a TypeError before it reaches the native addon."
     },
     {
       "name": "sqlite3",
@@ -250,6 +279,12 @@
       "name": "passport"
     },
     {
+      "name": "@clerk/backend"
+    },
+    {
+      "name": "better-auth"
+    },
+    {
       "name": "twilio"
     },
     {
@@ -263,6 +298,17 @@
     },
     {
       "name": "amqplib"
+    },
+    {
+      "name": "kafkajs"
+    },
+    {
+      "name": "bullmq",
+      "notes": "bullmq runs a processor file in a child process or a worker thread, which workerd does not implement; use Cloudflare Queues on Workers."
+    },
+    {
+      "name": "node-cron",
+      "notes": "A node-cron task that names a file runs in a child process, which workerd does not implement; use a Cron Trigger on Workers."
     },
     {
       "name": "busboy"
@@ -280,7 +326,16 @@
       "name": "fast-xml-parser"
     },
     {
+      "name": "csv-parse"
+    },
+    {
       "name": "ejs"
+    },
+    {
+      "name": "handlebars"
+    },
+    {
+      "name": "nunjucks"
     },
     {
       "name": "markdown-it"
@@ -304,6 +359,9 @@
       "name": "joi"
     },
     {
+      "name": "class-validator"
+    },
+    {
       "name": "bignumber.js"
     },
     {
@@ -320,15 +378,19 @@
     },
     {
       "name": "firebase-admin",
-      "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process, and on Deno the Firestore client reads http2 status constants that Deno lacks."
+      "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process."
     },
     {
       "name": "@google-cloud/storage",
       "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run."
     },
     {
+      "name": "@azure/storage-blob",
+      "notes": "On Workers, @azure/core-xml loads its browser build, which needs document, DOMParser, Node and XMLSerializer as it loads, and workerd has none of them; use the Blob REST API with fetch on Workers."
+    },
+    {
       "name": "mssql",
-      "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either."
+      "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either. Tedious calls an @azure/identity credential only after a SQL Server accepts the login, so a run without one cannot reach the child_process calls. The UDP lookup for a named instance does not throw on workerd, and the connection times out."
     },
     {
       "name": "argon2",
@@ -336,11 +398,24 @@
     },
     {
       "name": "@electric-sql/pglite",
-      "notes": "PGlite loads its WebAssembly module with WebAssembly.instantiateStreaming, which workerd does not support, and its multi-tab worker uses navigator.locks, which Bun does not have."
+      "notes": "PGlite calls WebAssembly.instantiateStreaming only in its browser branch. With nodejs_compat at the date of the table, PGlite takes its Node branch on workerd, so this call does not run. The Node branch reads its files from disk, and the Worker bundle has none, so PGlite.create() fails before it uses WebAssembly or reaches node:process.binding. The multi-tab worker of PGlite uses navigator.locks, which Bun and workerd do not have."
     },
     {
       "name": "socket.io",
       "notes": "On Workers the browser build of engine.io-parser reads a Blob with FileReader, which Workers do not have."
+    },
+    {
+      "name": "dotenv"
+    },
+    {
+      "name": "lru-cache"
+    },
+    {
+      "name": "meilisearch"
+    },
+    {
+      "name": "@elastic/elasticsearch",
+      "notes": "The client sends requests with undici, and workerd rejects the ALPNProtocols option of node:tls.connect that undici sets; call the Elasticsearch REST API with fetch on Workers."
     }
   ]
 }

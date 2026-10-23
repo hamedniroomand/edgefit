@@ -30,16 +30,17 @@ Without a wrangler config, edgefit uses the settings the compatibility data was 
 
 ## Cloudflare Pages
 
-A Pages config has `pages_build_output_dir` and no `main`. With no `--entry` or config `entry`, edgefit looks for the code that Pages runs, in this order:
+A Pages config has `pages_build_output_dir` and no `main`. With no `--entry` or config `entry`, edgefit looks for the server code that Pages runs, in this order:
 
 1. `<pages_build_output_dir>/_worker.js`, a file, or a folder with an `index.js`. This is build output, so edgefit checks it as `--built` does. Nitro and Nuxt write it with the `cloudflare_pages` preset. The SvelteKit and Astro Cloudflare adapters write it too.
 2. Every `.js`, `.mjs`, `.ts`, `.tsx` and `.jsx` file in the `functions/` folder. Pages ignores `functions/` when `_worker.js` exists, so edgefit does too.
 
-For a Pages project, edgefit does not guess other files, such as `src/index.ts`, and does not use the entries of other targets. When nothing is found, the error says why:
+For a Pages project, edgefit does not guess other files, such as `src/index.ts`, and does not use the entries of other targets. The folder that `pages_build_output_dir` names is the Pages output folder. A worker is a `_worker.js` file, or a `_worker.js/index.js` file. When edgefit finds no server code, there are four outcomes:
 
-- The output has no server code: Pages only serves static files.
-- A Nitro build used another preset, such as `node-server`: build with `NITRO_PRESET=cloudflare_pages`, then run `edgefit check` again.
-- The project uses a framework that has no build output yet: build it for Pages first, then run `edgefit check` again. See [framework build output](/guide/built-output).
+- **Static files only.** The Pages output folder holds at least one file that is not a dotfile or `nitro.json`, and has no `_worker.js`. The project has no `functions/` folder. The Pages output folder has no Nitro marker (`nitro.json`), or the marker names a static preset. Nitro marks these presets as static: `static`, `cloudflare-pages-static`, `github-pages`, `gitlab-pages`, `netlify-static`, `vercel-static`, `zeabur-static` and `zerops-static`. A name with `_` in place of `-` is the same preset. A file that is not JSON, or that names no preset, is not a marker. Pages serves the folder as static files, so there is no server code to check. The workerd target gives a clean result and one note: `Pages serves dist as static files, so there is no server code to check on workerd.` The note names your Pages output folder in place of `dist`. The text report and the `notes` of the workerd target in the JSON report show the note. The report shows `no server code` and no module, and the JSON `entries` list is empty. The other targets run as before.
+- **A Nitro build without a worker.** The marker in the Pages output folder names a preset that is not static, and the folder has no worker. Any preset that is not in the list above counts as a server preset. The check fails with `No entry point to scan.` The advice names the marker, its preset and its build date. It also names `.output/nitro.json` when that file has another preset and a later build date, because the last build wrote its files there. For a `cloudflare-pages` marker, the advice says that a static build writes no worker, and names `NITRO_PRESET=cloudflare-pages-static` for static files only. For any other preset, the advice asks for a build with `NITRO_PRESET=cloudflare_pages`. When the Pages output folder has no marker, edgefit reads `.output/nitro.json` instead.
+- **No output yet.** The Pages output folder does not exist, or holds no file other than dotfiles and `nitro.json`. The check fails with `No entry point to scan.` The advice tells you to build the project, or to check `pages_build_output_dir`. It names the framework when `package.json` lists one. See [framework build output](/guide/built-output).
+- **Anything else.** The `_worker.js` folder has no `index.js` file, or the `functions/` folder has no file that Pages runs. The check fails with `No entry point to scan.` The advice says what each of them needs.
 
 ## Compatibility date and flags
 
@@ -62,7 +63,7 @@ A module that is not native at your date and flags is reported as `mocked`, beca
 
 An entry with the status `mismatch` can name the options that make a call fail. Then only a call that passes one of them is a finding, and an option that fails only from a compatibility date follows your date and flags.
 
-The overrides also say that the globals `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing, so code behind a check such as `typeof window !== 'undefined'` is guarded. A call, a construction or a member of one of these globals through the global object, such as `globalThis.document.title`, is a finding when no check protects it.
+The overrides also say that the globals `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing, and the [DOM globals](/targets/#dom-globals) list adds the other DOM globals. So code behind a check such as `typeof window !== 'undefined'` is guarded. A call, a construction or a member of one of these globals through the global object, such as `globalThis.document.title`, is a finding when no check protects it. A read of one of them by its bare name, such as `document.title`, is a finding only when it runs as the module loads, see [Browser globals by their bare name](/guide/findings#browser-globals-by-their-bare-name).
 
 The matrix does not list `node:cluster`, `domain`, `inspector`, `punycode`, `repl`, `tty`, `v8`, `vm`, `wasi` and `worker_threads`. The overrides record that each of them loads with `nodejs_compat` at compatibility date 2026-09-29, so an import of one gives no finding at a date from which the module is native (see the gates above). Their members are not measured, so a use of a member is an `unknown` warning, unless an `apis` entry covers it.
 

@@ -29,6 +29,17 @@ describe('the weekly check of the data entries', () => {
     expect(uses("require('child_process');", 'node:child_process.spawn')).toBe(false);
   });
 
+  it('looks for the text before the computed part of an API', () => {
+    expect(uses('const read = globalThis[name].args;', 'globalThis[<expression>]')).toBe(true);
+    expect(uses('const read = globalThis.args;', 'globalThis[<expression>]')).toBe(false);
+    expect(uses('const load = createRequire(root)(name);', 'require(<expression>)')).toBe(true);
+    expect(uses('await import(name);', 'import(<expression>)')).toBe(true);
+    expect(uses("require('fs');", 'import(<expression>)')).toBe(false);
+    expect(problemsOf('const read = 1;', { apis: ['globalThis[<expression>]'] })).toEqual([
+      'no longer uses globalThis[<expression>].',
+    ]);
+  });
+
   it('reads a range without a max as open', () => {
     expect(inRange('9.0.0', { min: '1.14.0' })).toBe(true);
     expect(inRange('1.13.0', { min: '1.14.0' })).toBe(false);

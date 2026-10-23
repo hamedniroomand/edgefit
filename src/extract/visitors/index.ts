@@ -2,7 +2,8 @@ import type { Node } from 'oxc-parser';
 
 import type { Visitor } from '@/extract/context.ts';
 
-import { visitCall, visitImportExpression, visitNew } from './calls.ts';
+import { visitCallExpression } from './call-expression.ts';
+import { visitImportExpression, visitNew } from './calls.ts';
 import { visitDeclaration, visitDeclarator } from './declarators.ts';
 import { visitConditional, visitIf, visitLogical, visitTry } from './guards.ts';
 import {
@@ -59,7 +60,7 @@ const visitors: VisitorMap = {
   TryStatement: visitTry,
   ConditionalExpression: visitConditional,
   LogicalExpression: visitLogical,
-  CallExpression: visitCall,
+  CallExpression: visitCallExpression,
   NewExpression: visitNew,
   ImportExpression: visitImportExpression,
   VariableDeclaration: visitDeclaration,
