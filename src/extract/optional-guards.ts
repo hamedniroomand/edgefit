@@ -7,6 +7,7 @@ import { isCheckedOperand } from './checked-operands.ts';
 import type { GlobalGuard } from './guard-stack.ts';
 import { parens } from './lowered-tests.ts';
 import { isFeatureCheck } from './refs.ts';
+import { isDiscarded } from './statement-use.ts';
 
 /** The whole optional chain that holds a use, and what receives its value. */
 type Consumer = { value: Node; parent: Node; outer: readonly Node[] };
@@ -37,7 +38,8 @@ function firstOptionalObject(node: Node): Node | undefined {
 
 /**
  * The end of the chain: `node` without the wrappers above it, such as `(x)`, `x!` and the `ChainExpression`
- * itself. An `await` is not read through, so a chain that is awaited is not covered.
+ * itself. An `await` is not read through, so an awaited read of a member is not covered. An awaited
+ * call is, because its chain ends below the `await`.
  */
 function chainEnd(node: Node): Node | undefined {
   let end = node;
@@ -89,9 +91,9 @@ function chainConsumer(
 const hasNullishOperand = (parent: Node): boolean =>
   parent.type === 'LogicalExpression' && (isNullish(parent.left) || isNullish(parent.right));
 
-/** Whether the value of the chain goes where `undefined` does no harm: a check, an operand of `||` or `??`, or a statement. */
+/** Whether the value of the chain goes where `undefined` does no harm: a check, an operand of `||` or `??`, or a place where nothing reads the value. */
 const handlesAbsence = ({ value, parent, outer }: Consumer, context: BindingContext): boolean =>
-  parent.type === 'ExpressionStatement' ||
+  isDiscarded(value, [...outer.toReversed(), parent]) ||
   isFeatureCheck(value, parent) ||
   (isCheckedOperand(value, parent, outer, context) && !hasNullishOperand(parent));
 

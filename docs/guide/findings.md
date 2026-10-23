@@ -352,14 +352,14 @@ A `?.` right behind the global guards the rest of the chain, as in `globalThis.D
 
 - the test of an `if` or `?:`, the left side of `&&`, the operand of `typeof` or `!`, or a comparison with `undefined` or `null`
 - an operand of `||` or `??`. The right operand counts when the left one is an API, see [Checks for an API](#checks-for-an-api)
-- a statement of its own
+- a place where nothing reads the value. These places are a statement of its own, and an item of a list joined with commas that is not the last item. They are also the last item of such a list, the right side of `&&`, `||` or `??`, and a branch of `?:`, when the expression around it is one of these places. A call with `await` before it counts too, as in `await globalThis.Deno?.core.read();`. The list is closed: the operand of `void` and the head of a `for` keep the finding
 
 The use is a finding in these cases:
 
-- the value is assigned, returned, passed to a call, awaited or used in another way
+- the value is assigned, returned, passed to a call or used in another way. This holds also when `await` comes first, even for a test, as in `if (await globalThis.Deno?.core.read())`. The one exception is an awaited call in a place where nothing reads the value, as in the list above
 - the `?.` comes after a plain `.` read of the global, as in `globalThis.Deno.env?.toObject()`
 - the chain starts at a module, as in `fs?.watch('.')`, because a missing module does not always leave `undefined` in the name
-- the other operand of the `||` or `??` is `null` or `undefined`, as in `(globalThis.Deno?.env.toObject() ?? null).x`, because the value can be nullish
+- the other operand of the `||` or `??` is `null` or `undefined`, as in `(globalThis.Deno?.env.toObject() ?? null).x`, because the value can be nullish. This does not apply where nothing reads the value, as in `null ?? globalThis.Deno?.core.print('x');`
 - the chain starts at a name that is not read as the global object, such as a `let`, a `var` or a parameter, as in `let g = globalThis; g.Deno?.env.toObject()`
 - the target has `Deno` and lacks `env.toObject`
 
