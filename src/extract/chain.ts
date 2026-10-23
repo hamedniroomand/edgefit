@@ -193,6 +193,31 @@ export function isCheckedOperand(
 }
 
 /**
+ * Whether the value of `node` only goes back to the caller: `return x`, or the body of `() => x`,
+ * through wrappers such as `(x)`, `x!` and `(0, x)`. `await x` is not one of these, so a read that is
+ * awaited stays unknown.
+ * `outer` holds the ancestors above `parent`, nearest first.
+ */
+export function isReturned(node: Node, parent: Node, outer: readonly Node[]): boolean {
+  let value = node;
+  for (const ancestor of [parent, ...outer]) {
+    if (ancestor.type === 'ReturnStatement') {
+      return true;
+    }
+    // The walker gives the default value of a parameter the arrow function as its parent, so only
+    // the body counts.
+    if (ancestor.type === 'ArrowFunctionExpression') {
+      return ancestor.body === value;
+    }
+    if (ancestor.type === 'AwaitExpression' || !passesOn(ancestor, value)) {
+      return false;
+    }
+    value = ancestor;
+  }
+  return false;
+}
+
+/**
  * Whether `obj[name]` reads a key that an `in` test on `obj` proved present. As for `||`, a read
  * that is called in place or read further is not covered: a present member that throws still fails.
  */

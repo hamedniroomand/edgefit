@@ -102,10 +102,10 @@ describe('a symbol held in a constant', () => {
 
   it('still reports a key that may not be a symbol', () => {
     const reported = ['dynamic globalThis[<expression>]'];
-    expect(usagesOf('function get(key) {\n  return globalThis[key];\n}')).toEqual(reported);
+    expect(usagesOf('function get(key) {\n  return globalThis[key]();\n}')).toEqual(reported);
     expect(usagesOf("let key = Symbol();\nkey = 'x';\nglobalThis[key];")).toEqual(reported);
     expect(
-      usagesOf('const key = Symbol();\nfunction get(key) {\n  return globalThis[key];\n}'),
+      usagesOf('const key = Symbol();\nfunction get(key) {\n  return globalThis[key]();\n}'),
     ).toEqual(reported);
   });
 

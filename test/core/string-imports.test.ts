@@ -28,7 +28,7 @@ async function usagesOfIndex(files: Record<string, string>): Promise<string[]> {
   return (found?.usages ?? []).map(usage => `${usage.kind} ${usage.display}`);
 }
 
-const read = "import { key } from './key.mjs';\nexport const get = () => globalThis[key];\n";
+const read = "import { key } from './key.mjs';\nexport const get = () => globalThis[key]();\n";
 const unknown = ['dynamic globalThis[<expression>]'];
 // The same as a `const` of the file: the string stands for the key.
 const known = ['api ~pkg/current'];

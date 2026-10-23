@@ -10,6 +10,7 @@ import {
   isCheckedOperand,
   isOptionalRead,
   isPresentRead,
+  isReturned,
   isSafeRead,
   isTestedChain,
 } from './chain.ts';
@@ -180,6 +181,7 @@ export class Walker implements VisitContext {
     const { member, memberParent } = chain;
     const global = isGlobalRoot(chain.ref) && memberParent !== undefined;
     const written = global && isMemberWrite(member, memberParent);
+    const returned = global && isReturned(member, memberParent, this.#outer(member));
     const checked =
       isPresentRead(member, memberParent, this.scope) ||
       (global && isCheckedOperand(member, memberParent, this.#outer(member), this));
@@ -192,7 +194,7 @@ export class Walker implements VisitContext {
           this.collector.api(ref, chain.propertyOffset, false, through);
         });
       }
-    } else if (!(tested || written || checked)) {
+    } else if (!(tested || written || checked || returned)) {
       this.collector.dynamic(
         chain.ref,
         `${displayRef(chain.ref)}[<expression>]`,
