@@ -50,7 +50,7 @@ Netlify reads its import map from a separate file that `netlify.toml` names, and
 
 ```toml
 [functions]
-  deno_import_map = "./import_map.json"
+deno_import_map = "./import_map.json"
 ```
 
 edgefit applies that file to your own code, so this target ignores `deno.json` and the `deno` config option.
