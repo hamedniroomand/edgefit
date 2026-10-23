@@ -2,12 +2,12 @@
   "version": 2,
   "package": "@libsql/client",
   "resolved": "0.18.0",
-  "checkedAt": "2026-10-23T11:39:29.553Z",
+  "checkedAt": "2026-10-23T12:34:40.737Z",
   "edgefit": "0.16.2",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
-    "bun": "1.4.2",
+    "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
     "deno-deploy": "2.5.0",
@@ -42,7 +42,7 @@
       ]
     },
     "bun": {
-      "settings": "Bun 1.4.2 (from the compatibility data; no pinned Bun version found), entries from --entry or the config, NODE_ENV not fixed, so both branches of a check are followed",
+      "settings": "Bun 1.4.4 (from the compatibility data; no pinned Bun version found), entries from --entry or the config, NODE_ENV not fixed, so both branches of a check are followed",
       "notes": []
     },
     "deno": {
@@ -230,12 +230,12 @@
       }
     }
   ],
-  "durationMs": 4417,
+  "durationMs": 4720,
   "verified": {
     "bun": {
       "outcome": "verified",
       "kind": "load",
-      "runtime": "bun 1.4.2"
+      "runtime": "bun 1.4.4"
     },
     "deno": {
       "outcome": "verified",
