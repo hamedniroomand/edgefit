@@ -2,8 +2,8 @@
   "version": 2,
   "package": "nodemailer",
   "resolved": "10.2.1",
-  "checkedAt": "2026-10-23T06:06:20.641Z",
-  "edgefit": "0.16.0",
+  "checkedAt": "2026-10-23T10:37:19.325Z",
+  "edgefit": "0.16.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -497,7 +497,7 @@
       }
     }
   ],
-  "durationMs": 9222,
+  "durationMs": 9340,
   "verified": {
     "bun": {
       "outcome": "verified",

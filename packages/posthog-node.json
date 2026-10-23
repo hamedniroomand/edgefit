@@ -2,8 +2,8 @@
   "version": 2,
   "package": "posthog-node",
   "resolved": "5.57.0",
-  "checkedAt": "2026-10-23T06:06:34.625Z",
-  "edgefit": "0.16.0",
+  "checkedAt": "2026-10-23T10:38:56.665Z",
+  "edgefit": "0.16.1",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -157,7 +157,7 @@
       }
     }
   ],
-  "durationMs": 6613,
+  "durationMs": 5121,
   "verified": {
     "bun": {
       "outcome": "verified",
