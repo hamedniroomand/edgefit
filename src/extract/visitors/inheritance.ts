@@ -1,5 +1,7 @@
 import type { Node } from 'oxc-parser';
 
+import { memberPath } from '@/data/compat-index.ts';
+import type { NodeOf } from '@/extract/ast.ts';
 import { resolveBinding } from '@/extract/bindings.ts';
 import type { VisitContext } from '@/extract/context.ts';
 import { displayRef, extendedReason, memberRef } from '@/extract/refs.ts';
@@ -25,4 +27,25 @@ export function visitParentClass(parent: Node, context: VisitContext): void {
     extendedReason,
     parent.start,
   );
+}
+
+/** `util.inherits(Child, Parent)` makes `Parent` the parent class of `Child`. */
+export function visitInherits(node: NodeOf<'CallExpression'>, context: VisitContext): boolean {
+  const callee = resolveBinding(node.callee, context);
+  const [child, parent, ...rest] = node.arguments;
+  if (
+    !isTracked(callee) ||
+    callee.ref.module !== 'util' ||
+    memberPath(callee.ref).join('.') !== 'inherits' ||
+    child === undefined ||
+    parent === undefined ||
+    parent.type === 'SpreadElement'
+  ) {
+    return false;
+  }
+  context.visit(node.callee);
+  context.visitAll([child]);
+  visitParentClass(parent, context);
+  context.visitAll(rest);
+  return true;
 }

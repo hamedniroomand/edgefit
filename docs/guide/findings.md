@@ -68,7 +68,7 @@ A feature check such as `if ('gpu' in navigator)` is not reported for `navigator
 
 edgefit could not determine what is used. Typical causes:
 
-- `require(name)` or `import(name)` with a computed module name
+- `require(name)` or `import(name)` with a computed module name. One case is read: a call that a `try` block catches, with a name that is a conditional expression of strings. See [Try blocks](#try-blocks)
 - computed member access on a module that has unsupported members, such as `fs[method]`
 - a module that the compatibility data does not list. An exception: the curated data can record that the module loads. A member of such a module is still not covered, unless another entry covers it
 - a `jsr:` import on Deno
@@ -186,6 +186,10 @@ Usages in the `try` block are guarded, for the APIs the target lacks and for the
 - the `catch` and `finally` blocks themselves
 - a function defined in the block, which may run after the block has ended, and a class body
 - an `import()` that nothing awaits, since its error does not reach the block. `await import(…)` does
+
+A `require()` or an `import()` in a `try` block that guards can name its module with a conditional expression of strings, such as `require(flag ? 'a' : 'b')`. The `import()` must follow `await` directly. A `const` can hold the expression, but a `let` or a `var` cannot. Each branch can be a string, a `const` that holds a string, or strings that a template literal or a `+` joins. A branch can also be `undefined`, `null` or `void 0`, which loads nothing. When every branch is one of these, edgefit reads one `require()` or `import()` for each string, and it does not report `require(<expression>)` or `import(<expression>)`. A Node.js module that a string names is then reported by name, as for a plain call. A test such as `typeof Deno !== 'undefined'` limits its branch to that runtime, as in an `if`. See [Runtime checks](#runtime-checks). Edgefit does not read the code of a package that a string names when a `const` holds the expression or `createRequire` makes the call. It does not read it for a `const` that holds one string either.
+
+Edgefit reports the call as before when one branch is something else, such as a variable or a call, when only `undefined` and `null` are left, when the `catch` throws again, and when no `try` block guards the call. An unguarded `require` is `unknown`, and it is an error on `vercel-edge`.
 
 ### Polyfills
 
