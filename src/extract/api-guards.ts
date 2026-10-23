@@ -62,6 +62,10 @@ export function guardFor(node: Node, context: BindingContext, key?: string): Api
   return [{ kind: 'api', ref, root: local ? name : undefined, active: true }];
 }
 
+/** The guard that says the API `ref` exists, for a read that the walker already resolved. */
+export const apiGuard = (ref: ApiRef) =>
+  ({ kind: 'api', ref: normalizeRef(ref), root: undefined, active: true }) as const;
+
 /** The guard that says `node`, or its member `key`, is missing. */
 export function absentGuard(node: Node, context: BindingContext, key?: string): AbsentGuard[] {
   const binding = resolveBinding(node, context);

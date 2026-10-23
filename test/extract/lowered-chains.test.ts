@@ -74,6 +74,20 @@ const cases: [string, string][] = [
     `const v = ${deno}?.cwd;\nconst w = ${deno}?.args;`,
     `const v = ${chain(deno, '.cwd')};\nconst w = ${chain(deno, '.args')};`,
   ],
+  [
+    `const v = ${deno}?.env.toObject() || {};`,
+    `const v = (${chain(deno, '.env.toObject()')}) || {};`,
+  ],
+  [
+    `const v = ${deno}?.env.toObject() ?? {};`,
+    `const v = (_b = ${chain(deno, '.env.toObject()')}) !== null && _b !== void 0 ? _b : {};`,
+  ],
+  [
+    `const v = typeof ${deno}?.env.toObject();`,
+    `const v = typeof (${chain(deno, '.env.toObject()')});`,
+  ],
+  [`const v = !${deno}?.env.toObject();`, `const v = !(${chain(deno, '.env.toObject()')});`],
+  [`${deno}?.env.toObject().x;`, `${chain(deno, '.env.toObject().x')};`],
   [`${fs}fs?.watch;`, `${fs}${chain('fs', '.watch')};`],
   [`${fs}fs.promises?.watch;`, `${fs}${chain('fs.promises', '.watch')};`],
   [
