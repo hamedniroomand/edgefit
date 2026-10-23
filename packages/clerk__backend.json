@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@clerk/backend",
   "resolved": "3.26.1",
-  "checkedAt": "2026-10-23T12:33:52.122Z",
-  "edgefit": "0.16.2",
+  "checkedAt": "2026-10-23T12:58:20.129Z",
+  "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -172,7 +172,7 @@
       }
     }
   ],
-  "durationMs": 4683,
+  "durationMs": 6197,
   "verified": {
     "bun": {
       "outcome": "verified",

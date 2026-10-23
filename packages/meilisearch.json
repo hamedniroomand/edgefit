@@ -2,8 +2,8 @@
   "version": 2,
   "package": "meilisearch",
   "resolved": "0.62.0",
-  "checkedAt": "2026-10-23T12:34:26.769Z",
-  "edgefit": "0.16.2",
+  "checkedAt": "2026-10-23T12:58:36.126Z",
+  "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -88,7 +88,7 @@
       }
     }
   ],
-  "durationMs": 691,
+  "durationMs": 1228,
   "verified": {
     "bun": {
       "outcome": "verified",

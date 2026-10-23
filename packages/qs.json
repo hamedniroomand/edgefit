@@ -2,8 +2,8 @@
   "version": 2,
   "package": "qs",
   "resolved": "6.16.1",
-  "checkedAt": "2026-10-23T12:34:24.148Z",
-  "edgefit": "0.16.2",
+  "checkedAt": "2026-10-23T12:58:03.729Z",
+  "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 812,
+  "durationMs": 1541,
   "verified": {
     "bun": {
       "outcome": "verified",

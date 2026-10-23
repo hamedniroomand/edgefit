@@ -2,8 +2,8 @@
   "version": 2,
   "package": "jszip",
   "resolved": "3.10.2",
-  "checkedAt": "2026-10-23T12:36:45.573Z",
-  "edgefit": "0.16.2",
+  "checkedAt": "2026-10-23T12:58:13.848Z",
+  "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",

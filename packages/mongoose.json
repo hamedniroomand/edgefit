@@ -2,8 +2,8 @@
   "version": 2,
   "package": "mongoose",
   "resolved": "9.11.3",
-  "checkedAt": "2026-10-23T12:35:13.245Z",
-  "edgefit": "0.16.2",
+  "checkedAt": "2026-10-23T12:56:29.735Z",
+  "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 11597,
+  "durationMs": 6685,
   "verified": {
     "bun": {
       "outcome": "verified",

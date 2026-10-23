@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@neondatabase/serverless",
   "resolved": "1.2.0",
-  "checkedAt": "2026-10-23T12:32:35.575Z",
-  "edgefit": "0.16.2",
+  "checkedAt": "2026-10-23T12:55:07.230Z",
+  "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 2037,
+  "durationMs": 1905,
   "verified": {
     "bun": {
       "outcome": "verified",

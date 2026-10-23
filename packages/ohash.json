@@ -2,8 +2,8 @@
   "version": 2,
   "package": "ohash",
   "resolved": "2.0.12",
-  "checkedAt": "2026-10-23T12:35:19.729Z",
-  "edgefit": "0.16.2",
+  "checkedAt": "2026-10-23T12:55:22.789Z",
+  "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -109,7 +109,7 @@
       }
     }
   ],
-  "durationMs": 1079,
+  "durationMs": 1058,
   "verified": {
     "bun": {
       "outcome": "verified",

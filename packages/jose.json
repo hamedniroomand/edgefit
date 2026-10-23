@@ -2,8 +2,8 @@
   "version": 2,
   "package": "jose",
   "resolved": "6.2.13",
-  "checkedAt": "2026-10-23T12:32:48.950Z",
-  "edgefit": "0.16.2",
+  "checkedAt": "2026-10-23T12:55:05.329Z",
+  "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -235,7 +235,7 @@
       }
     }
   ],
-  "durationMs": 2892,
+  "durationMs": 2687,
   "verified": {
     "bun": {
       "outcome": "verified",

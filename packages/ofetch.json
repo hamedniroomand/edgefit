@@ -2,8 +2,8 @@
   "version": 2,
   "package": "ofetch",
   "resolved": "1.5.1",
-  "checkedAt": "2026-10-23T12:35:26.298Z",
-  "edgefit": "0.16.2",
+  "checkedAt": "2026-10-23T12:58:13.980Z",
+  "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -88,7 +88,7 @@
       }
     }
   ],
-  "durationMs": 1327,
+  "durationMs": 1407,
   "verified": {
     "bun": {
       "outcome": "verified",
