@@ -62,7 +62,7 @@ Only the global `process.env` exists on this runtime. `process.env` is allowed a
 
 ## `require`
 
-The documentation says calling `require` directly is not allowed and that packages must be ES modules. Vercel bundles the code, so a static `require('x')` is part of the bundle and is not reported. A `require` whose module is computed at runtime, such as `require(name)`, cannot be bundled. It is reported as an error here and stays an `unknown` warning on the other targets. A `require` inside `try` stays a warning, because the `catch` handles the error.
+The documentation says calling `require` directly is not allowed and that packages must be ES modules. Vercel bundles the code, so a static `require('x')` is part of the bundle and is not reported. A `require` whose module is computed at runtime, such as `require(name)`, cannot be bundled. It is reported as an error here and stays an `unknown` warning on the other targets. A `require` inside `try` stays a warning, because the `catch` handles the error. When a `try` block guards the call and the name is a conditional expression of strings, such as `flag ? 'a' : 'b'`, edgefit reads a `require` for each string and does not report `require(<expression>)`. See [Try blocks](/guide/findings#try-blocks).
 
 ## Middleware and edge functions
 
