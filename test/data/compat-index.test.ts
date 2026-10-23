@@ -236,3 +236,24 @@ describe('an exact entry', () => {
     expect(index.hasProblemsBelow({ module: 'zz', path: ['x'] })).toBe(true);
   });
 });
+
+describe('globals that only a curated entry lists', () => {
+  it('names the globals that the overrides say only a read at load fails', () => {
+    expect(data.curatedLoadOnlyGlobals().toSorted()).toEqual([
+      'Bun',
+      'Deno',
+      'HTMLAnchorElement',
+      'document',
+      'window',
+    ]);
+  });
+
+  it('gives the loadOnly of the entry with the result', () => {
+    expect(data.lookup({ module: '*globals*', path: ['document', 'title'] })).toMatchObject({
+      status: 'unsupported',
+      absent: true,
+      loadOnly: 'bare',
+    });
+    expect(data.lookup({ module: '*globals*', path: ['FileList'] })).not.toHaveProperty('loadOnly');
+  });
+});

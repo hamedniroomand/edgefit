@@ -7,7 +7,8 @@ import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import { isFallbackRead } from './fallback-reads.ts';
 import { keysOf, passedKeysOf } from './known-values.ts';
-import { memberRef, passesOn } from './refs.ts';
+import { isOptionalRead } from './optional-reads.ts';
+import { isFeatureCheck, memberRef, passesOn } from './refs.ts';
 import { declaringScope, isTracked, lookupPresent, lookupSymbol } from './scope.ts';
 import type { Scope } from './scope.ts';
 
@@ -277,4 +278,22 @@ export function callPassedKeys(
     .map(argument => passedKeysOf(argument, scope))
     .findLast(keys => keys !== undefined);
   return options === undefined || options.length === 0 ? undefined : [...options];
+}
+
+/** A read that only tests for the API, so it is not a use. */
+export const isCheck = (node: Node, parent: Node | undefined, outer: readonly Node[]): boolean =>
+  (parent !== undefined && (isFeatureCheck(node, parent) || isTestedChain(parent, outer))) ||
+  isOptionalRead(node, parent, outer);
+
+/** A read that tests the global or takes a fallback when it is missing. It still reads the name. */
+export function isCheckedRead(
+  node: Node,
+  parent: Node | undefined,
+  outer: readonly Node[],
+  context: BindingContext,
+): boolean {
+  return (
+    isCheck(node, parent, outer) ||
+    (parent !== undefined && isCheckedOperand(node, parent, outer, context))
+  );
 }

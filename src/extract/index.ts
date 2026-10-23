@@ -35,6 +35,8 @@ export interface ExtractOptions {
   importedChecks?: UsageCollector['importedChecks'];
   /** The options that the data names as a path, such as `auth.lock`. The file lists each one that it sets. */
   optionPaths?: readonly string[];
+  /** The tracked globals that only a read at load fails, such as `document` on a server runtime. */
+  loadOnlyGlobals?: ReadonlySet<string>;
 }
 
 export interface ExtractedModule {

@@ -143,6 +143,12 @@ export const visitAssignment: Visitor<NodeOf<'AssignmentExpression'>> = (node, c
       context.visit(node.right);
     });
   }
+  if (target.type === 'MemberExpression' && isGlobalObjectName(target.object, context)) {
+    const written = staticKey(target.property, target.computed);
+    if (written !== undefined) {
+      context.collector.written.add(written);
+    }
+  }
 };
 
 export const visitUpdate: Visitor<NodeOf<'UpdateExpression'>> = (node, context) => {

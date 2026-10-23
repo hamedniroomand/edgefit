@@ -3,7 +3,7 @@ import process from 'node:process';
 
 import { builtEntries, isBuildOutput } from '@/built/entry.ts';
 import { missingPeersOf, resolveGraph } from '@/resolve/graph.ts';
-import { createTarget } from '@/targets/index.ts';
+import { loadOnlyGlobals, createTarget } from '@/targets/index.ts';
 import type { Target, TargetInfo } from '@/targets/index.ts';
 import type { EdgefitConfig, Finding, TargetKey } from '@/types.ts';
 
@@ -110,6 +110,7 @@ function scanOptionsOf(
     leaveOutMissingPeers: options.missingPeersAsNotes,
     byExport: options.byExport,
     optionPaths: unreachedOptionPaths(loadUnreached()),
+    loadOnlyGlobals: loadOnlyGlobals(target),
   };
 }
 

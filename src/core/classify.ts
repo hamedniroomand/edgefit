@@ -48,13 +48,25 @@ function isOptionMiss(usage: Usage, result: LookupResult): boolean {
 
 /**
  * Whether a usage says nothing about support: a call that only counts for options, or an API
- * that fails only for some options, so a call that passes none of them is not a proof.
+ * that fails only for some options, so a call that passes none of them is not a proof. A read of a
+ * plain global name that only counts at load says nothing when it does not run at load.
  */
 export function dependsOnOptions(usage: Usage, target: Target): boolean {
-  return (
-    usage.onlyForOptions === true ||
-    (usage.api !== undefined && target.lookup(usage.api).options !== undefined)
-  );
+  if (usage.api === undefined) {
+    return usage.onlyForOptions === true;
+  }
+  const result = target.lookup(usage.api);
+  return usage.onlyForOptions === true || result.options !== undefined || isLazyRead(usage, result);
+}
+
+/**
+ * A read of a plain global name that the target lacks, in code that does not run as the module
+ * loads, when the data says that only a read at load is a finding. Such a read often sits behind
+ * an environment check that edgefit cannot read: the module loads, and the read runs only on a
+ * runtime that has the global.
+ */
+function isLazyRead(usage: Usage, result: LookupResult): boolean {
+  return result.loadOnly === 'bare' && usage.bare === true && usage.atLoad !== true;
 }
 
 function classifyApi(usage: Usage, target: Target): Classification | undefined {
@@ -63,7 +75,7 @@ function classifyApi(usage: Usage, target: Target): Classification | undefined {
   }
   const result = target.lookup(usage.api);
   const statusCategory = categoryByStatus[result.status];
-  if (statusCategory === undefined || isOptionMiss(usage, result)) {
+  if (statusCategory === undefined || isOptionMiss(usage, result) || isLazyRead(usage, result)) {
     return undefined;
   }
   const category = result.category ?? statusCategory;
