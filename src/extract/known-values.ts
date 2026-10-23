@@ -9,6 +9,19 @@ import { literalOf, presenceOf, propertyKey, spreadLiterals, writtenKeys } from 
 import { createScope, declare, lookupKeys, lookupObject } from './scope.ts';
 import type { KnownObject, KnownValue, Scope } from './scope.ts';
 
+/** The lists that no code of the file can change, because the file never gave them a name. */
+const settled = new WeakSet<object>();
+
+/** Marks a list as one that no code can change: an array that is written in place, and nothing else. */
+export function settle<TList extends object>(list: TList): TList {
+  settled.add(list);
+  return list;
+}
+
+export function isSettled(list: object | undefined): boolean {
+  return list !== undefined && settled.has(list);
+}
+
 /** The strings of `values`, when there is at least one and each one is a string. */
 function strings(values: readonly KnownValue[] | undefined): readonly string[] | undefined {
   // An empty set says nothing, and silence is not an answer.

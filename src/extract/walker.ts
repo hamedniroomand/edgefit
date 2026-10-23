@@ -54,7 +54,7 @@ export class Walker implements VisitContext {
   public readonly wrappers: VisitContext['wrappers'];
   public readonly functions: VisitContext['functions'];
   public readonly supplied: VisitContext['supplied'];
-  public readonly callKeys: VisitContext['callKeys'];
+  public readonly calls: VisitContext['calls'];
   readonly #stack: Node[] = [];
   #scope: Scope = createScope();
   #bound: ReadonlySet<Node> = new Set();
@@ -68,7 +68,7 @@ export class Walker implements VisitContext {
     wrappers: VisitContext['wrappers'],
     functions: VisitContext['functions'],
     supplied: VisitContext['supplied'],
-    callKeys: VisitContext['callKeys'],
+    calls: VisitContext['calls'],
     imported = false,
   ) {
     this.imported = imported;
@@ -81,7 +81,7 @@ export class Walker implements VisitContext {
     this.wrappers = wrappers;
     this.functions = functions;
     this.supplied = supplied;
-    this.callKeys = callKeys;
+    this.calls = calls;
   }
 
   public get scope(): Scope {

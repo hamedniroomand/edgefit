@@ -78,8 +78,16 @@ describe('a call that does not set a signal handler', () => {
   it.each([
     ['for an event that is not a signal', `process.on('exit', () => ${kill});`],
     [
-      'with an event that is not a string',
-      `for (const signal of ['SIGTERM']) {\n  process.on(signal, () => ${kill});\n}`,
+      'with an event that is not known',
+      `for (const signal of signals) {\n  process.on(signal, () => ${kill});\n}`,
+    ],
+    [
+      'with an event that names a known string that is not a signal',
+      `const event = 'exit';\nprocess.on(event, () => ${kill});`,
+    ],
+    [
+      'with an event that is a template with an unknown part',
+      `process.on(\`SIG\${name}\`, () => ${kill});`,
     ],
     ['on an object that is not process', `emitter.on('SIGTERM', () => ${kill});`],
     [

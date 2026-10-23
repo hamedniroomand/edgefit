@@ -1,16 +1,17 @@
 import type { Node } from 'oxc-parser';
 
-import { staticKey, strip } from './ast.ts';
+import { childNodes, staticKey, strip } from './ast.ts';
 import type { FunctionNode, NodeOf } from './ast.ts';
 import { collectVarDeclarators } from './declarations.ts';
-import { elementsOf, keysOf, unionKeys, valueOf } from './known-values.ts';
+import { elementsOf, isSettled, keysOf, settle, unionKeys, valueOf } from './known-values.ts';
 import { bindFilteredList } from './present-keys.ts';
-import type { Scope } from './scope.ts';
+import { lookupObject } from './scope.ts';
+import type { KnownObject, Scope } from './scope.ts';
 import { collectWrites } from './writes.ts';
 import type { Writes } from './writes.ts';
 
 /** Array methods whose callback gets each element as its first argument. */
-const iterators = new Set([
+export const iterators = new Set([
   'every',
   'filter',
   'find',
@@ -20,6 +21,31 @@ const iterators = new Set([
   'map',
   'some',
 ]);
+
+/** Whether a function has the name `arguments` anywhere: it can reach every argument that the call gave it. */
+export function usesArguments(fn: Node): boolean {
+  const pending = [fn];
+  for (let node = pending.pop(); node !== undefined; node = pending.pop()) {
+    if (node.type === 'Identifier' && node.name === 'arguments') return true;
+    for (const child of childNodes(node)) pending.push(child);
+  }
+  return false;
+}
+
+/**
+ * Whether the callback of an iterator cannot change the array that it walks. The array is the third
+ * argument of the callback, so a third parameter, a rest parameter or `arguments` can reach it.
+ */
+export function cannotChangeList(callback: Node | undefined): boolean {
+  const fn = callback === undefined ? undefined : strip(callback);
+  const plain = fn?.type === 'ArrowFunctionExpression' || fn?.type === 'FunctionExpression';
+  return (
+    plain &&
+    fn.params.length <= 2 &&
+    !fn.params.some(param => param.type === 'RestElement') &&
+    !usesArguments(fn)
+  );
+}
 
 function functionName(statement: Node): string[] {
   const declaration =
@@ -114,8 +140,27 @@ export function collectKnown(
   }
 }
 
-/** `name` holds each string of `list`, and each value that `body` writes to it. */
-function bindElements(scope: Scope, name: string, list: Node, body: Node, outer: Scope): void {
+/** Whether no code can change `list`: an array written in place, or the list that a method gets. */
+function isFixedList(list: Node, scope: Scope): boolean {
+  const node = strip(list);
+  return (
+    node.type === 'ArrayExpression' ||
+    (node.type === 'Identifier' && isSettled(lookupObject(scope, node.name)))
+  );
+}
+
+/**
+ * `name` holds each string of `list`, and each value that `body` writes to it. `closed` is set
+ * when the code that walks the list has no way to change it, see `cannotChangeList`.
+ */
+function bindElements(
+  scope: Scope,
+  name: string,
+  list: Node,
+  body: Node,
+  outer: Scope,
+  closed: boolean,
+): void {
   const elements = elementsOf(list, outer);
   const written = elements === undefined ? null : collectWrites([body]).get(name);
   const keys =
@@ -124,6 +169,7 @@ function bindElements(scope: Scope, name: string, list: Node, body: Node, outer:
       : unionKeys([elements, ...(written ?? []).map(value => keysOf(value, scope))]);
   if (keys !== undefined) {
     scope.keys.set(name, keys);
+    if (closed && written === undefined && isFixedList(list, outer)) settle(keys);
   }
 }
 
@@ -131,7 +177,7 @@ function bindElements(scope: Scope, name: string, list: Node, body: Node, outer:
 export function bindLoopKeys(node: NodeOf<'ForOfStatement'>, scope: Scope): void {
   const id = node.left.type === 'VariableDeclaration' ? node.left.declarations[0]?.id : node.left;
   if (id?.type === 'Identifier') {
-    bindElements(scope, id.name, node.right, node.body, scope);
+    bindElements(scope, id.name, node.right, node.body, scope, true);
   }
 }
 
@@ -152,7 +198,7 @@ export function bindCallbackKeys(
     first?.type === 'Identifier' &&
     fn.body !== null
   ) {
-    bindElements(scope, first.name, callee.object, fn.body, outer);
+    bindElements(scope, first.name, callee.object, fn.body, outer, cannotChangeList(fn));
   }
 }
 
@@ -170,5 +216,17 @@ export function bindParameterKeys(
       const all = unionKeys([keys, ...(written ?? []).map(value => keysOf(value, scope))]);
       if (all !== undefined) scope.keys.set(param.name, all);
     }
+  }
+}
+
+/** A parameter holds the list that the one call of its method passes, see `findCallLists`. */
+export function bindParameterLists(
+  fn: FunctionNode,
+  lists: ReadonlyMap<number, KnownObject> | undefined,
+  scope: Scope,
+): void {
+  for (const [index, list] of lists ?? []) {
+    const param = fn.params[index];
+    if (param?.type === 'Identifier') scope.objects.set(param.name, list);
   }
 }
