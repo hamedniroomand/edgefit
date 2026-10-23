@@ -3,18 +3,29 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import process from 'node:process';
 
 const timeoutMs = 5 * 60 * 1000;
 // The note of an optional peer. src/package/check-entry.ts writes the text. If that text changes,
 // no peer matches and the run installs none.
 const peerNote = /^peer (\S+) not installed, checked in your project$/u;
 
-/** Runs `npm install` with `args` in `directory`. Returns the error text, or `undefined`. */
+/**
+ * Runs `npm install` with `args` in `directory`. Returns the error text, or `undefined`. npm runs
+ * the install scripts here, because a native addon can need them. The `postinstall` script of
+ * `puppeteer` downloads a browser. No reach script needs that browser. So each install sets
+ * `PUPPETEER_SKIP_DOWNLOAD`, and puppeteer then skips the download.
+ */
 function npmInstall(directory, args = []) {
   const run = spawnSync(
     'npm',
     ['install', '--no-audit', '--no-fund', '--loglevel=error', ...args],
-    { cwd: directory, encoding: 'utf8', timeout: timeoutMs },
+    {
+      cwd: directory,
+      encoding: 'utf8',
+      timeout: timeoutMs,
+      env: { ...process.env, PUPPETEER_SKIP_DOWNLOAD: 'true' },
+    },
   );
   if (run.status === 0) {
     return undefined;
