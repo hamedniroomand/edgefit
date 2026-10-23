@@ -5,7 +5,7 @@ import { chainTemps, staticKey } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { isTemp, nullishOf, parens, tempOf, testOf } from './lowered-tests.ts';
 import type { Temp } from './lowered-tests.ts';
-import { isStatementUse } from './statement-use.ts';
+import { isDiscarded, isStatementUse } from './statement-use.ts';
 
 /** The object `W` of the member `V = W.y`, also when `V` is the chain of an inner form. */
 function objectOf(value: Node): Node | undefined {
@@ -167,8 +167,9 @@ function plainChain(
 /**
  * The source form of a compiled `V?.y` or `V ?? y`, or `undefined` when `node` is not one:
  * `(t = V) == null ? void 0 : t.y` gives `(t = V)?.y`, `(t = V) != null ? t : y` gives
- * `(t = V) ?? y`, the `(t = V) != null && t.y` of a minified test gives `(t = V)?.y`, and
- * `(V?.y).call(t)` gives `(V?.y)()`. The assignment stays, so `t` is still set, and passes its
+ * `(t = V) ?? y`, the `(t = V) != null && t.y` of a minified test gives `(t = V)?.y`, the
+ * `(t = V) == null || t.y` of a minified statement gives `(t = V)?.y` where its value is dropped,
+ * and `(V?.y).call(t)` gives `(V?.y)()`. The assignment stays, so `t` is still set, and passes its
  * value on.
  */
 function restored(node: Node, ancestors: readonly Node[]): Node | undefined {
@@ -176,10 +177,14 @@ function restored(node: Node, ancestors: readonly Node[]): Node | undefined {
     return calledChain(node);
   }
   if (node.type === 'LogicalExpression') {
-    const test = node.operator === '&&' ? testOf(node.left) : undefined;
-    // A hand-written `x != null && x.y()` on a plain name is a check, so only a temp counts.
-    return test?.present === true &&
+    const present = node.operator === '&&';
+    const test = present || node.operator === '||' ? testOf(node.left) : undefined;
+    // A hand-written `x != null && x.y()` or `x == null || x.y()` on a plain name is a check, so
+    // only a temp counts. The `(t = V) == null || t.y` of a minifier is `true` when `V` is missing,
+    // so it is the chain only where its value is dropped.
+    return test?.present === present &&
       test.temp.assignment !== undefined &&
+      (present || isDiscarded(node, ancestors)) &&
       rebase(node.right, test.temp)
       ? chainOf(node.right, node)
       : undefined;

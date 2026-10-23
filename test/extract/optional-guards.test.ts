@@ -174,8 +174,14 @@ describe('a `?.` that does not follow a property of the global object', () => {
 describe('the use after a `?.` link on a global, as a finding', () => {
   const source = 'export const e = () => globalThis.Deno?.env.toObject() || {};';
   const missing = { status: 'unsupported', absent: true } as const;
-  const counts = (results: Parameters<typeof stubTarget>[0], globals: string[]): number[] => {
-    const usages = extractUsages('src/input.ts', source, { globals: names, nodeEnv: 'production' });
+  const minified =
+    'var o;\nexport function e() {\n  (o = globalThis.Deno) == null || o.env.toObject();\n}';
+  const counts = (
+    results: Parameters<typeof stubTarget>[0],
+    globals: string[],
+    code = source,
+  ): number[] => {
+    const usages = extractUsages('src/input.ts', code, { globals: names, nodeEnv: 'production' });
     const module = { file: 'src/input.ts', package: undefined, chain: ['src/input.ts'], usages };
     const options = { target: stubTarget(results, [], globals), levels: defaultLevels, ignore: [] };
     const { findings, guarded } = collectFindings([module], options);
@@ -189,5 +195,11 @@ describe('the use after a `?.` link on a global, as a finding', () => {
 
   it('is a finding on a target that has the global and lacks the API', () => {
     expect(counts({ '*globals*.Deno.env.toObject': missing }, ['Deno'])).toEqual([1, 0]);
+  });
+
+  it('is guarded on a target that lacks the global, in the minified form of a statement', () => {
+    const results = { '*globals*.Deno': missing, '*globals*.Deno.env.toObject': missing };
+    expect(counts(results, [], minified)).toEqual([0, 1]);
+    expect(counts({ '*globals*.Deno.env.toObject': missing }, ['Deno'], minified)).toEqual([1, 0]);
   });
 });
