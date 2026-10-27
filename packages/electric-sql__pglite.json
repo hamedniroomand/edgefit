@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "@electric-sql/pglite",
-  "resolved": "0.5.11",
-  "checkedAt": "2026-10-23T12:58:23.312Z",
+  "resolved": "0.5.12",
+  "checkedAt": "2026-10-27T10:04:58.374Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -26,7 +26,7 @@
   "summary": {
     "workerd": "fail",
     "bun": "pass",
-    "deno": "pass"
+    "deno": "warn"
   },
   "worst": {
     "bun": {
@@ -57,7 +57,7 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 2,
+          "errors": 1,
           "warnings": 0,
           "findings": [
             {
@@ -65,12 +65,6 @@
               "category": "unsupported",
               "level": "error",
               "detail": "does not exist on the target"
-            },
-            {
-              "api": "node:process.binding",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
             }
           ]
         },
@@ -80,9 +74,17 @@
           "warnings": 0
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:fs.constants",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -274,17 +276,12 @@
     }
   ],
   "notes": "PGlite calls WebAssembly.instantiateStreaming only in its browser branch. With nodejs_compat at the date of the table, PGlite takes its Node branch on workerd, so this call does not run. The Node branch reads its files from disk, and the Worker bundle has none, so PGlite.create() fails before it uses WebAssembly or reaches node:process.binding. The multi-tab worker of PGlite uses navigator.locks, which Bun and workerd do not have.",
-  "durationMs": 10444,
+  "durationMs": 10918,
   "verified": {
     "bun": {
       "outcome": "verified",
       "kind": "load",
       "runtime": "bun 1.4.4"
-    },
-    "deno": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "deno 2.9.7"
     }
   }
 }

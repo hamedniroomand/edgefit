@@ -2,7 +2,7 @@
   "version": 2,
   "package": "koa",
   "resolved": "3.2.1",
-  "checkedAt": "2026-10-23T12:57:33.898Z",
+  "checkedAt": "2026-10-27T10:01:54.702Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -73,7 +73,7 @@
       }
     }
   ],
-  "durationMs": 2085,
+  "durationMs": 2788,
   "verified": {
     "bun": {
       "outcome": "verified",

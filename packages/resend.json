@@ -2,7 +2,7 @@
   "version": 2,
   "package": "resend",
   "resolved": "6.34.1",
-  "checkedAt": "2026-10-23T12:58:06.353Z",
+  "checkedAt": "2026-10-27T10:04:15.895Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 2366,
+  "durationMs": 2039,
   "verified": {
     "bun": {
       "outcome": "verified",

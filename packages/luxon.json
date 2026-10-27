@@ -2,7 +2,7 @@
   "version": 2,
   "package": "luxon",
   "resolved": "3.7.2",
-  "checkedAt": "2026-10-23T12:58:32.032Z",
+  "checkedAt": "2026-10-27T10:05:33.764Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1602,
+  "durationMs": 1551,
   "verified": {
     "bun": {
       "outcome": "verified",

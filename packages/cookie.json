@@ -2,7 +2,7 @@
   "version": 2,
   "package": "cookie",
   "resolved": "2.0.1",
-  "checkedAt": "2026-10-23T12:55:39.507Z",
+  "checkedAt": "2026-10-27T10:02:42.324Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 565,
+  "durationMs": 502,
   "verified": {
     "bun": {
       "outcome": "verified",

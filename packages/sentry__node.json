@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.9.0",
-  "checkedAt": "2026-10-23T12:57:24.808Z",
+  "checkedAt": "2026-10-27T10:04:13.274Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -737,7 +737,7 @@
     }
   ],
   "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement; use @sentry/cloudflare or @sentry/bun.",
-  "durationMs": 122625,
+  "durationMs": 124552,
   "verified": {
     "workerd": {
       "outcome": "verified",

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@upstash/ratelimit",
   "resolved": "2.2.0",
-  "checkedAt": "2026-10-23T12:55:57.234Z",
+  "checkedAt": "2026-10-27T10:01:53.465Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1332,
+  "durationMs": 1354,
   "verified": {
     "bun": {
       "outcome": "verified",

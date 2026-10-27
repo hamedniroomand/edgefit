@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ky",
   "resolved": "2.2.0",
-  "checkedAt": "2026-10-23T12:55:19.844Z",
+  "checkedAt": "2026-10-27T10:02:09.025Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1267,
+  "durationMs": 1261,
   "verified": {
     "bun": {
       "outcome": "verified",

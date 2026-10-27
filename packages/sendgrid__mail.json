@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@sendgrid/mail",
   "resolved": "8.1.6",
-  "checkedAt": "2026-10-23T12:56:55.233Z",
+  "checkedAt": "2026-10-27T10:04:44.029Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1822,
+  "durationMs": 2865,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "handlebars",
   "resolved": "4.7.10",
-  "checkedAt": "2026-10-23T12:56:41.917Z",
+  "checkedAt": "2026-10-27T10:05:39.018Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1566,
+  "durationMs": 1979,
   "verified": {
     "bun": {
       "outcome": "verified",

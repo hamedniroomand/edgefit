@@ -2,7 +2,7 @@
   "version": 2,
   "package": "tweetnacl",
   "resolved": "1.0.3",
-  "checkedAt": "2026-10-23T12:57:58.253Z",
+  "checkedAt": "2026-10-27T10:02:15.438Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1152,
+  "durationMs": 1207,
   "verified": {
     "bun": {
       "outcome": "verified",

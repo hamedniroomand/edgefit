@@ -2,7 +2,7 @@
   "version": 2,
   "package": "argon2",
   "resolved": "0.45.1",
-  "checkedAt": "2026-10-23T12:58:05.681Z",
+  "checkedAt": "2026-10-27T10:04:51.214Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -76,7 +76,7 @@
     }
   ],
   "notes": "argon2 is a native addon, so use bcryptjs or a WebAssembly hash on Workers.",
-  "durationMs": 856,
+  "durationMs": 1033,
   "verified": {
     "bun": {
       "outcome": "verified",

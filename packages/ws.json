@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ws",
   "resolved": "8.22.0",
-  "checkedAt": "2026-10-23T12:55:36.743Z",
+  "checkedAt": "2026-10-27T10:02:40.501Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 929,
+  "durationMs": 848,
   "verified": {
     "bun": {
       "outcome": "verified",

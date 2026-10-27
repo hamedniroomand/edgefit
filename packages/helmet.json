@@ -2,7 +2,7 @@
   "version": 2,
   "package": "helmet",
   "resolved": "8.3.0",
-  "checkedAt": "2026-10-23T12:55:17.216Z",
+  "checkedAt": "2026-10-27T10:02:01.515Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 794,
+  "durationMs": 788,
   "verified": {
     "bun": {
       "outcome": "verified",

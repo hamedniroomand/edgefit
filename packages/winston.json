@@ -2,7 +2,7 @@
   "version": 2,
   "package": "winston",
   "resolved": "3.19.0",
-  "checkedAt": "2026-10-23T12:57:37.421Z",
+  "checkedAt": "2026-10-27T10:02:06.378Z",
   "edgefit": "0.16.3",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 2986,
+  "durationMs": 3074,
   "verified": {
     "bun": {
       "outcome": "verified",
