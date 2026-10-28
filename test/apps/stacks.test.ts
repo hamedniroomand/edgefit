@@ -60,21 +60,20 @@ describe.skipIf(!installed).each([
  * on `process.env.NEXT_RUNTIME`, which its edge build replaces with 'edge', so the Node-only
  * branches must be guarded, not errors. `next/server` is a CommonJS barrel that requires the
  * server rendering code for exports the middleware never imports, so that code is not reached:
- * `process.cwd` sits in a function of `dynamic-rendering.js` that only app rendering calls, and
- * the guarded `process.nextTick` and `setImmediate` uses sit in the same code. That needs the
- * barrel and the modules it reaches to be read by export name, which the second test pins. The
- * guarded usage that remains is pinned so a change is noticed. React's development build, which
- * has `MessageChannel`, is not reached, because `process.env.NODE_ENV` is `production`.
+ * the guarded `process.nextTick` and `setImmediate` uses sit in the scheduler that
+ * `dynamic-rendering.js` requires. That needs the barrel and the modules it reaches to be read by
+ * export name, which the second test pins. The middleware reaches no guarded use, and the first
+ * test pins that so a change is noticed.
  */
 describe.skipIf(!installed)('next.js middleware on vercel-edge', () => {
   const root = sampleApp('next-middleware');
 
-  it('reports nothing, and keeps only the guarded use that is reached', async () => {
+  it('reports nothing, and reaches no guarded use', async () => {
     const result = await check({ root, config: { targets: ['vercel-edge'] } });
     const [report] = result.reports;
     expect(report?.entries).toEqual(['middleware.ts']);
     expect(report?.findings).toEqual([]);
-    expect(report?.guarded.map(finding => finding.api)).toEqual(['node:process.emit', 'reportError']);
+    expect(report?.guarded).toEqual([]);
   });
 
   it.each([

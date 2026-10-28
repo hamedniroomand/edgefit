@@ -18,8 +18,6 @@ describe.skipIf(!installed)('a known-bad app', () => {
       report?.findings.map(finding => `${finding.level} ${finding.api} ${finding.package?.name}`),
     ).toEqual([
       'error node:fs.watch chokidar',
-      'error node:fs.unwatchFile chokidar',
-      'error node:fs.watchFile chokidar',
       'error node:child_process.spawn cross-spawn',
       'error node:child_process.spawnSync cross-spawn',
     ]);
@@ -31,8 +29,6 @@ describe.skipIf(!installed)('a known-bad app', () => {
       report?.findings.map(finding => `${finding.api} ${finding.suggestion?.text.split(' ').slice(0, 2).join(' ')}`),
     ).toEqual([
       'node:fs.watch chokidar watches',
-      'node:fs.unwatchFile chokidar watches',
-      'node:fs.watchFile chokidar watches',
       'node:child_process.spawn cross-spawn starts',
       'node:child_process.spawnSync cross-spawn starts',
     ]);
@@ -45,8 +41,8 @@ describe.skipIf(!installed)('a known-bad app', () => {
   it('names the package, the file and the import chain', async () => {
     const [report] = (await check({ root: sampleApp('known-bad') })).reports;
     const watch = report?.findings.find(finding => finding.api === 'node:fs.watch');
-    expect(watch?.package).toMatchObject({ name: 'chokidar', version: '5.0.0' });
-    expect(watch?.location.file).toMatch(/chokidar\/handler\.js$/);
+    expect(watch?.package).toMatchObject({ name: 'chokidar', version: '6.0.0' });
+    expect(watch?.location.file).toMatch(/chokidar\/backend\.js$/);
     expect(watch?.chain).toEqual(['src/index.js', 'chokidar']);
   });
 
@@ -64,9 +60,7 @@ describe.skipIf(!installed)('a known-bad app', () => {
         'API                           workerd  bun  deno',
         'node:child_process.spawn      ✗        ✓    ✓',
         'node:child_process.spawnSync  ✗        ✓    ✓',
-        'node:fs.unwatchFile           ✗        ✓    ✓',
         'node:fs.watch                 ✗        ✓    ✓',
-        'node:fs.watchFile             ✗        ✓    ✓',
       ].join('\n'),
     );
   });
@@ -115,7 +109,13 @@ describe.skipIf(!installed)('a known-bad app on the Edge platforms', () => {
     await run(['compare', 'workerd', 'netlify-edge', 'vercel-edge', '--entry', 'src/index.js', '--no-color'], io);
     expect(io.output()).toContain('API                           workerd  netlify-edge  vercel-edge');
     expect(io.output()).toContain('node:child_process.spawn      ✗        ✗             ✗');
-    expect(io.output()).toContain('node:fs.watch                 ✗        ✓             –');
+    expect(io.output()).toContain('node:fs.watch                 ✗        ✓             ✗');
+  });
+
+  it('shows – for an API that only guarded code uses', async () => {
+    const io = captureIo(root);
+    await run(['compare', 'workerd', 'netlify-edge', 'vercel-edge', '--all', '--entry', 'src/index.js', '--no-color'], io);
+    expect(io.output()).toMatch(/^node:fs\.closeSync +✓ +✓ +–$/mu);
   });
 });
 
