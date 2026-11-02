@@ -74,13 +74,6 @@
     "vite-plus": "catalog:",
     "vitest": "catalog:"
   },
-  "devEngines": {
-    "runtime": {
-      "name": "node",
-      "version": "24.22.2",
-      "onFail": "download"
-    }
-  },
   "engines": {
     "node": ">=22.18.0"
   },
