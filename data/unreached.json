@@ -4,7 +4,7 @@
   "entries": [
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.3" },
+      "versions": { "min": "16.3.8", "max": "16.4.4" },
       "file": "dist/esm/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
@@ -13,7 +13,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.3" },
+      "versions": { "min": "16.3.8", "max": "16.4.4" },
       "file": "dist/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
@@ -22,7 +22,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.3" },
+      "versions": { "min": "16.3.8", "max": "16.4.4" },
       "file": "dist/esm/build/templates/app-route.js",
       "guards": ["dist/esm/server/route-modules/route-module.js"],
       "apis": ["node:process.hrtime.bigint"],
@@ -32,7 +32,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.3" },
+      "versions": { "min": "16.3.8", "max": "16.4.4" },
       "file": "dist/build/templates/app-route.js",
       "guards": ["dist/server/route-modules/route-module.js"],
       "apis": ["node:process.hrtime.bigint"],
@@ -42,7 +42,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.3" },
+      "versions": { "min": "16.3.8", "max": "16.4.4" },
       "file": "dist/esm/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
@@ -51,7 +51,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.3" },
+      "versions": { "min": "16.3.8", "max": "16.4.4" },
       "file": "dist/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
@@ -78,7 +78,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.1.4" },
+      "versions": { "min": "4.0.2", "max": "4.2.0" },
       "file": "dist/esm/decode-strings.js",
       "apis": ["FileReader"],
       "target": "workerd",
@@ -87,7 +87,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.1.4" },
+      "versions": { "min": "4.0.2", "max": "4.2.0" },
       "file": "dist/esm/decode-strings.js",
       "apis": ["FileReader"],
       "target": "bun",
@@ -96,7 +96,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.1.4" },
+      "versions": { "min": "4.0.2", "max": "4.2.0" },
       "file": "dist/cjs/decode-strings.js",
       "apis": ["FileReader"],
       "target": "workerd",
@@ -105,7 +105,7 @@
     },
     {
       "package": "postal-mime",
-      "versions": { "min": "4.0.2", "max": "4.1.4" },
+      "versions": { "min": "4.0.2", "max": "4.2.0" },
       "file": "dist/cjs/decode-strings.js",
       "apis": ["FileReader"],
       "target": "bun",
@@ -114,7 +114,7 @@
     },
     {
       "package": "nodemailer",
-      "versions": { "min": "10.0.13", "max": "10.2.1" },
+      "versions": { "min": "10.0.13", "max": "10.3.1" },
       "file": "dist/esm/sendmail-transport/index.js",
       "guards": ["dist/esm/nodemailer.js"],
       "apis": ["node:child_process", "node:child_process.spawn"],
@@ -125,7 +125,7 @@
     },
     {
       "package": "nodemailer",
-      "versions": { "min": "10.0.13", "max": "10.2.1" },
+      "versions": { "min": "10.0.13", "max": "10.3.1" },
       "file": "dist/cjs/sendmail-transport/index.js",
       "guards": ["dist/cjs/nodemailer.js"],
       "apis": ["node:child_process", "node:child_process.spawn"],
@@ -188,7 +188,7 @@
     },
     {
       "package": "@grpc/grpc-js",
-      "versions": { "min": "1.14.0", "max": "1.14.6" },
+      "versions": { "min": "1.14.0", "max": "1.14.7" },
       "file": "build/src/server.js",
       "apis": ["node:http2.constants.HTTP_STATUS_UNSUPPORTED_MEDIA_TYPE"],
       "target": "deno",
