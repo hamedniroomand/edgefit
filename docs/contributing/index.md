@@ -8,7 +8,7 @@ Thanks for helping out. This page gets you from a fresh clone to a passing test 
 
 ## Prerequisites
 
-- Node.js 22.18 or newer
+- Node.js 22.18 or newer. Development uses Node.js 24, which `package.json` pins and `vp install` downloads
 - [Vite+](https://viteplus.dev/guide/), which provides the `vp` command. It wraps pnpm, Vite, Vitest, Oxlint and Oxfmt in one tool
 
 ## Get the code running

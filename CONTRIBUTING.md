@@ -10,7 +10,7 @@ Thanks for taking the time to help. Bug reports, corrections to the compatibilit
 
 ## Development
 
-You need Node.js 22.18 or newer and [Vite+](https://viteplus.dev/guide/).
+You need Node.js 22.18 or newer and [Vite+](https://viteplus.dev/guide/). Development uses Node.js 24, which `package.json` pins and `vp install` downloads.
 
 ```sh
 vp install        # install dependencies
