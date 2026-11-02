@@ -100,6 +100,11 @@ body {
   outline-offset: 3px;
 }
 
+/* The search bar of the dialog has its own focus border, so the input needs no second one. */
+.VPLocalSearchBox input:focus-visible {
+  outline: none;
+}
+
 /* Navigation */
 
 .VPNavBarTitle .logo {
