@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.16.4
+
+### Patch Changes
+
+- [#477](https://github.com/hamedniroomand/edgefit/pull/477) [`db4e5d9`](https://github.com/hamedniroomand/edgefit/commit/db4e5d96b480953089c1f7314104a6bda94a23cb) - Add `next` 16.4.3 to the data for code that a target never runs. For example, `edgefit check --built .vercel/output` on a Next.js app built with `next` 16.4.3 no longer fails on `node:process.hrtime.bigint`, `setImmediate` and `WeakRef` on vercel-edge.
+
+- [#479](https://github.com/hamedniroomand/edgefit/pull/479) [`0892876`](https://github.com/hamedniroomand/edgefit/commit/08928763f428a8be019be7e328f2e36ac4b1a2c4) - Add the newest releases to the data about code that a target never runs and modules that a package stores: `next` 16.4.4, `postal-mime` 4.2.0, `nodemailer` 10.3.1, and `@grpc/grpc-js` 1.14.7.
+
 ## 0.16.3
 
 ### Patch Changes
