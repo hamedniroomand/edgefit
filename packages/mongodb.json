@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "mongodb",
-  "resolved": "7.7.0",
-  "checkedAt": "2026-10-27T10:04:22.733Z",
-  "edgefit": "0.16.3",
+  "resolved": "7.8.0",
+  "checkedAt": "2026-11-02T14:28:45.032Z",
+  "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -24,7 +24,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "pass",
+    "workerd": "fail",
     "bun": "pass",
     "deno": "pass"
   },
@@ -50,9 +50,17 @@
       "specifier": "mongodb",
       "results": {
         "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:child_process.spawn",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -67,7 +75,7 @@
       }
     }
   ],
-  "durationMs": 9192,
+  "durationMs": 5733,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -78,11 +86,6 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "deno 2.9.7"
-    },
-    "workerd": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "workerd 1.20260929.1"
     }
   }
 }

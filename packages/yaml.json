@@ -2,8 +2,8 @@
   "version": 2,
   "package": "yaml",
   "resolved": "2.9.1",
-  "checkedAt": "2026-10-27T10:02:07.753Z",
-  "edgefit": "0.16.3",
+  "checkedAt": "2026-11-02T14:28:22.150Z",
+  "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -88,7 +88,7 @@
       }
     }
   ],
-  "durationMs": 2501,
+  "durationMs": 2309,
   "verified": {
     "bun": {
       "outcome": "verified",

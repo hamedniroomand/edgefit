@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "postgres",
-  "resolved": "3.4.9",
-  "checkedAt": "2026-10-27T10:01:49.791Z",
-  "edgefit": "0.16.3",
+  "resolved": "4.0.0",
+  "checkedAt": "2026-11-02T14:26:40.608Z",
+  "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -24,7 +24,7 @@
     "deno"
   ],
   "summary": {
-    "workerd": "pass",
+    "workerd": "warn",
     "bun": "pass",
     "deno": "pass"
   },
@@ -50,9 +50,17 @@
       "specifier": "postgres",
       "results": {
         "workerd": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:tls.connect",
+              "category": "mismatch",
+              "level": "warning",
+              "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -67,7 +75,7 @@
       }
     }
   ],
-  "durationMs": 1227,
+  "durationMs": 1129,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -78,11 +86,6 @@
       "outcome": "verified",
       "kind": "load",
       "runtime": "deno 2.9.7"
-    },
-    "workerd": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "workerd 1.20260929.1"
     }
   }
 }

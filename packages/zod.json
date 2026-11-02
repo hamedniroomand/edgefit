@@ -2,8 +2,8 @@
   "version": 2,
   "package": "zod",
   "resolved": "4.6.7",
-  "checkedAt": "2026-10-27T10:02:09.898Z",
-  "edgefit": "0.16.3",
+  "checkedAt": "2026-11-02T14:27:15.714Z",
+  "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -256,7 +256,7 @@
       }
     }
   ],
-  "durationMs": 10503,
+  "durationMs": 17127,
   "verified": {
     "bun": {
       "outcome": "verified",

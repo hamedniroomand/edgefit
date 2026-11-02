@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@electric-sql/pglite",
-  "resolved": "0.5.12",
-  "checkedAt": "2026-10-27T10:04:58.374Z",
-  "edgefit": "0.16.3",
+  "resolved": "0.5.14",
+  "checkedAt": "2026-11-02T14:29:07.309Z",
+  "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -246,6 +246,64 @@
       }
     },
     {
+      "subpath": "./memfs2opfs",
+      "specifier": "@electric-sql/pglite/memfs2opfs",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "WebAssembly.instantiateStreaming",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "does not exist on the target"
+            }
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./memfs-frontend",
+      "specifier": "@electric-sql/pglite/memfs-frontend",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "WebAssembly.instantiateStreaming",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "does not exist on the target"
+            }
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
       "subpath": "./basefs",
       "specifier": "@electric-sql/pglite/basefs",
       "results": {
@@ -273,10 +331,47 @@
           "warnings": 0
         }
       }
+    },
+    {
+      "subpath": "./node-postgres",
+      "specifier": "@electric-sql/pglite/node-postgres",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "WebAssembly.instantiateStreaming",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "does not exist on the target"
+            }
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:fs.constants",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            }
+          ]
+        }
+      }
     }
   ],
   "notes": "PGlite calls WebAssembly.instantiateStreaming only in its browser branch. With nodejs_compat at the date of the table, PGlite takes its Node branch on workerd, so this call does not run. The Node branch reads its files from disk, and the Worker bundle has none, so PGlite.create() fails before it uses WebAssembly or reaches node:process.binding. The multi-tab worker of PGlite uses navigator.locks, which Bun and workerd do not have.",
-  "durationMs": 10918,
+  "durationMs": 7548,
   "verified": {
     "bun": {
       "outcome": "verified",
