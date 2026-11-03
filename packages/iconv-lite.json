@@ -2,7 +2,7 @@
   "version": 2,
   "package": "iconv-lite",
   "resolved": "0.7.3",
-  "checkedAt": "2026-11-02T14:28:03.331Z",
+  "checkedAt": "2026-11-03T12:22:10.719Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 699,
+  "durationMs": 1193,
   "verified": {
     "bun": {
       "outcome": "verified",

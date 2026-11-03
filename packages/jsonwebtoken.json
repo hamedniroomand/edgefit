@@ -2,7 +2,7 @@
   "version": 2,
   "package": "jsonwebtoken",
   "resolved": "9.0.3",
-  "checkedAt": "2026-11-02T14:27:32.523Z",
+  "checkedAt": "2026-11-03T12:20:03.971Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1362,
+  "durationMs": 1831,
   "verified": {
     "bun": {
       "outcome": "verified",

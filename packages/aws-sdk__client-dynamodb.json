@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@aws-sdk/client-dynamodb",
   "resolved": "3.1161.0",
-  "checkedAt": "2026-11-02T14:28:14.096Z",
+  "checkedAt": "2026-11-03T12:21:04.051Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 6721,
+  "durationMs": 6856,
   "verified": {
     "bun": {
       "outcome": "verified",

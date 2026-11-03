@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "@trpc/server",
-  "resolved": "11.22.1",
-  "checkedAt": "2026-11-02T14:27:24.755Z",
+  "resolved": "11.23.0",
+  "checkedAt": "2026-11-03T12:20:02.774Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -155,22 +155,28 @@
       "specifier": "@trpc/server/adapters/next-app-dir",
       "results": {
         "workerd": {
-          "status": "unchecked",
+          "status": "pass",
           "errors": 0,
           "warnings": 0,
-          "message": "needs \"next\", which the package does not declare"
+          "notes": [
+            "peer next not installed, checked in your project"
+          ]
         },
         "bun": {
-          "status": "unchecked",
+          "status": "pass",
           "errors": 0,
           "warnings": 0,
-          "message": "needs \"next\", which the package does not declare"
+          "notes": [
+            "peer next not installed, checked in your project"
+          ]
         },
         "deno": {
-          "status": "unchecked",
+          "status": "pass",
           "errors": 0,
           "warnings": 0,
-          "message": "needs \"next\", which the package does not declare"
+          "notes": [
+            "peer next not installed, checked in your project"
+          ]
         }
       }
     },
@@ -364,7 +370,7 @@
       }
     }
   ],
-  "durationMs": 7418,
+  "durationMs": 7083,
   "verified": {
     "bun": {
       "outcome": "verified",

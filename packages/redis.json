@@ -2,7 +2,7 @@
   "version": 2,
   "package": "redis",
   "resolved": "6.3.1",
-  "checkedAt": "2026-11-02T14:28:50.408Z",
+  "checkedAt": "2026-11-03T12:23:02.286Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 3615,
+  "durationMs": 5011,
   "verified": {
     "bun": {
       "outcome": "verified",

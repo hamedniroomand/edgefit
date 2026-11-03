@@ -2,7 +2,7 @@
   "version": 2,
   "package": "superstruct",
   "resolved": "2.0.2",
-  "checkedAt": "2026-11-02T14:30:04.082Z",
+  "checkedAt": "2026-11-03T12:21:53.077Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 874,
+  "durationMs": 629,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "jszip",
   "resolved": "3.10.2",
-  "checkedAt": "2026-11-02T14:28:59.773Z",
+  "checkedAt": "2026-11-03T12:22:53.837Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1539,
+  "durationMs": 2318,
   "verified": {
     "bun": {
       "outcome": "verified",

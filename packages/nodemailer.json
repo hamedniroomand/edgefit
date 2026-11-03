@@ -2,7 +2,7 @@
   "version": 2,
   "package": "nodemailer",
   "resolved": "10.3.1",
-  "checkedAt": "2026-11-02T14:29:44.115Z",
+  "checkedAt": "2026-11-03T12:21:51.185Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -497,7 +497,7 @@
       }
     }
   ],
-  "durationMs": 9620,
+  "durationMs": 6840,
   "verified": {
     "bun": {
       "outcome": "verified",

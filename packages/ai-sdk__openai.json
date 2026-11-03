@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "@ai-sdk/openai",
-  "resolved": "4.0.106",
-  "checkedAt": "2026-11-02T14:27:11.642Z",
+  "resolved": "4.0.108",
+  "checkedAt": "2026-11-03T12:22:42.317Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -88,7 +88,7 @@
       }
     }
   ],
-  "durationMs": 10176,
+  "durationMs": 7945,
   "verified": {
     "bun": {
       "outcome": "verified",

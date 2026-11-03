@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "fast-xml-parser",
-  "resolved": "5.11.2",
-  "checkedAt": "2026-11-02T14:29:43.130Z",
+  "resolved": "5.12.0",
+  "checkedAt": "2026-11-03T12:22:15.772Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1818,
+  "durationMs": 1237,
   "verified": {
     "bun": {
       "outcome": "verified",

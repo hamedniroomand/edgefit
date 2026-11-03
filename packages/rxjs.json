@@ -2,7 +2,7 @@
   "version": 2,
   "package": "rxjs",
   "resolved": "7.8.2",
-  "checkedAt": "2026-11-02T14:29:37.091Z",
+  "checkedAt": "2026-11-03T12:23:34.799Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -172,7 +172,7 @@
       }
     }
   ],
-  "durationMs": 6302,
+  "durationMs": 5119,
   "verified": {
     "bun": {
       "outcome": "verified",

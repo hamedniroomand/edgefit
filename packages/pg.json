@@ -2,7 +2,7 @@
   "version": 2,
   "package": "pg",
   "resolved": "8.23.1",
-  "checkedAt": "2026-11-02T14:27:13.403Z",
+  "checkedAt": "2026-11-03T12:20:00.978Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1438,
+  "durationMs": 1559,
   "verified": {
     "bun": {
       "outcome": "verified",

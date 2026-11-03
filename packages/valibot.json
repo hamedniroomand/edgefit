@@ -2,7 +2,7 @@
   "version": 2,
   "package": "valibot",
   "resolved": "1.5.0",
-  "checkedAt": "2026-11-02T14:27:01.504Z",
+  "checkedAt": "2026-11-03T12:19:59.412Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1933,
+  "durationMs": 1870,
   "verified": {
     "bun": {
       "outcome": "verified",

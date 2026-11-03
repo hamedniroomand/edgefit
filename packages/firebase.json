@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "firebase",
-  "resolved": "13.1.0",
-  "checkedAt": "2026-11-02T14:29:51.200Z",
+  "resolved": "13.2.0",
+  "checkedAt": "2026-11-03T12:22:48.412Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -183,6 +183,156 @@
           "status": "pass",
           "errors": 0,
           "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./crashlytics",
+      "specifier": "firebase/crashlytics",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./crashlytics/angular",
+      "specifier": "firebase/crashlytics/angular",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @angular/core not installed, checked in your project",
+            "peer @angular/router not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @angular/core not installed, checked in your project",
+            "peer @angular/router not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer @angular/core not installed, checked in your project",
+            "peer @angular/router not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./crashlytics/next-navigation",
+      "specifier": "firebase/crashlytics/next-navigation",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer next not installed, checked in your project",
+            "peer react not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer next not installed, checked in your project",
+            "peer react not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer next not installed, checked in your project",
+            "peer react not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./crashlytics/react",
+      "specifier": "firebase/crashlytics/react",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer react not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer react not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer react not installed, checked in your project"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./crashlytics/react-router",
+      "specifier": "firebase/crashlytics/react-router",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer react not installed, checked in your project",
+            "peer react-router-dom not installed, checked in your project"
+          ]
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer react not installed, checked in your project",
+            "peer react-router-dom not installed, checked in your project"
+          ]
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0,
+          "notes": [
+            "peer react not installed, checked in your project",
+            "peer react-router-dom not installed, checked in your project"
+          ]
         }
       }
     },
@@ -774,7 +924,7 @@
     }
   ],
   "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin.",
-  "durationMs": 54297,
+  "durationMs": 74260,
   "verified": {
     "bun": {
       "outcome": "verified",

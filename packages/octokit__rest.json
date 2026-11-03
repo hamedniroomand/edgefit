@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@octokit/rest",
   "resolved": "22.0.1",
-  "checkedAt": "2026-11-02T14:30:07.009Z",
+  "checkedAt": "2026-11-03T12:21:36.478Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1860,
+  "durationMs": 1249,
   "verified": {
     "bun": {
       "outcome": "verified",

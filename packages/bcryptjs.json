@@ -2,7 +2,7 @@
   "version": 2,
   "package": "bcryptjs",
   "resolved": "3.0.3",
-  "checkedAt": "2026-11-02T14:27:04.324Z",
+  "checkedAt": "2026-11-03T12:20:05.075Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 777,
+  "durationMs": 982,
   "verified": {
     "bun": {
       "outcome": "verified",

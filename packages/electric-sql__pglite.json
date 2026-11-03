@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@electric-sql/pglite",
   "resolved": "0.5.14",
-  "checkedAt": "2026-11-02T14:29:07.309Z",
+  "checkedAt": "2026-11-03T12:23:37.604Z",
   "edgefit": "0.16.4",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -371,7 +371,7 @@
     }
   ],
   "notes": "PGlite calls WebAssembly.instantiateStreaming only in its browser branch. With nodejs_compat at the date of the table, PGlite takes its Node branch on workerd, so this call does not run. The Node branch reads its files from disk, and the Worker bundle has none, so PGlite.create() fails before it uses WebAssembly or reaches node:process.binding. The multi-tab worker of PGlite uses navigator.locks, which Bun and workerd do not have.",
-  "durationMs": 7548,
+  "durationMs": 13606,
   "verified": {
     "bun": {
       "outcome": "verified",
