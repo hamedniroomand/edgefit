@@ -1,6 +1,6 @@
 import type { ArrowFunctionExpression, Function as FunctionNode, Node } from 'oxc-parser';
 
-import { childNodes, invokers, staticKey, strip, unwrap } from './ast.ts';
+import { childNodes, pushChildNodes, invokers, staticKey, strip, unwrap } from './ast.ts';
 import { patternNames } from './declarations.ts';
 
 export type LocalFunction = FunctionNode | ArrowFunctionExpression;
@@ -61,7 +61,7 @@ export function declarationCounts(body: readonly Node[]): Map<string, number> {
       : []) {
       counts.set(name, (counts.get(name) ?? 0) + 1);
     }
-    pending.push(...childNodes(node));
+    pushChildNodes(pending, node);
   }
   return counts;
 }
@@ -82,7 +82,7 @@ function walkDeclarations(body: readonly Node[]): {
     if (fn !== undefined && name !== undefined) {
       functions.set(name, fn);
     }
-    pending.push(...childNodes(node));
+    pushChildNodes(pending, node);
   }
   return { counts, functions };
 }

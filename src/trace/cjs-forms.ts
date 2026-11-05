@@ -2,6 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import {
   childNodes,
+  pushChildNodes,
   isFunction,
   isTypeOnly,
   staticKey,
@@ -241,7 +242,7 @@ export function eagerRequires(body: readonly Node[]): Set<string> {
       if (found?.call === node) {
         specifiers.add(found.specifier);
       }
-      pending.push(...childNodes(node));
+      pushChildNodes(pending, node);
     }
   }
   return specifiers;

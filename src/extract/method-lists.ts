@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, staticKey, strip } from './ast.ts';
+import { childNodes, pushChildNodes, staticKey, strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { cannotChangeList, iterators, usesArguments } from './key-bindings.ts';
 import { settle, valueOf } from './known-values.ts';
@@ -32,7 +32,7 @@ export function namesAreUnique(node: Node, counts: ReadonlyMap<string, number>):
   const pending = [node];
   for (let item = pending.pop(); item !== undefined; item = pending.pop()) {
     if (item.type === 'Identifier' && (counts.get(item.name) ?? 0) > 1) return false;
-    pending.push(...childNodes(item));
+    pushChildNodes(pending, item);
   }
   return true;
 }

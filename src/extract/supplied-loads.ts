@@ -1,6 +1,6 @@
 import type { ArrowFunctionExpression, Function as FunctionNode, Node } from 'oxc-parser';
 
-import { childNodes, staticKey, strip } from './ast.ts';
+import { childNodes, pushChildNodes, staticKey, strip } from './ast.ts';
 import { patternNames } from './declarations.ts';
 
 export type LocalFunction = FunctionNode | ArrowFunctionExpression;
@@ -23,7 +23,7 @@ function valuesSetIn(root: LocalFunction, target: Node): Node[] {
     } else if (node.type === 'AssignmentExpression' && sameTarget(node.left, target)) {
       values.push(node.right);
     }
-    pending.push(...childNodes(node));
+    pushChildNodes(pending, node);
   }
   return values;
 }
@@ -104,7 +104,7 @@ function calledNames(body: readonly Node[]): Set<string> {
     if (callee?.type === 'Identifier') {
       names.add(callee.name);
     }
-    pending.push(...childNodes(node));
+    pushChildNodes(pending, node);
   }
   return names;
 }

@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { append, childNodes, staticKey, strip } from './ast.ts';
+import { append, pushChildNodes, staticKey, strip } from './ast.ts';
 
 export type Loader = { specifier: string; caught: boolean };
 
@@ -77,7 +77,7 @@ function collect(body: readonly Node[], wrapperOf: RequireWrapperOf): Found {
         });
       }
     }
-    pending.push(...childNodes(node));
+    pushChildNodes(pending, node);
   }
   return found;
 }

@@ -4,7 +4,7 @@ import path from 'node:path';
 import type { Loader, Plugin } from 'esbuild';
 import type { Node } from 'oxc-parser';
 
-import { childNodes, isEquality, isInequality, staticKey, strip } from '@/extract/ast.ts';
+import { pushChildNodes, isEquality, isInequality, staticKey, strip } from '@/extract/ast.ts';
 import { parse } from '@/extract/index.ts';
 
 const loaders: Record<string, Loader> = {
@@ -67,7 +67,7 @@ function mainOnlyRanges(root: Node): Range[] {
     ) {
       dead(node.right, '0');
     } else {
-      pending.push(...childNodes(node));
+      pushChildNodes(pending, node);
     }
   }
   return found;

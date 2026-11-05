@@ -80,6 +80,13 @@ export function childNodes(node: Node): Node[] {
   return children;
 }
 
+/** A spread push fails on a node with about 120,000 or more children, so this pushes one at a time. */
+export function pushChildNodes(pending: Node[], node: Node): void {
+  for (const child of childNodes(node)) {
+    pending.push(child);
+  }
+}
+
 export function staticString(node: Node | null | undefined): string | undefined {
   if (node?.type === 'Literal' && typeof node.value === 'string') {
     return node.value;

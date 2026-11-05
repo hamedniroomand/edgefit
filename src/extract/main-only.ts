@@ -1,6 +1,6 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, isFunction, staticKey, staticString, strip } from './ast.ts';
+import { childNodes, pushChildNodes, isFunction, staticKey, staticString, strip } from './ast.ts';
 import { patternNames } from './declarations.ts';
 import { declared, isPropertyName } from './local-functions.ts';
 import type { LocalFunction } from './local-functions.ts';
@@ -24,7 +24,7 @@ function namesIn(body: readonly Node[]): Map<Node, string> {
     ) {
       names.set(node, name);
     }
-    pending.push(...childNodes(node));
+    pushChildNodes(pending, node);
   }
   for (const [node, name] of names) {
     if (counts.get(name) !== 1) names.delete(node);
@@ -54,7 +54,7 @@ function descendants(node: Node): Node[] {
   const pending = [node];
   for (let child = pending.pop(); child !== undefined; child = pending.pop()) {
     found.push(child);
-    pending.push(...childNodes(child));
+    pushChildNodes(pending, child);
   }
   return found;
 }

@@ -2,6 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import {
   childNodes,
+  pushChildNodes,
   destructuredNames,
   staticKey,
   staticString,
@@ -207,7 +208,7 @@ export function loadsOf(body: readonly Node[], kind: LoadKind): DynamicImports {
     if (load !== undefined) {
       loads.push(load);
     }
-    pending.push(...childNodes(node));
+    pushChildNodes(pending, node);
   }
   for (const { specifier, node } of loads) {
     if (!understood.has(node)) {

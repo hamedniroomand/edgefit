@@ -111,11 +111,9 @@ export function collectWrites(nodes: readonly Node[]): Writes {
     const writer = writers[node.type] as ((node: Node, add: Add) => void) | undefined;
     writer?.(node, nested ? unknown : add);
     const inner = nested || functionTypes.has(node.type);
-    pending.push(
-      ...childNodes(node)
-        .map(child => [child, inner] as const)
-        .reverse(),
-    );
+    for (const child of childNodes(node).reverse()) {
+      pending.push([child, inner]);
+    }
   }
   return writes;
 }
