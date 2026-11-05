@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.5
+
+### Patch Changes
+
+- [`5ee5ec1`](https://github.com/hamedniroomand/edgefit/commit/5ee5ec1831505b07700f3e7f563333ff53dab4ec) - A file with an array, object or call that has about 120,000 or more children stopped the scan with `RangeError: Maximum call stack size exceeded`. edgefit now scans such a file.
+
 ## 0.16.4
 
 ### Patch Changes
