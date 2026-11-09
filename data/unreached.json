@@ -4,7 +4,7 @@
   "entries": [
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.4" },
+      "versions": { "min": "16.3.8", "max": "16.4.5" },
       "file": "dist/esm/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
@@ -13,7 +13,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.4" },
+      "versions": { "min": "16.3.8", "max": "16.4.5" },
       "file": "dist/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
@@ -22,7 +22,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.4" },
+      "versions": { "min": "16.3.8", "max": "16.4.5" },
       "file": "dist/esm/build/templates/app-route.js",
       "guards": ["dist/esm/server/route-modules/route-module.js"],
       "apis": ["node:process.hrtime.bigint"],
@@ -32,7 +32,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.4" },
+      "versions": { "min": "16.3.8", "max": "16.4.5" },
       "file": "dist/build/templates/app-route.js",
       "guards": ["dist/server/route-modules/route-module.js"],
       "apis": ["node:process.hrtime.bigint"],
@@ -42,7 +42,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.4" },
+      "versions": { "min": "16.3.8", "max": "16.4.5" },
       "file": "dist/esm/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
@@ -51,7 +51,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.4" },
+      "versions": { "min": "16.3.8", "max": "16.4.5" },
       "file": "dist/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
@@ -114,7 +114,7 @@
     },
     {
       "package": "nodemailer",
-      "versions": { "min": "10.0.13", "max": "10.3.1" },
+      "versions": { "min": "10.0.13", "max": "10.4.0" },
       "file": "dist/esm/sendmail-transport/index.js",
       "guards": ["dist/esm/nodemailer.js"],
       "apis": ["node:child_process", "node:child_process.spawn"],
@@ -125,7 +125,7 @@
     },
     {
       "package": "nodemailer",
-      "versions": { "min": "10.0.13", "max": "10.3.1" },
+      "versions": { "min": "10.0.13", "max": "10.4.0" },
       "file": "dist/cjs/sendmail-transport/index.js",
       "guards": ["dist/cjs/nodemailer.js"],
       "apis": ["node:child_process", "node:child_process.spawn"],
