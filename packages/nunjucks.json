@@ -2,8 +2,8 @@
   "version": 2,
   "package": "nunjucks",
   "resolved": "3.2.4",
-  "checkedAt": "2026-11-03T12:21:43.082Z",
-  "edgefit": "0.16.4",
+  "checkedAt": "2026-11-09T21:03:39.457Z",
+  "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1206,
+  "durationMs": 2025,
   "verified": {
     "bun": {
       "outcome": "verified",

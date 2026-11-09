@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@elastic/elasticsearch",
   "resolved": "9.5.1",
-  "checkedAt": "2026-11-03T12:23:43.808Z",
-  "edgefit": "0.16.4",
+  "checkedAt": "2026-11-09T21:03:55.190Z",
+  "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -72,6 +72,44 @@
               "level": "warning",
               "detail": "is not covered by the compatibility data"
             }
+          ],
+          "exports": [
+            {
+              "name": "Client",
+              "level": "warning",
+              "findings": [
+                {
+                  "api": "node:tls.connect",
+                  "category": "mismatch",
+                  "level": "warning",
+                  "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
+                }
+              ]
+            },
+            {
+              "name": "HttpConnection",
+              "level": "warning",
+              "findings": [
+                {
+                  "api": "node:tls.connect",
+                  "category": "mismatch",
+                  "level": "warning",
+                  "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
+                }
+              ]
+            },
+            {
+              "name": "UndiciConnection",
+              "level": "warning",
+              "findings": [
+                {
+                  "api": "node:tls.connect",
+                  "category": "mismatch",
+                  "level": "warning",
+                  "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
+                }
+              ]
+            }
           ]
         },
         "bun": {
@@ -88,7 +126,7 @@
     }
   ],
   "notes": "The client sends requests with undici, and workerd rejects the ALPNProtocols option of node:tls.connect that undici sets; call the Elasticsearch REST API with fetch on Workers.",
-  "durationMs": 9183,
+  "durationMs": 9271,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -104,7 +142,7 @@
       "outcome": "confirmed",
       "kind": "reach",
       "runtime": "workerd 1.20260929.1",
-      "error": "ConnectionError: The options.ALPNProtocols option is not implemented, at Connection.request (bundle.mjs:31224:21)"
+      "error": "ConnectionError: The options.ALPNProtocols option is not implemented, at Connection.request (bundle.mjs:31727:21)"
     }
   }
 }

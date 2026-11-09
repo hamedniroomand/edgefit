@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@electric-sql/pglite",
-  "resolved": "0.5.14",
-  "checkedAt": "2026-11-03T12:23:37.604Z",
-  "edgefit": "0.16.4",
+  "resolved": "0.5.16",
+  "checkedAt": "2026-11-09T21:03:59.388Z",
+  "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -34,6 +34,20 @@
       "status": "fail"
     }
   },
+  "skipped": [
+    {
+      "subpath": "./pglite.wasm",
+      "reason": "no target of this subpath is a script file (.wasm)"
+    },
+    {
+      "subpath": "./initdb.wasm",
+      "reason": "no target of this subpath is a script file (.wasm)"
+    },
+    {
+      "subpath": "./pglite.data",
+      "reason": "no target of this subpath is a script file (.data)"
+    }
+  ],
   "context": {
     "workerd": {
       "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
@@ -371,7 +385,7 @@
     }
   ],
   "notes": "PGlite calls WebAssembly.instantiateStreaming only in its browser branch. With nodejs_compat at the date of the table, PGlite takes its Node branch on workerd, so this call does not run. The Node branch reads its files from disk, and the Worker bundle has none, so PGlite.create() fails before it uses WebAssembly or reaches node:process.binding. The multi-tab worker of PGlite uses navigator.locks, which Bun and workerd do not have.",
-  "durationMs": 13606,
+  "durationMs": 13937,
   "verified": {
     "bun": {
       "outcome": "verified",

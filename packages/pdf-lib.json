@@ -2,8 +2,8 @@
   "version": 2,
   "package": "pdf-lib",
   "resolved": "1.17.1",
-  "checkedAt": "2026-11-03T12:22:08.254Z",
-  "edgefit": "0.16.4",
+  "checkedAt": "2026-11-09T21:03:37.391Z",
+  "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 4318,
+  "durationMs": 4465,
   "verified": {
     "bun": {
       "outcome": "verified",

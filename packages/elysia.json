@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "elysia",
-  "resolved": "1.4.30",
-  "checkedAt": "2026-11-03T12:20:50.573Z",
-  "edgefit": "0.16.4",
+  "resolved": "2.0.0-rc.4",
+  "checkedAt": "2026-11-09T21:01:41.572Z",
+  "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -25,8 +25,14 @@
   ],
   "summary": {
     "workerd": "pass",
-    "bun": "pass",
-    "deno": "pass"
+    "bun": "warn",
+    "deno": "warn"
+  },
+  "worst": {
+    "workerd": {
+      "subpath": "./plugin/aot/bun",
+      "status": "fail"
+    }
   },
   "context": {
     "workerd": {
@@ -55,371 +61,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "origin",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./ws",
-      "specifier": "elysia/ws",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./ws/types",
-      "specifier": "elysia/ws/types",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./ws/bun",
-      "specifier": "elysia/ws/bun",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./compose",
-      "specifier": "elysia/compose",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./context",
-      "specifier": "elysia/context",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./cookies",
-      "specifier": "elysia/cookies",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./error",
-      "specifier": "elysia/error",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./schema",
-      "specifier": "elysia/schema",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./sucrose",
-      "specifier": "elysia/sucrose",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./trace",
-      "specifier": "elysia/trace",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./type-system",
-      "specifier": "elysia/type-system",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./type-system/format",
-      "specifier": "elysia/type-system/format",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./type-system/utils",
-      "specifier": "elysia/type-system/utils",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./type-system/types",
-      "specifier": "elysia/type-system/types",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./types",
-      "specifier": "elysia/types",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./utils",
-      "specifier": "elysia/utils",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./parse-query",
-      "specifier": "elysia/parse-query",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "origin",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
         }
       }
     },
@@ -487,69 +152,6 @@
       }
     },
     {
-      "subpath": "./adapter/bun/handler",
-      "specifier": "elysia/adapter/bun/handler",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./adapter/bun/compose",
-      "specifier": "elysia/adapter/bun/compose",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./adapter/cloudflare-worker",
-      "specifier": "elysia/adapter/cloudflare-worker",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
       "subpath": "./adapter/web-standard",
       "specifier": "elysia/adapter/web-standard",
       "results": {
@@ -571,8 +173,655 @@
       }
     },
     {
-      "subpath": "./adapter/web-standard/handler",
-      "specifier": "elysia/adapter/web-standard/handler",
+      "subpath": "./adapter/response-ownership",
+      "specifier": "elysia/adapter/response-ownership",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./base",
+      "specifier": "elysia/base",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "origin",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "origin",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./compiled",
+      "specifier": "elysia/compiled",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./coerce-plan",
+      "specifier": "elysia/coerce-plan",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./reconstruct",
+      "specifier": "elysia/reconstruct",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./route-shape",
+      "specifier": "elysia/route-shape",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./constants",
+      "specifier": "elysia/constants",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./context",
+      "specifier": "elysia/context",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./error",
+      "specifier": "elysia/error",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./memory",
+      "specifier": "elysia/memory",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./plugin/aot/bun",
+      "specifier": "elysia/plugin/aot/bun",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:worker_threads.Worker",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "the Worker constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./plugin/aot/esbuild",
+      "specifier": "elysia/plugin/aot/esbuild",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:worker_threads.Worker",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "the Worker constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./plugin/aot/vite",
+      "specifier": "elysia/plugin/aot/vite",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:worker_threads.Worker",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "the Worker constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./plugin/aot/unplugin",
+      "specifier": "elysia/plugin/aot/unplugin",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:worker_threads.Worker",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "the Worker constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./plugin/aot/rspack",
+      "specifier": "elysia/plugin/aot/rspack",
+      "results": {
+        "workerd": {
+          "status": "fail",
+          "errors": 1,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:worker_threads.Worker",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "the Worker constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "import(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ],
+          "notes": [
+            "loads a module the user names (core.mjs:551)"
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./auto-head",
+      "specifier": "elysia/auto-head",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./sucrose",
+      "specifier": "elysia/sucrose",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./trace",
+      "specifier": "elysia/trace",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "origin",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "origin",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./type",
+      "specifier": "elysia/type",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./type-system/types",
+      "specifier": "elysia/type-system/types",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./types",
+      "specifier": "elysia/types",
       "results": {
         "workerd": {
           "status": "pass",
@@ -613,48 +862,6 @@
       }
     },
     {
-      "subpath": "./universal/server",
-      "specifier": "elysia/universal/server",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
-      "subpath": "./universal/env",
-      "specifier": "elysia/universal/env",
-      "results": {
-        "workerd": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        },
-        "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
-        }
-      }
-    },
-    {
       "subpath": "./universal/file",
       "specifier": "elysia/universal/file",
       "results": {
@@ -674,20 +881,110 @@
           "warnings": 0
         }
       }
+    },
+    {
+      "subpath": "./utils",
+      "specifier": "elysia/utils",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./websocket",
+      "specifier": "elysia/websocket",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "origin",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
+        },
+        "deno": {
+          "status": "warn",
+          "errors": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "origin",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "subpath": "./ws",
+      "specifier": "elysia/ws",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./ws/types",
+      "specifier": "elysia/ws/types",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
     }
   ],
-  "durationMs": 38970,
+  "durationMs": 53897,
   "verified": {
-    "bun": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "bun 1.4.4"
-    },
-    "deno": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "deno 2.9.7"
-    },
     "workerd": {
       "outcome": "verified",
       "kind": "load",

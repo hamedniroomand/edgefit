@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "jsdom",
-  "resolved": "30.1.3",
-  "checkedAt": "2026-11-03T12:21:37.652Z",
-  "edgefit": "0.16.4",
+  "resolved": "31.0.0",
+  "checkedAt": "2026-11-09T21:01:31.782Z",
+  "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -25,8 +25,8 @@
   ],
   "summary": {
     "workerd": "fail",
-    "bun": "pass",
-    "deno": "pass"
+    "bun": "warn",
+    "deno": "warn"
   },
   "context": {
     "workerd": {
@@ -52,7 +52,7 @@
         "workerd": {
           "status": "fail",
           "errors": 3,
-          "warnings": 6,
+          "warnings": 7,
           "findings": [
             {
               "api": "node:vm.runInContext",
@@ -83,6 +83,12 @@
               "category": "unknown",
               "level": "warning",
               "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "require(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
             },
             {
               "api": "node:worker_threads.MessageChannel",
@@ -125,36 +131,42 @@
           ]
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "require(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "require(<expression>)",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: the module name is computed at runtime"
+            }
+          ]
         }
       }
     }
   ],
   "notes": "jsdom runs scripts with node:vm and starts workers with node:worker_threads, which workerd does not implement; use cheerio or linkedom on Workers.",
-  "durationMs": 30687,
+  "durationMs": 25666,
   "verified": {
-    "bun": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "bun 1.4.4"
-    },
-    "deno": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "deno 2.9.7"
-    },
     "workerd": {
       "outcome": "confirmed",
       "kind": "load",
       "runtime": "workerd 1.20260929.1",
-      "error": "ENOENT: no such file or directory, readAll '/browser/default-stylesheet.css', at node-internal:internal_fs_sync:369:21"
+      "error": "TypeError: __require.resolve is not a function, at node_modules/jsdom/lib/jsdom/living/xhr/XMLHttpRequest-impl.js (bundle.mjs:230101:36)"
     }
   }
 }
