@@ -11,6 +11,8 @@ npx nuxi build --preset cloudflare_module
 npx edgefit check --built .output/server
 ```
 
+For a project that builds with Vite and the Cloudflare Vite plugin or Nitro 3, see [Check after `vite build`](/guide/vite).
+
 `--built` takes the output directory or its entry file:
 
 ```sh

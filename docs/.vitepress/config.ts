@@ -120,6 +120,7 @@ export default defineConfig({
             link('settings', 'Configuration', '/guide/configuration'),
             link('columns-3', 'Comparing targets', '/guide/compare'),
             link('layers', 'Framework build output', '/guide/built-output'),
+            link('zap', 'Check after vite build', '/guide/vite'),
             link('git-pull-request', 'Pull request checks', '/guide/ci'),
             link('terminal', 'Use with a coding assistant', '/guide/assistants'),
           ],
