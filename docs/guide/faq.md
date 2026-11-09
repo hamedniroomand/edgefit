@@ -1,8 +1,30 @@
 ---
-description: 'edgefit FAQ: npm errors, Nitro and Nuxt builds, packages you never imported, why wrangler builds but edgefit reports errors, and wrong findings.'
+description: 'edgefit FAQ: Node.js errors on Cloudflare Workers and Vercel Edge, npm errors, Nitro and Nuxt builds, why wrangler builds but edgefit reports errors.'
 ---
 
 # FAQ
+
+## `No such module "node:fs"` or `Could not resolve "fs"` on Cloudflare Workers
+
+Workers has no Node built-in modules when the `nodejs_compat` flag is off. From compatibility date 2026-08-04, the flag is on by default. edgefit reads `compatibility_date` and `compatibility_flags` from your wrangler config. When the flag is off, edgefit reports each use of a Node module with the fix `Add nodejs_compat to compatibility_flags`. The `via` line shows the package that imports the module.
+
+```sh
+npx edgefit check --target workerd
+```
+
+## `[unenv] fs.readFile is not implemented yet!`
+
+wrangler builds the Worker, but it puts an [unenv](https://github.com/unjs/unenv) polyfill in place of each Node module that is not native at your compatibility date. Some polyfill functions throw this error when you call them. edgefit reports a use of such a module as `mocked`, with the package and the import chain. A later compatibility date often makes the module native. See [Compatibility date and flags](/targets/workerd#compatibility-date-and-flags).
+
+## `The edge runtime does not support Node.js 'crypto' module`
+
+Next.js shows this error when middleware or an Edge route uses a Node module that the Vercel Edge runtime does not have. The runtime allows only `events`, `buffer`, `assert`, `async_hooks` and `util`. The use often comes from a dependency, not from your code. edgefit finds the package and the import chain:
+
+```sh
+npx edgefit check --target vercel-edge
+```
+
+See [Vercel Edge runtime compatibility](/targets/vercel-edge).
 
 ## `npx edgefit` fails with EBADDEVENGINES
 

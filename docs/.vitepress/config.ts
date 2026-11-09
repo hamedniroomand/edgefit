@@ -26,6 +26,15 @@ export default defineConfig({
 
   sitemap: { hostname: site },
 
+  // GitHub Pages also serves each page at its `.html` path. The canonical link names the sitemap URL.
+  transformHead({ pageData }) {
+    if (pageData.isNotFound === true) {
+      return [];
+    }
+    const path = pageData.relativePath.replace(/(^|\/)index\.md$/u, '$1').replace(/\.md$/u, '');
+    return [['link', { rel: 'canonical', href: `${site}/${path}` }]];
+  },
+
   vite: {
     plugins: [llmstxt({ domain: site })],
   },

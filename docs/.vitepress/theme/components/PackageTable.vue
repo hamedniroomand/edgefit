@@ -2,6 +2,8 @@
   import { withBase } from 'vitepress';
   import { computed, onMounted, ref } from 'vue';
 
+  import { data } from './results.data.ts';
+
   type Status = 'pass' | 'warn' | 'fail' | 'error' | 'unchecked';
 
   interface Row {
@@ -67,8 +69,8 @@
     unchecked: 'not checked',
   };
 
-  const results = ref<Results | undefined>(undefined);
-  const loaded = ref(false);
+  // Read at build time, so the table is in the static HTML for crawlers.
+  const results = ref((data as Results | null) ?? undefined);
   const query = ref('');
   const target = ref('');
   const status = ref<Status | ''>('');
@@ -191,13 +193,6 @@
   }
 
   onMounted(async () => {
-    try {
-      const response = await fetch(withBase('/packages/results.json'));
-      results.value = response.ok ? ((await response.json()) as Results) : undefined;
-    } catch {
-      results.value = undefined;
-    }
-    loaded.value = true;
     const hash = decodeURIComponent(window.location.hash.slice(1));
     const row = results.value?.packages.find(item => item.file === hash);
     if (row !== undefined) {
@@ -209,9 +204,8 @@
 
 <template>
   <div class="ef-packages">
-    <p v-if="!loaded">Loading the results…</p>
     <p
-      v-else-if="results === undefined"
+      v-if="results === undefined"
       class="ef-packages-empty"
     >
       No results are published yet. They come from the weekly

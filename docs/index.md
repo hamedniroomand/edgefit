@@ -1,4 +1,6 @@
 ---
+title: edgefit · Node.js compatibility checker for edge runtimes
+titleTemplate: false
 description: 'A Node.js compatibility checker for Cloudflare Workers, Bun, Deno, Netlify and Vercel Edge. Check your code and every npm package it imports before you deploy.'
 layout: home
 
