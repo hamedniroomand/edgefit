@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.16.5
+
+### Patch Changes
+
+- [#485](https://github.com/hamedniroomand/edgefit/pull/485) [`f3dd98e`](https://github.com/hamedniroomand/edgefit/commit/f3dd98ed9cd01b9463e7d051675e881a2e5afd6e) - Add the newest releases to the data about code that a target never runs and modules that a package stores: `next` 16.4.5 and `nodemailer` 10.4.0.
+
+- [`5ee5ec1`](https://github.com/hamedniroomand/edgefit/commit/5ee5ec1831505b07700f3e7f563333ff53dab4ec) - A file with an array, object or call that has about 120,000 or more children stopped the scan with `RangeError: Maximum call stack size exceeded`. edgefit now scans such a file.
+
 ## 0.16.4
 
 ### Patch Changes
