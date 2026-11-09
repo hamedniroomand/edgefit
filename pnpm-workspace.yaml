@@ -11,8 +11,8 @@ peerDependencyRules:
     vitest: '*'
 
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@1.5.0
-  vite-plus: 1.5.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.5.1
+  vite-plus: 1.5.1
   vitest: 5.1.0
   '@vitest/coverage-v8': 5.1.0
 
@@ -21,37 +21,37 @@ overrides:
   vitest@*: 'catalog:'
 
 minimumReleaseAgeExclude:
-  - '@voidzero-dev/vite-plus-core@1.5.0'
-  - '@voidzero-dev/vite-plus-darwin-arm64@1.5.0'
-  - '@voidzero-dev/vite-plus-darwin-x64@1.5.0'
-  - '@voidzero-dev/vite-plus-linux-arm64-gnu@1.5.0'
-  - '@voidzero-dev/vite-plus-linux-arm64-musl@1.5.0'
-  - '@voidzero-dev/vite-plus-linux-x64-gnu@1.5.0'
-  - '@voidzero-dev/vite-plus-linux-x64-musl@1.5.0'
-  - '@voidzero-dev/vite-plus-win32-arm64-msvc@1.5.0'
-  - '@voidzero-dev/vite-plus-win32-x64-msvc@1.5.0'
-  - vite-plus@1.5.0
-  - '@oxc-parser/binding-android-arm-eabi@0.153.0'
-  - '@oxc-parser/binding-android-arm64@0.153.0'
-  - '@oxc-parser/binding-darwin-arm64@0.153.0'
-  - '@oxc-parser/binding-darwin-x64@0.153.0'
-  - '@oxc-parser/binding-freebsd-x64@0.153.0'
-  - '@oxc-parser/binding-linux-arm-gnueabihf@0.153.0'
-  - '@oxc-parser/binding-linux-arm-musleabihf@0.153.0'
-  - '@oxc-parser/binding-linux-arm64-gnu@0.153.0'
-  - '@oxc-parser/binding-linux-arm64-musl@0.153.0'
-  - '@oxc-parser/binding-linux-ppc64-gnu@0.153.0'
-  - '@oxc-parser/binding-linux-riscv64-gnu@0.153.0'
-  - '@oxc-parser/binding-linux-riscv64-musl@0.153.0'
-  - '@oxc-parser/binding-linux-s390x-gnu@0.153.0'
-  - '@oxc-parser/binding-linux-x64-gnu@0.153.0'
-  - '@oxc-parser/binding-linux-x64-musl@0.153.0'
-  - '@oxc-parser/binding-openharmony-arm64@0.153.0'
-  - '@oxc-parser/binding-win32-arm64-msvc@0.153.0'
-  - '@oxc-parser/binding-win32-ia32-msvc@0.153.0'
-  - '@oxc-parser/binding-win32-x64-msvc@0.153.0'
-  - '@oxc-project/types@0.153.0'
-  - oxc-parser@0.153.0
+  - '@voidzero-dev/vite-plus-core@1.5.0 || 1.5.1'
+  - '@voidzero-dev/vite-plus-darwin-arm64@1.5.0 || 1.5.1'
+  - '@voidzero-dev/vite-plus-darwin-x64@1.5.0 || 1.5.1'
+  - '@voidzero-dev/vite-plus-linux-arm64-gnu@1.5.0 || 1.5.1'
+  - '@voidzero-dev/vite-plus-linux-arm64-musl@1.5.0 || 1.5.1'
+  - '@voidzero-dev/vite-plus-linux-x64-gnu@1.5.0 || 1.5.1'
+  - '@voidzero-dev/vite-plus-linux-x64-musl@1.5.0 || 1.5.1'
+  - '@voidzero-dev/vite-plus-win32-arm64-msvc@1.5.0 || 1.5.1'
+  - '@voidzero-dev/vite-plus-win32-x64-msvc@1.5.0 || 1.5.1'
+  - vite-plus@1.5.0 || 1.5.1
+  - '@oxc-parser/binding-android-arm-eabi@0.158.0'
+  - '@oxc-parser/binding-android-arm64@0.158.0'
+  - '@oxc-parser/binding-darwin-arm64@0.158.0'
+  - '@oxc-parser/binding-darwin-x64@0.158.0'
+  - '@oxc-parser/binding-freebsd-x64@0.158.0'
+  - '@oxc-parser/binding-linux-arm-gnueabihf@0.158.0'
+  - '@oxc-parser/binding-linux-arm-musleabihf@0.158.0'
+  - '@oxc-parser/binding-linux-arm64-gnu@0.158.0'
+  - '@oxc-parser/binding-linux-arm64-musl@0.158.0'
+  - '@oxc-parser/binding-linux-ppc64-gnu@0.158.0'
+  - '@oxc-parser/binding-linux-riscv64-gnu@0.158.0'
+  - '@oxc-parser/binding-linux-riscv64-musl@0.158.0'
+  - '@oxc-parser/binding-linux-s390x-gnu@0.158.0'
+  - '@oxc-parser/binding-linux-x64-gnu@0.158.0'
+  - '@oxc-parser/binding-linux-x64-musl@0.158.0'
+  - '@oxc-parser/binding-openharmony-arm64@0.158.0'
+  - '@oxc-parser/binding-win32-arm64-msvc@0.158.0'
+  - '@oxc-parser/binding-win32-ia32-msvc@0.158.0'
+  - '@oxc-parser/binding-win32-x64-msvc@0.158.0'
+  - '@oxc-project/types@0.158.0'
+  - oxc-parser@0.158.0
 
 allowBuilds:
   esbuild: true
