@@ -32,7 +32,11 @@ export default defineConfig({
       return [];
     }
     const path = pageData.relativePath.replace(/(^|\/)index\.md$/u, '$1').replace(/\.md$/u, '');
-    return [['link', { rel: 'canonical', href: `${site}/${path}` }]];
+    const url = `${site}/${path}`;
+    return [
+      ['link', { rel: 'canonical', href: url }],
+      ['meta', { property: 'og:url', content: url }],
+    ];
   },
 
   vite: {
