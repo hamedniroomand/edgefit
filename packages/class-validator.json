@@ -2,7 +2,7 @@
   "version": 2,
   "package": "class-validator",
   "resolved": "0.15.1",
-  "checkedAt": "2026-11-09T21:04:18.384Z",
+  "checkedAt": "2026-11-10T13:00:22.385Z",
   "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 4032,
+  "durationMs": 3147,
   "verified": {
     "bun": {
       "outcome": "verified",

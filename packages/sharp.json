@@ -2,7 +2,7 @@
   "version": 2,
   "package": "sharp",
   "resolved": "0.35.5",
-  "checkedAt": "2026-11-09T21:00:35.658Z",
+  "checkedAt": "2026-11-10T12:59:57.821Z",
   "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -94,7 +94,7 @@
     }
   ],
   "notes": "Native addon.",
-  "durationMs": 3370,
+  "durationMs": 2519,
   "verified": {
     "bun": {
       "outcome": "verified",

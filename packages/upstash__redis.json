@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@upstash/redis",
   "resolved": "1.41.0",
-  "checkedAt": "2026-11-09T21:00:55.970Z",
+  "checkedAt": "2026-11-10T12:57:53.161Z",
   "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -214,7 +214,7 @@
       }
     }
   ],
-  "durationMs": 8511,
+  "durationMs": 7633,
   "verified": {
     "bun": {
       "outcome": "verified",

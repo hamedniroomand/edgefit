@@ -2,7 +2,7 @@
   "version": 2,
   "package": "unstorage",
   "resolved": "2.0.0-beta.0",
-  "checkedAt": "2026-11-09T21:02:22.970Z",
+  "checkedAt": "2026-11-10T13:00:33.141Z",
   "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -109,7 +109,7 @@
       }
     }
   ],
-  "durationMs": 1332,
+  "durationMs": 1045,
   "verified": {
     "bun": {
       "outcome": "verified",

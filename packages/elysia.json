@@ -2,7 +2,7 @@
   "version": 2,
   "package": "elysia",
   "resolved": "2.0.0-rc.4",
-  "checkedAt": "2026-11-09T21:01:41.572Z",
+  "checkedAt": "2026-11-10T12:58:41.637Z",
   "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -983,7 +983,7 @@
       }
     }
   ],
-  "durationMs": 53897,
+  "durationMs": 52731,
   "verified": {
     "workerd": {
       "outcome": "verified",

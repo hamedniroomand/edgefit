@@ -2,7 +2,7 @@
   "version": 2,
   "package": "lodash",
   "resolved": "4.18.1",
-  "checkedAt": "2026-11-09T21:00:36.381Z",
+  "checkedAt": "2026-11-10T12:59:54.380Z",
   "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 2185,
+  "durationMs": 1896,
   "verified": {
     "bun": {
       "outcome": "verified",

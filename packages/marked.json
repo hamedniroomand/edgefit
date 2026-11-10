@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "marked",
-  "resolved": "18.1.3",
-  "checkedAt": "2026-11-09T21:02:36.786Z",
+  "resolved": "18.2.0",
+  "checkedAt": "2026-11-10T12:58:00.072Z",
   "edgefit": "0.16.5",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -114,7 +114,7 @@
       }
     }
   ],
-  "durationMs": 1799,
+  "durationMs": 1480,
   "verified": {
     "bun": {
       "outcome": "verified",
