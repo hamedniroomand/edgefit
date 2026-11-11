@@ -9,7 +9,8 @@ head:
 description: 'A Node.js compatibility checker for Cloudflare Workers, Bun, Deno, Netlify and Vercel Edge. Check your code and every npm package it imports before you deploy.'
 layout: home
 
-hero:
+# HomeHero shows `intro`. A `hero` key would also show the default hero.
+intro:
   name: edgefit
   text: Know it runs on the edge before you deploy.
   tagline: >-
@@ -17,9 +18,7 @@ hero:
     edgefit follows your code and every npm package from the entry point and
     tells you which Node and Web APIs the runtime will not run, down to the
     package, the line and the import chain.
-  image:
-    src: /hero.svg
-    alt: edgefit
+  command: npx edgefit check
   actions:
     - theme: brand
       text: Get started
@@ -31,12 +30,6 @@ hero:
       text: View on GitHub
       link: https://github.com/hamedniroomand/edgefit
 ---
-
-<Terminal
-  src="/demo.gif"
-  title="npx edgefit check"
-  alt="edgefit check on a Worker project: five errors for file watching and process spawning APIs from chokidar and cross-spawn, each with the package, the file and line, the import chain and a link to the workerd source."
-/>
 
 ## Why edgefit
 
@@ -97,31 +90,31 @@ Postgres client, a Nitro build) installed from npm.
 
 <CardGroup :cols="3">
 
-<Card title="Cloudflare Workers Node.js compatibility" icon="cloud" to="/targets/workerd">
+<Card title="Cloudflare Workers Node.js compatibility" icon="cloud" to="/targets/workerd" data-target="workerd">
 
 `workerd`. Reads your wrangler compatibility date and flags.
 
 </Card>
 
-<Card title="Bun Node.js compatibility" icon="zap" to="/targets/bun">
+<Card title="Bun Node.js compatibility" icon="zap" to="/targets/bun" data-target="bun">
 
 `bun`. Warns when your project pins an older Bun than the data.
 
 </Card>
 
-<Card title="Deno and Deno Deploy Node.js compatibility" icon="globe" to="/targets/deno">
+<Card title="Deno and Deno Deploy Node.js compatibility" icon="globe" to="/targets/deno" data-target="deno">
 
 `deno` and `deno-deploy`. Applies your import map and `npm:` specifiers.
 
 </Card>
 
-<Card title="Netlify Edge Functions compatibility" icon="network" to="/targets/netlify-edge">
+<Card title="Netlify Edge Functions compatibility" icon="network" to="/targets/netlify-edge" data-target="netlify-edge">
 
 `netlify-edge`. The Deno data, with the entry and import map read from `netlify.toml`.
 
 </Card>
 
-<Card title="Vercel Edge runtime compatibility" icon="layers" to="/targets/vercel-edge">
+<Card title="Vercel Edge runtime compatibility" icon="layers" to="/targets/vercel-edge" data-target="vercel-edge">
 
 `vercel-edge`, experimental. Built from Vercel's documented list of allowed modules.
 

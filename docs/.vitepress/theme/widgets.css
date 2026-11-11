@@ -1,0 +1,463 @@
+/* One color for each target. */
+[data-target='workerd'] {
+  --target: var(--ef-target-workerd);
+}
+
+[data-target='bun'] {
+  --target: var(--ef-target-bun);
+}
+
+[data-target='deno'] {
+  --target: var(--ef-target-deno);
+}
+
+[data-target='netlify-edge'] {
+  --target: var(--ef-target-netlify-edge);
+}
+
+[data-target='vercel-edge'] {
+  --target: var(--ef-target-vercel-edge);
+}
+
+/* Home hero: the text on the left, the check on the right. */
+.ef-hero {
+  display: grid;
+  /* Without minmax(0, 1fr) the output block makes the page wider than a phone screen. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+  max-width: 1344px;
+  margin: 0 auto;
+  padding: 40px 24px 24px;
+}
+
+@media (width >= 640px) {
+  .ef-hero {
+    padding: 56px 48px 24px;
+  }
+}
+
+@media (width >= 1080px) {
+  .ef-hero {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 56px;
+    padding: 88px 64px 40px;
+  }
+}
+
+.ef-hero-title {
+  font-family: var(--ef-font-display);
+  font-size: clamp(38px, 4.4vw, 62px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.ef-hero-name {
+  display: block;
+  width: fit-content;
+  background: linear-gradient(110deg, var(--vp-c-brand-3), var(--ef-accent));
+  background-clip: text;
+  color: transparent;
+}
+
+.ef-hero-tagline {
+  max-width: 34em;
+  margin-top: 22px;
+  color: var(--vp-c-text-2);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.ef-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.ef-command {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  margin-top: 14px;
+  padding: 5px 6px 5px 14px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+  font-family: var(--vp-font-family-mono);
+  font-size: 13px;
+}
+
+.ef-command-prompt {
+  color: var(--vp-c-text-3);
+  user-select: none;
+}
+
+.ef-command .ef-command-text {
+  padding: 0;
+  background: none;
+  color: var(--vp-c-text-1);
+  font-size: inherit;
+}
+
+.ef-command-copy {
+  min-width: 62px;
+  padding: 4px 10px;
+  border: 1px solid var(--vp-c-border);
+  border-radius: 6px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
+  font-family: var(--vp-font-family-base);
+  font-size: 12px;
+  font-weight: 500;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.ef-command-copy:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+/* A card of a target takes the color of that target. The mix keeps the glyph readable on a light page. */
+.ef-card[data-target] .ef-card-glyph {
+  border-color: color-mix(in srgb, var(--target) 45%, var(--vp-c-divider));
+  background: color-mix(in srgb, var(--target) 12%, var(--vp-c-bg));
+  color: color-mix(in srgb, var(--target) 72%, var(--vp-c-text-1));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ef-card-link[data-target]:hover {
+    border-color: color-mix(in srgb, var(--target) 55%, var(--vp-c-divider));
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--target) 16%, transparent);
+  }
+
+  .ef-card-link[data-target]:hover .ef-card-arrow {
+    color: color-mix(in srgb, var(--target) 72%, var(--vp-c-text-1));
+  }
+}
+
+/* Chain check */
+
+.ef-chain {
+  --ef-fail: #ff6369;
+  --ef-ok: #46d08c;
+  --ef-pane: #0b0e14;
+  --ef-pane-line: #1f2532;
+  --ef-pane-text: #d8dde7;
+  --ef-pane-dim: #7d8696;
+  margin: 0;
+  border: 1px solid var(--ef-pane-line);
+  border-radius: 16px;
+  /* The check always shows as a dark terminal, in the light theme too. */
+  background: var(--ef-pane);
+  color: var(--ef-pane-text);
+  box-shadow:
+    0 30px 70px -30px color-mix(in srgb, var(--target) 55%, transparent),
+    var(--ef-shadow-panel);
+  font-family: var(--vp-font-family-mono);
+  overflow: hidden;
+  transition: box-shadow 400ms ease;
+}
+
+.ef-chain-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--ef-pane-line);
+}
+
+.ef-chain-pick {
+  color: var(--ef-pane-dim);
+  font-family: var(--vp-font-family-base);
+  font-size: 13px;
+}
+
+.ef-chain-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ef-chain-target {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 8px;
+  border: 1px solid var(--ef-pane-line);
+  border-radius: 8px;
+  color: var(--ef-pane-dim);
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 1.4;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.ef-chain-target svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.ef-chain-target:hover {
+  border-color: var(--target);
+  color: var(--target);
+}
+
+.ef-chain-target:active {
+  transform: scale(0.95);
+}
+
+.ef-chain-target[aria-pressed='true'] {
+  border-color: var(--target);
+  background: color-mix(in srgb, var(--target) 16%, transparent);
+  color: var(--target);
+  font-weight: 500;
+}
+
+.ef-chain-target:focus-visible {
+  outline-color: var(--target);
+}
+
+.ef-chain-stage {
+  padding: 20px 18px 6px;
+  font-size: clamp(11.5px, 0.5vw + 8px, 13.5px);
+}
+
+.ef-chain-node {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 3px 9px;
+  border: 1px solid var(--ef-pane-line);
+  border-radius: 7px;
+  background: #121722;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.ef-chain-entry {
+  border-color: var(--target);
+  color: var(--target);
+}
+
+.ef-chain-role,
+.ef-chain-state {
+  color: var(--ef-pane-dim);
+  font-family: var(--vp-font-family-base);
+  font-size: 12px;
+}
+
+.ef-chain-role {
+  margin-left: 9px;
+}
+
+/* The rail from the entry down to each package. */
+.ef-chain-rows {
+  position: relative;
+  margin: 0 0 0 16px;
+  padding: 6px 0 0;
+  list-style: none;
+}
+
+.ef-chain-row {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 0;
+  padding: 7px 0 7px 26px;
+}
+
+.ef-chain-row::before,
+.ef-chain-row::after {
+  position: absolute;
+  left: 0;
+  background: var(--ef-pane-dim);
+  content: '';
+}
+
+/* The tick is at the first line of a row, so a row that wraps on a phone keeps its place on the rail. */
+.ef-chain-row::before {
+  top: -6px;
+  width: 1.5px;
+  height: 28px;
+}
+
+.ef-chain-row:not(:last-child)::before {
+  height: auto;
+  bottom: 0;
+}
+
+.ef-chain-row::after {
+  top: 21px;
+  width: 20px;
+  height: 1.5px;
+}
+
+@media (width < 520px) {
+  .ef-chain-link {
+    display: none;
+  }
+
+  .ef-chain-api {
+    margin-left: 6px;
+  }
+}
+
+.ef-chain-link {
+  flex: 0 1 44px;
+  min-width: 14px;
+  height: 1.5px;
+  background: var(--ef-pane-dim);
+}
+
+.ef-chain-row.is-fail .ef-chain-api {
+  border-color: var(--ef-fail);
+  background: color-mix(in srgb, var(--ef-fail) 14%, transparent);
+  color: var(--ef-fail);
+}
+
+.ef-chain-row.is-fail .ef-chain-link {
+  background: var(--ef-fail);
+}
+
+.ef-chain-state {
+  margin-left: 10px;
+}
+
+.ef-chain-state::before {
+  margin-right: 5px;
+  font-weight: 700;
+}
+
+.ef-chain-row.is-ok .ef-chain-state::before {
+  color: var(--ef-ok);
+  content: '✓';
+}
+
+.ef-chain-row.is-fail .ef-chain-state {
+  color: var(--ef-fail);
+}
+
+.ef-chain-row.is-fail .ef-chain-state::before {
+  content: '✖';
+}
+
+.ef-chain .ef-chain-output {
+  height: 23.5em;
+  margin: 14px 0 0;
+  padding: 14px 18px;
+  border-top: 1px solid var(--ef-pane-line);
+  overflow: auto;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.ef-chain .ef-chain-output code {
+  padding: 0;
+  background: none;
+  color: var(--ef-pane-dim);
+  font: inherit;
+}
+
+.ef-chain-line.is-head {
+  color: var(--ef-pane-text);
+  font-weight: 500;
+}
+
+.ef-chain-line.is-error {
+  color: var(--ef-fail);
+  font-weight: 500;
+}
+
+.ef-chain-line.is-ok {
+  color: var(--ef-ok);
+  font-weight: 500;
+}
+
+/* A widget note, not CLI text: it tells how many findings the sample leaves out. */
+.ef-chain-line.is-more {
+  font-family: var(--vp-font-family-base);
+  font-style: italic;
+}
+
+.ef-chain-line.is-more::before {
+  content: '… ';
+}
+
+.ef-chain-caption {
+  padding: 11px 18px 13px;
+  border-top: 1px solid var(--ef-pane-line);
+  color: var(--ef-pane-dim);
+  font-family: var(--vp-font-family-base);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.ef-chain-caption code {
+  color: var(--ef-pane-text);
+  font-size: 0.95em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The trace goes from the entry to each package, then to the API, then the result shows. */
+  .ef-chain-row::before,
+  .ef-chain-row::after,
+  .ef-chain-link {
+    animation: ef-draw 220ms ease-out calc(var(--row) * 110ms) both;
+    transform-origin: left top;
+  }
+
+  .ef-chain-link {
+    animation-delay: calc(var(--row) * 110ms + 260ms);
+  }
+
+  .ef-chain-row > .ef-chain-node {
+    animation: ef-arrive 240ms ease-out calc(var(--row) * 110ms + 140ms) both;
+  }
+
+  .ef-chain-row > .ef-chain-api {
+    animation-delay: calc(var(--row) * 110ms + 420ms);
+  }
+
+  .ef-chain-state {
+    animation: ef-arrive 240ms ease-out calc(var(--row) * 110ms + 560ms) both;
+  }
+
+  /* The output prints line by line after the trace, as a terminal does. */
+  .ef-chain-line {
+    animation: ef-print 200ms ease-out calc(var(--i) * 34ms + 620ms) both;
+  }
+}
+
+@keyframes ef-draw {
+  from {
+    transform: scale(0);
+  }
+}
+
+@keyframes ef-arrive {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+@keyframes ef-print {
+  from {
+    opacity: 0;
+  }
+}

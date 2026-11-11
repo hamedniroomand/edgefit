@@ -78,7 +78,7 @@ keeps working, and a leaked token can no longer publish.
 
 ## Every later release
 
-If the text report changed shape, re-record the demo first: `vp pack && vhs docs/demo.tape` (needs `vhs`, and `vp install` in `apps/`).
+If the text report changed shape, re-record the demo of the README first: `vp pack && vhs docs/demo.tape` (needs `vhs`, and `vp install` in `apps/`). Also copy the new output into the sample of the home page, `docs/.vitepress/theme/components/checkSample.ts`. The sample is the output of `edgefit check --no-color --target <name>` for each target, on a project whose entry imports hono, chokidar and cross-spawn.
 
 Changes are described with [changesets](https://github.com/changesets/changesets): each pull request that users will notice adds a file in `.changeset/` (`vp run changeset`).
 
