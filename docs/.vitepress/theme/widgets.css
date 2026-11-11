@@ -60,6 +60,9 @@
   background: linear-gradient(110deg, var(--vp-c-brand-3), var(--ef-accent));
   background-clip: text;
   color: transparent;
+  /* The gradient paints only inside the box, and the "g" descender goes below the tight line box. The margin cancels the padding, so the layout does not move. */
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
 }
 
 .ef-hero-tagline {
