@@ -173,6 +173,52 @@ describe('usages behind a var or let that holds the check', () => {
   });
 });
 
+describe('usages behind a var in a nested block', () => {
+  const deno = "typeof globalThis.Deno !== 'undefined'";
+  const reader = `{\n  var isDeno = ${deno};\n  var read = () => (isDeno ? globalThis.Deno.version : 'none');\n}`;
+
+  it('does not follow when the function writes the name outside the block', () => {
+    expect(
+      usagesOf(`export function run() {\n${reader}\nisDeno = true;\nreturn read();\n}`),
+    ).toEqual(['api Deno.version']);
+  });
+
+  it('does not follow when the file writes the name outside the block', () => {
+    expect(usagesOf(`${reader}\nisDeno = true;\nexport const run = read;`)).toEqual([
+      'api Deno.version',
+    ]);
+  });
+
+  it('follows when nothing writes the name again', () => {
+    expect(usagesOf(`export function run() {\n${reader}\nreturn read();\n}`)).toEqual([
+      'api Deno.version [guarded] [deno]',
+    ]);
+  });
+
+  it('does not follow a var of a catch block that the block writes again', () => {
+    const check = "var has = typeof fs.watch === 'function';";
+    expect(
+      usagesOf(
+        `${fs}try {\n  run();\n} catch (has) {\n  ${check}\n  has = false;\n  if (has) fs.watch('.');\n}`,
+      ),
+    ).toEqual(plainWatch);
+  });
+
+  it('reads a var of a static block against the writes of that block', () => {
+    const check = "var has = typeof fs.watch === 'function';";
+    expect(
+      usagesOf(
+        `${fs}function make(has) {\n  has = 1;\n  return class { static { ${check} if (has) fs.watch('.'); } };\n}`,
+      ),
+    ).toEqual(guardedWatch);
+    expect(
+      usagesOf(
+        `${fs}class A { static { { ${check} var go = () => has && fs.watch('.'); } has = false; go(); } }`,
+      ),
+    ).toEqual(plainWatch);
+  });
+});
+
 describe('usages behind a value that only a module sets', () => {
   it('guards the domain module where process.domain is set', () => {
     expect(usagesOf("if (process.domain) require('domain');")).toContain(
