@@ -10,6 +10,6 @@ describe('the plugins of a graph build', () => {
       plugin => plugin.name,
     );
     expect(names[0]).toBe('target');
-    expect(names).toHaveLength(5);
+    expect(names).toHaveLength(6);
   });
 });

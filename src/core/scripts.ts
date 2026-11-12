@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { extractModule, isTypeScript } from '@/extract/index.ts';
+import { extractModule } from '@/extract/index.ts';
 import type { ExtractedModule } from '@/extract/index.ts';
 import type { GraphModule, ModuleGraph } from '@/resolve/graph.ts';
-import { keepsUnusedImports } from '@/resolve/tsconfig.ts';
+import { isProjectScript, keepsUnusedImports } from '@/resolve/tsconfig.ts';
 import type { ApiRef, Usage } from '@/types.ts';
 
 import { dropFollowed, followAliases } from './aliases.ts';
@@ -37,11 +37,6 @@ export interface ScanOptions {
 
 // esbuild's metafile also lists JSON and asset inputs, which hold no code.
 const scriptFile = /\.[cm]?[jt]sx?$/u;
-
-// A package ships its own build settings, so the project's `tsconfig.json` does not apply to it.
-function isProjectScript(file: string): boolean {
-  return isTypeScript(file) && !file.includes('node_modules');
-}
 
 /** The optional peers to report as unknown: none when the caller lists them instead. */
 function peers(module: GraphModule, options: ScanOptions): readonly string[] {
