@@ -120,6 +120,54 @@ describe('what a CommonJS module asks of a module it requires through tslib', ()
   });
 });
 
+const ownExports =
+  "function used() {\n  return fs.watch('.');\n}\nfunction dead() {\n  return fs.watchFile('.');\n}\nexports.used = used;\nexports.dead = dead;\n";
+
+/** What `lib.js`, which defines `helper`, keeps when the entry imports `name` from it and runs `code`. */
+const libWith = (helper: string, name: string, code: string): string[] | undefined =>
+  reached({
+    'index.js': entry(`import { ${name} } from './lib.js';\n${code}`, { './lib.js': 'lib.js' }),
+    'lib.js': cjs(`${ownExports}${helper}`, { 'require-call:./dep.js': 'dep.js' }),
+    'dep.js': dependency,
+  })['lib.js'];
+
+/** The entry calls `__importStar()` and then the export `dead` of its result. */
+const ownHelper = (helper: string): string[] | undefined =>
+  libWith(
+    `${helper}\nexports.__importStar = __importStar;`,
+    '__importStar',
+    '__importStar().dead();',
+  );
+
+/** `__importStar` as tsc 4 emits it, which gets the module as the parameter `mod`. */
+const importStarFunction =
+  'var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\n    Object.defineProperty(o, "default", { enumerable: true, value: v });\n}) : function(o, v) {\n    o["default"] = v;\n});\nvar __importStar = (this && this.__importStar) || function (mod) {\n    if (mod && mod.__esModule) return mod;\n    var result = {};\n    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);\n    __setModuleDefault(result, mod);\n    return result;\n};\n';
+
+describe('a CommonJS function with the name of a helper that reads the exports of its module', () => {
+  it.each([
+    [
+      'a declaration that returns module.exports',
+      'function __importStar() {\n  return module.exports;\n}',
+    ],
+    [
+      'a var that returns module.exports',
+      'var __importStar = function () {\n  return module.exports;\n};',
+    ],
+    ['a declaration that returns exports', 'function __importStar() {\n  return exports;\n}'],
+    ['a computed read of module', "function __importStar() {\n  return module['exports'];\n}"],
+    ['eval', "function __importStar() {\n  return eval('module.exports');\n}"],
+  ])('asks for everything for %s', (_, helper) => {
+    expect(ownHelper(helper)).toEqual(all);
+  });
+
+  it('reads the exports by name when the helpers of tsc get the module as a parameter', () => {
+    const importStar = `${importStarFunction}const _dep = __importStar(require('./dep.js'));`;
+    const exportStar = `${tsc.exportStar}__exportStar(require('./dep.js'), exports);`;
+    expect(libWith(`${tsc.createBinding}${importStar}`, 'used', 'used();')).toEqual(used);
+    expect(libWith(`${tsc.createBinding}${exportStar}`, 'used', 'used();')).toEqual(used);
+  });
+});
+
 describe('what a CommonJS module asks of a module it requires through the helper of older esbuild', () => {
   const toModule = 'var __toModule = (m) => __reExport(__markAsModule({}), m);\n';
 

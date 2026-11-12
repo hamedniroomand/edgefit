@@ -143,6 +143,10 @@ describe('a CommonJS module whose chained writes cannot be read', () => {
       'a local name that a helper of a compiler uses',
       'exports.used = used;\nexports.dead = dead;\nvar __importStar = exports.__importStar = function () {\n  return module.exports;\n};',
     ],
+    [
+      'a helper name that is not declared',
+      'exports.used = used;\nexports.dead = dead;\n__importStar = exports.__importStar = function () {\n  return module.exports;\n};',
+    ],
   ])('is checked in full for %s', (_, code) => {
     expect(libOf(`${exported}${code}\n`)).toEqual(both);
   });

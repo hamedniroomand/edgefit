@@ -11,7 +11,6 @@ import {
   destructuredNames,
   helperName,
   isExportsObject,
-  isHelperName,
   isName,
   opaqueNames,
   requireCall,
@@ -126,14 +125,11 @@ class CommonJsReader {
         shape.unboundRequires.add(requireCall(call)?.specifier ?? '');
       }
     }
+    // Compiler helpers need no exception here. `mentionsIn` does not count an `exports` that a helper
+    // declares as a parameter, as in tsc's `__exportStar(m, exports)`.
     shape.traceable =
       settled &&
-      !shape.units.some(
-        unit =>
-          // The body of a helper such as tsc's `__exportStar(m, exports)` names `exports` as a parameter.
-          !(unit.name !== undefined && isHelperName(unit.name)) &&
-          [...opaqueNames].some(name => rootNames(unit).has(name)),
-      );
+      !shape.units.some(unit => [...opaqueNames].some(name => rootNames(unit).has(name)));
   }
 
   /** Notes a `require` that is the whole value of the declarator that binds or destructures it. */
