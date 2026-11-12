@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@langchain/core",
-  "resolved": "1.3.6",
-  "checkedAt": "2026-11-10T13:00:15.831Z",
-  "edgefit": "0.16.5",
+  "resolved": "1.4.0",
+  "checkedAt": "2026-11-12T00:49:39.097Z",
+  "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -237,6 +237,27 @@
     {
       "subpath": "./context",
       "specifier": "@langchain/core/context",
+      "results": {
+        "workerd": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "bun": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "deno": {
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    {
+      "subpath": "./decisions",
+      "specifier": "@langchain/core/decisions",
       "results": {
         "workerd": {
           "status": "pass",
@@ -1558,7 +1579,7 @@
       }
     }
   ],
-  "durationMs": 128245,
+  "durationMs": 133343,
   "verified": {
     "bun": {
       "outcome": "verified",

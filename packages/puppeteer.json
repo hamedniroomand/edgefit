@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "puppeteer",
-  "resolved": "25.16.0",
-  "checkedAt": "2026-11-10T12:57:58.547Z",
-  "edgefit": "0.16.5",
+  "resolved": "25.17.0",
+  "checkedAt": "2026-11-12T00:50:15.722Z",
+  "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -25,8 +25,8 @@
   ],
   "summary": {
     "workerd": "fail",
-    "bun": "pass",
-    "deno": "pass"
+    "bun": "warn",
+    "deno": "warn"
   },
   "context": {
     "workerd": {
@@ -52,7 +52,7 @@
         "workerd": {
           "status": "fail",
           "errors": 9,
-          "warnings": 0,
+          "warnings": 1,
           "findings": [
             {
               "api": "node:child_process.execSync",
@@ -107,6 +107,12 @@
               "category": "unsupported",
               "level": "error",
               "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
+            },
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
             }
           ],
           "notes": [
@@ -114,17 +120,33 @@
           ]
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            }
+          ],
           "notes": [
             "loads a module the user names (index.js:59)"
           ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0,
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "globalThis[<expression>]",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: accessed with a computed property"
+            }
+          ],
           "notes": [
             "loads a module the user names (index.js:59)"
           ]
@@ -133,18 +155,8 @@
     }
   ],
   "notes": "puppeteer starts the browser as a child process, which workerd does not implement; use @cloudflare/puppeteer with Browser Run on Workers.",
-  "durationMs": 6954,
+  "durationMs": 8446,
   "verified": {
-    "bun": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "bun 1.4.4"
-    },
-    "deno": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "deno 2.9.7"
-    },
     "workerd": {
       "outcome": "verified",
       "kind": "reach",

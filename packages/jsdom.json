@@ -2,8 +2,8 @@
   "version": 2,
   "package": "jsdom",
   "resolved": "31.0.0",
-  "checkedAt": "2026-11-10T12:59:20.680Z",
-  "edgefit": "0.16.5",
+  "checkedAt": "2026-11-12T00:47:32.322Z",
+  "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -160,13 +160,13 @@
     }
   ],
   "notes": "jsdom runs scripts with node:vm and starts workers with node:worker_threads, which workerd does not implement; use cheerio or linkedom on Workers.",
-  "durationMs": 17680,
+  "durationMs": 27697,
   "verified": {
     "workerd": {
       "outcome": "confirmed",
       "kind": "load",
       "runtime": "workerd 1.20260929.1",
-      "error": "TypeError: __require.resolve is not a function, at node_modules/jsdom/lib/jsdom/living/xhr/XMLHttpRequest-impl.js (bundle.mjs:230101:36)"
+      "error": "TypeError: __require.resolve is not a function, at node_modules/jsdom/lib/jsdom/living/xhr/XMLHttpRequest-impl.js (bundle.mjs:230098:36)"
     }
   }
 }

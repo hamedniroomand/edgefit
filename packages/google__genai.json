@@ -1,9 +1,9 @@
 {
   "version": 2,
   "package": "@google/genai",
-  "resolved": "3.0.0",
-  "checkedAt": "2026-11-10T13:00:20.439Z",
-  "edgefit": "0.16.5",
+  "resolved": "3.2.0",
+  "checkedAt": "2026-11-12T00:48:13.963Z",
+  "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -206,7 +206,7 @@
       }
     }
   ],
-  "durationMs": 16701,
+  "durationMs": 11680,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "node-cron",
   "resolved": "4.6.0",
-  "checkedAt": "2026-11-10T13:00:13.786Z",
-  "edgefit": "0.16.5",
+  "checkedAt": "2026-11-12T00:48:20.209Z",
+  "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20260929.1",
@@ -76,7 +76,7 @@
     }
   ],
   "notes": "A node-cron task that names a file runs in a child process, which workerd does not implement; use a Cron Trigger on Workers.",
-  "durationMs": 905,
+  "durationMs": 641,
   "verified": {
     "bun": {
       "outcome": "verified",
