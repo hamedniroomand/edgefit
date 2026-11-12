@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.16.6
+
+### Patch Changes
+
+- [#491](https://github.com/hamedniroomand/edgefit/pull/491) [`7786c03`](https://github.com/hamedniroomand/edgefit/commit/7786c03c9479c3bfe490151f5802b8bbac0c62cf) - A CommonJS function with the name of a compiler helper, such as `__importStar`, could hide a use. When the function used `module`, `exports` or `eval`, as in `return module.exports`, edgefit still read the exports of the module by name. Then it did not report an export that code used through that function. edgefit now checks such a module as a whole, the same as for a function with any other name. The helpers that `tsc` and SWC write get the module as a parameter, so their result does not change.
+
+- [#493](https://github.com/hamedniroomand/edgefit/pull/493) [`21afd9b`](https://github.com/hamedniroomand/edgefit/commit/21afd9b111340ea921b48affc34511a20b737fc2) - Two code forms hid a real finding. edgefit now reports them:
+
+  - A `var` that holds a check, in a nested block, stayed a guard after a write outside the block, as in `{ var isDeno = …; var read = () => (isDeno ? Deno.version : 'none'); } isDeno = true;`. A write anywhere in the function of the `var`, or in the file at the top level, now ends the check.
+  - A call of `WebAssembly.compile`, `WebAssembly.compileStreaming`, `WebAssembly.instantiate`, `WebAssembly.instantiateStreaming`, `fetch`, `fs.openAsBlob` or `events.once` in a `try` without `await` counted as caught. These functions give a promise, so the `catch` does not stop their error. Now only `await` in the `try` makes the call caught.
+
+- [#492](https://github.com/hamedniroomand/edgefit/pull/492) [`87b82d9`](https://github.com/hamedniroomand/edgefit/commit/87b82d9153e80854a1e19f15b93afb46c1a47da8) - When the project root had no `tsconfig.json` and a folder above the root had one, edgefit did not read a `tsconfig.json` below the root, such as `src/tsconfig.json`. So it dropped an import that the bundler keeps because of `verbatimModuleSyntax`, `preserveValueImports` or `importsNotUsedAsValues`, and it did not report a failure when that module loads. edgefit now keeps these imports. A config above the root still does not apply. In this case, edgefit still does not read the `paths`, `baseUrl` and JSX options of a config below the root.
+
 ## 0.16.5
 
 ### Patch Changes
