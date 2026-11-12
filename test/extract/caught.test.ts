@@ -56,3 +56,42 @@ describe('a use that a try block with a catch stops', () => {
     expect(caught("if (fs.watch) {\n  fs.watch('.');\n}")).toEqual([]);
   });
 });
+
+describe('a function outside a promises path that gives a promise', () => {
+  // A module from a wasm import is not bytes, so only the plain call is recorded.
+  const caughtGlobal = (source: string): string[] =>
+    extractUsages('src/a.ts', `import wasm from './x.wasm';\n${source}`, {
+      ...options,
+      globals: new Set(['WebAssembly', 'fetch']),
+    })
+      .filter(usage => usage.caught === true)
+      .map(usage => usage.display);
+
+  it.each([
+    ['WebAssembly.compile', 'WebAssembly.compile(bytes)'],
+    ['WebAssembly.compileStreaming', 'WebAssembly.compileStreaming(response)'],
+    ['WebAssembly.instantiate', 'WebAssembly.instantiate(wasm)'],
+    ['WebAssembly.instantiateStreaming', 'WebAssembly.instantiateStreaming(response)'],
+    ['fetch', 'fetch(url)'],
+  ])('is not caught when %s is not awaited, and is caught when it is', (api, call) => {
+    expect(caughtGlobal(`try {\n  return ${call};\n} catch {\n  return null;\n}`)).toEqual([]);
+    expect(caughtGlobal(`try {\n  return await ${call};\n} catch {\n  return null;\n}`)).toEqual([
+      api,
+    ]);
+  });
+
+  it('reads the Node.js functions fs.openAsBlob and events.once the same way', () => {
+    const source =
+      "import events from 'node:events';\ntry {\n  fs.openAsBlob(p);\n  events.once(e, 'x');\n} catch {}";
+    expect(caught(source)).toEqual([]);
+    expect(caught(source.replace('fs.openAsBlob', 'await fs.openAsBlob'))).toEqual([
+      'node:fs.openAsBlob',
+    ]);
+  });
+
+  it('keeps a method with the same name on another module sync', () => {
+    expect(caught("try {\n  process.once('exit', stop);\n} catch {}")).toEqual([
+      'node:process.once',
+    ]);
+  });
+});

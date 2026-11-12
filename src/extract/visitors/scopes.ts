@@ -21,6 +21,7 @@ type FunctionNode = NodeOf<
 >;
 
 export const visitProgram: Visitor<NodeOf<'Program'>> = (node, context) => {
+  context.scope.body = node.body;
   declare(context.scope, collectBlockNames(node.body));
   collectKnown(node.body, context.scope, []);
   visitStatements(node.body, context);
@@ -36,6 +37,7 @@ export const visitFunction: Visitor<FunctionNode> = (node, context) => {
   const { body } = node;
   if (body?.type === 'BlockStatement') {
     names.push(...collectBlockNames(body.body));
+    scope.body = body.body;
   }
   declare(scope, names);
   for (const param of node.params) {
@@ -91,6 +93,9 @@ export const visitClass: Visitor<NodeOf<'ClassDeclaration' | 'ClassExpression'>>
 
 export const visitBlock: Visitor<NodeOf<'BlockStatement' | 'StaticBlock'>> = (node, context) => {
   const scope = createScope(context.scope);
+  if (node.type === 'StaticBlock') {
+    scope.body = node.body;
+  }
   declare(scope, collectLexicalNames(node.body));
   collectKnown(node.body, scope);
   context.inScope(scope, () => {

@@ -55,14 +55,17 @@ function returnedValue(fn: FunctionNode): Returned | undefined {
   return ifReturnsBoolean(fn.body.body);
 }
 
+/** The statements that hold a `var`: the body of the nearest function, static block or file. */
+function varBody(scope: Scope | undefined, statements: readonly Node[]): readonly Node[] {
+  return scope === undefined ? statements : (scope.body ?? varBody(scope.parent, statements));
+}
+
 /**
- * Remembers the checks a block declares, so a `const`, a `let` or `var` that the block does not set
- * again, or a helper without parameters that holds one can stand in for it:
- * `const isDeno = typeof Deno !== 'undefined'`, or
+ * Remembers the checks a block declares, so a `const`, a `let` that the block does not set again,
+ * a `var` that its function does not set again, or a helper without parameters that holds one can
+ * stand in for it: `const isDeno = typeof Deno !== 'undefined'`, or
  * `function hasWatch() { return typeof fs.watch === 'function'; }`.
  * ponytail: a helper with parameters is not followed; substituting them needs the call's arguments.
- * ponytail: the scan of a `var` in a nested block covers writes in that block only, so a closure in
- * the block can miss a write outside it. Upgrade: scan the enclosing function body for a `var`.
  */
 export function collectChecks(statements: readonly Node[], scope: Scope): void {
   for (const statement of statements) {
@@ -80,7 +83,14 @@ export function collectChecks(statements: readonly Node[], scope: Scope): void {
         });
       }
     } else if (declaration?.type === 'VariableDeclaration') {
-      const region = declaration.kind === 'const' ? undefined : statements;
+      // The block stays in the region of a `var`: a `catch` parameter of the same name hides the
+      // writes in the block from the scan of the function body.
+      const region =
+        declaration.kind === 'const'
+          ? undefined
+          : declaration.kind === 'var'
+            ? [statements, varBody(scope, statements)]
+            : [statements];
       for (const { id, init } of declaration.declarations) {
         if (id.type !== 'Identifier' || init === null) {
           continue;
@@ -96,8 +106,10 @@ export function collectChecks(statements: readonly Node[], scope: Scope): void {
   }
 }
 
-/** The check a name holds, unless the name is a `let` or `var` that its block sets again. */
+/** The check a name holds, unless the name is a `let` or `var` that its region sets again. */
 export function heldCheck(scope: Scope | undefined, name: string): Check | undefined {
   const check = lookupCheck(scope, name);
-  return check?.region !== undefined && namesSetAgain(check.region).has(name) ? undefined : check;
+  return check?.region?.some(statements => namesSetAgain(statements).has(name)) === true
+    ? undefined
+    : check;
 }

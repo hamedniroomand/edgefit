@@ -50,8 +50,11 @@ export interface Check {
   scope: Scope;
   /** Set while the check is being read, so a helper that calls itself stops there. */
   busy: boolean;
-  /** For a `let` or `var`: the block that declares it, where a write ends the check. */
-  region: readonly Node[] | undefined;
+  /**
+   * For a `let` or `var`: the statements where a write ends the check. These are the block that
+   * declares it, and for a `var` also the body of the function, static block or file that holds it.
+   */
+  region: readonly (readonly Node[])[] | undefined;
   /** For an imported name: what the file that exports it found, in place of `test`. */
   held?: HeldGuards;
 }
@@ -81,6 +84,8 @@ export interface Scope {
   wasmImports: Set<string>;
   /** The `module` parameter of a CommonJS factory, as in esbuild's `__commonJS` helper. */
   modules: Set<string>;
+  /** The statements of a function, static block or file, where each `var` of the scope belongs. */
+  body: readonly Node[] | undefined;
   parent: Scope | undefined;
 }
 
@@ -97,6 +102,7 @@ export function createScope(parent?: Scope): Scope {
     symbols: new Set(),
     wasmImports: new Set(),
     modules: new Set(),
+    body: undefined,
     parent,
   };
 }

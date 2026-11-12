@@ -213,7 +213,7 @@ try {
 }
 ```
 
-Usages in the `try` block are guarded, for the APIs the target lacks and for the APIs that exist and throw, because the `catch` takes the error of both. A check does not do the second. A promise that nothing awaits is not guarded, because a rejection does not reach the `catch`. The data does not say which API gives a promise, so edgefit reads the name: a path with `promises` in it. These are not guarded:
+Usages in the `try` block are guarded, for the APIs the target lacks and for the APIs that exist and throw, because the `catch` takes the error of both. A check does not do the second. A promise that nothing awaits is not guarded, because a rejection does not reach the `catch`. The data does not say which API gives a promise, so edgefit reads the name: a path with `promises` or `subtle` in it, and `WebAssembly.compile`, `WebAssembly.compileStreaming`, `WebAssembly.instantiate`, `WebAssembly.instantiateStreaming`, `fetch`, `fs.openAsBlob` and `events.once`. These are not guarded:
 
 - a `try` with no `catch`, or a `catch` that throws again, even only on some errors. A `catch` that throws again only when `error.code` is not the code of a missing module guards the load of that module. On a target that lacks the whole module, it also guards the members of the module that the rest of the block reads, because the load throws before they run. On a target that has the module, a missing member stays a finding, because its error is not the one that the `catch` stops. Node.js gives `ERR_UNKNOWN_BUILTIN_MODULE` for a name with the `node:` prefix. Without the prefix, it gives `MODULE_NOT_FOUND` for `require()` and `ERR_MODULE_NOT_FOUND` for `import()`. Another API in the same block stays unguarded
 - the `catch` and `finally` blocks themselves
@@ -488,7 +488,7 @@ if (reading) reader = new FileReader();
 
 A helper can also test the check in one `if` and return `true` or `false`. The `if` and one `return` after it are its only statements, or the `if` has an `else` (not an `else if`) and is its only statement. The two returns must have different values. So `if (check) { return true; } return false;` holds the check, and `if (check) { return false; } return true;` holds the opposite check.
 
-edgefit does not follow a `let` or `var` that its block sets again, because the check may no longer hold. A write is an `=`, a `++`, a loop over the name, a second `var` with a value, or a function declaration with the same name. A write in a nested function or block that declares its own variable with the same name does not count. For a `var` in a nested block, only the writes in that block count. See [Limitations](/guide/limitations).
+edgefit does not follow a `let` that its block sets again, or a `var` that its function sets again, because the check may no longer hold. A `var` belongs to the whole function, so a write outside the block of the `var` counts too. At the top level of a file, a write anywhere in the file counts. A write is an `=`, a `++`, a loop over the name, a second `var` with a value, or a function declaration with the same name. A write in a nested function or block that declares its own variable with the same name does not count. See [Limitations](/guide/limitations).
 
 A `const` that holds a check can also come from another file of the project or of a package. The import gives the same guards as the `const` in the other file when these are true:
 
