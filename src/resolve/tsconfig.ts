@@ -3,6 +3,10 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 
 import { parseJSONC } from 'confbox';
+import { transform } from 'esbuild';
+import type { Plugin } from 'esbuild';
+
+import { isTypeScript } from '@/extract/index.ts';
 
 interface TsConfig {
   extends?: unknown;
@@ -125,6 +129,14 @@ function directoryKeeps(directory: string, root: string, cache: Map<string, bool
 }
 
 /**
+ * Whether a file, relative to the root, is a TypeScript file of the project. A package ships its
+ * own build settings, so the project's `tsconfig.json` does not apply to it.
+ */
+export function isProjectScript(file: string): boolean {
+  return isTypeScript(file) && !file.includes('node_modules');
+}
+
+/**
  * Whether the bundler keeps an import that nothing uses as a value. It reads the nearest
  * `tsconfig.json` from the file up to `root`. A config above the root is not read, because the
  * platform does not read it. Pass one `cache` to many calls to read each directory once.
@@ -147,7 +159,9 @@ export function tsconfigRawFor(root: string): string | undefined {
   }
   for (let directory = path.dirname(root); ; directory = path.dirname(directory)) {
     if (existsSync(path.join(directory, 'tsconfig.json'))) {
-      // ponytail: this also hides a nested config below the root. Add a resolve plugin to keep it.
+      // ponytail: this also hides a config below the root. `nestedTsconfigs` gives back the
+      // imports that such a config keeps, but its `paths`, `baseUrl` and JSX options stay lost.
+      // Upgrade with a resolve plugin that reads them.
       return '{}';
     }
     if (directory === path.dirname(directory)) {
@@ -155,3 +169,48 @@ export function tsconfigRawFor(root: string): string | undefined {
     }
   }
 }
+
+/**
+ * When `tsconfigRawFor` hides every config, this keeps the imports that a `tsconfig.json` below
+ * the root keeps. It reads the configs as `keepsUnusedImports` does. `preserveValueImports` drops
+ * `import { type A } from 'a'`, but this keeps it as `import 'a'`, which can only add a module.
+ * ponytail: a file that `importWrappers` or `mainOnly` changes keeps their output, and esbuild then
+ * drops its unused imports. A file outside the root, such as a package beside the project, gets no
+ * config. Upgrade by running this step in those plugins too, and by reading the config of a file
+ * outside the root when that config is not above the root.
+ */
+export const nestedTsconfigs = (root: string): Plugin => ({
+  name: 'edgefit-nested-tsconfigs',
+  setup(build) {
+    if (tsconfigRawFor(root) === undefined) {
+      return;
+    }
+    const cache = new Map<string, boolean>();
+    // esbuild compiles filters as Go regular expressions, which reject the `u` flag.
+    // oxlint-disable-next-line require-unicode-regexp
+    build.onLoad({ filter: /\.[cm]?tsx?$/, namespace: 'file' }, async args => {
+      const file = path.relative(root, args.path);
+      // For a file outside the root, `keepsUnusedImports` goes past the root and can read a
+      // config above it.
+      if (
+        file.startsWith(`..${path.sep}`) ||
+        !isProjectScript(file) ||
+        !keepsUnusedImports(args.path, root, cache)
+      ) {
+        return;
+      }
+      try {
+        // `preserve` writes an import with no value use as `import 'a'`, which the `ts` loader
+        // keeps. With a `js` loader, an import of a type by name fails.
+        const { code } = await transform(readFileSync(args.path, 'utf8'), {
+          loader: args.path.endsWith('x') ? 'tsx' : 'ts',
+          sourcefile: args.path,
+          tsconfigRaw: { compilerOptions: { importsNotUsedAsValues: 'preserve' } },
+        });
+        return { contents: code, loader: 'ts', resolveDir: path.dirname(args.path) };
+      } catch {
+        // The bundler then reads the file itself and reports why it does not parse.
+      }
+    });
+  },
+});
