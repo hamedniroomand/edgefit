@@ -189,7 +189,8 @@ export class ExportWriter {
 
   /** `local = exports.name = value`: the function or lazy class `value` is both the export and `local`. */
   public alias(local: string, value: Node, unit: Node): boolean {
-    // A helper name skips the opaque check, and `this` can read the export by another name.
+    // A helper name does not get this form. The write into the exports is then not read, so the module
+    // counts as a whole. This is the safe result.
     const write = opaqueNames.has(local) || isHelperName(local) ? undefined : waitingExport(value);
     if (write === undefined || this.#context.reaches(true)) {
       return false;
