@@ -2,7 +2,7 @@
   "version": 2,
   "package": "oauth4webapi",
   "resolved": "3.8.8",
-  "checkedAt": "2026-11-12T00:46:55.677Z",
+  "checkedAt": "2026-11-17T13:50:14.958Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1275,
+  "durationMs": 1105,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "kysely",
-  "resolved": "0.29.8",
-  "checkedAt": "2026-11-12T00:49:51.098Z",
+  "resolved": "0.29.9",
+  "checkedAt": "2026-11-17T13:52:09.729Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -231,7 +231,7 @@
       }
     }
   ],
-  "durationMs": 5603,
+  "durationMs": 4695,
   "verified": {
     "bun": {
       "outcome": "verified",

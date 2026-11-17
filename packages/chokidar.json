@@ -2,7 +2,7 @@
   "version": 2,
   "package": "chokidar",
   "resolved": "6.0.0",
-  "checkedAt": "2026-11-12T00:50:05.389Z",
+  "checkedAt": "2026-11-17T13:50:13.740Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -76,7 +76,7 @@
     }
   ],
   "notes": "Watches the file system.",
-  "durationMs": 1330,
+  "durationMs": 1428,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "@sentry/node",
-  "resolved": "11.12.0",
-  "checkedAt": "2026-11-12T00:49:42.507Z",
+  "resolved": "11.13.0",
+  "checkedAt": "2026-11-17T13:52:02.724Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -51,8 +51,8 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 9,
-          "warnings": 2,
+          "errors": 10,
+          "warnings": 5,
           "findings": [
             {
               "api": "node:child_process.execFile",
@@ -109,6 +109,18 @@
               "detail": "always returns undefined"
             },
             {
+              "api": "node:module.Module.prototype._compile",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:fs.promises",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
+            {
               "api": "node:http",
               "category": "unknown",
               "level": "warning",
@@ -119,33 +131,27 @@
               "category": "unknown",
               "level": "warning",
               "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:worker_threads.threadId",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
+            },
+            {
+              "api": "node:worker_threads.MessageChannel",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "is not covered by the compatibility data"
             }
           ],
           "exports": [
             {
               "name": "eveInstrumentation",
-              "level": "error",
+              "level": "warning",
               "findings": [
                 {
-                  "api": "node:module.Module.prototype._compile",
-                  "category": "unsupported",
-                  "level": "error",
-                  "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
-                },
-                {
-                  "api": "node:worker_threads.threadId",
-                  "category": "unknown",
-                  "level": "warning",
-                  "detail": "is not covered by the compatibility data"
-                },
-                {
                   "api": "node:worker_threads.parentPort",
-                  "category": "unknown",
-                  "level": "warning",
-                  "detail": "is not covered by the compatibility data"
-                },
-                {
-                  "api": "node:worker_threads.MessageChannel",
                   "category": "unknown",
                   "level": "warning",
                   "detail": "is not covered by the compatibility data"
@@ -154,28 +160,10 @@
             },
             {
               "name": "init",
-              "level": "error",
+              "level": "warning",
               "findings": [
                 {
-                  "api": "node:module.Module.prototype._compile",
-                  "category": "unsupported",
-                  "level": "error",
-                  "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
-                },
-                {
-                  "api": "node:worker_threads.threadId",
-                  "category": "unknown",
-                  "level": "warning",
-                  "detail": "is not covered by the compatibility data"
-                },
-                {
                   "api": "node:worker_threads.parentPort",
-                  "category": "unknown",
-                  "level": "warning",
-                  "detail": "is not covered by the compatibility data"
-                },
-                {
-                  "api": "node:worker_threads.MessageChannel",
                   "category": "unknown",
                   "level": "warning",
                   "detail": "is not covered by the compatibility data"
@@ -184,52 +172,10 @@
             },
             {
               "name": "initWithoutDefaultIntegrations",
-              "level": "error",
+              "level": "warning",
               "findings": [
-                {
-                  "api": "node:module.Module.prototype._compile",
-                  "category": "unsupported",
-                  "level": "error",
-                  "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
-                },
-                {
-                  "api": "node:worker_threads.threadId",
-                  "category": "unknown",
-                  "level": "warning",
-                  "detail": "is not covered by the compatibility data"
-                },
                 {
                   "api": "node:worker_threads.parentPort",
-                  "category": "unknown",
-                  "level": "warning",
-                  "detail": "is not covered by the compatibility data"
-                },
-                {
-                  "api": "node:worker_threads.MessageChannel",
-                  "category": "unknown",
-                  "level": "warning",
-                  "detail": "is not covered by the compatibility data"
-                }
-              ]
-            },
-            {
-              "name": "NodeClient",
-              "level": "error",
-              "findings": [
-                {
-                  "api": "node:module.Module.prototype._compile",
-                  "category": "unsupported",
-                  "level": "error",
-                  "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
-                },
-                {
-                  "api": "node:worker_threads.threadId",
-                  "category": "unknown",
-                  "level": "warning",
-                  "detail": "is not covered by the compatibility data"
-                },
-                {
-                  "api": "node:worker_threads.MessageChannel",
                   "category": "unknown",
                   "level": "warning",
                   "detail": "is not covered by the compatibility data"
@@ -266,8 +212,14 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 1,
+          "warnings": 2,
           "findings": [
+            {
+              "api": "node:fs.promises",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
+            },
             {
               "api": "node:http",
               "category": "unknown",
@@ -779,7 +731,7 @@
     }
   ],
   "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement; use @sentry/cloudflare or @sentry/bun.",
-  "durationMs": 131119,
+  "durationMs": 92803,
   "verified": {
     "workerd": {
       "outcome": "verified",

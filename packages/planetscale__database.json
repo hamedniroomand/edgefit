@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@planetscale/database",
   "resolved": "2.0.0",
-  "checkedAt": "2026-11-12T00:49:50.093Z",
+  "checkedAt": "2026-11-17T13:52:10.191Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 902,
+  "durationMs": 882,
   "verified": {
     "bun": {
       "outcome": "verified",

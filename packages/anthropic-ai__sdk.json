@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "@anthropic-ai/sdk",
-  "resolved": "1.8.0",
-  "checkedAt": "2026-11-12T00:47:47.239Z",
+  "resolved": "1.9.0",
+  "checkedAt": "2026-11-17T13:51:03.448Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -25,8 +25,8 @@
   ],
   "summary": {
     "workerd": "pass",
-    "bun": "pass",
-    "deno": "pass"
+    "bun": "warn",
+    "deno": "warn"
   },
   "context": {
     "workerd": {
@@ -55,14 +55,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -139,14 +155,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -160,14 +192,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -181,14 +229,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -265,14 +329,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -286,14 +366,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -307,14 +403,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -454,14 +566,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -475,14 +603,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -496,14 +640,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -706,14 +866,30 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     },
@@ -727,30 +903,36 @@
           "warnings": 0
         },
         "bun": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "node:util",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: exported, so its members may be used elsewhere"
+            }
+          ]
         }
       }
     }
   ],
-  "durationMs": 46406,
+  "durationMs": 47788,
   "verified": {
-    "bun": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "bun 1.4.4"
-    },
-    "deno": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "deno 2.9.7"
-    },
     "workerd": {
       "outcome": "verified",
       "kind": "load",

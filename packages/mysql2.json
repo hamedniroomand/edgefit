@@ -2,7 +2,7 @@
   "version": 2,
   "package": "mysql2",
   "resolved": "3.24.6",
-  "checkedAt": "2026-11-12T00:47:38.305Z",
+  "checkedAt": "2026-11-17T13:50:12.710Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -147,7 +147,7 @@
       }
     }
   ],
-  "durationMs": 8143,
+  "durationMs": 7837,
   "verified": {
     "bun": {
       "outcome": "verified",

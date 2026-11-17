@@ -2,7 +2,7 @@
   "version": 2,
   "package": "cors",
   "resolved": "2.8.6",
-  "checkedAt": "2026-11-12T00:47:07.059Z",
+  "checkedAt": "2026-11-17T13:50:18.352Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 753,
+  "durationMs": 559,
   "verified": {
     "bun": {
       "outcome": "verified",

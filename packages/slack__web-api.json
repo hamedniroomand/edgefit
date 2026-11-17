@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "@slack/web-api",
-  "resolved": "8.3.0",
-  "checkedAt": "2026-11-12T00:49:55.498Z",
+  "resolved": "8.4.0",
+  "checkedAt": "2026-11-17T13:51:32.852Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 2197,
+  "durationMs": 2388,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,7 +2,7 @@
   "version": 2,
   "package": "uuid",
   "resolved": "14.0.3",
-  "checkedAt": "2026-11-12T00:47:43.227Z",
+  "checkedAt": "2026-11-17T13:51:25.519Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 509,
+  "durationMs": 721,
   "verified": {
     "bun": {
       "outcome": "verified",

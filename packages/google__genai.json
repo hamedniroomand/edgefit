@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "@google/genai",
-  "resolved": "3.2.0",
-  "checkedAt": "2026-11-12T00:48:13.963Z",
+  "resolved": "3.4.0",
+  "checkedAt": "2026-11-17T13:52:54.506Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -206,7 +206,7 @@
       }
     }
   ],
-  "durationMs": 11680,
+  "durationMs": 16703,
   "verified": {
     "bun": {
       "outcome": "verified",

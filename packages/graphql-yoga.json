@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "graphql-yoga",
-  "resolved": "6.0.1",
-  "checkedAt": "2026-11-12T00:47:55.158Z",
+  "resolved": "6.1.0",
+  "checkedAt": "2026-11-17T13:51:25.457Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 8084,
+  "durationMs": 7818,
   "verified": {
     "bun": {
       "outcome": "verified",

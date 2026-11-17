@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "firebase",
-  "resolved": "13.3.0",
-  "checkedAt": "2026-11-12T00:48:59.274Z",
+  "resolved": "13.4.0",
+  "checkedAt": "2026-11-17T13:52:20.439Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -31,7 +31,7 @@
   },
   "worst": {
     "workerd": {
-      "subpath": "./ai",
+      "subpath": "./crashlytics",
       "status": "warn"
     },
     "bun": {
@@ -39,7 +39,7 @@
       "status": "warn"
     },
     "deno": {
-      "subpath": "./messaging/sw",
+      "subpath": "./crashlytics",
       "status": "warn"
     }
   },
@@ -191,9 +191,17 @@
       "specifier": "firebase/crashlytics",
       "results": {
         "workerd": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "performance.timing",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
         },
         "bun": {
           "status": "pass",
@@ -201,9 +209,17 @@
           "warnings": 0
         },
         "deno": {
-          "status": "pass",
+          "status": "warn",
           "errors": 0,
-          "warnings": 0
+          "warnings": 1,
+          "findings": [
+            {
+              "api": "performance.timing",
+              "category": "web",
+              "level": "warning",
+              "detail": "is missing on the target according to runtime-compat-data, which is auto-generated and may be inaccurate"
+            }
+          ]
         }
       }
     },
@@ -924,7 +940,7 @@
     }
   ],
   "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin.",
-  "durationMs": 72109,
+  "durationMs": 54764,
   "verified": {
     "bun": {
       "outcome": "verified",

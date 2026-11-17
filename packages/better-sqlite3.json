@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "better-sqlite3",
-  "resolved": "13.1.1",
-  "checkedAt": "2026-11-12T00:49:45.516Z",
+  "resolved": "13.2.0",
+  "checkedAt": "2026-11-17T13:52:23.597Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -25,8 +25,8 @@
   ],
   "summary": {
     "workerd": "fail",
-    "bun": "pass",
-    "deno": "pass"
+    "bun": "fail",
+    "deno": "fail"
   },
   "context": {
     "workerd": {
@@ -69,14 +69,30 @@
           ]
         },
         "bun": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:process.report.excludeNetwork",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "does not exist on the target"
+            }
+          ]
         },
         "deno": {
-          "status": "pass",
-          "errors": 0,
-          "warnings": 0
+          "status": "fail",
+          "errors": 1,
+          "warnings": 0,
+          "findings": [
+            {
+              "api": "node:process.report.excludeNetwork",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "does not exist on the target"
+            }
+          ]
         }
       }
     },
@@ -362,23 +378,13 @@
     }
   ],
   "notes": "Native addon. On workerd, process.report.getReport() returns an empty object with no header. The package reads header.glibcVersionRuntime, so the run throws a TypeError before it reaches the native addon.",
-  "durationMs": 2624,
+  "durationMs": 2487,
   "verified": {
-    "bun": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "bun 1.4.4"
-    },
-    "deno": {
-      "outcome": "verified",
-      "kind": "load",
-      "runtime": "deno 2.9.7"
-    },
     "workerd": {
       "outcome": "confirmed",
       "kind": "reach",
       "runtime": "workerd 1.20260929.1",
-      "error": "TypeError: Cannot read properties of undefined (reading 'glibcVersionRuntime'), at isLinuxMusl (bundle.mjs:744:80)"
+      "error": "TypeError: Cannot read properties of undefined (reading 'glibcVersionRuntime'), at isLinuxMusl (bundle.mjs:767:42)"
     }
   }
 }

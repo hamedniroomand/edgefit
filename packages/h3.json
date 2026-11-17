@@ -2,7 +2,7 @@
   "version": 2,
   "package": "h3",
   "resolved": "2.0.8",
-  "checkedAt": "2026-11-12T00:47:02.724Z",
+  "checkedAt": "2026-11-17T13:50:16.011Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -321,7 +321,7 @@
       }
     }
   ],
-  "durationMs": 12941,
+  "durationMs": 14055,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "@google-cloud/storage",
-  "resolved": "8.4.0",
-  "checkedAt": "2026-11-12T00:49:52.367Z",
+  "resolved": "9.0.0",
+  "checkedAt": "2026-11-17T13:53:03.091Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -82,7 +82,7 @@
     }
   ],
   "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run.",
-  "durationMs": 5424,
+  "durationMs": 5823,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -95,11 +95,10 @@
       "runtime": "deno 2.9.7"
     },
     "workerd": {
-      "outcome": "verified",
+      "outcome": "confirmed",
       "kind": "reach",
       "runtime": "workerd 1.20260929.1",
-      "error": "ERR_METHOD_NOT_IMPLEMENTED: The child_process.spawn method is not implemented, at Object.spawn (node:child_process:81:11)",
-      "api": "node:child_process.spawn"
+      "error": "TypeError: Cannot read properties of undefined (reading 'getAccessToken'), at run (bundle.mjs:41250:30)"
     }
   }
 }

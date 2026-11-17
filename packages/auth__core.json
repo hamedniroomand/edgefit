@@ -2,7 +2,7 @@
   "version": 2,
   "package": "@auth/core",
   "resolved": "0.41.3",
-  "checkedAt": "2026-11-12T00:49:43.682Z",
+  "checkedAt": "2026-11-17T13:52:08.321Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -140,7 +140,7 @@
       }
     }
   ],
-  "durationMs": 2977,
+  "durationMs": 2676,
   "verified": {
     "bun": {
       "outcome": "verified",

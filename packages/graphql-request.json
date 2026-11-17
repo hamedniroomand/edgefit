@@ -2,7 +2,7 @@
   "version": 2,
   "package": "graphql-request",
   "resolved": "7.4.0",
-  "checkedAt": "2026-11-12T00:47:55.349Z",
+  "checkedAt": "2026-11-17T13:50:19.144Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1510,
+  "durationMs": 1778,
   "verified": {
     "bun": {
       "outcome": "verified",
