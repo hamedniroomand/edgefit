@@ -33,6 +33,9 @@ describe('the weekly check of the data entries', () => {
     const text = 'const { report } = process;\nconst previous = report.excludeNetwork;';
     expect(uses(text, 'node:process.report.excludeNetwork')).toBe(true);
     expect(uses('const { report } = process;', 'node:process.report.excludeNetwork')).toBe(false);
+    expect(
+      uses('options.report.excludeNetwork = true;', 'node:process.report.excludeNetwork'),
+    ).toBe(false);
   });
 
   it('looks for the text before the computed part of an API', () => {
