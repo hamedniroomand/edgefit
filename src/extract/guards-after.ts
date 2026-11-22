@@ -2,7 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef } from '@/types.ts';
 
-import { invokers, staticKey, strip } from './ast.ts';
+import { invokers, staticKey, strip, unwrap } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { foldedString, resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
@@ -119,10 +119,12 @@ function statementValues(statement: Node): Node[] {
  */
 function calledApis(statement: Node, context: BindingContext): ApiRef[] {
   return statementValues(statement).flatMap(value => {
-    let node = strip(value);
-    const awaited = node.type === 'AwaitExpression';
-    if (node.type === 'AwaitExpression') {
-      node = strip(node.argument);
+    // `strip` passes through `await` too, so note it on the way down.
+    let node = value;
+    let awaited = false;
+    for (let inner = unwrap(node); inner !== undefined; inner = unwrap(node)) {
+      awaited ||= node.type === 'AwaitExpression';
+      node = inner;
     }
     if (node.type !== 'CallExpression' || node.optional) {
       return [];

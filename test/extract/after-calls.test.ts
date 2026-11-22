@@ -102,6 +102,12 @@ describe('code after a call that a target can skip or postpone', () => {
     expect(afterCalls(source)).toContain('node:fs.watch');
   });
 
+  it('holds after a promise API that the statement awaits', () => {
+    const source =
+      "import * as fsp from 'node:fs/promises';\ntry {\n  await fsp.watch('.');\n  fs.watch('.');\n} catch {}";
+    expect(afterCalls(source)).toContain('node:fs.watch after fs/promises.watch');
+  });
+
   it('does not hold after bind, which calls nothing', () => {
     expect(
       afterCalls('try {\n  mod.registerHooks.bind(mod);\n  fs.watch(".");\n} catch {}'),
