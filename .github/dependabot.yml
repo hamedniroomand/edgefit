@@ -21,6 +21,10 @@ updates:
       # Types follow the oldest Node.js the package supports (engines), not the latest release.
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
+      # vp test runs the Vitest that vite-plus bundles, so these stay on that exact version. Update
+      # them with `vp migrate` when vite-plus is updated, not on their own.
+      - dependency-name: 'vitest'
+      - dependency-name: '@vitest/coverage-v8'
     exclude-paths:
       - test/fixtures/**
     groups:
