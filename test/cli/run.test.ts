@@ -105,7 +105,7 @@ describe('edgefit targets and help', () => {
     expect(await run(['targets'], io)).toBe(0);
     expect(io.output()).toContain('workerd  Cloudflare Workers');
     expect(io.output()).toContain('workers-nodejs-compat-matrix@ee58120');
-    expect(io.output()).toContain('overrides/workerd (workerd 1.20260929.1)');
+    expect(io.output()).toContain('overrides/workerd (workerd 1.20261121.1)');
     expect(io.output()).toContain('bun  Bun');
     expect(io.output()).toContain('overrides/bun (bun 1.4.4)');
     expect(io.output()).toContain('deno  Deno');

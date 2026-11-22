@@ -12,7 +12,7 @@ Every result comes from data that is pinned to these releases. `edgefit targets`
 
 | Target         | Runtime in the data | Notes                                                                                                                                                    |
 | -------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workerd`      | 1.20260929.1        | Compatibility date 2026-09-29, `nodejs_compat`                                                                                                           |
+| `workerd`      | 1.20261121.1        | Compatibility date 2026-11-21, `nodejs_compat`                                                                                                           |
 | `bun`          | 1.4.4               |                                                                                                                                                          |
 | `deno`         | 2.9.7               |                                                                                                                                                          |
 | `deno-deploy`  | Deno 2.5.0 layer    | Deno Deploy runs an older Deno, so it has its own curated overrides                                                                                      |
@@ -22,7 +22,7 @@ Every result comes from data that is pinned to these releases. `edgefit targets`
 | Data                      | Version                                                                                                                                                     |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Node API baseline         | Node 20.20.2, 22.22.2 and 24.15.0, merged                                                                                                                   |
-| Node compatibility matrix | workers-nodejs-compat-matrix at `ee58120`, runtime dumps of 2026-10-23                                                                                      |
+| Node compatibility matrix | workers-nodejs-compat-matrix at `ee58120`, workerd dump of 2026-11-22, Bun and Deno dumps of 2026-10-23                                                     |
 | Curated overrides         | Read from each runtime's source at the versions above                                                                                                       |
 | Web API data              | runtime-compat-data 0.0.5, published March 2024                                                                                                             |
 | DOM globals               | TypeScript 5.9.3 `lib.dom` without `lib.webworker`; probed on workerd, Bun and Deno at the versions above, and read from the production witness for Netlify |

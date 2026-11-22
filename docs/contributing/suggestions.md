@@ -29,7 +29,7 @@ A setting always wins, because it is the smallest change. A finding in code that
         "kind": "change",
         "text": "cross-spawn starts child processes, which Workers cannot do. Do that work outside the Worker, at build time or in a service the Worker calls with fetch.",
         "apis": ["node:child_process.*"],
-        "source": "https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/node/child_process.ts",
+        "source": "https://github.com/cloudflare/workerd/blob/v1.20261121.1/src/node/child_process.ts",
         "reviewed": "2026-09-30"
       }
     ]
