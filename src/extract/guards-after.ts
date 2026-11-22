@@ -1,13 +1,16 @@
 import type { Node } from 'oxc-parser';
 
+import type { ApiRef } from '@/types.ts';
+
 import { strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
-import { foldedString } from './bindings.ts';
+import { foldedString, resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import { computedKey } from './chain.ts';
 import type { ApiGuard, Guard } from './guard-stack.ts';
 import { guardsWhen } from './guards.ts';
-import { createScope, lookupKeys } from './scope.ts';
+import { normalizeRef } from './refs.ts';
+import { createScope, isTracked, lookupKeys } from './scope.ts';
 import type { Scope } from './scope.ts';
 
 const jumps = new Set(['ReturnStatement', 'ThrowStatement', 'ContinueStatement', 'BreakStatement']);
@@ -95,4 +98,43 @@ export function guardsAfter(node: NodeOf<'IfStatement'>, context: BindingContext
     return consequent ? [] : fallbackGuards(node, context);
   }
   return guardsWhen(node.test, alternate, context);
+}
+
+/** The value that a statement always computes first: `x()`, `await x()` or `const a = x()`. */
+function statementValues(statement: Node): Node[] {
+  if (statement.type === 'ExpressionStatement') {
+    return [statement.expression];
+  }
+  if (statement.type === 'VariableDeclaration') {
+    return statement.declarations.flatMap(declarator =>
+      declarator.init === null ? [] : [declarator.init],
+    );
+  }
+  return [];
+}
+
+/**
+ * The APIs that `statement` always calls, such as `module.registerHooks` in
+ * `module.registerHooks(hooks);`. A call that a condition or an optional chain can skip is left out.
+ */
+function calledApis(statement: Node, context: BindingContext): ApiRef[] {
+  return statementValues(statement).flatMap(value => {
+    let node = strip(value);
+    if (node.type === 'AwaitExpression') {
+      node = strip(node.argument);
+    }
+    if (node.type !== 'CallExpression' || node.optional) {
+      return [];
+    }
+    const binding = resolveBinding(node.callee, context);
+    return isTracked(binding) && binding.ref.path.length > 0 ? [normalizeRef(binding.ref)] : [];
+  });
+}
+
+/**
+ * The guards that hold after `statement` inside a `try` that catches: the code after a call runs
+ * only when the call returned, see `ThrowsGuard`.
+ */
+export function throwsGuards(statement: Node, context: BindingContext): Guard[] {
+  return calledApis(statement, context).map(ref => ({ kind: 'throws', ref }));
 }

@@ -50,6 +50,15 @@ export interface OptionGuard {
   name: string;
 }
 
+/**
+ * The code runs only after a call of `ref` returned, in a `try` whose `catch` stops the error: on
+ * a target where the call throws, the `catch` takes over and the code never runs.
+ */
+export interface ThrowsGuard {
+  kind: 'throws';
+  ref: ApiRef;
+}
+
 /** What a `const` that another file exports tells when it is true and when it is false. */
 export type HeldGuards = { whenTrue: readonly Guard[]; whenFalse: readonly Guard[] };
 
@@ -60,7 +69,8 @@ export type Guard =
   | DeadGuard
   | AbsentGuard
   | PolyfillGuard
-  | OptionGuard;
+  | OptionGuard
+  | ThrowsGuard;
 
 /** Whether `ref` is `guard.ref` or something below it. */
 function isCovered(guard: ApiGuard, ref: ApiRef): boolean {
@@ -245,6 +255,10 @@ export class GuardStack {
   public readonly options = (): string[] => [
     ...new Set(this.#guards.flatMap(guard => (guard.kind === 'option' ? [guard.name] : []))),
   ];
+
+  /** The APIs whose call must have returned for this point to run, see `ThrowsGuard`. */
+  public readonly afterCalls = (): ApiRef[] =>
+    this.#guards.flatMap(guard => (guard.kind === 'throws' ? [guard.ref] : []));
 
   /** What is known of the runtime at this point. */
   public readonly runtimes = (): RuntimeCondition[] =>
