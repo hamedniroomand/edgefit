@@ -88,3 +88,37 @@ describe('code that a call in a try block does not decide', () => {
     expect(afterCalls(source)).toContain('node:fs.watch');
   });
 });
+
+describe('code after a call that a target can skip or postpone', () => {
+  it('does not hold inside a function declaration, which is hoisted', () => {
+    const source =
+      'try {\n  mod.registerHooks({});\n  function f() {\n    fs.watch(".");\n  }\n} catch {}\nf();';
+    expect(afterCalls(source)).toContain('node:fs.watch');
+  });
+
+  it('does not hold after a promise API that nothing awaits, which rejects later', () => {
+    const source =
+      "import * as fsp from 'node:fs/promises';\ntry {\n  fsp.watch('.');\n  fs.watch('.');\n} catch {}";
+    expect(afterCalls(source)).toContain('node:fs.watch');
+  });
+
+  it('does not hold after bind, which calls nothing', () => {
+    expect(
+      afterCalls('try {\n  mod.registerHooks.bind(mod);\n  fs.watch(".");\n} catch {}'),
+    ).toContain('node:fs.watch');
+  });
+});
+
+describe('the API that a call through call or apply makes', () => {
+  it('is the function itself', () => {
+    expect(
+      afterCalls('try {\n  mod.registerHooks.call(mod, {});\n  fs.watch(".");\n} catch {}'),
+    ).toContain('node:fs.watch after module.registerHooks');
+  });
+
+  it('holds after the try when the catch jumps, since the code is reached only when the call returned', () => {
+    const source =
+      'function g() {\n  try {\n    mod.registerHooks({});\n  } catch {\n    return;\n  }\n  fs.watch(".");\n}';
+    expect(afterCalls(source)).toContain('node:fs.watch after module.registerHooks');
+  });
+});

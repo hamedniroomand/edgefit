@@ -256,6 +256,22 @@ export class GuardStack {
     ...new Set(this.#guards.flatMap(guard => (guard.kind === 'option' ? [guard.name] : []))),
   ];
 
+  /**
+   * Runs `body` without the `throws` guards: a function declaration is hoisted, so it exists, and
+   * can run, before the call that the guard waits for.
+   */
+  public readonly withoutThrows = (body: () => void): void => {
+    const saved = [...this.#guards];
+    this.#guards.length = 0;
+    this.#guards.push(...saved.filter(guard => guard.kind !== 'throws'));
+    try {
+      body();
+    } finally {
+      this.#guards.length = 0;
+      this.#guards.push(...saved);
+    }
+  };
+
   /** The APIs whose call must have returned for this point to run, see `ThrowsGuard`. */
   public readonly afterCalls = (): ApiRef[] =>
     this.#guards.flatMap(guard => (guard.kind === 'throws' ? [guard.ref] : []));

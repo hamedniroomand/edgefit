@@ -2,14 +2,14 @@ import type { Node } from 'oxc-parser';
 
 import type { ApiRef } from '@/types.ts';
 
-import { strip } from './ast.ts';
+import { invokers, staticKey, strip } from './ast.ts';
 import type { NodeOf } from './ast.ts';
 import { foldedString, resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import { computedKey } from './chain.ts';
 import type { ApiGuard, Guard } from './guard-stack.ts';
 import { guardsWhen } from './guards.ts';
-import { normalizeRef } from './refs.ts';
+import { isPromiseApi, normalizeRef } from './refs.ts';
 import { createScope, isTracked, lookupKeys } from './scope.ts';
 import type { Scope } from './scope.ts';
 
@@ -120,14 +120,30 @@ function statementValues(statement: Node): Node[] {
 function calledApis(statement: Node, context: BindingContext): ApiRef[] {
   return statementValues(statement).flatMap(value => {
     let node = strip(value);
+    const awaited = node.type === 'AwaitExpression';
     if (node.type === 'AwaitExpression') {
       node = strip(node.argument);
     }
     if (node.type !== 'CallExpression' || node.optional) {
       return [];
     }
-    const binding = resolveBinding(node.callee, context);
-    return isTracked(binding) && binding.ref.path.length > 0 ? [normalizeRef(binding.ref)] : [];
+    // `fn.call(...)` and `fn.apply(...)` call `fn`. `fn.bind(...)` calls nothing.
+    let callee = strip(node.callee);
+    const key =
+      callee.type === 'MemberExpression' ? staticKey(callee.property, callee.computed) : undefined;
+    if (callee.type === 'MemberExpression' && key !== undefined && invokers.has(key)) {
+      if (key === 'bind') {
+        return [];
+      }
+      callee = callee.object;
+    }
+    const binding = resolveBinding(callee, context);
+    if (!isTracked(binding) || binding.ref.path.length === 0) {
+      return [];
+    }
+    const ref = normalizeRef(binding.ref);
+    // A promise that nothing awaits rejects later, so the code after the call still runs.
+    return awaited || !isPromiseApi(ref) ? [ref] : [];
   });
 }
 

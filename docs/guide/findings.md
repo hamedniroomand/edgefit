@@ -236,7 +236,7 @@ try {
 }
 ```
 
-On workerd, `module.registerHooks` throws, so the uses below it are guarded. On a target where the call returns, they are findings as before. The call must be a statement of its own, `await` of a call, or the value of a declaration. A call that a condition or `?.` can skip does not end the block, and neither does a call in a nested block, for the code after that block. A call that throws only with some options does not either.
+On workerd, `module.registerHooks` throws, so the uses below it are guarded. On a target where the call returns, they are findings as before. The call must be a statement of its own, `await` of a call, or the value of a declaration. A call through `call` or `apply` counts as a call of the function. A call that a condition or `?.` can skip does not end the block, and neither does a call in a nested block, for the code after that block, a call of a promise API that nothing awaits, which rejects later, or a call that throws only with some options. A function declaration after the call is not covered, because it is hoisted and can run before the call. When the `catch` has a `return`, `throw`, `break` or `continue` at its top level, the code after the `try` statement is covered too, since it runs only when the block ended.
 
 A guard clause at the top level of a `try` block protects the code after the `try`, see [Checks for an API](#checks-for-an-api).
 

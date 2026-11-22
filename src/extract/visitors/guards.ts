@@ -92,7 +92,13 @@ export function visitStatements(statements: readonly Node[], context: VisitConte
   collectChecks(statements, context.scope);
   context.collector.guards.scoped(add => {
     for (const [index, statement] of statements.entries()) {
-      context.visit(statement);
+      if (statement.type === 'FunctionDeclaration') {
+        context.collector.guards.withoutThrows(() => {
+          context.visit(statement);
+        });
+      } else {
+        context.visit(statement);
+      }
       dropRewrittenAlias(statements, index, context);
       // Inside a `try` that catches, the code after a call runs only when the call returned.
       if (context.collector.guards.isCaught()) {
