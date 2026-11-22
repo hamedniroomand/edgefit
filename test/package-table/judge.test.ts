@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { fixture } from '~/helpers.ts';
 
-/** Real runs on workerd 1.20261121.1 and the findings of the same rows. */
+/** Real runs on workerd 1.20260929.1 and the findings of the same rows. */
 const runs = JSON.parse(readFileSync(fixture('verify/workerd-runs.json'), 'utf8')) as Record<
   string,
   { findings: RowFinding[]; run: Run }

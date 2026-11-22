@@ -19,7 +19,7 @@
         "text": "cross-spawn starts child processes, which Workers cannot do. Do that work outside the Worker, at build time or in a service the Worker calls with fetch.",
         "apis": ["node:child_process.*"],
         "source": "https://github.com/cloudflare/workerd/blob/v1.20261121.1/src/node/child_process.ts",
-        "reviewed": "2026-09-30"
+        "reviewed": "2026-11-22"
       }
     ]
   },
@@ -30,7 +30,7 @@
         "kind": "change",
         "text": "Workers cannot start processes. Do that work outside the Worker, at build time or in a service the Worker calls with fetch.",
         "source": "https://github.com/cloudflare/workerd/blob/v1.20261121.1/src/node/child_process.ts",
-        "reviewed": "2026-09-30"
+        "reviewed": "2026-11-22"
       }
     ],
     "node:fs.watch*": [
@@ -39,7 +39,7 @@
         "kind": "change",
         "text": "Workers do not implement file watching. Run it in development tooling, not in code the Worker bundles.",
         "source": "https://github.com/cloudflare/workerd/blob/v1.20261121.1/src/node/internal/internal_fs_callback.ts",
-        "reviewed": "2026-09-30"
+        "reviewed": "2026-11-22"
       }
     ],
     "node:fs.unwatchFile": [
@@ -48,7 +48,7 @@
         "kind": "change",
         "text": "Workers do not implement file watching. Run it in development tooling, not in code the Worker bundles.",
         "source": "https://github.com/cloudflare/workerd/blob/v1.20261121.1/src/node/internal/internal_fs_callback.ts",
-        "reviewed": "2026-09-30"
+        "reviewed": "2026-11-22"
       }
     ],
     "node:fs.promises.watch": [
@@ -57,7 +57,7 @@
         "kind": "change",
         "text": "Workers do not implement file watching. Run it in development tooling, not in code the Worker bundles.",
         "source": "https://github.com/cloudflare/workerd/blob/v1.20261121.1/src/node/internal/internal_fs_promises.ts",
-        "reviewed": "2026-09-30"
+        "reviewed": "2026-11-22"
       }
     ],
     "node:fs/promises.watch": [
@@ -66,7 +66,7 @@
         "kind": "change",
         "text": "Workers do not implement file watching. Run it in development tooling, not in code the Worker bundles.",
         "source": "https://github.com/cloudflare/workerd/blob/v1.20261121.1/src/node/internal/internal_fs_promises.ts",
-        "reviewed": "2026-09-30"
+        "reviewed": "2026-11-22"
       }
     ],
     "eval": [
