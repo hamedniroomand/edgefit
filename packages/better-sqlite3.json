@@ -2,11 +2,11 @@
   "version": 2,
   "package": "better-sqlite3",
   "resolved": "13.2.0",
-  "checkedAt": "2026-11-17T13:52:23.597Z",
+  "checkedAt": "2026-11-22T23:05:27.138Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -25,14 +25,14 @@
   ],
   "summary": {
     "workerd": "fail",
-    "bun": "fail",
-    "deno": "fail"
+    "bun": "pass",
+    "deno": "pass"
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -69,30 +69,14 @@
           ]
         },
         "bun": {
-          "status": "fail",
-          "errors": 1,
-          "warnings": 0,
-          "findings": [
-            {
-              "api": "node:process.report.excludeNetwork",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "does not exist on the target"
-            }
-          ]
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
         },
         "deno": {
-          "status": "fail",
-          "errors": 1,
-          "warnings": 0,
-          "findings": [
-            {
-              "api": "node:process.report.excludeNetwork",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "does not exist on the target"
-            }
-          ]
+          "status": "pass",
+          "errors": 0,
+          "warnings": 0
         }
       }
     },
@@ -378,13 +362,23 @@
     }
   ],
   "notes": "Native addon. On workerd, process.report.getReport() returns an empty object with no header. The package reads header.glibcVersionRuntime, so the run throws a TypeError before it reaches the native addon.",
-  "durationMs": 2487,
+  "durationMs": 2829,
   "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.4"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
     "workerd": {
       "outcome": "confirmed",
       "kind": "reach",
-      "runtime": "workerd 1.20260929.1",
-      "error": "TypeError: Cannot read properties of undefined (reading 'glibcVersionRuntime'), at isLinuxMusl (bundle.mjs:767:42)"
+      "runtime": "workerd 1.20261121.1",
+      "error": "TypeError: Cannot read properties of undefined (reading 'glibcVersionRuntime'), at isLinuxMusl (file:///bundle/bundle.mjs:767:42)"
     }
   }
 }

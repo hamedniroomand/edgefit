@@ -1,12 +1,12 @@
 {
   "version": 2,
   "package": "@electric-sql/pglite",
-  "resolved": "0.5.16",
-  "checkedAt": "2026-11-17T13:52:42.335Z",
+  "resolved": "0.5.17",
+  "checkedAt": "2026-11-22T23:05:23.708Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -50,9 +50,9 @@
   ],
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -385,7 +385,7 @@
     }
   ],
   "notes": "PGlite calls WebAssembly.instantiateStreaming only in its browser branch. With nodejs_compat at the date of the table, PGlite takes its Node branch on workerd, so this call does not run. The Node branch reads its files from disk, and the Worker bundle has none, so PGlite.create() fails before it uses WebAssembly or reaches node:process.binding. The multi-tab worker of PGlite uses navigator.locks, which Bun and workerd do not have.",
-  "durationMs": 10756,
+  "durationMs": 10497,
   "verified": {
     "bun": {
       "outcome": "verified",

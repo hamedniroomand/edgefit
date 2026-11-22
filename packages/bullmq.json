@@ -1,12 +1,12 @@
 {
   "version": 2,
   "package": "bullmq",
-  "resolved": "6.7.7",
-  "checkedAt": "2026-11-17T13:52:12.033Z",
+  "resolved": "6.7.8",
+  "checkedAt": "2026-11-22T23:05:51.132Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -30,9 +30,9 @@
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -97,7 +97,7 @@
     }
   ],
   "notes": "bullmq runs a processor file in a child process or a worker thread, which workerd does not implement; use Cloudflare Queues on Workers.",
-  "durationMs": 3721,
+  "durationMs": 5590,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -112,7 +112,7 @@
     "workerd": {
       "outcome": "verified",
       "kind": "reach",
-      "runtime": "workerd 1.20260929.1",
+      "runtime": "workerd 1.20261121.1",
       "error": "ERR_METHOD_NOT_IMPLEMENTED: The child_process.fork method is not implemented, at fork (node:child_process:78:11)",
       "api": "node:child_process.fork"
     }

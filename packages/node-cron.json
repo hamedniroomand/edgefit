@@ -2,11 +2,11 @@
   "version": 2,
   "package": "node-cron",
   "resolved": "4.6.0",
-  "checkedAt": "2026-11-17T13:53:17.379Z",
+  "checkedAt": "2026-11-22T23:04:03.197Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -30,9 +30,9 @@
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -76,7 +76,7 @@
     }
   ],
   "notes": "A node-cron task that names a file runs in a child process, which workerd does not implement; use a Cron Trigger on Workers.",
-  "durationMs": 954,
+  "durationMs": 861,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -91,7 +91,7 @@
     "workerd": {
       "outcome": "verified",
       "kind": "reach",
-      "runtime": "workerd 1.20260929.1",
+      "runtime": "workerd 1.20261121.1",
       "error": "ERR_METHOD_NOT_IMPLEMENTED: The child_process.fork method is not implemented, at fork (node:child_process:78:11)",
       "api": "node:child_process.fork"
     }

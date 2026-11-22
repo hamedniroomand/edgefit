@@ -2,11 +2,11 @@
   "version": 2,
   "package": "itty-router",
   "resolved": "5.0.24",
-  "checkedAt": "2026-11-17T13:50:03.058Z",
+  "checkedAt": "2026-11-22T23:02:45.886Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -30,9 +30,9 @@
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -445,7 +445,7 @@
       }
     }
   ],
-  "durationMs": 2402,
+  "durationMs": 2588,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -460,7 +460,7 @@
     "workerd": {
       "outcome": "verified",
       "kind": "load",
-      "runtime": "workerd 1.20260929.1"
+      "runtime": "workerd 1.20261121.1"
     }
   }
 }

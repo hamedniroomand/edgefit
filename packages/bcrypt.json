@@ -2,11 +2,11 @@
   "version": 2,
   "package": "bcrypt",
   "resolved": "6.0.0",
-  "checkedAt": "2026-11-17T13:51:41.318Z",
+  "checkedAt": "2026-11-22T23:02:47.520Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -30,9 +30,9 @@
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -76,7 +76,7 @@
     }
   ],
   "notes": "Native addon; bcryptjs is the pure-JS alternative.",
-  "durationMs": 701,
+  "durationMs": 1033,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -91,8 +91,8 @@
     "workerd": {
       "outcome": "verified",
       "kind": "load",
-      "runtime": "workerd 1.20260929.1",
-      "error": "Error: No native build was found for platform=linux arch=x64 runtime=node abi= uv= libc=glibc node=22.19.0, at load2.resolve.load2.path (bundle.mjs:111:13)",
+      "runtime": "workerd 1.20261121.1",
+      "error": "Error: No native build was found for platform=linux arch=x64 runtime=node abi= uv= libc=glibc node=22.23.4, at load2.resolve.load2.path (file:///bundle/bundle.mjs:111:13)",
       "api": "native addon bcrypt"
     }
   }

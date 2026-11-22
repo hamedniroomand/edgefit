@@ -2,11 +2,11 @@
   "version": 2,
   "package": "firebase",
   "resolved": "13.4.0",
-  "checkedAt": "2026-11-17T13:52:20.439Z",
+  "checkedAt": "2026-11-22T23:04:33.252Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -45,9 +45,9 @@
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -940,7 +940,7 @@
     }
   ],
   "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin.",
-  "durationMs": 54764,
+  "durationMs": 67324,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -955,7 +955,7 @@
     "workerd": {
       "outcome": "verified",
       "kind": "load",
-      "runtime": "workerd 1.20260929.1"
+      "runtime": "workerd 1.20261121.1"
     }
   }
 }

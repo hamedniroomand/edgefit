@@ -1,12 +1,12 @@
 {
   "version": 2,
   "package": "@sentry/node",
-  "resolved": "11.13.0",
-  "checkedAt": "2026-11-17T13:52:02.724Z",
+  "resolved": "11.16.0",
+  "checkedAt": "2026-11-22T23:04:52.365Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -30,9 +30,9 @@
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -270,21 +270,15 @@
       "specifier": "@sentry/node/vite",
       "results": {
         "bun": {
-          "status": "warn",
-          "errors": 0,
-          "warnings": 7,
+          "status": "fail",
+          "errors": 1,
+          "warnings": 6,
           "findings": [
             {
-              "api": "node:sea.getAsset",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "import(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
+              "api": "node:module.syncBuiltinESMExports",
+              "category": "mocked",
+              "level": "error",
+              "detail": "does nothing"
             },
             {
               "api": "node:worker_threads",
@@ -297,6 +291,12 @@
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:module",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
             },
             {
               "api": "node:inspector.url",
@@ -321,20 +321,8 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 8,
+          "warnings": 6,
           "findings": [
-            {
-              "api": "node:sea.getAsset",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "import(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
-            },
             {
               "api": "node:worker_threads",
               "category": "unknown",
@@ -354,7 +342,7 @@
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
             },
             {
-              "api": "node:fs.promises",
+              "api": "node:module",
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
@@ -386,21 +374,15 @@
       "specifier": "@sentry/node/rollup",
       "results": {
         "bun": {
-          "status": "warn",
-          "errors": 0,
-          "warnings": 7,
+          "status": "fail",
+          "errors": 1,
+          "warnings": 6,
           "findings": [
             {
-              "api": "node:sea.getAsset",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "import(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
+              "api": "node:module.syncBuiltinESMExports",
+              "category": "mocked",
+              "level": "error",
+              "detail": "does nothing"
             },
             {
               "api": "node:worker_threads",
@@ -413,6 +395,12 @@
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:module",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
             },
             {
               "api": "node:inspector.url",
@@ -437,20 +425,8 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 8,
+          "warnings": 6,
           "findings": [
-            {
-              "api": "node:sea.getAsset",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "import(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
-            },
             {
               "api": "node:worker_threads",
               "category": "unknown",
@@ -470,7 +446,7 @@
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
             },
             {
-              "api": "node:fs.promises",
+              "api": "node:module",
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
@@ -502,21 +478,15 @@
       "specifier": "@sentry/node/webpack",
       "results": {
         "bun": {
-          "status": "warn",
-          "errors": 0,
-          "warnings": 7,
+          "status": "fail",
+          "errors": 1,
+          "warnings": 6,
           "findings": [
             {
-              "api": "node:sea.getAsset",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "import(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
+              "api": "node:module.syncBuiltinESMExports",
+              "category": "mocked",
+              "level": "error",
+              "detail": "does nothing"
             },
             {
               "api": "node:worker_threads",
@@ -529,6 +499,12 @@
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:module",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
             },
             {
               "api": "node:inspector.url",
@@ -553,20 +529,8 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 8,
+          "warnings": 6,
           "findings": [
-            {
-              "api": "node:sea.getAsset",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "import(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
-            },
             {
               "api": "node:worker_threads",
               "category": "unknown",
@@ -586,7 +550,7 @@
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
             },
             {
-              "api": "node:fs.promises",
+              "api": "node:module",
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
@@ -618,21 +582,15 @@
       "specifier": "@sentry/node/esbuild",
       "results": {
         "bun": {
-          "status": "warn",
-          "errors": 0,
-          "warnings": 7,
+          "status": "fail",
+          "errors": 1,
+          "warnings": 6,
           "findings": [
             {
-              "api": "node:sea.getAsset",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "import(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
+              "api": "node:module.syncBuiltinESMExports",
+              "category": "mocked",
+              "level": "error",
+              "detail": "does nothing"
             },
             {
               "api": "node:worker_threads",
@@ -645,6 +603,12 @@
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: accessed with a computed property"
+            },
+            {
+              "api": "node:module",
+              "category": "unknown",
+              "level": "warning",
+              "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
             },
             {
               "api": "node:inspector.url",
@@ -669,20 +633,8 @@
         "deno": {
           "status": "warn",
           "errors": 0,
-          "warnings": 8,
+          "warnings": 6,
           "findings": [
-            {
-              "api": "node:sea.getAsset",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "import(<expression>)",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: the module name is computed at runtime"
-            },
             {
               "api": "node:worker_threads",
               "category": "unknown",
@@ -702,7 +654,7 @@
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
             },
             {
-              "api": "node:fs.promises",
+              "api": "node:module",
               "category": "unknown",
               "level": "warning",
               "detail": "cannot be checked statically: passed on as a value, so its members may be used elsewhere"
@@ -731,13 +683,13 @@
     }
   ],
   "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement; use @sentry/cloudflare or @sentry/bun.",
-  "durationMs": 92803,
+  "durationMs": 102774,
   "verified": {
     "workerd": {
       "outcome": "verified",
       "kind": "reach",
-      "runtime": "workerd 1.20260929.1",
-      "error": "ERR_METHOD_NOT_IMPLEMENTED: The process.cpuUsage method is not implemented, at process.cpuUsage (node-internal:public_process:235:11)",
+      "runtime": "workerd 1.20261121.1",
+      "error": "ERR_METHOD_NOT_IMPLEMENTED: The process.cpuUsage method is not implemented, at process.cpuUsage (node-internal:public_process:151:11)",
       "api": "node:process.cpuUsage"
     }
   }

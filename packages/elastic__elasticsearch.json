@@ -2,11 +2,11 @@
   "version": 2,
   "package": "@elastic/elasticsearch",
   "resolved": "9.5.1",
-  "checkedAt": "2026-11-17T13:53:13.011Z",
+  "checkedAt": "2026-11-22T23:06:38.522Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -30,9 +30,9 @@
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -126,7 +126,7 @@
     }
   ],
   "notes": "The client sends requests with undici, and workerd rejects the ALPNProtocols option of node:tls.connect that undici sets; call the Elasticsearch REST API with fetch on Workers.",
-  "durationMs": 8883,
+  "durationMs": 9355,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -141,8 +141,8 @@
     "workerd": {
       "outcome": "confirmed",
       "kind": "reach",
-      "runtime": "workerd 1.20260929.1",
-      "error": "ConnectionError: The options.ALPNProtocols option is not implemented, at Connection.request (bundle.mjs:31727:21)"
+      "runtime": "workerd 1.20261121.1",
+      "error": "ConnectionError: The options.ALPNProtocols option is not implemented, at Connection.request (file:///bundle/bundle.mjs:31850:21)"
     }
   }
 }

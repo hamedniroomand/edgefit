@@ -2,11 +2,11 @@
   "version": 2,
   "package": "sqlite3",
   "resolved": "6.0.1",
-  "checkedAt": "2026-11-17T13:52:09.289Z",
+  "checkedAt": "2026-11-22T23:03:43.412Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -30,9 +30,9 @@
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -76,7 +76,7 @@
     }
   ],
   "notes": "Native addon.",
-  "durationMs": 2002,
+  "durationMs": 1696,
   "verified": {
     "bun": {
       "outcome": "verified",
@@ -91,8 +91,8 @@
     "workerd": {
       "outcome": "verified",
       "kind": "load",
-      "runtime": "workerd 1.20260929.1",
-      "error": "Error: Could not find module root given file: \"bundle.mjs\". Do you have a `package.json` file? , at bindings.getRoot (bundle.mjs:214:17)",
+      "runtime": "workerd 1.20261121.1",
+      "error": "Error: Could not find module root given file: \"/bundle/bundle.mjs\". Do you have a `package.json` file? , at bindings.getRoot (file:///bundle/bundle.mjs:214:17)",
       "api": "native addon sqlite3"
     }
   }

@@ -1,12 +1,12 @@
 {
   "version": 2,
   "package": "puppeteer",
-  "resolved": "25.17.0",
-  "checkedAt": "2026-11-17T13:51:54.088Z",
+  "resolved": "25.18.1",
+  "checkedAt": "2026-11-22T23:04:48.869Z",
   "edgefit": "0.16.6",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
-    "workerd": "1.20260929.1",
+    "workerd": "1.20261121.1",
     "bun": "1.4.4",
     "deno": "2.9.7",
     "unenv": "2.0.0-rc.24",
@@ -25,14 +25,14 @@
   ],
   "summary": {
     "workerd": "fail",
-    "bun": "warn",
-    "deno": "warn"
+    "bun": "pass",
+    "deno": "pass"
   },
   "context": {
     "workerd": {
-      "settings": "compatibility_date 2026-09-29, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
+      "settings": "compatibility_date 2026-11-21, flags: nodejs_compat (from the compatibility data defaults (no wrangler config found)), entries from --entry or the config, NODE_ENV production (as the platform's build)",
       "notes": [
-        "No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
+        "No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, or point `workerd.wranglerConfig` at your wrangler config."
       ]
     },
     "bun": {
@@ -52,7 +52,7 @@
         "workerd": {
           "status": "fail",
           "errors": 9,
-          "warnings": 1,
+          "warnings": 0,
           "findings": [
             {
               "api": "node:child_process.execSync",
@@ -107,12 +107,6 @@
               "category": "unsupported",
               "level": "error",
               "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
-            },
-            {
-              "api": "globalThis[<expression>]",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: accessed with a computed property"
             }
           ],
           "notes": [
@@ -120,33 +114,17 @@
           ]
         },
         "bun": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1,
-          "findings": [
-            {
-              "api": "globalThis[<expression>]",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: accessed with a computed property"
-            }
-          ],
+          "warnings": 0,
           "notes": [
             "loads a module the user names (index.js:59)"
           ]
         },
         "deno": {
-          "status": "warn",
+          "status": "pass",
           "errors": 0,
-          "warnings": 1,
-          "findings": [
-            {
-              "api": "globalThis[<expression>]",
-              "category": "unknown",
-              "level": "warning",
-              "detail": "cannot be checked statically: accessed with a computed property"
-            }
-          ],
+          "warnings": 0,
           "notes": [
             "loads a module the user names (index.js:59)"
           ]
@@ -155,12 +133,22 @@
     }
   ],
   "notes": "puppeteer starts the browser as a child process, which workerd does not implement; use @cloudflare/puppeteer with Browser Run on Workers.",
-  "durationMs": 8511,
+  "durationMs": 7112,
   "verified": {
+    "bun": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "bun 1.4.4"
+    },
+    "deno": {
+      "outcome": "verified",
+      "kind": "load",
+      "runtime": "deno 2.9.7"
+    },
     "workerd": {
       "outcome": "verified",
       "kind": "reach",
-      "runtime": "workerd 1.20260929.1",
+      "runtime": "workerd 1.20261121.1",
       "error": "ERR_METHOD_NOT_IMPLEMENTED: The child_process.spawn method is not implemented, at Object.spawn (node:child_process:81:11)",
       "api": "node:child_process"
     }
