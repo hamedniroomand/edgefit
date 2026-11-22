@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.16.7
+
+### Patch Changes
+
+- [#512](https://github.com/hamedniroomand/edgefit/pull/512) [`cc873e0`](https://github.com/hamedniroomand/edgefit/commit/cc873e0649032d7827b0cdfcbfab2801b1db7709) - Report the `process.report.excludeNetwork` read of `better-sqlite3` 13.2.0 as guarded on Bun and Deno: its libc check returns before it reaches `process.report` there.
+
+- [#500](https://github.com/hamedniroomand/edgefit/pull/500) [`6d56945`](https://github.com/hamedniroomand/edgefit/commit/6d56945bf18ab2f5c43f56b61b434733be9acbb9) - Add the newest releases to the data about code that a target never runs and modules that a package stores: `postal-mime` 4.2.1 and `nodemailer` 10.6.1.
+
+- [#508](https://github.com/hamedniroomand/edgefit/pull/508) [`d1cc134`](https://github.com/hamedniroomand/edgefit/commit/d1cc134c260a962c04ee39022f8fce9b4ee6120e) - Add the newest release to the data about code that a target never runs: `next` 16.4.6.
+
+- [#513](https://github.com/hamedniroomand/edgefit/pull/513) [`dd689a0`](https://github.com/hamedniroomand/edgefit/commit/dd689a089cf787a3ff3b8faca5ad00578ad0fda7) - Add the newest releases to the data about code that a target never runs: `mongodb` 7.9.1, `@supabase/auth-js` and `@supabase/realtime-js` 2.119.2, `got` 16.2.0, and `puppeteer-core` 25.18.1.
+
+- [#511](https://github.com/hamedniroomand/edgefit/pull/511) [`3c76163`](https://github.com/hamedniroomand/edgefit/commit/3c76163c7559630b7133e9d454149e643866717d) - Bump the workerd data to 1.20261121.1, with compatibility date 2026-11-21. `assert.Assert`, `util.diff`, `util.convertProcessSignalToExitCode` and `util.setTraceSigInt` (also on `sys`) now exist on workerd, and `util.getSystemErrorName`, `util.getSystemErrorMessage` and `util.transferableAbortSignal` now work, so a use of them is no longer reported.
+
 ## 0.16.6
 
 ### Patch Changes
