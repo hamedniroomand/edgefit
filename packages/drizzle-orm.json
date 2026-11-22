@@ -2,8 +2,8 @@
   "version": 2,
   "package": "drizzle-orm",
   "resolved": "0.45.4",
-  "checkedAt": "2026-11-22T23:04:54.552Z",
-  "edgefit": "0.16.6",
+  "checkedAt": "2026-11-22T23:26:53.663Z",
+  "edgefit": "0.16.7",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -9925,7 +9925,7 @@
       }
     }
   ],
-  "durationMs": 131426,
+  "durationMs": 182300,
   "verified": {
     "bun": {
       "outcome": "verified",

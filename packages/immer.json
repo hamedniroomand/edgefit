@@ -2,8 +2,8 @@
   "version": 2,
   "package": "immer",
   "resolved": "11.2.10",
-  "checkedAt": "2026-11-22T23:04:59.783Z",
-  "edgefit": "0.16.6",
+  "checkedAt": "2026-11-22T23:24:42.368Z",
+  "edgefit": "0.16.7",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 979,
+  "durationMs": 1055,
   "verified": {
     "bun": {
       "outcome": "verified",

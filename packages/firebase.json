@@ -2,8 +2,8 @@
   "version": 2,
   "package": "firebase",
   "resolved": "13.4.0",
-  "checkedAt": "2026-11-22T23:04:33.252Z",
-  "edgefit": "0.16.6",
+  "checkedAt": "2026-11-22T23:25:57.096Z",
+  "edgefit": "0.16.7",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -940,7 +940,7 @@
     }
   ],
   "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin.",
-  "durationMs": 67324,
+  "durationMs": 63606,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "lru-cache",
   "resolved": "11.5.3",
-  "checkedAt": "2026-11-22T23:05:24.646Z",
-  "edgefit": "0.16.6",
+  "checkedAt": "2026-11-22T23:25:41.024Z",
+  "edgefit": "0.16.7",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -88,7 +88,7 @@
       }
     }
   ],
-  "durationMs": 915,
+  "durationMs": 862,
   "verified": {
     "bun": {
       "outcome": "verified",

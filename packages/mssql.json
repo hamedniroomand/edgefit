@@ -2,8 +2,8 @@
   "version": 2,
   "package": "mssql",
   "resolved": "12.8.1",
-  "checkedAt": "2026-11-22T23:05:35.299Z",
-  "edgefit": "0.16.6",
+  "checkedAt": "2026-11-22T23:27:46.202Z",
+  "edgefit": "0.16.7",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -124,7 +124,7 @@
     }
   ],
   "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either. Tedious calls an @azure/identity credential only after a SQL Server accepts the login, so a run without one cannot reach the child_process calls. The UDP lookup for a named instance does not throw on workerd, and the connection times out.",
-  "durationMs": 8713,
+  "durationMs": 13312,
   "verified": {
     "bun": {
       "outcome": "verified",

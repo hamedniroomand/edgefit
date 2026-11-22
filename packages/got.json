@@ -2,8 +2,8 @@
   "version": 2,
   "package": "got",
   "resolved": "16.2.0",
-  "checkedAt": "2026-11-22T23:05:02.398Z",
-  "edgefit": "0.16.6",
+  "checkedAt": "2026-11-22T23:24:45.115Z",
+  "edgefit": "0.16.7",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -68,7 +68,7 @@
     }
   ],
   "notes": "With the http2 option, got calls node:tls.connect with options that Workers reject, and the default options work.",
-  "durationMs": 2627,
+  "durationMs": 2767,
   "verified": {
     "bun": {
       "outcome": "verified",

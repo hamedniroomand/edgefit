@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@langchain/core",
   "resolved": "1.5.0",
-  "checkedAt": "2026-11-22T23:06:02.090Z",
-  "edgefit": "0.16.6",
+  "checkedAt": "2026-11-22T23:25:47.443Z",
+  "edgefit": "0.16.7",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -1579,7 +1579,7 @@
       }
     }
   ],
-  "durationMs": 181286,
+  "durationMs": 122106,
   "verified": {
     "bun": {
       "outcome": "verified",

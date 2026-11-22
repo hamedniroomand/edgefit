@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@sinclair/typebox",
   "resolved": "0.34.52",
-  "checkedAt": "2026-11-22T23:03:54.401Z",
-  "edgefit": "0.16.6",
+  "checkedAt": "2026-11-22T23:26:19.275Z",
+  "edgefit": "0.16.7",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -214,7 +214,7 @@
       }
     }
   ],
-  "durationMs": 4862,
+  "durationMs": 5504,
   "verified": {
     "bun": {
       "outcome": "verified",
