@@ -255,6 +255,24 @@
       "target": "netlify-edge",
       "reason": "`addPageBinding` of `cdp/utils.js` runs only in the browser page. `ExecutionContext#evaluate` sends it to the page, and `pageBindingInitString` gives the page a string of it. No code of the package calls it on the target.",
       "source": "https://github.com/puppeteer/puppeteer/blob/puppeteer-core-v25.18.1/packages/puppeteer-core/src/cdp/ExecutionContext.ts#L161-L166"
+    },
+    {
+      "package": "better-sqlite3",
+      "versions": { "min": "13.2.0", "max": "13.2.0" },
+      "file": "lib/binding.js",
+      "apis": ["node:process.report.excludeNetwork"],
+      "target": "bun",
+      "reason": "Runs only when isLinuxMusl() cannot read /proc/self/maps. The function returns at its first line on every platform but Linux, and on Linux Bun maps its libc loader into /proc/self/maps, so it returns before it reaches process.report.",
+      "source": "https://github.com/WiseLibs/better-sqlite3/blob/v13.2.0/lib/binding.js#L52-L73"
+    },
+    {
+      "package": "better-sqlite3",
+      "versions": { "min": "13.2.0", "max": "13.2.0" },
+      "file": "lib/binding.js",
+      "apis": ["node:process.report.excludeNetwork"],
+      "target": "deno",
+      "reason": "Runs only when isLinuxMusl() cannot read /proc/self/maps. The function returns at its first line on every platform but Linux, and on Linux Deno maps its libc loader into /proc/self/maps, so it returns before it reaches process.report.",
+      "source": "https://github.com/WiseLibs/better-sqlite3/blob/v13.2.0/lib/binding.js#L52-L73"
     }
   ]
 }

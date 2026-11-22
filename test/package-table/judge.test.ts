@@ -125,3 +125,37 @@ describe('the match rule', () => {
     expect(matchOf(error({ message }), [addon])).toBeDefined();
   });
 });
+
+describe('a fail row whose reach script finishes', () => {
+  const finished: Run = { load: { ok: true }, reach: { ok: true } };
+  const finding = (fields: Partial<RowFinding>): RowFinding => ({
+    api: 'node:module.syncBuiltinESMExports',
+    category: 'mocked',
+    level: 'error',
+    detail: 'does nothing',
+    ...fields,
+  });
+
+  it('is absent when every finding that fails the row is mocked, which never throws', () => {
+    expect(judge({ status: 'fail', run: finished, findings: [finding({})] })).toEqual({
+      outcome: 'absent',
+      kind: 'reach',
+      reason: 'mocked',
+      error: 'a mocked API does not throw: node:module.syncBuiltinESMExports',
+    });
+  });
+
+  it('is a mismatch when a finding that fails the row should throw', () => {
+    const findings = [finding({}), finding({ api: 'node:fs.watch', category: 'unsupported' })];
+    expect(judge({ status: 'fail', run: finished, findings }).outcome).toBe('mismatch');
+  });
+
+  it('counts only the findings that fail the row', () => {
+    const findings = [
+      finding({}),
+      finding({ api: 'node:fs.watch', category: 'unsupported', exports: ['./watch'] }),
+      finding({ api: 'node:v8.getHeapStatistics', category: 'unsupported', level: 'warning' }),
+    ];
+    expect(judge({ status: 'fail', run: finished, findings }).outcome).toBe('absent');
+  });
+});

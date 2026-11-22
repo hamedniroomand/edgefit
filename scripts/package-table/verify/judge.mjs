@@ -123,6 +123,18 @@ function judgeFail({ load, reach }, findings) {
     return { outcome: 'absent', kind: 'load', reason: 'lazy finding, no reach script' };
   }
   if (reach.ok) {
+    // A mocked API does nothing instead of throwing, so a run that finishes says nothing about it.
+    const failing = findings.filter(
+      finding => finding.level === 'error' && finding.exports === undefined,
+    );
+    if (failing.length > 0 && failing.every(finding => finding.category === 'mocked')) {
+      return {
+        outcome: 'absent',
+        kind: 'reach',
+        reason: 'mocked',
+        error: `a mocked API does not throw: ${failing.map(finding => finding.api).join(', ')}`,
+      };
+    }
     return {
       outcome: 'mismatch',
       kind: 'reach',
