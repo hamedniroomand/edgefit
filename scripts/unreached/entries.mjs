@@ -27,10 +27,18 @@ export function uses(text, api) {
     [`node:${module}`, `'${module}'`, `"${module}"`].some(item => text.includes(item)) &&
     text.includes(path.at(-1) ?? '');
   // A member below the module can be read through a name that holds its object, when the file
-  // also names the module, as in
-  // `const { report } = process; report.excludeNetwork`.
-  const parent =
-    path.length >= 2 && text.includes(module) && text.includes(path.slice(-2).join('.'));
+  // takes that object from the module: `const { report } = process; report.excludeNetwork`, or
+  // `const report = process.report`.
+  const holder = path.at(-2);
+  const escaped = value => value.replaceAll(/[.*+?^${}()|[\]\\]/gu, '\\$&');
+  const takes =
+    holder !== undefined &&
+    (text.includes(`${module}.${holder}`) ||
+      new RegExp(
+        `\\{[^}]*\\b${escaped(holder)}\\b[^}]*\\}\\s*=\\s*${escaped(module)}\\b`,
+        'u',
+      ).test(text));
+  const parent = path.length >= 2 && takes && text.includes(path.slice(-2).join('.'));
   return text.includes(name) || named || parent;
 }
 

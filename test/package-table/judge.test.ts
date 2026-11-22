@@ -152,9 +152,10 @@ describe('a fail row whose reach script finishes', () => {
 
   it('counts only the findings that fail the row', () => {
     const findings = [
+      finding({}),
       finding({ api: 'node:fs.watch', category: 'unsupported', exports: ['./watch'] }),
       finding({ api: 'node:v8.getHeapStatistics', category: 'unsupported', level: 'warning' }),
     ];
-    expect(judge({ status: 'fail', run: finished, findings }).outcome).toBe('mismatch');
+    expect(judge({ status: 'fail', run: finished, findings }).outcome).toBe('absent');
   });
 });
