@@ -23,7 +23,7 @@ A build can leave a deploy config for wrangler to use instead: `.wrangler/deploy
 The report header shows where the settings came from:
 
 ```
-settings compatibility_date 2026-09-29, flags: nodejs_compat (from wrangler.jsonc)
+settings compatibility_date 2026-11-21, flags: nodejs_compat (from wrangler.jsonc)
 ```
 
 Without a wrangler config, edgefit uses the settings the compatibility data was generated with (its date and `nodejs_compat`), and says so in a note in the report and in the JSON `notes`. A wrangler config that has no `compatibility_flags` enables none, as on Workers. One with no `compatibility_date` gets the data's date, with a note. You can override any of this in the [config file](/guide/configuration#cloudflare-workers).
@@ -50,7 +50,7 @@ A module that is not native at your date and flags is reported as `mocked`, beca
 
 ## What the data covers
 
-- **Node API data** from workers-nodejs-compat-matrix, generated with workerd `1.20260929.1`.
+- **Node API data** from workers-nodejs-compat-matrix, generated with workerd `1.20261121.1`.
 - **Curated overrides** for APIs that the matrix reports as present but that throw or do nothing when called. Some examples:
 
 | API                    | Result        | Why                                                                 |
@@ -65,7 +65,7 @@ An entry with the status `mismatch` can name the options that make a call fail. 
 
 The overrides also say that the globals `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing, and the [DOM globals](/targets/#dom-globals) list adds the other DOM globals. So code behind a check such as `typeof window !== 'undefined'` is guarded. A call, a construction or a member of one of these globals through the global object, such as `globalThis.document.title`, is a finding when no check protects it. A read of one of them by its bare name, such as `document.title`, is a finding only when it runs as the module loads, see [Browser globals by their bare name](/guide/findings#browser-globals-by-their-bare-name).
 
-The matrix does not list `node:cluster`, `domain`, `inspector`, `punycode`, `repl`, `tty`, `v8`, `vm`, `wasi` and `worker_threads`. The overrides record that each of them loads with `nodejs_compat` at compatibility date 2026-09-29, so an import of one gives no finding at a date from which the module is native (see the gates above). Their members are not measured, so a use of a member is an `unknown` warning, unless an `apis` entry covers it.
+The matrix does not list `node:cluster`, `domain`, `inspector`, `punycode`, `repl`, `tty`, `v8`, `vm`, `wasi` and `worker_threads`. The overrides record that each of them loads with `nodejs_compat` at compatibility date 2026-11-21, so an import of one gives no finding at a date from which the module is native (see the gates above). Their members are not measured, so a use of a member is an `unknown` warning, unless an `apis` entry covers it.
 
 The full list is in `data/overrides/workerd.json` in the package. Each entry links to the workerd source file it was read from.
 

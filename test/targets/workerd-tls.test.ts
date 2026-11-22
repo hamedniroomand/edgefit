@@ -14,7 +14,7 @@ describe('workerd TLS', () => {
     );
     expect(note).toMatch(/^throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols,/u);
     expect(source).toBe(
-      'https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node/internal/internal_tls_wrap.ts',
+      'https://github.com/cloudflare/workerd/tree/v1.20261121.1/src/node/internal/internal_tls_wrap.ts',
     );
   });
 
@@ -23,7 +23,7 @@ describe('workerd TLS', () => {
       status: 'unsupported',
       note: 'throws Not implemented',
       source:
-        'https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node/internal/internal_tls.ts',
+        'https://github.com/cloudflare/workerd/tree/v1.20261121.1/src/node/internal/internal_tls.ts',
     });
   });
 

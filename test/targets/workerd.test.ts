@@ -189,7 +189,7 @@ describe('workerd Web APIs', () => {
       status: 'unsupported',
       note: 'exists, but throws: not implemented',
       source:
-        'https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/workerd/api/url-standard.c++',
+        'https://github.com/cloudflare/workerd/tree/v1.20261121.1/src/workerd/api/url-standard.c++',
     });
   });
 
@@ -231,7 +231,7 @@ const notesOf = (root: string, options: WorkerdOptions = {}): readonly string[] 
 describe('workerd settings that were assumed', () => {
   it('says so when there is no wrangler config', () => {
     expect(notesOf('bun-app')).toEqual([
-      'No wrangler config was found, so compatibility_date 2026-09-29 and the flags nodejs_compat are assumed. ' +
+      'No wrangler config was found, so compatibility_date 2026-11-21 and the flags nodejs_compat are assumed. ' +
         'Set `workerd.compatibilityDate` and `workerd.compatibilityFlags` in the edgefit config, ' +
         'or point `workerd.wranglerConfig` at your wrangler config.',
     ]);
@@ -258,7 +258,7 @@ describe('workerd settings that are only partly assumed', () => {
     const target = createWorkerdTarget(fixture('wrangler-bare'));
     expect(target.info.settings).toContain('flags: none (from wrangler.jsonc)');
     expect(target.info.notes[0]).toContain(
-      'wrangler.jsonc has no compatibility_date, so 2026-09-29 is assumed.',
+      'wrangler.jsonc has no compatibility_date, so 2026-11-21 is assumed.',
     );
     // From 2026-08-04 nodejs_compat is on without a flag, so the assumed date needs no note.
     expect(target.info.notes.join(' ')).not.toContain('nodejs_compat is not enabled');

@@ -13,7 +13,7 @@ error    unsupported  node:fs.watch  (workerd)
        file watching is not implemented; throws ERR_UNSUPPORTED_OPERATION
        chokidar@4.0.1  node_modules/chokidar/index.js:5:13
        via src/index.ts > src/dev/reload.ts > chokidar
-       see https://github.com/cloudflare/workerd/tree/v1.20260929.1/src/node/internal/internal_fs_callback.ts
+       see https://github.com/cloudflare/workerd/tree/v1.20261121.1/src/node/internal/internal_fs_callback.ts
 ```
 
 | Line                              | What it tells you                                                                                             |
@@ -105,7 +105,7 @@ error    unsupported  node:child_process.spawn  (workerd)
        every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes
        cross-spawn@7.0.6  node_modules/cross-spawn/index.js:12:24
        fix: cross-spawn starts child processes, which Workers cannot do. Do that work outside the Worker, at build time or in a service the Worker calls with fetch.
-            https://github.com/cloudflare/workerd/blob/v1.20260929.1/src/node/child_process.ts
+            https://github.com/cloudflare/workerd/blob/v1.20261121.1/src/node/child_process.ts
 ```
 
 Two kinds of fix exist:

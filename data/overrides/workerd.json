@@ -271,22 +271,7 @@
       "note": "throws not implemented",
       "source": "util.ts"
     },
-    "util.transferableAbortSignal": {
-      "status": "unsupported",
-      "note": "throws not implemented",
-      "source": "util.ts"
-    },
     "util.getSystemErrorMap": {
-      "status": "unsupported",
-      "note": "throws not implemented",
-      "source": "util.ts"
-    },
-    "util.getSystemErrorName": {
-      "status": "unsupported",
-      "note": "throws not implemented",
-      "source": "util.ts"
-    },
-    "util.getSystemErrorMessage": {
       "status": "unsupported",
       "note": "throws not implemented",
       "source": "util.ts"
