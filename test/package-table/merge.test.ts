@@ -11,7 +11,7 @@ const run = (runtime: string, cell: Cell, resolved = '5.0.0'): VerifyRun => ({
   package: 'chokidar',
   resolved,
   runtime,
-  version: runtime === 'workerd' ? '1.20260929.1' : '1.4.4',
+  version: runtime === 'workerd' ? '1.20261121.1' : '1.4.4',
   cell,
 });
 const reach: Cell = {
@@ -25,7 +25,7 @@ describe('the verified field of a package result', () => {
   it('keeps a verified and a confirmed cell with the runtime and its version', () => {
     const confirmed: Cell = { outcome: 'confirmed', kind: 'load', error: 'ENOENT: no file' };
     expect(verifiedOf([run('workerd', reach), run('bun', confirmed)], '5.0.0')).toEqual({
-      workerd: { ...reach, runtime: 'workerd 1.20260929.1' },
+      workerd: { ...reach, runtime: 'workerd 1.20261121.1' },
       bun: { outcome: 'confirmed', kind: 'load', runtime: 'bun 1.4.4', error: 'ENOENT: no file' },
     });
   });
