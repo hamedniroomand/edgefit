@@ -29,6 +29,12 @@ describe('the weekly check of the data entries', () => {
     expect(uses("require('child_process');", 'node:child_process.spawn')).toBe(false);
   });
 
+  it('reads a deeper member through a name that holds its object', () => {
+    const text = 'const { report } = process;\nconst previous = report.excludeNetwork;';
+    expect(uses(text, 'node:process.report.excludeNetwork')).toBe(true);
+    expect(uses('const { report } = process;', 'node:process.report.excludeNetwork')).toBe(false);
+  });
+
   it('looks for the text before the computed part of an API', () => {
     expect(uses('const read = globalThis[name].args;', 'globalThis[<expression>]')).toBe(true);
     expect(uses('const read = globalThis.args;', 'globalThis[<expression>]')).toBe(false);

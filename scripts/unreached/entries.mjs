@@ -5,7 +5,9 @@ export { inRange } from '../../src/data/version-range.ts';
 /**
  * Whether the file uses the API as the code writes it. A member of a Node.js module may be read
  * as `module.member`, or imported by its name: `import { spawn } from 'node:child_process'` and
- * `const { spawn } = require('child_process')`. A report shows a computed read or call as
+ * `const { spawn } = require('child_process')`. A deeper member may be read through a name that
+ * holds its object, such as `report.excludeNetwork` for `node:process.report.excludeNetwork`. A
+ * report shows a computed read or call as
  * `globalThis[<expression>]` or `require(<expression>)`. The check looks for the text before
  * `<expression>`.
  */
@@ -24,7 +26,10 @@ export function uses(text, api) {
   const named =
     [`node:${module}`, `'${module}'`, `"${module}"`].some(item => text.includes(item)) &&
     text.includes(path.at(-1) ?? '');
-  return text.includes(name) || named;
+  // A member below the module can be read through a name that holds its object, as in
+  // `const { report } = process; report.excludeNetwork`.
+  const parent = path.length >= 2 && text.includes(path.slice(-2).join('.'));
+  return text.includes(name) || named || parent;
 }
 
 /** The members of a stored-modules entry that the text of its file does not hold. */
