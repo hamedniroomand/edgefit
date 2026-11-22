@@ -4,7 +4,7 @@
   "entries": [
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.5" },
+      "versions": { "min": "16.3.8", "max": "16.4.6" },
       "file": "dist/esm/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
@@ -13,7 +13,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.5" },
+      "versions": { "min": "16.3.8", "max": "16.4.6" },
       "file": "dist/server/app-render/cache-signal.js",
       "apis": ["node:process.nextTick", "setImmediate", "clearImmediate"],
       "target": "vercel-edge",
@@ -22,7 +22,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.5" },
+      "versions": { "min": "16.3.8", "max": "16.4.6" },
       "file": "dist/esm/build/templates/app-route.js",
       "guards": ["dist/esm/server/route-modules/route-module.js"],
       "apis": ["node:process.hrtime.bigint"],
@@ -32,7 +32,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.5" },
+      "versions": { "min": "16.3.8", "max": "16.4.6" },
       "file": "dist/build/templates/app-route.js",
       "guards": ["dist/server/route-modules/route-module.js"],
       "apis": ["node:process.hrtime.bigint"],
@@ -42,7 +42,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.5" },
+      "versions": { "min": "16.3.8", "max": "16.4.6" },
       "file": "dist/esm/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
@@ -51,7 +51,7 @@
     },
     {
       "package": "next",
-      "versions": { "min": "16.3.8", "max": "16.4.5" },
+      "versions": { "min": "16.3.8", "max": "16.4.6" },
       "file": "dist/server/lib/clone-response.js",
       "apis": ["WeakRef"],
       "target": "vercel-edge",
