@@ -136,15 +136,19 @@ function isChainLink(child: Node, parent: Node): boolean {
 function throwsOnUndefined(node: Node, ancestors: readonly Node[]): boolean {
   let child = node;
   let inChain = true;
-  for (const [index, parent] of ancestors.entries()) {
-    if (inChain && parent.type === 'ChainExpression') {
-      inChain = false;
-    } else if (inChain ? !isChainLink(child, parent) : !passesOn(child, parent)) {
-      return throwsAt(child, parent, ancestors[index + 1]);
+  // The first ancestor that uses the value rather than passing it on.
+  const at = ancestors.findIndex(parent => {
+    const carries =
+      (inChain && parent.type === 'ChainExpression') ||
+      (inChain ? isChainLink(child, parent) : passesOn(child, parent));
+    if (carries) {
+      inChain &&= parent.type !== 'ChainExpression';
+      child = parent;
     }
-    child = parent;
-  }
-  return false;
+    return !carries;
+  });
+  const user = ancestors[at];
+  return user !== undefined && throwsAt(child, user, ancestors[at + 1]);
 }
 
 /**
