@@ -1,7 +1,8 @@
-import type { Node } from 'oxc-parser';
+import type { Class, Node } from 'oxc-parser';
 
 import { childNodes, staticKey } from './ast.ts';
 import type { Guard } from './guard-stack.ts';
+import { instanceCode } from './guarded-classes.ts';
 import { declared, isPropertyName } from './local-functions.ts';
 import type { LocalFunction } from './local-functions.ts';
 import { exportedNames } from './main-only.ts';
@@ -20,7 +21,10 @@ function shared(lists: readonly (readonly Guard[])[]): Guard[] {
 
 function declaresName(node: Node, parent: Node | undefined): boolean {
   return (
-    (parent?.type === 'VariableDeclarator' || parent?.type === 'FunctionDeclaration') &&
+    (parent?.type === 'VariableDeclarator' ||
+      parent?.type === 'FunctionDeclaration' ||
+      parent?.type === 'ClassDeclaration' ||
+      parent?.type === 'ClassExpression') &&
     parent.id === node
   );
 }
@@ -40,6 +44,10 @@ function isExportTarget(node: Node): boolean {
   return false;
 }
 
+/** The code that the guards of `functionGuards` hold for: a function, or the instance code of a class. */
+export const codeOf = (fn: LocalFunction | Class): readonly Node[] =>
+  fn.type === 'ClassDeclaration' || fn.type === 'ClassExpression' ? instanceCode(fn) : [fn];
+
 /** The names that `node` or a node below it reads. */
 function namesBelow(node: Node): string[] {
   return node.type === 'Identifier'
@@ -58,7 +66,10 @@ function exportsOf(node: Node): string[] {
 }
 
 /** Where the file reads the name of each local function outside its body, and which names it exports. */
-function findReads(body: readonly Node[], functions: ReadonlyMap<string, LocalFunction>): Reads {
+function findReads(
+  body: readonly Node[],
+  functions: ReadonlyMap<string, LocalFunction | Class>,
+): Reads {
   const result: Reads = { reads: new Map(), exported: new Set(), evaluated: false };
   const visit = (node: Node, parent?: Node): void => {
     result.evaluated ||=
@@ -74,7 +85,7 @@ function findReads(body: readonly Node[], functions: ReadonlyMap<string, LocalFu
       named &&
       !isPropertyName(node, parent) &&
       !declaresName(node, parent) &&
-      (node.start < fn.start || node.start >= fn.end)
+      !codeOf(fn).some(part => node.start >= part.start && node.start < part.end)
     ) {
       const reads = result.reads.get(node.name) ?? [];
       reads.push(node.start);
@@ -94,12 +105,12 @@ function findReads(body: readonly Node[], functions: ReadonlyMap<string, LocalFu
  * ponytail: a read inside another function does not get the guards of that function, so a guard
  * reaches one function only. Upgrade: repeat until no function gets a new guard.
  */
-export function functionGuards(
+export function functionGuards<TCode extends LocalFunction | Class>(
   body: readonly Node[],
-  functions: ReadonlyMap<string, LocalFunction>,
+  functions: ReadonlyMap<string, TCode>,
   seen: ReadonlyMap<number, readonly Guard[]>,
-): Map<LocalFunction, Guard[]> {
-  const result = new Map<LocalFunction, Guard[]>();
+): Map<TCode, Guard[]> {
+  const result = new Map<TCode, Guard[]>();
   if (![...seen.values()].some(guards => guards.length > 0)) return result;
   const { reads, exported, evaluated } = findReads(body, functions);
   // Code that `eval` runs can call any function of the file.

@@ -578,6 +578,21 @@ A use as a [signal handler](#signal-handlers) or in a [page function](#functions
 
 A function that only another function calls gets no check, even when checked code calls that other function. See [Limitations](/guide/limitations).
 
+A class in the same file follows the same rules, with a use of its name in place of a call. When each use, such as `new Monitor()`, is behind a check, the code that runs for an instance gets the checks: the constructor, the methods and accessors that are not static, and the values of the fields that are not static:
+
+```js
+class BrowserMonitor {
+  constructor() {
+    window.addEventListener('online', this.update); // Guarded on Workers, which lack `window`
+  }
+}
+
+export const monitor = () =>
+  typeof window !== 'undefined' ? new BrowserMonitor() : new NoopMonitor();
+```
+
+A static member, a static block, a computed key and the parent class run when the class is defined, so they get no checks. A use of the class in them, such as `static instance = new Monitor()`, counts as a use with the checks around the class.
+
 ## Clean runs
 
 When nothing is found, edgefit prints:

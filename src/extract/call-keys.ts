@@ -1,7 +1,8 @@
-import type { Node } from 'oxc-parser';
+import type { Class, Node } from 'oxc-parser';
 
 import { childNodes, strip } from './ast.ts';
 import { collectBlockNames, patternNames } from './declarations.ts';
+import { findLocalClasses } from './guarded-classes.ts';
 import { collectKnown } from './key-bindings.ts';
 import { keysOf } from './known-values.ts';
 import { declarationCounts, findLocalFunctions, isPropertyName } from './local-functions.ts';
@@ -112,12 +113,15 @@ export function findFunctions(
   shared?: ReadonlySet<string>,
 ): {
   functions: Map<string, LocalFunction>;
+  /** The local functions and classes, whose reads the walker records with their guards. */
+  named: Map<string, LocalFunction | Class>;
   callKeys: CallKeys;
   callLists: MethodLists;
 } {
   const functions = findLocalFunctions(body);
   return {
     functions,
+    named: new Map<string, LocalFunction | Class>([...functions, ...findLocalClasses(body)]),
     callKeys: findCallKeys(body, functions),
     callLists: findCallLists(body, () => programValues(body), shared),
   };
