@@ -13,6 +13,11 @@ describe('a read that a fallback statement follows', () => {
     ['a test with !', 'let f = console.log;\nif (!f) { f = console.error; }'],
     ['a test with === undefined', 'let f = console.log;\nif (f === undefined) f = console.error;'],
     ['a test with == null', 'let f = console.log;\nif (f == null) f = console.error;'],
+    [
+      'a test with typeof === undefined',
+      "let f = console.log;\nif (typeof f === 'undefined') f = console.error;",
+    ],
+    ['a minified typeof test', 'let f = console.log;\nif (typeof f > "u") f = console.error;'],
   ])('guards the read of %s', (_name, code) => {
     expect(usages(code)).toEqual(['api console.log [guarded]', 'api console.error']);
   });
@@ -33,6 +38,10 @@ describe('a read that a fallback statement follows', () => {
     ['a test with === null', 'let f = console.log;\nif (f === null) f = console.error;'],
     ['another declarator', `let f = console.log, g = f();\n${fallback}`],
     ['the opposite test', "let f = console.log;\nif (typeof f === 'function') f = console.error;"],
+    ...['<', '>', '<=', '>='].map(operator => [
+      `a typeof test with ${operator} 'undefined'`,
+      `let f = console.log;\nif (typeof f ${operator} 'undefined') f = console.error;`,
+    ]),
   ])('does not guard the read with %s', (_name, code) => {
     expect(usages(code)).toContain('api console.log');
   });
