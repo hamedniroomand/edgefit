@@ -61,7 +61,7 @@ A module that is not native at your date and flags is reported as `mocked`, beca
 | `node:readline`        | `mocked`      | functions are no-ops; interfaces never emit input                   |
 | `node:tls.connect`     | `mismatch`    | throws for some options, such as `ALPNProtocols`                    |
 
-An entry with the status `mismatch` can name the options that make a call fail. Then only a call that passes one of them is a finding, and an option that fails only from a compatibility date follows your date and flags.
+An entry with the status `mismatch` can name the options that make a call fail. Then only a call that passes one of them is a finding, and an option that fails only from a compatibility date follows your date and flags. A call that passes an option that fails at every date and with every flag, such as `ALPNProtocols` or `rejectUnauthorized: false` for `node:tls.connect`, always throws, so it is `unsupported`, an error. A call that passes only an option that a flag can turn off, such as `checkServerIdentity`, stays a `mismatch` warning.
 
 The overrides also say that the globals `window`, `document`, `HTMLAnchorElement`, `Deno` and `Bun` are missing, and the [DOM globals](/targets/#dom-globals) list adds the other DOM globals. So code behind a check such as `typeof window !== 'undefined'` is guarded. A call, a construction or a member of one of these globals through the global object, such as `globalThis.document.title`, is a finding when no check protects it. A read of one of them by its bare name, such as `document.title`, is a finding only when it runs as the module loads, see [Browser globals by their bare name](/guide/findings#browser-globals-by-their-bare-name).
 

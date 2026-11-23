@@ -47,8 +47,8 @@ describe('an option behind a workerd flag', () => {
     expect(categoryAt('checkServerIdentity', '2026-01-01', flags)).toBe('mismatch');
   });
 
-  it('keeps an option without a gate at every date', () => {
-    expect(categoryAt('ALPNProtocols', '2026-01-01')).toBe('mismatch');
+  it('keeps an option without a gate at every date, where the call always throws', () => {
+    expect(categoryAt('ALPNProtocols', '2026-01-01')).toBe('unsupported');
   });
 
   it('leaves a result without options as it is', () => {
