@@ -57,6 +57,13 @@ export interface Check {
   region: readonly (readonly Node[])[] | undefined;
   /** For an imported name: what the file that exports it found, in place of `test`. */
   held?: HeldGuards;
+  /**
+   * For a helper that returns strings: the test behind the one `if (test) return 'value'` that
+   * returns each string, so `helper() === 'value'` tells that the test was true.
+   */
+  values?: ReadonlyMap<string, Node>;
+  /** Set when the helper's own return value is no check, only its `values` are. */
+  valuesOnly?: true;
 }
 
 /** The object of an `in` test, and the scope that declares its name. */
@@ -215,7 +222,11 @@ export function lookupCheck(scope: Scope | undefined, name: string): Check | und
   if (check !== undefined) {
     return check;
   }
-  return scope.names.has(name) ? undefined : lookupCheck(scope.parent, name);
+  // `Monitor.isAvailable` belongs to the class `Monitor`: a nearer `Monitor` hides it.
+  const owner = name.split('.')[0] ?? name;
+  return scope.names.has(owner) || scope.parameters.has(owner)
+    ? undefined
+    : lookupCheck(scope.parent, name);
 }
 
 /** Returns `undefined` when no enclosing scope declares the name. */

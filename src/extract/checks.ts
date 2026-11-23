@@ -1,10 +1,11 @@
 import type { Node } from 'oxc-parser';
 
-import { isFunction, strip } from './ast.ts';
+import { isFunction, strip, stringLiteral } from './ast.ts';
 import type { FunctionNode } from './ast.ts';
 import { lookupCheck } from './scope.ts';
 import type { Check, Scope } from './scope.ts';
 import { namesSetAgain } from './set-again.ts';
+import { staticChecks } from './static-checks.ts';
 
 type Returned = { test: Node; negated: boolean };
 
@@ -55,6 +56,79 @@ function returnedValue(fn: FunctionNode): Returned | undefined {
   return ifReturnsBoolean(fn.body.body);
 }
 
+/** The string that `statement` returns: `return 'deno';`, alone or as the only statement of a block. */
+function returnedString(statement: Node | null | undefined): string | undefined {
+  const only =
+    statement?.type === 'BlockStatement' && statement.body.length === 1
+      ? statement.body[0]
+      : statement;
+  return only?.type === 'ReturnStatement' && only.argument !== null
+    ? stringLiteral(only.argument)
+    : undefined;
+}
+
+/**
+ * For a helper without parameters that is a list of `if (test) return 'value';` and a last
+ * `return 'other';`: the test behind each string that one `if` alone returns. A string that more
+ * than one `return` gives tells nothing, so it is left out.
+ */
+function returnedValues(fn: FunctionNode): ReadonlyMap<string, Node> | undefined {
+  if (fn.async || fn.generator || fn.params.length > 0 || fn.body?.type !== 'BlockStatement') {
+    return undefined;
+  }
+  const tests = new Map<string, Node>();
+  const seen = new Set<string>();
+  const body = fn.body.body;
+  for (const [index, statement] of body.entries()) {
+    const last = index === body.length - 1;
+    const value =
+      statement.type === 'IfStatement' && statement.alternate === null
+        ? returnedString(statement.consequent)
+        : last
+          ? returnedString(statement)
+          : undefined;
+    if (value === undefined) {
+      return undefined;
+    }
+    if (seen.has(value)) {
+      tests.delete(value);
+    } else if (statement.type === 'IfStatement') {
+      tests.set(value, statement.test);
+    }
+    seen.add(value);
+  }
+  return tests.size === 0 ? undefined : tests;
+}
+
+/** The check that a helper without parameters holds: what it returns, or the strings it returns. */
+function helperCheck(fn: FunctionNode, scope: Scope): Check | undefined {
+  const returned = returnedValue(fn);
+  const values = returnedValues(fn);
+  if (returned !== undefined) {
+    return { ...returned, call: true, scope, busy: false, region: undefined };
+  }
+  return values === undefined
+    ? undefined
+    : {
+        test: fn,
+        negated: false,
+        call: true,
+        scope,
+        busy: false,
+        region: undefined,
+        values,
+        valuesOnly: true,
+      };
+}
+
+/** The check that a declared value holds: a helper's, or the value itself as a test. */
+function declaredCheck(init: Node, scope: Scope): Check | undefined {
+  const value = strip(init);
+  return isFunction(value)
+    ? helperCheck(value, scope)
+    : { test: init, negated: false, call: false, scope, busy: false, region: undefined };
+}
+
 /** The statements that hold a `var`: the body of the nearest function, static block or file. */
 function varBody(scope: Scope | undefined, statements: readonly Node[]): readonly Node[] {
   return scope === undefined ? statements : (scope.body ?? varBody(scope.parent, statements));
@@ -72,16 +146,12 @@ export function collectChecks(statements: readonly Node[], scope: Scope): void {
     const declaration =
       statement.type === 'ExportNamedDeclaration' ? statement.declaration : statement;
     if (declaration?.type === 'FunctionDeclaration' && declaration.id !== null) {
-      const returned = returnedValue(declaration);
-      if (returned !== undefined) {
-        scope.checks.set(declaration.id.name, {
-          ...returned,
-          call: true,
-          scope,
-          busy: false,
-          region: undefined,
-        });
+      const check = helperCheck(declaration, scope);
+      if (check !== undefined) {
+        scope.checks.set(declaration.id.name, check);
       }
+    } else if (declaration?.type === 'ClassDeclaration') {
+      staticChecks(declaration, statement !== declaration, statements, scope, helperCheck);
     } else if (declaration?.type === 'VariableDeclaration') {
       // The block stays in the region of a `var`: a `catch` parameter of the same name hides the
       // writes in the block from the scan of the function body.
@@ -95,11 +165,9 @@ export function collectChecks(statements: readonly Node[], scope: Scope): void {
         if (id.type !== 'Identifier' || init === null) {
           continue;
         }
-        const value = strip(init);
-        const helper = isFunction(value);
-        const returned = helper ? returnedValue(value) : { test: init, negated: false };
-        if (returned !== undefined) {
-          scope.checks.set(id.name, { ...returned, call: helper, scope, busy: false, region });
+        const check = declaredCheck(init, scope);
+        if (check !== undefined) {
+          scope.checks.set(id.name, { ...check, region });
         }
       }
     }

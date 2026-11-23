@@ -28,6 +28,7 @@ import {
   mainModuleMatches,
   runtimeMarker,
 } from './runtimes.ts';
+import { calleeName, valueGuard } from './value-checks.ts';
 
 /**
  * What a check of `obj[key]` says when `key` may be one of several strings: each member, but only
@@ -105,6 +106,20 @@ function typeIsGuard(
   return equal ? withoutLooksMissing(presence(argument, false, context), false) : [];
 }
 
+/** What a comparison of the runtime's name tells: `navigator.userAgent === 'Cloudflare-Workers'`, or Next.js's edge flag. */
+function runtimeComparison(
+  node: NodeOf<'BinaryExpression'>,
+  equal: boolean,
+  context: BindingContext,
+): Guard[] | undefined {
+  const agent = agentRuntime(node, context);
+  if (agent !== undefined) {
+    return runtimeGuard(agent, equal);
+  }
+  const edge = nextRuntimeEdge(node, context);
+  return edge === undefined ? undefined : runtimeGuard('vercel-edge', equal === edge);
+}
+
 function comparisonGuard(
   node: NodeOf<'BinaryExpression'>,
   truth: boolean,
@@ -130,13 +145,10 @@ function comparisonGuard(
   if (typed !== undefined) {
     return typed;
   }
-  const agent = agentRuntime(node, context);
-  if (agent !== undefined) {
-    return runtimeGuard(agent, equal);
-  }
-  const edge = nextRuntimeEdge(node, context);
-  if (edge !== undefined) {
-    return runtimeGuard('vercel-edge', equal === edge);
+  const told =
+    runtimeComparison(node, equal, context) ?? valueGuard(node, equal, context, guardsWhen);
+  if (told !== undefined) {
+    return told;
   }
   const left = isNullish(node.left);
   if (!left && !isNullish(node.right)) {
@@ -159,15 +171,14 @@ function checkGuards(
   context: BindingContext,
   nullish: boolean,
 ): Guard[] {
-  let name: string | undefined;
-  if (node.type === 'Identifier') {
-    name = node.name;
-  } else if (node.type === 'CallExpression' && node.arguments.length === 0) {
-    const callee = strip(node.callee);
-    name = callee.type === 'Identifier' ? callee.name : undefined;
-  }
+  const name = node.type === 'Identifier' ? node.name : calleeName(node);
   const check = name === undefined ? undefined : heldCheck(context.scope, name);
-  if (check === undefined || check.call !== (node.type === 'CallExpression') || check.busy) {
+  if (
+    check === undefined ||
+    check.call !== (node.type === 'CallExpression') ||
+    check.busy ||
+    check.valuesOnly === true
+  ) {
     return [];
   }
   if (check.held !== undefined) {
