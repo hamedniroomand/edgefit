@@ -40,12 +40,129 @@ export const visitLogical: Visitor<NodeOf<'LogicalExpression'>> = (node, context
   });
 };
 
-/** The callee of `x.y?.()` is only used when it exists. */
+/** The nodes that pass a value on unchanged. */
+const passThrough = new Set([
+  'ParenthesizedExpression',
+  'TSAsExpression',
+  'TSNonNullExpression',
+  'TSSatisfiesExpression',
+  'TSTypeAssertion',
+  'AwaitExpression',
+]);
+
+const patterns = new Set(['ObjectPattern', 'ArrayPattern']);
+
+/** Whether `parent` passes the value of `child` on as its own value, so the use of `parent` decides. */
+function passesOn(child: Node, parent: Node): boolean {
+  if (passThrough.has(parent.type)) {
+    return true;
+  }
+  if (parent.type === 'ConditionalExpression') {
+    return parent.consequent === child || parent.alternate === child;
+  }
+  if (parent.type === 'LogicalExpression') {
+    // `undefined && b` is `undefined`. `undefined || b` and `undefined ?? b` are `b`.
+    return parent.right === child || (parent.operator === '&&' && parent.left === child);
+  }
+  if (parent.type === 'AssignmentExpression') {
+    // `({ a } = x)` destructures `x`, see `destructures`.
+    return parent.operator === '=' && parent.right === child && !patterns.has(parent.left.type);
+  }
+  return parent.type === 'SequenceExpression' && parent.expressions.at(-1) === child;
+}
+
+/** Whether `parent` destructures `child`: `const { a } = child`, `({ a } = child)` or a default. */
+function destructures(child: Node, parent: Node): boolean {
+  if (parent.type === 'VariableDeclarator') {
+    return parent.init === child && patterns.has(parent.id.type);
+  }
+  if (parent.type === 'AssignmentExpression') {
+    return parent.right === child && parent.operator === '=' && patterns.has(parent.left.type);
+  }
+  return (
+    parent.type === 'AssignmentPattern' && parent.right === child && patterns.has(parent.left.type)
+  );
+}
+
+/** Whether `parent` uses `child` in a way that throws when it is `undefined`. */
+function throwsAt(child: Node, parent: Node, grandparent: Node | undefined): boolean {
+  if (destructures(child, parent)) {
+    return true;
+  }
+  if (parent.type === 'NewExpression') {
+    return parent.callee === child;
+  }
+  if (parent.type === 'CallExpression') {
+    // A new `?.` after the chain, as in `(x.y?.())?.()`, skips the call too.
+    return parent.callee === child && !parent.optional;
+  }
+  if (parent.type === 'ClassDeclaration' || parent.type === 'ClassExpression') {
+    return parent.superClass === child;
+  }
+  if (parent.type === 'TaggedTemplateExpression') {
+    return parent.tag === child;
+  }
+  if (parent.type === 'ForOfStatement') {
+    return parent.right === child;
+  }
+  if (parent.type === 'YieldExpression') {
+    return parent.delegate;
+  }
+  if (parent.type === 'BinaryExpression') {
+    return parent.right === child && (parent.operator === 'in' || parent.operator === 'instanceof');
+  }
+  if (parent.type === 'SpreadElement') {
+    // `{ ...undefined }` gives `{}`. A spread into a list or a call throws.
+    return grandparent?.type !== 'ObjectExpression';
+  }
+  return parent.type === 'MemberExpression' && parent.object === child && !parent.optional;
+}
+
+/** Whether `parent` is a link of the optional chain that `child` is in: `?.` skips it too. */
+function isChainLink(child: Node, parent: Node): boolean {
+  return (
+    (parent.type === 'MemberExpression' && parent.object === child) ||
+    (parent.type === 'CallExpression' && parent.callee === child) ||
+    parent.type === 'TSNonNullExpression'
+  );
+}
+
+/**
+ * Whether the code uses the value of `node`, the call `x.y?.()`, in a way that throws when it is
+ * `undefined`. Inside the chain, a member read or a call after it is skipped too, so the value of
+ * the whole chain counts: destructuring it, `new`, a call, `for … of`, `in`, `instanceof`, a tagged
+ * template, `yield*`, a spread into a list or a call, or a member read after the chain.
+ */
+function throwsOnUndefined(node: Node, ancestors: readonly Node[]): boolean {
+  let child = node;
+  let inChain = true;
+  // The first ancestor that uses the value rather than passing it on.
+  const at = ancestors.findIndex(parent => {
+    const carries =
+      (inChain && parent.type === 'ChainExpression') ||
+      (inChain ? isChainLink(child, parent) : passesOn(child, parent));
+    if (carries) {
+      inChain &&= parent.type !== 'ChainExpression';
+      child = parent;
+    }
+    return !carries;
+  });
+  const user = ancestors[at];
+  return user !== undefined && throwsAt(child, user, ancestors[at + 1]);
+}
+
+/**
+ * The callee of `x.y?.()` is only used when it exists. A use of the result that throws on
+ * `undefined` is not protected, so it stays a finding.
+ */
 export function visitOptionalCallee(
   node: NodeOf<'CallExpression'>,
   context: VisitContext,
 ): boolean {
   if (!node.optional || !isTracked(resolveBinding(node.callee, context))) {
+    return false;
+  }
+  if (throwsOnUndefined(node, context.ancestors())) {
     return false;
   }
   context.collector.guards.within(guardsWhen(node.callee, true, context), () => {

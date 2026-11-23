@@ -139,7 +139,7 @@ These checks are understood:
 - `if (x.y)`, `typeof x.y === 'function'`, `x.y !== undefined` and `'y' in x`, for the code they protect
 - `x.y && x.y()`, `!x.y || x.y()` and `x.y ? x.y() : fallback`
 - `x.y` in any place of an `&&` or `||` chain that is the test of an `if`, a loop or `?:`, or the operand of `!`, such as `if (a && x.y && b)`
-- `x.y?.()`, and `if (x.y?.z)` or `if (x.y?.z?.())`, which also protect `x.y`
+- `x.y?.()`, and `if (x.y?.z)` or `if (x.y?.z?.())`, which also protect `x.y`. `x.y?.()` protects only the call itself: a use of its result that throws on `undefined`, such as destructuring it, `new`, calling it, `for … of`, a spread into a list or a call, or a member read after the chain, as in `(x.y?.()).z`, stays a finding
 - a guard clause such as `if (!x.y) throw …`, `return`, `break` or `continue`, for the rest of the block
 
 A guard clause at the top level of a `try` block also protects the code after the `try` statement. This holds when the `catch` has a `return`, `throw`, `break` or `continue` at its top level. Then the code after the `try` runs only when the block ended without an error or a jump. So the test of the clause was false:

@@ -36,6 +36,8 @@ export interface VisitContext extends BindingContext {
   inScope: (scope: Scope, body: () => void) => void;
   /** The parent of the node being visited. */
   parent: () => Node | undefined;
+  /** The ancestors of the node being visited, nearest first. */
+  ancestors: () => Node[];
   /** Runs `body` with `node` on the ancestor stack without dispatching it. */
   withAncestor: (node: Node, body: () => void) => void;
   /**

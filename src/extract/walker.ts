@@ -144,6 +144,8 @@ export class Walker implements VisitContext {
 
   public readonly parent = (): Node | undefined => this.#stack.at(-2);
 
+  public readonly ancestors = (): Node[] => this.#stack.slice(0, -1).reverse();
+
   public readonly withAncestor = (node: Node, body: () => void): void => {
     this.#stack.push(node);
     try {
