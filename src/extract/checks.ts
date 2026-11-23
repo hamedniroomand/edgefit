@@ -2,6 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import { isFunction, strip, stringLiteral } from './ast.ts';
 import type { FunctionNode } from './ast.ts';
+import { constantOf } from './constants.ts';
 import { lookupCheck } from './scope.ts';
 import type { Check, Scope } from './scope.ts';
 import { namesSetAgain } from './set-again.ts';
@@ -17,7 +18,9 @@ function returnedBoolean(statement: Node | null | undefined): boolean | undefine
       : statement;
   const value =
     only?.type === 'ReturnStatement' && only.argument !== null ? strip(only.argument) : undefined;
-  return value?.type === 'Literal' && typeof value.value === 'boolean' ? value.value : undefined;
+  // A minifier writes `true` and `false` as `!0` and `!1`.
+  const constant = value === undefined ? undefined : constantOf(value);
+  return typeof constant?.value === 'boolean' ? constant.value : undefined;
 }
 
 /** `if (c) return true; return false;`, also with an `else`, or with the two values swapped. */

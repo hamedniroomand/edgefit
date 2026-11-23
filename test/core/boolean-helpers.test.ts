@@ -48,3 +48,32 @@ describe('a helper that returns true or false after a test', () => {
     expect(await findingsOf(`${helper} ${use('isDeno()')}`)).toEqual(['Deno.env']);
   });
 });
+
+describe('a minified helper that returns !0 or !1 after a test', () => {
+  it.each([
+    'function isDeno() { if ("Deno" in globalThis) return !0; return !1; }',
+    'function isDeno() { if (!("Deno" in globalThis)) return !1; return !0; }',
+  ])('guards like true and false: %s', async helper => {
+    expect(await findingsOf(`${helper} ${use('isDeno()')}`)).toEqual([]);
+  });
+});
+
+describe('a strict compare with null', () => {
+  it.each([
+    'globalThis.Deno === null ? void 0 : globalThis.Deno.env',
+    'null === globalThis.Deno ? void 0 : globalThis.Deno.env',
+    'globalThis.Deno !== null ? globalThis.Deno.env : void 0',
+  ])('does not guard a read when the global is missing: %s', async test => {
+    expect(await findingsOf(`export const f = () => ${test};`)).toEqual(['Deno.env']);
+  });
+
+  it.each([
+    'globalThis.Deno == null ? void 0 : globalThis.Deno.env',
+    'globalThis.Deno === undefined ? void 0 : globalThis.Deno.env',
+    'var _a; export const g = () => (_a = globalThis.Deno) === null || _a === void 0 ? void 0 : _a.env;',
+    'export function g() { if (globalThis.Deno === null || globalThis.Deno === void 0) return; return globalThis.Deno.env; }',
+  ])('still guards a loose compare and the TypeScript form of ?.: %s', async code => {
+    const source = code.startsWith('globalThis') ? `export const f = () => ${code};` : code;
+    expect(await findingsOf(source)).toEqual([]);
+  });
+});
