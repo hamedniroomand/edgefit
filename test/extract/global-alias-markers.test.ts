@@ -40,6 +40,7 @@ describe('a runtime check through a const that holds the global object', () => {
     ['a const that holds the name', 'const h = globalThis; const g = h;'],
     ['a conditional of consts', 'const h = globalThis; const g = c ? h : self;'],
     ['a type assertion', 'const g = globalThis as any;'],
+    ['a conditional with window', "const g = typeof window !== 'undefined' ? window : globalThis;"],
   ])('limits the branch when the const holds %s', (_name, setup) => {
     expect(usagesOf(withBun(setup))).toEqual(limited);
   });
@@ -74,7 +75,7 @@ describe('a name that may not be the global object', () => {
     ['a function that returns it', 'const g = () => globalThis;'],
     ['a module', "const g = require('node:process');"],
     ['window', 'const g = window;'],
-    ['a conditional with window', "const g = typeof window !== 'undefined' ? window : globalThis;"],
+    ['window on its own', 'const g = window;'],
     ['two names joined by ||', 'const g = globalThis || self;'],
     ['consts that name each other', 'const g = h; const h = g;'],
   ])('limits nothing when the name holds %s', (_name, setup) => {
