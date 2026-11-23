@@ -236,13 +236,9 @@ export class GuardStack {
         guard.ref.path.join('.') === ref.path.join('.'),
     );
 
-  /**
-   * The global the code at this point stores a value in only when it is missing.
-   * ponytail: only the innermost store counts, so `a ??= (b ??= m)` is judged by `b` alone.
-   * Upgrade: keep every ref and guard when the target has any one of them.
-   */
-  public readonly polyfill = (): ApiRef | undefined =>
-    this.#guards.findLast(guard => guard.kind === 'polyfill')?.ref;
+  /** The globals that the code at this point stores a value in, each only when it is missing. */
+  public readonly polyfills = (): ApiRef[] =>
+    this.#guards.flatMap(guard => (guard.kind === 'polyfill' ? [guard.ref] : []));
 
   /** Whether a bundler removes the code at this point. */
   public readonly dead = (): boolean => this.#guards.some(guard => guard.kind === 'dead');

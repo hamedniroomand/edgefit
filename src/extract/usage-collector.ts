@@ -163,7 +163,7 @@ export class UsageCollector {
       ...(afterLoad ? { afterLoad: true as const } : {}),
       ...(atLoad ? { atLoad: true as const } : {}),
       ...(loadOnly && isBareGlobal(ref) ? { bare: true as const } : {}),
-      ...this.#polyfill(),
+      ...this.#polyfills(),
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
@@ -201,7 +201,7 @@ export class UsageCollector {
       location: this.location(offset),
       // A `try` that catches the error of a missing addon guards the import.
       ...(this.guards.isCaught() ? { guarded: true as const } : {}),
-      ...this.#polyfill(),
+      ...this.#polyfills(),
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
@@ -230,7 +230,7 @@ export class UsageCollector {
       location: this.location(offset),
       ...(exported ? { exported: true as const } : {}),
       ...(supplied ? { supplied: true as const } : {}),
-      ...this.#polyfill(),
+      ...this.#polyfills(),
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
@@ -247,16 +247,16 @@ export class UsageCollector {
     const options = unique([...(usage.options ?? []), ...this.guards.options()]);
     Object.assign(
       usage,
-      usage.polyfill === undefined ? this.#polyfill() : {},
+      usage.polyfills === undefined ? this.#polyfills() : {},
       runtimes.length === 0 ? {} : { runtimes },
       globals.length === 0 ? {} : { globals },
       options.length === 0 ? {} : { options },
     );
   }
 
-  #polyfill(): { polyfill?: ApiRef } {
-    const polyfill = this.guards.polyfill();
-    return polyfill === undefined ? {} : { polyfill };
+  #polyfills(): { polyfills?: ApiRef[] } {
+    const polyfills = this.guards.polyfills();
+    return polyfills.length === 0 ? {} : { polyfills };
   }
 
   #globals(): { globals?: GlobalCondition[] } {
