@@ -76,6 +76,10 @@ describe('a name that may not be the global object', () => {
     ['a module', "const g = require('node:process');"],
     ['window', 'const g = window;'],
     ['window on its own', 'const g = window;'],
+    [
+      'a conditional with a window that the file declares',
+      'const window = {};\nconst g = c ? window : globalThis;',
+    ],
     ['two names joined by ||', 'const g = globalThis || self;'],
     ['consts that name each other', 'const g = h; const h = g;'],
   ])('limits nothing when the name holds %s', (_name, setup) => {
@@ -122,5 +126,25 @@ describe('other reads through a const that holds the global object', () => {
     const source =
       'const g = globalThis;\nexport const load = bytes => g.WebAssembly.instantiate(bytes);';
     expect(usagesOf(source)).toContain('api WebAssembly.instantiate(bytes)');
+  });
+});
+
+describe('the UMD const of the global object', () => {
+  const root = "const root = typeof window !== 'undefined' ? window : globalThis;";
+
+  it('guards a check of an API and limits a check of the runtime alike', () => {
+    const source = `${root}
+export function list() {
+  if (!root.FileList) return 0;
+  return new root.FileList();
+}
+export function load() {
+  if (typeof root.Bun !== 'undefined') {
+    ${dgram}
+  }
+}`;
+    const usages = usagesOf(source, 'src/input.ts', new Set(['globalThis', 'window', 'FileList']));
+    expect(usages).toContain('api FileList [guarded]');
+    expect(usages).toContain('api node:dgram [bun]');
   });
 });
