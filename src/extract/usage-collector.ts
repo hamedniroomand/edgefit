@@ -1,4 +1,4 @@
-import type { Node } from 'oxc-parser';
+import type { Class, Node } from 'oxc-parser';
 
 import { displayApi } from '@/data/builtins.ts';
 import type {
@@ -14,7 +14,7 @@ import type {
 import type { ComputedKey } from './chain.ts';
 import { GuardStack } from './guard-stack.ts';
 import type { Guard, HeldGuards } from './guard-stack.ts';
-import { functionGuards } from './guarded-functions.ts';
+import { codeOf, functionGuards } from './guarded-functions.ts';
 import { runsAtLoad } from './load-time.ts';
 import type { LocalFunction } from './local-functions.ts';
 import { omitMainFunctions } from './main-only.ts';
@@ -42,18 +42,20 @@ export class UsageCollector {
     omitMainFunctions(body, functions, dead, this);
   };
 
-  /** Adds the guards that hold whenever a local function runs to the usages in its body. */
+  /** Adds the guards that hold whenever a local function or class instance runs, to its usages. */
   public readonly guardFunctions = (
     body: readonly Node[],
-    functions: ReadonlyMap<string, LocalFunction>,
+    functions: ReadonlyMap<string, LocalFunction | Class>,
     seen: ReadonlyMap<number, readonly Guard[]>,
   ): void => {
     for (const [fn, guards] of functionGuards(body, functions, seen)) {
+      const parts = codeOf(fn);
       this.guards.within(guards, () => {
         for (let index = this.offsets.length - 1; index >= 0; index -= 1) {
           const offset = this.offsets[index] ?? -1;
           const usage = this.usages[index];
-          if (usage === undefined || offset < fn.start || offset >= fn.end) continue;
+          const inside = parts.some(part => offset >= part.start && offset < part.end);
+          if (usage === undefined || !inside) continue;
           if (this.guards.dead()) {
             this.offsets.splice(index, 1);
             this.usages.splice(index, 1);
@@ -65,6 +67,8 @@ export class UsageCollector {
     }
   };
 
+  /** The names of the local functions and classes, whose reads the walker records with their guards. */
+  public readNames: ReadonlySet<string> = new Set();
   public readonly usages: Usage[] = [];
   /** Where each usage was found in the source, in the order of `usages`. */
   public readonly offsets: number[] = [];

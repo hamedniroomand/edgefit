@@ -99,7 +99,8 @@ export function extractModule(
     options.keepUnusedImports === true || !isTypeScript(file)
       ? new Set<string>()
       : typeOnlyImports(body);
-  const { functions, callKeys, callLists } = findFunctions(body, options.sharedMethods);
+  const { functions, named, callKeys, callLists } = findFunctions(body, options.sharedMethods);
+  collector.readNames = new Set(named.keys());
   const walker = new Walker(
     collector,
     options.globals,
@@ -114,7 +115,7 @@ export function extractModule(
   );
   walker.visit(result.program);
   collector.omitMainFunctions(body, functions, walker.mainOnlyNodes);
-  collector.guardFunctions(body, functions, walker.functionReads);
+  collector.guardFunctions(body, named, walker.functionReads);
   const shape =
     options.shape === true ? collectShape(body, result.module.hasModuleSyntax, dropped) : undefined;
   return finish(collector, shape, findAssignedOptions(body, options.optionPaths), callLists.names);

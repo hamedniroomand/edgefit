@@ -41,7 +41,7 @@ import { visitPattern } from './visitors/patterns.ts';
 export class Walker implements VisitContext {
   public readonly imported: boolean;
   public readonly mainOnlyNodes = new Set<Node>();
-  /** The guards in force at each read of a local function name, by the start of the read. */
+  /** The guards in force at each read of a local function or class name, by the start of the read. */
   public readonly functionReads = new Map<
     number,
     ReturnType<UsageCollector['guards']['snapshot']>
@@ -95,7 +95,7 @@ export class Walker implements VisitContext {
     if (this.collector.guards.mainOnly()) {
       this.mainOnlyNodes.add(node);
     }
-    if (node.type === 'Identifier' && this.functions.has(node.name)) {
+    if (node.type === 'Identifier' && this.collector.readNames.has(node.name)) {
       this.functionReads.set(node.start, this.collector.guards.snapshot());
     }
     this.withAncestor(node, () => {
