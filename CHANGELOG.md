@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.16.8
+
+### Patch Changes
+
+- [#514](https://github.com/hamedniroomand/edgefit/pull/514) [`5730cc9`](https://github.com/hamedniroomand/edgefit/commit/5730cc91484d30b2ecbdc7e48059031abf1c443c) - Code after a call that always throws on the target, in a `try` whose `catch` does not throw again, is now guarded on that target: the `catch` takes over at the call, so the code never runs. This removes the false error that `@sentry/node`'s import hook gave on workerd for `Module.prototype._compile`, after `module.registerHooks`, which throws there.
+
+- [#518](https://github.com/hamedniroomand/edgefit/pull/518) [`b8cf932`](https://github.com/hamedniroomand/edgefit/commit/b8cf93204d3797604100f007cd1b0285a1743eab) - A helper that returns a string behind each check, such as `getDetectedPlatform()` returning `'deno'` after `typeof Deno !== 'undefined'` in `openai` and `@anthropic-ai/sdk`, now guards a comparison of its result with that string, also through a `const` that holds the call. A `static` method of a local class that returns a check, such as `Monitor.isAvailable()`, now guards like a plain helper.
+
+- [#519](https://github.com/hamedniroomand/edgefit/pull/519) [`aea4201`](https://github.com/hamedniroomand/edgefit/commit/aea42012ca0d1bcd0a3b822a8fff17dfbdeb7feb) - A value stored by nested polyfill stores, as in `globalThis.crypto ??= { x: (globalThis.Bun ??= value) }`, is guarded on a target that has any of the globals. Before, only the innermost store counted.
+
+- [#517](https://github.com/hamedniroomand/edgefit/pull/517) [`b6e822b`](https://github.com/hamedniroomand/edgefit/commit/b6e822bd999fbcd985a6345db4970fc8c59e86a5) - A use of the result of `x.y?.()` that throws when the result is `undefined`, such as `const { a } = x.y?.()`, `new (x.y?.())()` or `for (const v of x.y?.())`, is now a finding, as it is without `?.`. The call alone, and a result read with `?.` or `??`, stay guarded.
+
+- [#520](https://github.com/hamedniroomand/edgefit/pull/520) [`7463f30`](https://github.com/hamedniroomand/edgefit/commit/7463f30134b096c19116aab638203980fb8900c4) - A strict compare with `null`, such as `globalThis.Deno === null ? void 0 : globalThis.Deno.env`, no longer guards the read: `undefined === null` is false, so the read still runs when the global is missing. A minified helper that returns `!0` or `!1` after a test now guards like one that returns `true` or `false`.
+
+- [#521](https://github.com/hamedniroomand/edgefit/pull/521) [`35f798c`](https://github.com/hamedniroomand/edgefit/commit/35f798c2e00a23409273fb873cd2aece94fbea6c) - On workerd, a call of `tls.connect` or `new tls.TLSSocket` that passes an option that fails at every date and with every flag, such as `ALPNProtocols` in undici, is now an `unsupported` error in place of a `mismatch` warning. The call always throws. An option that a flag can turn off, such as `checkServerIdentity`, stays a warning. mysql2's TLS call is listed as code that runs only when a project sets the `ssl` option, and postgres's Node socket code as code that its workerd build never runs.
+
+- [#516](https://github.com/hamedniroomand/edgefit/pull/516) [`f5df8c3`](https://github.com/hamedniroomand/edgefit/commit/f5df8c3917c0cf1a7d0555f9405b1b7354da0ba4) - A runtime check through a `const` that holds `typeof window !== 'undefined' ? window : globalThis`, such as `typeof root.Bun !== 'undefined'`, now limits its branch to that runtime, the same as a check of an API through that `const` already guarded.
+
 ## 0.16.7
 
 ### Patch Changes
