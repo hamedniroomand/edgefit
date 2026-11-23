@@ -113,6 +113,18 @@ function statementValues(statement: Node): Node[] {
   return [];
 }
 
+/** Whether `?.` anywhere in the chain of `node`, as in `a?.b.c` or `a.b?.()`, can skip what follows it. */
+function hasOptionalLink(node: Node): boolean {
+  let current = strip(node);
+  while (current.type === 'MemberExpression' || current.type === 'CallExpression') {
+    if (current.optional) {
+      return true;
+    }
+    current = strip(current.type === 'MemberExpression' ? current.object : current.callee);
+  }
+  return false;
+}
+
 /**
  * The APIs that `statement` always calls, such as `module.registerHooks` in
  * `module.registerHooks(hooks);`. A call that a condition or an optional chain can skip is left out.
@@ -126,7 +138,7 @@ function calledApis(statement: Node, context: BindingContext): ApiRef[] {
       awaited ||= node.type === 'AwaitExpression';
       node = inner;
     }
-    if (node.type !== 'CallExpression' || node.optional) {
+    if (node.type !== 'CallExpression' || hasOptionalLink(node)) {
       return [];
     }
     // `fn.call(...)` and `fn.apply(...)` call `fn`. `fn.bind(...)` calls nothing.

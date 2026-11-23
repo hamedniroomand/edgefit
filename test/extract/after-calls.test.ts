@@ -70,6 +70,12 @@ describe('code that a call in a try block does not decide', () => {
     expect(
       afterCalls('try {\n  ok && mod.registerHooks({});\n  fs.watch(".");\n} catch {}'),
     ).toContain('node:fs.watch');
+    expect(afterCalls('try {\n  mod?.registerHooks({});\n  fs.watch(".");\n} catch {}')).toContain(
+      'node:fs.watch',
+    );
+    expect(
+      afterCalls('try {\n  mod?.Module.prototype._compile();\n  fs.watch(".");\n} catch {}'),
+    ).toContain('node:fs.watch');
   });
 
   it('does not hold without a catch that stops the error, or after the try', () => {
