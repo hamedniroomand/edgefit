@@ -120,6 +120,16 @@ Prints the installed version and exits with `0`. With `pnpm dlx` or `npx`, pin a
 
 Colors are on when stdout is a terminal. They are off when `--no-color` is passed or the `NO_COLOR` environment variable is set to a non-empty value.
 
+## Tracing exports
+
+To see why a finding reaches an export, set the `EDGEFIT_DEBUG_TRACE` environment variable. edgefit then prints to stderr, for each run of the trace, the files that it loads. For each file, it prints what is asked of it, the file that first asked for all of it, and the units that are live: the code that runs at load and the named functions and classes that something uses. A file that edgefit cannot trace is marked `opaque` and counts in full. Set the variable to `*` for every run, or to an export name for the runs of `package` that ask for that export alone:
+
+```sh
+EDGEFIT_DEBUG_TRACE=errors edgefit package undici --target workerd
+```
+
+`check` traces the whole graph, so it prints with `*` only.
+
 ## Exit codes
 
 | Code | Meaning                                                                                                                    |

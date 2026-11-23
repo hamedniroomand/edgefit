@@ -4,6 +4,7 @@ import type { Usage } from '@/types.ts';
 
 import { analyze } from './analyze.ts';
 import type { Demand } from './analyze.ts';
+import { printTrace } from './debug.ts';
 import type { ModuleShape, Unit } from './shape.ts';
 
 /** Whether esbuild found the link as `import … from` or as a `require` of a written-out specifier. */
@@ -42,6 +43,8 @@ function nodeModeAsk(
 /** What is asked of each module, the modules that the trace loads, and the files left to analyze. */
 class Demands {
   public readonly loaded = new Set<string>();
+  /** The file that first asked each file for all of its exports, for the debug output. */
+  public readonly fullBy = new Map<string, string>();
   public readonly queue: string[] = [];
   readonly #demands = new Map<string, Demand>();
 
@@ -54,18 +57,21 @@ class Demands {
   }
 
   /** Adds to what is asked of a module, and says whether that asked for something new. */
-  public raise(file: string, names: Demand): boolean {
+  public raise(file: string, names: Demand, from?: string): boolean {
     const current = this.get(file);
     if (current === 'all' || (names !== 'all' && [...names].every(name => current.has(name)))) {
       return false;
+    }
+    if (names === 'all' && from !== undefined) {
+      this.fullBy.set(file, from);
     }
     this.#demands.set(file, names === 'all' ? 'all' : new Set([...current, ...names]));
     return true;
   }
 
   /** Loads the file, and analyzes it again when `names` asks it for something new. */
-  public visit(file: string, names?: Demand): void {
-    const raised = names !== undefined && this.raise(file, names);
+  public visit(file: string, names?: Demand, from?: string): void {
+    const raised = names !== undefined && this.raise(file, names, from);
     if (raised || !this.loaded.has(file)) {
       this.loaded.add(file);
       this.queue.push(file);
@@ -89,6 +95,7 @@ export type EntryAsk = { entry: string; names: Set<string> };
  * import whose specifier was read from a module that can be traced.
  */
 function seedLinks(
+  file: string,
   module: GraphModule | undefined,
   shapes: ReadonlyMap<string, ModuleShape>,
   shape: ModuleShape | undefined,
@@ -108,11 +115,11 @@ function seedLinks(
       shapes.get(link.path),
     );
     if (asked instanceof Set) {
-      demands.visit(link.path, asked);
+      demands.visit(link.path, asked, file);
     } else if (!named) {
       // ponytail: a `require` in a function whose result is not read loads its file for every
       // export of the module, not only for the export whose code holds the call.
-      demands.visit(link.path, 'all');
+      demands.visit(link.path, 'all', file);
     }
   }
 }
@@ -145,7 +152,7 @@ export function traceReach(
     const shape = shapes.get(file);
     const module = graph.modules.get(file);
     if (!seeded.has(file) && file !== ask?.entry) {
-      seedLinks(module, shapes, shape, demands);
+      seedLinks(file, module, shapes, shape, demands);
     }
     seeded.add(file);
     if (shape?.traceable !== true) {
@@ -162,11 +169,13 @@ export function traceReach(
         shapes.get(link.path),
       );
       if (names !== undefined || runsOnLoad(shape, link)) {
-        demands.visit(link.path, names);
+        demands.visit(link.path, names, file);
       }
     }
   }
-  return { traced, demands: demands.all(), loaded: demands.loaded };
+  const { loaded, fullBy } = demands;
+  printTrace({ asked: ask?.names, loaded, demands: demands.all(), shapes, traced, fullBy });
+  return { traced, demands: demands.all(), loaded };
 }
 
 /** The unit of a module that holds the offset, if it is in one. */
