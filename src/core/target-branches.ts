@@ -1,6 +1,6 @@
 import { globalRef, normalizeRef } from '@/extract/refs.ts';
 import type { Target } from '@/targets/index.ts';
-import type { ApiRef, Usage } from '@/types.ts';
+import type { ApiRef, CheckCondition, Usage } from '@/types.ts';
 
 /** Whether a load of the module that a `catch` stops fails on `target`, so the code after it does not run. */
 export const isAfterMissingModule = (usage: Usage, target: Target): boolean =>
@@ -60,3 +60,50 @@ function hasPolyfilled(polyfill: ApiRef, target: Target): boolean {
  */
 export const isShadowedPolyfill = (usage: Usage, target: Target): boolean =>
   usage.polyfills?.some(polyfill => hasPolyfilled(polyfill, target)) ?? false;
+
+// Members that a runtime always sets when it has their object, and that are always truthy then.
+const setWithObject = new Set(['process.versions', 'process.versions.node']);
+
+/**
+ * Whether the data decides that `ref` exists where it is supported. A member that the data does not
+ * list takes the result of its object, which says nothing of the member (`process.versions.zzz`),
+ * and the data does not say whether a value is truthy (`process.exitCode`). So only a module, a
+ * global, and the members that are always set count.
+ */
+function decidesPresence(ref: ApiRef): boolean {
+  return (
+    ref.path.length === 0 ||
+    (ref.module === '*globals*' && ref.path.length === 1) ||
+    setWithObject.has([ref.module, ...ref.path].join('.'))
+  );
+}
+
+/** Whether the target's data says `condition` holds there. A fact the data does not decide does not hold. */
+function holds(condition: CheckCondition, target: Target): boolean {
+  if (condition.kind === 'runtime') {
+    return target.runtimes.includes(condition.runtime) === condition.present;
+  }
+  if (condition.kind === 'global') {
+    return targetHas(target, condition.name) === condition.present;
+  }
+  const ref = normalizeRef(condition.ref);
+  const result = target.lookup(ref);
+  if (!condition.present) {
+    return result.absent === true;
+  }
+  return (
+    decidesPresence(ref) &&
+    result.absent !== true &&
+    result.status !== 'unsupported' &&
+    result.status !== 'uncovered'
+  );
+}
+
+/**
+ * Whether the usage sits in the `else` of a check that holds on the target, such as
+ * `typeof process == 'object' && typeof process.versions.node == 'string'` on a target with
+ * `process`, so the code never runs there.
+ */
+export const isFailedCheck = (usage: Usage, target: Target): boolean =>
+  usage.failedChecks?.some(conditions => conditions.every(condition => holds(condition, target))) ??
+  false;

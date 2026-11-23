@@ -15,7 +15,10 @@ function portable(guard: Guard): Guard[] {
   if (guard.kind === 'dead') {
     return guard.main === true ? [] : [guard];
   }
-  return guard.kind === 'runtime' || guard.kind === 'global' || guard.kind === 'absent'
+  return guard.kind === 'runtime' ||
+    guard.kind === 'global' ||
+    guard.kind === 'absent' ||
+    guard.kind === 'failed'
     ? [guard]
     : [];
 }

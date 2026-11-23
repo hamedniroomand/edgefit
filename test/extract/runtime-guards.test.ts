@@ -110,12 +110,12 @@ describe('checks that say nothing about the runtime', () => {
 
   it('ignores other checks and checks that leave the runtime open', () => {
     expect(usagesOf(`${fs}if (typeof window !== 'undefined') fs.watch('.');`)).toEqual(watch());
-    // Either runtime may be the one, so neither is known.
+    // Either runtime may be the one, so neither is known: only that it is not some third one.
     expect(
       usagesOf(
         `${fs}if (typeof Deno !== 'undefined' || typeof Bun !== 'undefined') fs.watch('.');`,
       ),
-    ).toEqual(watch());
+    ).toEqual(watch('unless no deno, no bun'));
     // A type other than the one tested for says nothing about whether the value exists.
     expect(usagesOf(`${fs}if (typeof Deno !== 'string') fs.watch('.');`)).toEqual(watch());
     expect(usagesOf(`${fs}if (process.versions.node) fs.watch('.');`)).toEqual(watch());
