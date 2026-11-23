@@ -5,7 +5,7 @@ import { resolveBinding } from '@/extract/bindings.ts';
 import { catches, missingModuleCatch } from '@/extract/catches.ts';
 import { collectChecks } from '@/extract/checks.ts';
 import type { VisitContext, Visitor } from '@/extract/context.ts';
-import { guardsAfter, leaves } from '@/extract/guards-after.ts';
+import { guardsAfter, leaves, throwsGuards } from '@/extract/guards-after.ts';
 import { guardsWhen } from '@/extract/guards.ts';
 import { dropRewrittenAlias } from '@/extract/rewritten-alias.ts';
 import { isTracked } from '@/extract/scope.ts';
@@ -92,8 +92,18 @@ export function visitStatements(statements: readonly Node[], context: VisitConte
   collectChecks(statements, context.scope);
   context.collector.guards.scoped(add => {
     for (const [index, statement] of statements.entries()) {
-      context.visit(statement);
+      if (statement.type === 'FunctionDeclaration') {
+        context.collector.guards.withoutThrows(() => {
+          context.visit(statement);
+        });
+      } else {
+        context.visit(statement);
+      }
       dropRewrittenAlias(statements, index, context);
+      // Inside a `try` that catches, the code after a call runs only when the call returned.
+      if (context.collector.guards.isCaught()) {
+        add(throwsGuards(statement, context));
+      }
       if (statement.type === 'IfStatement') {
         add(guardsAfter(statement, context));
       } else if (statement.type === 'TryStatement') {

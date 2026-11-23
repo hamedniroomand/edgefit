@@ -93,6 +93,11 @@ export interface Usage {
   globals?: GlobalCondition[];
   /** Set when the code sits behind a test of an option that its function gets, such as `if (options.http2)`. All must hold. */
   options?: string[];
+  /**
+   * Set when the code runs only after a call of these APIs returned, in a `try` whose `catch` stops
+   * the error. On a target where one of them throws, the code never runs.
+   */
+  afterCalls?: ApiRef[];
   /** Set when the value is stored in this global only if the global is missing. */
   polyfill?: ApiRef;
   /** Set for a call of the API: the keys of its object arguments that are known. */

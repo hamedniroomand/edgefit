@@ -8,6 +8,19 @@ export const isAfterMissingModule = (usage: Usage, target: Target): boolean =>
   usage.api !== undefined &&
   target.lookup({ module: usage.api.module, path: [] }).absent === true;
 
+/**
+ * Whether a call that must return before the usage runs always throws on `target`, so a `catch`
+ * takes over and the code never runs: the API is missing, or throws whatever it is given.
+ */
+export function isAfterThrowingCall(usage: Usage, target: Target): boolean {
+  return (
+    usage.afterCalls?.some(ref => {
+      const result = target.lookup(ref);
+      return result.status === 'unsupported' && result.options === undefined;
+    }) ?? false
+  );
+}
+
 /** Whether the runtime checks around a usage rule out the target's runtime, so the code never runs on it. */
 export function isOtherRuntime(usage: Usage, target: Target): boolean {
   return (

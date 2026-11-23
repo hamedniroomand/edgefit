@@ -1,13 +1,16 @@
 import type { Node } from 'oxc-parser';
 
-import { strip } from './ast.ts';
+import type { ApiRef } from '@/types.ts';
+
+import { invokers, staticKey, strip, unwrap } from './ast.ts';
 import type { NodeOf } from './ast.ts';
-import { foldedString } from './bindings.ts';
+import { foldedString, resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import { computedKey } from './chain.ts';
 import type { ApiGuard, Guard } from './guard-stack.ts';
 import { guardsWhen } from './guards.ts';
-import { createScope, lookupKeys } from './scope.ts';
+import { isPromiseApi, normalizeRef } from './refs.ts';
+import { createScope, isTracked, lookupKeys } from './scope.ts';
 import type { Scope } from './scope.ts';
 
 const jumps = new Set(['ReturnStatement', 'ThrowStatement', 'ContinueStatement', 'BreakStatement']);
@@ -95,4 +98,73 @@ export function guardsAfter(node: NodeOf<'IfStatement'>, context: BindingContext
     return consequent ? [] : fallbackGuards(node, context);
   }
   return guardsWhen(node.test, alternate, context);
+}
+
+/** The value that a statement always computes first: `x()`, `await x()` or `const a = x()`. */
+function statementValues(statement: Node): Node[] {
+  if (statement.type === 'ExpressionStatement') {
+    return [statement.expression];
+  }
+  if (statement.type === 'VariableDeclaration') {
+    return statement.declarations.flatMap(declarator =>
+      declarator.init === null ? [] : [declarator.init],
+    );
+  }
+  return [];
+}
+
+/** Whether `?.` anywhere in the chain of `node`, as in `a?.b.c` or `a.b?.()`, can skip what follows it. */
+function hasOptionalLink(node: Node): boolean {
+  let current = strip(node);
+  while (current.type === 'MemberExpression' || current.type === 'CallExpression') {
+    if (current.optional) {
+      return true;
+    }
+    current = strip(current.type === 'MemberExpression' ? current.object : current.callee);
+  }
+  return false;
+}
+
+/**
+ * The APIs that `statement` always calls, such as `module.registerHooks` in
+ * `module.registerHooks(hooks);`. A call that a condition or an optional chain can skip is left out.
+ */
+function calledApis(statement: Node, context: BindingContext): ApiRef[] {
+  return statementValues(statement).flatMap(value => {
+    // `strip` passes through `await` too, so note it on the way down.
+    let node = value;
+    let awaited = false;
+    for (let inner = unwrap(node); inner !== undefined; inner = unwrap(node)) {
+      awaited ||= node.type === 'AwaitExpression';
+      node = inner;
+    }
+    if (node.type !== 'CallExpression' || hasOptionalLink(node)) {
+      return [];
+    }
+    // `fn.call(...)` and `fn.apply(...)` call `fn`. `fn.bind(...)` calls nothing.
+    let callee = strip(node.callee);
+    const key =
+      callee.type === 'MemberExpression' ? staticKey(callee.property, callee.computed) : undefined;
+    if (callee.type === 'MemberExpression' && key !== undefined && invokers.has(key)) {
+      if (key === 'bind') {
+        return [];
+      }
+      callee = callee.object;
+    }
+    const binding = resolveBinding(callee, context);
+    if (!isTracked(binding) || binding.ref.path.length === 0) {
+      return [];
+    }
+    const ref = normalizeRef(binding.ref);
+    // A promise that nothing awaits rejects later, so the code after the call still runs.
+    return awaited || !isPromiseApi(ref) ? [ref] : [];
+  });
+}
+
+/**
+ * The guards that hold after `statement` inside a `try` that catches: the code after a call runs
+ * only when the call returned, see `ThrowsGuard`.
+ */
+export function throwsGuards(statement: Node, context: BindingContext): Guard[] {
+  return calledApis(statement, context).map(ref => ({ kind: 'throws', ref }));
 }

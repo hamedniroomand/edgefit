@@ -220,6 +220,24 @@ Usages in the `try` block are guarded, for the APIs the target lacks and for the
 - a function defined in the block, which may run after the block has ended, and a class body
 - an `import()` that nothing awaits, since its error does not reach the block. `await import(…)` does
 
+A call that the target's data says always throws ends the rest of its block, when a `try` around it has a `catch` that does not throw again. The `catch` takes over at the call, so the code after it in the same block never runs on that target. This includes a function that the code creates there:
+
+```js
+try {
+  if (typeof module.registerHooks === 'function') {
+    module.registerHooks(hooks); // throws ERR_METHOD_NOT_IMPLEMENTED on workerd
+    const compile = module.Module.prototype._compile;
+    module.Module.prototype._compile = function (...args) {
+      return compile.apply(this, args);
+    };
+  }
+} catch {
+  return;
+}
+```
+
+On workerd, `module.registerHooks` throws, so the uses below it are guarded. On a target where the call returns, they are findings as before. The call must be a statement of its own, `await` of a call, or the value of a declaration. A call through `call` or `apply` counts as a call of the function. A call that a condition or `?.` can skip does not end the block, and neither does a call in a nested block, for the code after that block, a call of a promise API that nothing awaits, which rejects later, or a call that throws only with some options. A function declaration after the call is not covered, because it is hoisted and can run before the call. When the `catch` has a `return`, `throw`, `break` or `continue` at its top level, the code after the `try` statement is covered too, since it runs only when the block ended.
+
 A guard clause at the top level of a `try` block protects the code after the `try`, see [Checks for an API](#checks-for-an-api).
 
 A `require()` or an `import()` in a `try` block that guards can name its module with a conditional expression of strings, such as `require(flag ? 'a' : 'b')`. The `import()` must follow `await` directly. A `const` can hold the expression, but a `let` or a `var` cannot. Each branch can be a string, a `const` that holds a string, or strings that a template literal or a `+` joins. A branch can also be `undefined`, `null` or `void 0`, which loads nothing. When every branch is one of these, edgefit reads one `require()` or `import()` for each string, and it does not report `require(<expression>)` or `import(<expression>)`. A Node.js module that a string names is then reported by name, as for a plain call. A test such as `typeof Deno !== 'undefined'` limits its branch to that runtime, as in an `if`. See [Runtime checks](#runtime-checks). Edgefit does not read the code of a package that a string names when a `const` holds the expression or `createRequire` makes the call. It does not read it for a `const` that holds one string either.

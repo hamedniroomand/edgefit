@@ -20,6 +20,7 @@ import type { Classification } from './classify.ts';
 import { group } from './finding-groups.ts';
 import {
   isAfterMissingModule,
+  isAfterThrowingCall,
   isOtherGlobal,
   isOtherRuntime,
   isShadowedPolyfill,
@@ -175,6 +176,7 @@ function isGuarded(
     (usage.guarded === true &&
       (classification.absent || (usage.kind === 'api' && classification.category === 'unknown'))) ||
     isAfterMissingModule(usage, target) ||
+    isAfterThrowingCall(usage, target) ||
     isOtherRuntime(usage, target) ||
     isOtherGlobal(usage, target) ||
     isShadowedPolyfill(usage, target) ||

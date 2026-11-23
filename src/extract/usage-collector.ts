@@ -167,6 +167,7 @@ export class UsageCollector {
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
+      ...this.#afterCalls(),
     };
     this.offsets.push(offset);
     this.usages.push(usage);
@@ -204,6 +205,7 @@ export class UsageCollector {
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
+      ...this.#afterCalls(),
     });
   }
 
@@ -232,6 +234,7 @@ export class UsageCollector {
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
+      ...this.#afterCalls(),
     });
   }
 
@@ -259,6 +262,11 @@ export class UsageCollector {
   #globals(): { globals?: GlobalCondition[] } {
     const globals = this.guards.globals();
     return globals.length === 0 ? {} : { globals };
+  }
+
+  #afterCalls(): { afterCalls?: ApiRef[] } {
+    const afterCalls = this.guards.afterCalls();
+    return afterCalls.length === 0 ? {} : { afterCalls };
   }
 
   #options(): { options?: string[] } {
