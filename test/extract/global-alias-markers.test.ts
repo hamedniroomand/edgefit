@@ -75,7 +75,6 @@ describe('a name that may not be the global object', () => {
     ['a function that returns it', 'const g = () => globalThis;'],
     ['a module', "const g = require('node:process');"],
     ['window', 'const g = window;'],
-    ['window on its own', 'const g = window;'],
     [
       'a conditional with a window that the file declares',
       'const window = {};\nconst g = c ? window : globalThis;',
