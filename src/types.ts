@@ -98,8 +98,11 @@ export interface Usage {
    * the error. On a target where one of them throws, the code never runs.
    */
   afterCalls?: ApiRef[];
-  /** Set when the value is stored in this global only if the global is missing. */
-  polyfill?: ApiRef;
+  /**
+   * Set when the value is stored in these globals only if each is missing, as in
+   * `a ??= { x: (b ??= m) }`. On a target that has any one of them, the store never runs.
+   */
+  polyfills?: ApiRef[];
   /** Set for a call of the API: the keys of its object arguments that are known. */
   passedKeys?: PassedKey[];
   /**

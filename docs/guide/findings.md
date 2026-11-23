@@ -262,6 +262,8 @@ The guard applies to:
 - each API and native addon in the value
 - the code of a local function that only the store names, see [Functions that only checked code uses](#functions-that-only-checked-code-uses)
 
+A store in the value of another store is guarded on a target that has either global, since then one of the two stores never runs. So `globalThis.crypto ??= { x: (globalThis.Bun ??= crypto) }` is guarded on Workers, which have `crypto`.
+
 The forms are `??=`, `||=`, and an assignment after a check such as `if (!globalThis.crypto)`. The global object must be `globalThis`, `self` or `global` by its own name, or a `const` declared as `const g = globalThis` (or `self` or `global`). A store through a `let` or `var` alias, such as `let g = globalThis; g.fetch ??= value`, does not count. A `const` that copies such an alias does not count either.
 
 The value stays a finding when:

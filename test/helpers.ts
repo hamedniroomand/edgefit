@@ -66,11 +66,10 @@ function optionTag(usage: Usage): string {
 }
 
 function polyfillTag(usage: Usage): string {
-  const { polyfill } = usage;
-  if (polyfill === undefined) {
-    return '';
-  }
-  return ` [polyfill ${polyfill.global === true ? polyfill.module : polyfill.path.join('.')}]`;
+  const names = usage.polyfills?.map(polyfill =>
+    polyfill.global === true ? polyfill.module : polyfill.path.join('.'),
+  );
+  return names === undefined ? '' : ` [polyfill ${names.join(' ')}]`;
 }
 
 /** Extracts usages from a snippet as compact `kind display` strings. */

@@ -36,7 +36,11 @@ describe('the value of a polyfill store on workerd', () => {
     'store-buffer.mjs',
     'store-const-alias.mjs',
     'store-const-alias-function.mjs',
+    'store-nested-outer.mjs',
+    'store-nested-inner.mjs',
     'helper.mjs',
+    'helper-nested.mjs',
+    'helper-inner-store.mjs',
   ])('is guarded when the target has the global: %s', async entry => {
     const report = await run(entry);
     expect(watches(report?.findings)).toEqual([]);
@@ -52,6 +56,7 @@ describe('the value of a polyfill store on workerd', () => {
     'store-alias-branch.mjs',
     'store-let-alias.mjs',
     'store-shadowed-alias.mjs',
+    'store-nested-missing.mjs',
     'helper-missing.mjs',
     'helper-unchecked.mjs',
     'helper-called.mjs',

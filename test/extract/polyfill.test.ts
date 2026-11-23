@@ -53,16 +53,21 @@ describe('other usages in the value of a store', () => {
       nodeEnv: undefined,
       nativeSpecifiers: new Map([['./addon.node', 'addon']]),
     });
-    expect(usages.find(usage => usage.kind === 'native')?.polyfill).toEqual({
-      module: '*globals*',
-      path: ['fetch'],
-    });
+    expect(usages.find(usage => usage.kind === 'native')?.polyfills).toEqual([
+      { module: '*globals*', path: ['fetch'] },
+    ]);
   });
 
   it('marks the value of a store to process, which is a module ref', () => {
     expect(usagesOf(`${crypto}globalThis.process ??= crypto.randomUUID();`)).toContain(
       'api node:crypto.randomUUID [polyfill process]',
     );
+  });
+
+  it('marks the value of nested stores with each global', () => {
+    expect(
+      usagesOf(`${crypto}globalThis.crypto ??= { x: (globalThis.Bun ??= crypto) };`),
+    ).toContain('dynamic node:crypto [polyfill crypto Bun]');
   });
 
   it('marks a store through a const alias of the global object', () => {

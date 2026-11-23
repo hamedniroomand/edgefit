@@ -163,7 +163,7 @@ export class UsageCollector {
       ...(afterLoad ? { afterLoad: true as const } : {}),
       ...(atLoad ? { atLoad: true as const } : {}),
       ...(loadOnly && isBareGlobal(ref) ? { bare: true as const } : {}),
-      ...this.#polyfill(),
+      ...this.#polyfills(),
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
@@ -201,7 +201,7 @@ export class UsageCollector {
       location: this.location(offset),
       // A `try` that catches the error of a missing addon guards the import.
       ...(this.guards.isCaught() ? { guarded: true as const } : {}),
-      ...this.#polyfill(),
+      ...this.#polyfills(),
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
@@ -230,7 +230,7 @@ export class UsageCollector {
       location: this.location(offset),
       ...(exported ? { exported: true as const } : {}),
       ...(supplied ? { supplied: true as const } : {}),
-      ...this.#polyfill(),
+      ...this.#polyfills(),
       ...this.#runtimes(),
       ...this.#globals(),
       ...this.#options(),
@@ -245,18 +245,20 @@ export class UsageCollector {
     const runtimes = unique([...(usage.runtimes ?? []), ...this.guards.runtimes()]);
     const globals = unique([...(usage.globals ?? []), ...this.guards.globals()]);
     const options = unique([...(usage.options ?? []), ...this.guards.options()]);
+    // The stores around the function and those in it all hold the usage.
+    const polyfills = unique([...(usage.polyfills ?? []), ...this.guards.polyfills()]);
     Object.assign(
       usage,
-      usage.polyfill === undefined ? this.#polyfill() : {},
+      polyfills.length === 0 ? {} : { polyfills },
       runtimes.length === 0 ? {} : { runtimes },
       globals.length === 0 ? {} : { globals },
       options.length === 0 ? {} : { options },
     );
   }
 
-  #polyfill(): { polyfill?: ApiRef } {
-    const polyfill = this.guards.polyfill();
-    return polyfill === undefined ? {} : { polyfill };
+  #polyfills(): { polyfills?: ApiRef[] } {
+    const polyfills = this.guards.polyfills();
+    return polyfills.length === 0 ? {} : { polyfills };
   }
 
   #globals(): { globals?: GlobalCondition[] } {

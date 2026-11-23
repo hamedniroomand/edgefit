@@ -263,7 +263,7 @@ describe('collecting findings behind a check for Netlify', () => {
 describe('a module stored in a global that is only set when it is missing', () => {
   const crypto = { module: 'crypto', path: [] };
   const polyfill = { module: '*globals*', path: ['crypto'] };
-  const usage = makeUsage(crypto, { kind: 'dynamic', polyfill });
+  const usage = makeUsage(crypto, { kind: 'dynamic', polyfills: [polyfill] });
   const stored = [module('a.js', [usage])];
 
   it('is guarded when the target has the global', () => {
