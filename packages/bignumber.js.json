@@ -2,8 +2,8 @@
   "version": 2,
   "package": "bignumber.js",
   "resolved": "11.1.5",
-  "checkedAt": "2026-11-22T23:27:31.711Z",
-  "edgefit": "0.16.7",
+  "checkedAt": "2026-11-23T11:34:53.319Z",
+  "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1084,
+  "durationMs": 695,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "cheerio",
   "resolved": "1.2.0",
-  "checkedAt": "2026-11-22T23:24:20.998Z",
-  "edgefit": "0.16.7",
+  "checkedAt": "2026-11-23T11:34:55.067Z",
+  "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -109,7 +109,7 @@
       }
     }
   ],
-  "durationMs": 6810,
+  "durationMs": 6577,
   "verified": {
     "bun": {
       "outcome": "verified",

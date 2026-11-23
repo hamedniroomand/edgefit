@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@upstash/ratelimit",
   "resolved": "2.2.1",
-  "checkedAt": "2026-11-22T23:23:45.396Z",
-  "edgefit": "0.16.7",
+  "checkedAt": "2026-11-23T11:32:54.659Z",
+  "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1187,
+  "durationMs": 1170,
   "verified": {
     "bun": {
       "outcome": "verified",

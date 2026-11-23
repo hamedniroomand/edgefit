@@ -2,8 +2,8 @@
   "version": 2,
   "package": "socket.io",
   "resolved": "4.8.4",
-  "checkedAt": "2026-11-22T23:26:49.232Z",
-  "edgefit": "0.16.7",
+  "checkedAt": "2026-11-23T11:35:40.735Z",
+  "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -76,7 +76,7 @@
     }
   ],
   "notes": "On Workers the browser build of engine.io-parser reads a Blob with FileReader, which Workers do not have.",
-  "durationMs": 2752,
+  "durationMs": 2098,
   "verified": {
     "bun": {
       "outcome": "verified",

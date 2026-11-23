@@ -2,8 +2,8 @@
   "version": 2,
   "package": "moment",
   "resolved": "2.31.0",
-  "checkedAt": "2026-11-22T23:27:30.594Z",
-  "edgefit": "0.16.7",
+  "checkedAt": "2026-11-23T11:35:50.524Z",
+  "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1634,
+  "durationMs": 1501,
   "verified": {
     "bun": {
       "outcome": "verified",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "mssql",
   "resolved": "12.8.1",
-  "checkedAt": "2026-11-22T23:27:46.202Z",
-  "edgefit": "0.16.7",
+  "checkedAt": "2026-11-23T11:38:10.641Z",
+  "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -51,8 +51,8 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 8,
-          "warnings": 1,
+          "errors": 9,
+          "warnings": 0,
           "findings": [
             {
               "api": "node:child_process.execFile",
@@ -91,6 +91,12 @@
               "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
             },
             {
+              "api": "node:tls.connect",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
+            },
+            {
               "api": "node:dgram.createSocket",
               "category": "mocked",
               "level": "error",
@@ -101,12 +107,6 @@
               "category": "unsupported",
               "level": "error",
               "detail": "every child_process function throws ERR_METHOD_NOT_IMPLEMENTED; Workers cannot spawn processes"
-            },
-            {
-              "api": "node:tls.connect",
-              "category": "mismatch",
-              "level": "warning",
-              "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
             }
           ]
         },
@@ -124,7 +124,7 @@
     }
   ],
   "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either. Tedious calls an @azure/identity credential only after a SQL Server accepts the login, so a run without one cannot reach the child_process calls. The UDP lookup for a named instance does not throw on workerd, and the connection times out.",
-  "durationMs": 13312,
+  "durationMs": 14834,
   "verified": {
     "bun": {
       "outcome": "verified",

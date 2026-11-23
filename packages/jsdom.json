@@ -2,8 +2,8 @@
   "version": 2,
   "package": "jsdom",
   "resolved": "31.0.1",
-  "checkedAt": "2026-11-22T23:26:00.392Z",
-  "edgefit": "0.16.7",
+  "checkedAt": "2026-11-23T11:35:12.729Z",
+  "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -51,8 +51,8 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 3,
-          "warnings": 7,
+          "errors": 4,
+          "warnings": 6,
           "findings": [
             {
               "api": "node:vm.runInContext",
@@ -65,6 +65,12 @@
               "category": "unsupported",
               "level": "error",
               "detail": "the Worker constructor throws ERR_METHOD_NOT_IMPLEMENTED"
+            },
+            {
+              "api": "node:tls.connect",
+              "category": "unsupported",
+              "level": "error",
+              "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
             },
             {
               "api": "node:http2.connect",
@@ -101,12 +107,6 @@
               "category": "unknown",
               "level": "warning",
               "detail": "is not covered by the compatibility data"
-            },
-            {
-              "api": "node:tls.connect",
-              "category": "mismatch",
-              "level": "warning",
-              "detail": "throws ERR_OPTION_NOT_IMPLEMENTED for the ALPNProtocols, enableTrace, minDHSize and pskCallback options, and for rejectUnauthorized: false. It throws for checkServerIdentity only while the throw_on_not_implemented_tls_options flag is on. That flag is on from compatibility date 2026-06-16, and no_throw_on_not_implemented_tls_options turns it off. edgefit uses your date and flags for checkServerIdentity"
             },
             {
               "api": "node:worker_threads.markAsUncloneable",
@@ -160,7 +160,7 @@
     }
   ],
   "notes": "jsdom runs scripts with node:vm and starts workers with node:worker_threads, which workerd does not implement; use cheerio or linkedom on Workers.",
-  "durationMs": 27833,
+  "durationMs": 28277,
   "verified": {
     "workerd": {
       "outcome": "confirmed",

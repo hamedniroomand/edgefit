@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@sentry/node",
   "resolved": "11.16.0",
-  "checkedAt": "2026-11-22T23:27:14.752Z",
-  "edgefit": "0.16.7",
+  "checkedAt": "2026-11-23T11:34:36.585Z",
+  "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -51,7 +51,7 @@
       "results": {
         "workerd": {
           "status": "fail",
-          "errors": 10,
+          "errors": 9,
           "warnings": 5,
           "findings": [
             {
@@ -107,12 +107,6 @@
               "category": "mocked",
               "level": "error",
               "detail": "always returns undefined"
-            },
-            {
-              "api": "node:module.Module.prototype._compile",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
             },
             {
               "api": "node:fs.promises",
@@ -235,16 +229,10 @@
       "specifier": "@sentry/node/import",
       "results": {
         "workerd": {
-          "status": "fail",
-          "errors": 1,
+          "status": "warn",
+          "errors": 0,
           "warnings": 1,
           "findings": [
-            {
-              "api": "node:module.Module.prototype._compile",
-              "category": "unsupported",
-              "level": "error",
-              "detail": "throws ERR_METHOD_NOT_IMPLEMENTED"
-            },
             {
               "api": "node:worker_threads.MessageChannel",
               "category": "unknown",
@@ -683,7 +671,7 @@
     }
   ],
   "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement; use @sentry/cloudflare or @sentry/bun.",
-  "durationMs": 144443,
+  "durationMs": 104567,
   "verified": {
     "workerd": {
       "outcome": "verified",
