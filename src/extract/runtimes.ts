@@ -68,9 +68,11 @@ const maxAliasDepth = 8;
 
 /**
  * The global object: `globalThis`, `self` or `global` by its own name, or a `const` that holds it,
- * as `g` does in `const g = globalThis`. A conditional counts when both of its results do. A `let`,
- * a `var`, a parameter, a name from another file and `window` do not count, because another value
- * may replace them, so a check through them must not hide any code.
+ * as `g` does in `const g = globalThis`. A conditional counts when both of its results do, and
+ * there `window` counts too, as in `typeof window !== 'undefined' ? window : globalThis`, the same
+ * as for a check of an API (`isGlobalObject` in `bindings.ts`). A `let`, a `var`, a parameter, a
+ * name from another file and `window` on its own do not count, because another value may replace
+ * them, so a check through them must not hide any code.
  */
 function isGlobalObject(node: Node, context: BindingContext, depth = 0): boolean {
   const inner = strip(node);
@@ -81,10 +83,9 @@ function isGlobalObject(node: Node, context: BindingContext, depth = 0): boolean
     return false;
   }
   if (inner.type === 'ConditionalExpression') {
-    return (
-      isGlobalObject(inner.consequent, context, depth + 1) &&
-      isGlobalObject(inner.alternate, context, depth + 1)
-    );
+    const branch = (result: Node): boolean =>
+      isUnbound(strip(result), 'window', context) || isGlobalObject(result, context, depth + 1);
+    return branch(inner.consequent) && branch(inner.alternate);
   }
   const held = inner.type === 'Identifier' ? heldCheck(context.scope, inner.name) : undefined;
   return (
