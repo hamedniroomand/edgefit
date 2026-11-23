@@ -32,6 +32,10 @@ describe('a use of the result of `x.y?.()` that throws on undefined', () => {
     ['a destructured default', 'function f({ a } = v8.startupSnapshot.X?.()) {}'],
     ['a tagged template', 'const t = (v8.startupSnapshot.X?.())`t`;'],
     ['yield*', 'function* g() {\n  yield* v8.startupSnapshot.X?.();\n}'],
+    ['destructuring the left side of &&', 'const { a } = v8.startupSnapshot.X?.() && b;'],
+    ['destructuring an assignment', 'let t;\nconst { a } = (t = v8.startupSnapshot.X?.());'],
+    ['a class that extends it', 'class A extends v8.startupSnapshot.X?.() {}'],
+    ['a class expression that extends it', 'const C = class extends v8.startupSnapshot.X?.() {};'],
   ])('is a finding for %s', (_name, source) => {
     expect(startup(source)).toEqual(unguarded);
   });

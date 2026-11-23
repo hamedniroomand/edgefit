@@ -61,7 +61,12 @@ function passesOn(child: Node, parent: Node): boolean {
     return parent.consequent === child || parent.alternate === child;
   }
   if (parent.type === 'LogicalExpression') {
-    return parent.right === child;
+    // `undefined && b` is `undefined`. `undefined || b` and `undefined ?? b` are `b`.
+    return parent.right === child || (parent.operator === '&&' && parent.left === child);
+  }
+  if (parent.type === 'AssignmentExpression') {
+    // `({ a } = x)` destructures `x`, see `destructures`.
+    return parent.operator === '=' && parent.right === child && !patterns.has(parent.left.type);
   }
   return parent.type === 'SequenceExpression' && parent.expressions.at(-1) === child;
 }
@@ -90,6 +95,9 @@ function throwsAt(child: Node, parent: Node, grandparent: Node | undefined): boo
   if (parent.type === 'CallExpression') {
     // A new `?.` after the chain, as in `(x.y?.())?.()`, skips the call too.
     return parent.callee === child && !parent.optional;
+  }
+  if (parent.type === 'ClassDeclaration' || parent.type === 'ClassExpression') {
+    return parent.superClass === child;
   }
   if (parent.type === 'TaggedTemplateExpression') {
     return parent.tag === child;
