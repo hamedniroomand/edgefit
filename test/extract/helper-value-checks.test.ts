@@ -115,6 +115,13 @@ describe('a static method whose check the file can change', () => {
       `${monitor}\nObject.defineProperty(Monitor, 'x', d);\n${use}`,
     ],
     ['the class is exported', `export ${monitor}\n${use}`],
+    ['the class is exported by name', `${monitor}\nexport { Monitor };\n${use}`],
+    ['the class is the default export', `${monitor}\nexport default Monitor;\n${use}`],
+    ['module.exports holds the class', `${monitor}\nmodule.exports = Monitor;\n${use}`],
+    [
+      'an export of module.exports holds it',
+      `${monitor}\nmodule.exports.Monitor = Monitor;\n${use}`,
+    ],
   ])('guards nothing when %s', (_name, source) => {
     expect(deno(source)).toEqual(['api Deno.version']);
   });

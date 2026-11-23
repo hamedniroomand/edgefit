@@ -1,10 +1,11 @@
 import type { Node } from 'oxc-parser';
 
-import { childNodes, isFunction, staticKey, strip, stringLiteral } from './ast.ts';
+import { isFunction, strip, stringLiteral } from './ast.ts';
 import type { FunctionNode } from './ast.ts';
 import { lookupCheck } from './scope.ts';
 import type { Check, Scope } from './scope.ts';
 import { namesSetAgain } from './set-again.ts';
+import { staticChecks } from './static-checks.ts';
 
 type Returned = { test: Node; negated: boolean };
 
@@ -120,103 +121,6 @@ function helperCheck(fn: FunctionNode, scope: Scope): Check | undefined {
       };
 }
 
-const patchers = new Set(['assign', 'defineProperty', 'defineProperties']);
-
-/**
- * The members of `name` that the code writes, as in `Monitor.isAvailable = () => true`, or
- * `undefined` when a write can change any of them: `Monitor = Other`, `Object.assign(Monitor, …)`
- * or `Object.defineProperty(Monitor, …)`.
- */
-function memberWrites(nodes: readonly Node[], name: string): Set<string> | undefined {
-  const keys = new Set<string>();
-  const found = { any: false };
-  const visit = (node: Node): void => {
-    // `Monitor = Other` replaces the whole class.
-    found.any ||=
-      node.type === 'AssignmentExpression' &&
-      node.left.type === 'Identifier' &&
-      node.left.name === name;
-    if (
-      node.type === 'AssignmentExpression' &&
-      node.left.type === 'MemberExpression' &&
-      node.left.object.type === 'Identifier' &&
-      node.left.object.name === name
-    ) {
-      const key = staticKey(node.left.property, node.left.computed);
-      found.any ||= key === undefined;
-      if (key !== undefined) {
-        keys.add(key);
-      }
-    }
-    if (node.type === 'CallExpression' && node.callee.type === 'MemberExpression') {
-      const object = node.callee.object;
-      const method = staticKey(node.callee.property, node.callee.computed);
-      const [target] = node.arguments;
-      found.any ||=
-        object.type === 'Identifier' &&
-        object.name === 'Object' &&
-        method !== undefined &&
-        patchers.has(method) &&
-        target?.type === 'Identifier' &&
-        target.name === name;
-    }
-    for (const child of childNodes(node)) {
-      visit(child);
-    }
-  };
-  for (const node of nodes) {
-    visit(node);
-  }
-  return found.any ? undefined : keys;
-}
-
-/** Whether `node` reads `this` or `super`, which a check read in the file's scope cannot follow. */
-function readsThis(node: Node): boolean {
-  return (
-    node.type === 'ThisExpression' ||
-    node.type === 'Super' ||
-    childNodes(node).some(child => readsThis(child))
-  );
-}
-
-/**
- * The checks that the static methods of a local class hold, as `Monitor.isAvailable`, when the
- * method has no parameters and the file does not set it again.
- */
-function staticChecks(
-  node: Node,
-  exported: boolean,
-  statements: readonly Node[],
-  scope: Scope,
-): void {
-  if (node.type !== 'ClassDeclaration' || node.id === null || exported) {
-    return;
-  }
-  const name = node.id.name;
-  const written = memberWrites(statements, name);
-  if (written === undefined) {
-    return;
-  }
-  for (const member of node.body.body) {
-    const key =
-      member.type === 'MethodDefinition' && member.static && member.kind === 'method'
-        ? staticKey(member.key, member.computed)
-        : undefined;
-    if (
-      key === undefined ||
-      member.type !== 'MethodDefinition' ||
-      written.has(key) ||
-      readsThis(member.value)
-    ) {
-      continue;
-    }
-    const check = helperCheck(member.value, scope);
-    if (check !== undefined) {
-      scope.checks.set(`${name}.${key}`, check);
-    }
-  }
-}
-
 /** The check that a declared value holds: a helper's, or the value itself as a test. */
 function declaredCheck(init: Node, scope: Scope): Check | undefined {
   const value = strip(init);
@@ -247,7 +151,7 @@ export function collectChecks(statements: readonly Node[], scope: Scope): void {
         scope.checks.set(declaration.id.name, check);
       }
     } else if (declaration?.type === 'ClassDeclaration') {
-      staticChecks(declaration, statement !== declaration, statements, scope);
+      staticChecks(declaration, statement !== declaration, statements, scope, helperCheck);
     } else if (declaration?.type === 'VariableDeclaration') {
       // The block stays in the region of a `var`: a `catch` parameter of the same name hides the
       // writes in the block from the scan of the function body.
