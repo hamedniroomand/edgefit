@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { check } from '@/core/check.ts';
 import { collectFindings, defaultLevels } from '@/core/findings.ts';
+import type { Target } from '@/targets/index.ts';
 import type { CheckCondition, Finding, TargetKey, Usage } from '@/types.ts';
 import { fixture, makeUsage, stubTarget } from '~/helpers.ts';
 
@@ -32,7 +33,7 @@ describe('the else branch of a failed && chain of checks', () => {
   it('does not run on workerd with nodejs_compat, where every check holds', async () => {
     expect(await linesOn('workerd')).toEqual({
       findings: ['WebAssembly.instantiateStreaming:19'],
-      guarded: ['WebAssembly.instantiateStreaming:11'],
+      guarded: ['WebAssembly.instantiateStreaming:11', 'WebAssembly.instantiateStreaming:25'],
     });
   });
 
@@ -45,12 +46,12 @@ describe('the else branch of a failed && chain of checks', () => {
 });
 
 describe('a failed chain of checks that the data does not decide', () => {
-  const target = stubTarget({ 'fs.watch': { status: 'unsupported' } }, [], ['process']);
-  const failed = (failedChecks: Usage['failedChecks']): number[] => {
+  const target = stubTarget({ 'fs.watch': { status: 'unsupported' } }, [], ['process', 'fetch']);
+  const failed = (failedChecks: Usage['failedChecks'], on: Target = target): number[] => {
     const usage = makeUsage({ module: 'fs', path: ['watch'] }, { failedChecks });
     const module = { file: 'a.js', package: undefined, chain: ['a.js'], usages: [usage] };
     const { findings, guarded } = collectFindings([module], {
-      target,
+      target: on,
       levels: defaultLevels,
       ignore: [],
     });
@@ -65,6 +66,19 @@ describe('a failed chain of checks that the data does not decide', () => {
   it('counts a module, a global and the version of Node.js', () => {
     expect(failed([[api('process', []), api('process', ['versions', 'node'])]])).toEqual([0, 1]);
     expect(failed([[api('*globals*', ['fetch'])]])).toEqual([0, 1]);
+  });
+
+  it('keeps a true || chain of runtimes on a runtime that it names', () => {
+    const either: CheckCondition[] = [
+      { kind: 'runtime', runtime: 'deno', present: false },
+      { kind: 'runtime', runtime: 'bun', present: false },
+    ];
+    expect(failed([either])).toEqual([0, 1]);
+    expect(failed([either], { ...target, runtimes: ['bun'] })).toEqual([1, 0]);
+  });
+
+  it('does not count a global that the target lacks, even where the lookup falls back', () => {
+    expect(failed([[api('*globals*', ['location'])]])).toEqual([1, 0]);
   });
 
   it('does not count a member that the data does not list, or a value that can be falsy', () => {

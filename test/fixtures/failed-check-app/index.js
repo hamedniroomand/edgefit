@@ -18,3 +18,11 @@ export function helper(url, h) {
   }
   return WebAssembly.instantiateStreaming(fetch(url));
 }
+
+// A true || chain runs where either runtime is.
+export function either(url) {
+  if (typeof Deno !== 'undefined' || typeof Bun !== 'undefined') {
+    return WebAssembly.instantiateStreaming(fetch(url));
+  }
+  return 'other';
+}

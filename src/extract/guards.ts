@@ -241,8 +241,7 @@ function callGuards(
   return node.optional && truth ? guardsWhen(node.callee, true, context) : undefined;
 }
 
-// Both sides of `a && b` or `a || b` are known when both had to hold: `a && b` true, `a || b`
-// false (a nullish `a || b` has a falsy `a` and a nullish `b`). Else see `failedGuards`.
+/** Both sides are known when both hold (`a && b` true, `a || b` false), else see `failedGuards`. */
 function logicalGuards(
   node: NodeOf<'LogicalExpression'>,
   truth: boolean,

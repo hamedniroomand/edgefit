@@ -91,8 +91,10 @@ function holds(condition: CheckCondition, target: Target): boolean {
   if (!condition.present) {
     return result.absent === true;
   }
+  const global = ref.module === '*globals*' ? ref.path[0] : undefined;
   return (
     decidesPresence(ref) &&
+    (global === undefined || target.hasGlobal(global)) &&
     result.absent !== true &&
     result.status !== 'unsupported' &&
     result.status !== 'uncovered'
