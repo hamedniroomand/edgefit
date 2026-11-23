@@ -98,3 +98,60 @@ describe('a static method of a local class that returns a check', () => {
     expect(deno(source)).toEqual(['api Deno.version']);
   });
 });
+
+describe('a static method whose check the file can change', () => {
+  const monitor = `class Monitor {
+  static isAvailable() {
+    return typeof globalThis.Deno !== 'undefined';
+  }
+}`;
+  const use = "export const v = () => (Monitor.isAvailable() ? globalThis.Deno.version : '');";
+
+  it.each([
+    ['the class is set again', `${monitor}\nMonitor = Other;\n${use}`],
+    ['Object.assign patches it', `${monitor}\nObject.assign(Monitor, extra);\n${use}`],
+    [
+      'Object.defineProperty patches it',
+      `${monitor}\nObject.defineProperty(Monitor, 'x', d);\n${use}`,
+    ],
+    ['the class is exported', `export ${monitor}\n${use}`],
+  ])('guards nothing when %s', (_name, source) => {
+    expect(deno(source)).toEqual(['api Deno.version']);
+  });
+
+  it('guards nothing through a parameter named like the class', () => {
+    const source = `${monitor}\nexport function f(Monitor) {\n  return Monitor.isAvailable() ? globalThis.Deno.version : '';\n}`;
+    expect(deno(source)).toEqual(['api Deno.version']);
+  });
+
+  it('guards nothing for a method that reads this', () => {
+    const source = `class Monitor {
+  static isAvailable() {
+    return this.supported;
+  }
+}\n${use}`;
+    expect(deno(source)).toEqual(['api Deno.version']);
+  });
+});
+
+describe('a helper whose test compares its own result', () => {
+  it('stops instead of looping', () => {
+    const source = `function d() {
+  if (d() === 'x') return 'x';
+  return 'y';
+}\nexport const v = () => (d() === 'x' ? globalThis.Deno.version : '');`;
+    expect(deno(source)).toEqual(['api Deno.version']);
+  });
+
+  it('stops for two helpers that test each other', () => {
+    const source = `function a() {
+  if (b() === 'q') return 'p';
+  return 'n';
+}
+function b() {
+  if (a() === 'p') return 'q';
+  return 'n';
+}\nexport const v = () => (a() === 'p' ? globalThis.Deno.version : '');`;
+    expect(deno(source)).toEqual(['api Deno.version']);
+  });
+});

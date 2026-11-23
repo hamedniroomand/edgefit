@@ -222,7 +222,11 @@ export function lookupCheck(scope: Scope | undefined, name: string): Check | und
   if (check !== undefined) {
     return check;
   }
-  return scope.names.has(name) ? undefined : lookupCheck(scope.parent, name);
+  // `Monitor.isAvailable` belongs to the class `Monitor`: a nearer `Monitor` hides it.
+  const owner = name.split('.')[0] ?? name;
+  return scope.names.has(owner) || scope.parameters.has(owner)
+    ? undefined
+    : lookupCheck(scope.parent, name);
 }
 
 /** Returns `undefined` when no enclosing scope declares the name. */

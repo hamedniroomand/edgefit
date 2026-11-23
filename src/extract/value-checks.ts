@@ -53,7 +53,14 @@ export function valueGuard(
   const name = calleeName(call);
   const helper = name === undefined ? undefined : heldCheck(scope, name);
   const test = helper?.call === true ? helper.values?.get(value) : undefined;
-  return helper === undefined || test === undefined
-    ? undefined
-    : guardsWhen(test, true, { ...context, scope: helper.scope });
+  if (helper === undefined || test === undefined || helper.busy) {
+    return undefined;
+  }
+  // A test that compares the helper's own result would call it again.
+  helper.busy = true;
+  try {
+    return guardsWhen(test, true, { ...context, scope: helper.scope });
+  } finally {
+    helper.busy = false;
+  }
 }
