@@ -196,6 +196,17 @@
       "source": "https://github.com/grpc/grpc-node/blob/@grpc/grpc-js@1.14.6/packages/grpc-js/src/server.ts#L1272-L1294"
     },
     {
+      "package": "mysql2",
+      "versions": { "min": "3.20.0", "max": "3.24.6" },
+      "file": "lib/base/connection.js",
+      "guards": ["lib/commands/client_handshake.js"],
+      "apis": ["node:tls.connect"],
+      "options": ["ssl"],
+      "target": "workerd",
+      "reason": "Runs only when a project sets the `ssl` option. The handshake then calls `startTLS`, which opens the TLS connection. A connection without `ssl` stays on the plain socket. An `ssl` set only in a connection URI is not seen.",
+      "source": "https://github.com/sidorares/node-mysql2/blob/v3.24.6/lib/commands/client_handshake.js#L306-L318"
+    },
+    {
       "package": "got",
       "versions": { "min": "16.1.0", "max": "16.2.0" },
       "file": "dist/source/core/utils/http2-client.js",

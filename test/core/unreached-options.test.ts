@@ -29,7 +29,7 @@ describe(
     it('is a finding for got when the project sets http2', async () => {
       const report = await run('with-http2.mjs');
       expect(report.findings).toMatchObject([
-        { api: 'node:tls.connect', category: 'mismatch', level: 'warning' },
+        { api: 'node:tls.connect', category: 'unsupported', level: 'error' },
       ]);
       expect(report.guarded).toEqual([]);
     });
@@ -56,6 +56,19 @@ describe(
       const report = await run('without-sendmail.mjs');
       expect(report.findings).toEqual([]);
       expect(apis(report.guarded)).toContain('node:child_process.spawn');
+    });
+
+    it('is a warning for mysql2 when the project sets ssl, since a flag can turn off its option', async () => {
+      const report = await run('with-ssl.mjs');
+      expect(report.findings).toMatchObject([
+        { api: 'node:tls.connect', category: 'mismatch', level: 'warning' },
+      ]);
+    });
+
+    it('stays hidden for mysql2 when the project does not set ssl', async () => {
+      const report = await run('without-ssl.mjs');
+      expect(report.findings).toEqual([]);
+      expect(apis(report.guarded)).toEqual(['node:tls.connect']);
     });
   },
 );
@@ -107,7 +120,7 @@ describe('an entry that names an option, in build output', { timeout: packageFlo
     const [report] = reports;
     expect(apis(report?.findings ?? [])).not.toContain('node:tls.connect');
     const guarded = report?.guarded.find(finding => finding.api === 'node:tls.connect');
-    expect(guarded).toMatchObject({ package: { name: 'got' }, category: 'mismatch' });
+    expect(guarded).toMatchObject({ package: { name: 'got' }, category: 'unsupported' });
     expect(guarded?.unreached).toBeDefined();
   });
 });

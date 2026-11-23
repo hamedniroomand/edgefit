@@ -1,7 +1,7 @@
 import { isSyntheticLeaf } from '@/data/builtins.ts';
 import type { LookupResult, OptionMatch, Status } from '@/data/dump.ts';
 import type { Target } from '@/targets/index.ts';
-import type { Category, Suggestion, Usage } from '@/types.ts';
+import type { Category, PassedKey, Suggestion, Usage } from '@/types.ts';
 
 export interface Classification {
   category: Category;
@@ -27,23 +27,38 @@ function describe(result: LookupResult): string {
   return result.note ?? `is ${result.status} on the target`;
 }
 
-/** Whether the call passes an option that fails: the key, and the value when the option names one. */
-function passesOption(usage: Usage, options: readonly OptionMatch[]): boolean {
-  return options.some(option =>
-    (usage.passedKeys ?? []).some(passed =>
-      typeof option === 'string'
-        ? passed.key === option
-        : passed.key === option.key &&
-          (option.value === undefined || passed.value === option.value),
-    ),
-  );
+/** Whether a key the call passes matches `option`: the key, and the value when the option names one. */
+function matches(option: OptionMatch, passed: PassedKey): boolean {
+  return typeof option === 'string'
+    ? passed.key === option
+    : passed.key === option.key && (option.value === undefined || passed.value === option.value);
+}
+
+/** The options that fail which the call passes. */
+function passedOptions(usage: Usage, options: readonly OptionMatch[]): OptionMatch[] {
+  const passed = usage.passedKeys ?? [];
+  return options.filter(option => passed.some(key => matches(option, key)));
 }
 
 /** A usage that only counts for options, on an API without them, or a call that passes none that fail. */
 function isOptionMiss(usage: Usage, result: LookupResult): boolean {
   return result.options === undefined
     ? usage.onlyForOptions === true
-    : !passesOption(usage, result.options);
+    : passedOptions(usage, result.options).length === 0;
+}
+
+/**
+ * A call that passes an option that fails with every setting, such as `ALPNProtocols` for
+ * `tls.connect` on workerd, always throws, so it is `unsupported`. An option that a flag can turn
+ * off stays at the category of its status.
+ */
+function alwaysFails(usage: Usage, result: LookupResult): boolean {
+  return (
+    result.options !== undefined &&
+    passedOptions(usage, result.options).some(
+      option => typeof option === 'string' || option.gate === undefined,
+    )
+  );
 }
 
 /**
@@ -84,7 +99,7 @@ function classifyApi(usage: Usage, target: Target): Classification | undefined {
   if (statusCategory === undefined || isOptionMiss(usage, result) || isLazyRead(usage, result)) {
     return undefined;
   }
-  const category = result.category ?? statusCategory;
+  const category = alwaysFails(usage, result) ? 'unsupported' : (result.category ?? statusCategory);
   return {
     category,
     detail: describe(result),

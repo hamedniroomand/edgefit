@@ -110,12 +110,24 @@ describe('an API that fails only for some options', () => {
   const categoryOf = (passedKeys?: Usage['passedKeys']): string | undefined =>
     classify(makeUsage(connect, passedKeys === undefined ? {} : { passedKeys }), options)?.category;
 
-  it('reports a call that passes a key that fails', () => {
-    expect(categoryOf([{ key: 'host', value: 'a' }, { key: 'ALPNProtocols' }])).toBe('mismatch');
+  it('reports a call that passes a key that fails as unsupported, since it always throws', () => {
+    expect(categoryOf([{ key: 'host', value: 'a' }, { key: 'ALPNProtocols' }])).toBe('unsupported');
   });
 
-  it('reports a call that passes the value that fails', () => {
-    expect(categoryOf([{ key: 'rejectUnauthorized', value: false }])).toBe('mismatch');
+  it('reports a call that passes the value that fails as unsupported', () => {
+    expect(categoryOf([{ key: 'rejectUnauthorized', value: false }])).toBe('unsupported');
+  });
+
+  it('keeps the category of the status for an option that a flag can turn off', () => {
+    const gated = stubTarget({
+      'tls.connect': {
+        status: 'mismatch',
+        note: 'throws while a flag is on',
+        options: [{ key: 'checkServerIdentity', gate: { flag: 'f', date: '2026-01-01' } }],
+      },
+    });
+    const usage = makeUsage(connect, { passedKeys: [{ key: 'checkServerIdentity' }] });
+    expect(classify(usage, gated)?.category).toBe('mismatch');
   });
 
   it.each([
