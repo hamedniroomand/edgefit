@@ -26,7 +26,11 @@ function testsMissing(test: Node, isName: (node: Node) => boolean): boolean {
     isName(strip(left.argument))
   ) {
     const text = stringLiteral(right);
-    return isInequality(inner.operator) ? text === 'function' : text === 'undefined';
+    // `<`, `>`, `<=` and `>=` against `'undefined'` say nothing, only the minified `> "u"` above does.
+    if (isInequality(inner.operator)) {
+      return text === 'function';
+    }
+    return isEquality(inner.operator) && text === 'undefined';
   }
   const [other] = isName(left) ? [right] : isName(right) ? [left] : [];
   // `undefined === null` is false, so only a loose comparison with `null` finds a missing member.

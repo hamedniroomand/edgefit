@@ -151,7 +151,9 @@ export function collectChecks(statements: readonly Node[], scope: Scope): void {
     if (declaration?.type === 'FunctionDeclaration' && declaration.id !== null) {
       const check = helperCheck(declaration, scope);
       if (check !== undefined) {
-        scope.checks.set(declaration.id.name, check);
+        // A function declaration belongs to its function as a `var` does, and a write ends it too.
+        const region = [statements, varBody(scope, statements)];
+        scope.checks.set(declaration.id.name, { ...check, region });
       }
     } else if (declaration?.type === 'ClassDeclaration') {
       staticChecks(declaration, statement !== declaration, statements, scope, helperCheck);
