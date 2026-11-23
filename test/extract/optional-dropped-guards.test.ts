@@ -53,6 +53,14 @@ const testedPlaces: [string, Place][] = [
   ['the left side of `||`', value => `export function f(n, m) { return (n && ${value}) || m; }`],
   ['a `typeof` operand', value => `export function f(n) { return typeof (n && ${value}); }`],
   ['a `!` operand', value => `export function f(n) { return !(n && ${value}); }`],
+  ['a `for` test', value => `export function f() { for (; ${value}; ) break; }`],
+  ['a `while` test', value => `export function f(n) { while (n && ${value}) break; }`],
+  ['a `do` test', value => `export function f(n) { do {} while (n && ${value}); }`],
+  ['the right side of `||` in a test', value => `export function f(n) { if (n || ${value}) h(); }`],
+  [
+    'the right side of `||` after a member in a test',
+    value => `export function f(a) { if (a.b || ${value}) h(); }`,
+  ],
 ];
 
 const guardedPlaces = [...droppedPlaces, ...testedPlaces];
@@ -90,8 +98,6 @@ const readPlaces: [string, Place][] = [
     'the right side of `&&` that is the right side of `||`',
     value => `export function f(n, m) { return m || (n && ${value}); }`,
   ],
-  ['a `for` test', value => `export function f() { for (; ${value}; ) break; }`],
-  ['the right side of `||` in a test', value => `export function f(n) { if (n || ${value}) h(); }`],
   [
     'an awaited `&&` in a test',
     value => `export async function f(n) { if (await (n && ${value})) h(); }`,
