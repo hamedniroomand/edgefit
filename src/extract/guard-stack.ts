@@ -1,4 +1,4 @@
-import type { ApiRef, GlobalCondition, RuntimeCondition } from '@/types.ts';
+import type { ApiRef, CheckCondition, GlobalCondition, RuntimeCondition } from '@/types.ts';
 
 import type { ComputedKey } from './chain.ts';
 import { normalizeRef } from './refs.ts';
@@ -59,6 +59,15 @@ export interface ThrowsGuard {
   ref: ApiRef;
 }
 
+/**
+ * The code runs only when a check that needs all of `conditions` fails, as in the `else` of
+ * `if (a && b)`: on a target where all of them hold, the code never runs.
+ */
+export interface FailedGuard {
+  kind: 'failed';
+  conditions: CheckCondition[];
+}
+
 /** What a `const` that another file exports tells when it is true and when it is false. */
 export type HeldGuards = { whenTrue: readonly Guard[]; whenFalse: readonly Guard[] };
 
@@ -70,7 +79,8 @@ export type Guard =
   | AbsentGuard
   | PolyfillGuard
   | OptionGuard
-  | ThrowsGuard;
+  | ThrowsGuard
+  | FailedGuard;
 
 /** Whether `ref` is `guard.ref` or something below it. */
 function isCovered(guard: ApiGuard, ref: ApiRef): boolean {
@@ -275,6 +285,10 @@ export class GuardStack {
   /** What is known of the runtime at this point. */
   public readonly runtimes = (): RuntimeCondition[] =>
     this.#guards.flatMap(guard => (guard.kind === 'runtime' ? [guard.condition] : []));
+
+  /** The checks that failed for the code at this point to run, see `FailedGuard`. */
+  public readonly failedChecks = (): CheckCondition[][] =>
+    this.#guards.flatMap(guard => (guard.kind === 'failed' ? [guard.conditions] : []));
 
   /** What is known of the globals at this point. */
   public readonly globals = (): GlobalCondition[] =>

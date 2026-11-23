@@ -3,6 +3,7 @@ import type { Node } from 'oxc-parser';
 import { displayApi } from '@/data/builtins.ts';
 import type {
   ApiRef,
+  CheckCondition,
   GlobalCondition,
   Location,
   PassedKey,
@@ -166,6 +167,7 @@ export class UsageCollector {
       ...this.#polyfills(),
       ...this.#runtimes(),
       ...this.#globals(),
+      ...this.#failedChecks(),
       ...this.#options(),
       ...this.#afterCalls(),
     };
@@ -204,6 +206,7 @@ export class UsageCollector {
       ...this.#polyfills(),
       ...this.#runtimes(),
       ...this.#globals(),
+      ...this.#failedChecks(),
       ...this.#options(),
       ...this.#afterCalls(),
     });
@@ -233,6 +236,7 @@ export class UsageCollector {
       ...this.#polyfills(),
       ...this.#runtimes(),
       ...this.#globals(),
+      ...this.#failedChecks(),
       ...this.#options(),
       ...this.#afterCalls(),
     });
@@ -244,6 +248,7 @@ export class UsageCollector {
     }
     const runtimes = unique([...(usage.runtimes ?? []), ...this.guards.runtimes()]);
     const globals = unique([...(usage.globals ?? []), ...this.guards.globals()]);
+    const failedChecks = unique([...(usage.failedChecks ?? []), ...this.guards.failedChecks()]);
     const options = unique([...(usage.options ?? []), ...this.guards.options()]);
     // The stores around the function and those in it all hold the usage.
     const polyfills = unique([...(usage.polyfills ?? []), ...this.guards.polyfills()]);
@@ -252,6 +257,7 @@ export class UsageCollector {
       polyfills.length === 0 ? {} : { polyfills },
       runtimes.length === 0 ? {} : { runtimes },
       globals.length === 0 ? {} : { globals },
+      failedChecks.length === 0 ? {} : { failedChecks },
       options.length === 0 ? {} : { options },
     );
   }
@@ -264,6 +270,11 @@ export class UsageCollector {
   #globals(): { globals?: GlobalCondition[] } {
     const globals = this.guards.globals();
     return globals.length === 0 ? {} : { globals };
+  }
+
+  #failedChecks(): { failedChecks?: CheckCondition[][] } {
+    const failedChecks = this.guards.failedChecks();
+    return failedChecks.length === 0 ? {} : { failedChecks };
   }
 
   #afterCalls(): { afterCalls?: ApiRef[] } {

@@ -20,6 +20,15 @@ export type GlobalCondition = {
   present: boolean;
 };
 
+/**
+ * One fact of a check: the runtime is or is not `runtime`, the global `name` is or is not there, or
+ * the API `ref` exists or does not.
+ */
+export type CheckCondition =
+  | { kind: 'runtime'; runtime: Runtime; present: boolean }
+  | { kind: 'global'; name: string; present: boolean }
+  | { kind: 'api'; ref: ApiRef; present: boolean };
+
 /** A reference to a runtime API, such as `fs.watch` or the `process.binding` global. */
 export interface ApiRef {
   /** The built-in module without the `node:` prefix (`fs`, `fs/promises`), or `*globals*` for globals. */
@@ -91,6 +100,12 @@ export interface Usage {
   runtimes?: RuntimeCondition[];
   /** Set when the code sits behind checks for a global, such as `if (!globalThis.FileList) throw`. All must hold. */
   globals?: GlobalCondition[];
+  /**
+   * Set when the code sits in the `else` of checks that each need all of their conditions, such as
+   * `typeof process == 'object' && typeof process.versions.node == 'string'`. On a target where
+   * every condition of one of them holds, the code never runs.
+   */
+  failedChecks?: CheckCondition[][];
   /** Set when the code sits behind a test of an option that its function gets, such as `if (options.http2)`. All must hold. */
   options?: string[];
   /**

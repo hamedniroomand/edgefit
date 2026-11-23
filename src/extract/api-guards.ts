@@ -1,8 +1,9 @@
 import type { Node } from 'oxc-parser';
 
-import type { ApiRef, Runtime } from '@/types.ts';
+import type { ApiRef, CheckCondition, Runtime } from '@/types.ts';
 
 import { isEquality, rootName, strip } from './ast.ts';
+import type { NodeOf } from './ast.ts';
 import { resolveBinding } from './bindings.ts';
 import type { BindingContext } from './bindings.ts';
 import type { AbsentGuard, ApiGuard, GlobalGuard, Guard } from './guard-stack.ts';
@@ -149,4 +150,59 @@ export function optionGuards(node: Node, truth: boolean, scope: Scope): Guard[] 
     }
   }
   return name === undefined ? [] : [{ kind: 'option', name }];
+}
+
+/** `guardsWhen` of `guards.ts`, passed in so that this module does not import it back. */
+type GuardsWhen = (test: Node, truth: boolean, context: BindingContext) => Guard[];
+
+/** The operands of a chain of one operator: `a`, `b` and `c` of `a && b && c`. */
+function chainOperands(node: Node, operator: string): Node[] {
+  const inner = strip(node);
+  return inner.type === 'LogicalExpression' && inner.operator === operator
+    ? [...chainOperands(inner.left, operator), ...chainOperands(inner.right, operator)]
+    : [node];
+}
+
+/** The fact of a guard that a target's data can decide, or `undefined` for any other guard. */
+function conditionOf(guard: Guard): CheckCondition | undefined {
+  if (guard.kind === 'runtime') {
+    return { kind: 'runtime', ...guard.condition };
+  }
+  if (guard.kind === 'global') {
+    return { kind: 'global', ...guard.condition };
+  }
+  if (guard.kind === 'absent') {
+    return { kind: 'api', ref: guard.ref, present: false };
+  }
+  return guard.kind === 'api' && guard.active && guard.key === undefined
+    ? { kind: 'api', ref: guard.ref, present: true }
+    : undefined;
+}
+
+/**
+ * What a false `a && b` (or a true `a || b`, which is a false `!a && !b`) tells: one operand
+ * failed, but not which one. When the facts of every operand are ones a target's data decides,
+ * the code runs only where one of them does not hold. An operand with no such facts, such as a
+ * call of `h()`, or with any other fact, tells nothing.
+ */
+export function failedGuards(
+  node: NodeOf<'LogicalExpression'>,
+  context: BindingContext,
+  guardsWhen: GuardsWhen,
+): Guard[] {
+  const conjunction = node.operator === '&&';
+  const conditions: CheckCondition[] = [];
+  for (const operand of chainOperands(node, node.operator)) {
+    const facts = guardsWhen(operand, conjunction, context).map(guard => conditionOf(guard));
+    if (facts.length === 0) {
+      return [];
+    }
+    for (const fact of facts) {
+      if (fact === undefined) {
+        return [];
+      }
+      conditions.push(fact);
+    }
+  }
+  return [{ kind: 'failed', conditions }];
 }

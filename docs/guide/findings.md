@@ -296,7 +296,24 @@ These checks name a runtime:
 
 The minified form of a `typeof` check, such as `typeof Deno < "u"`, names a runtime too. See [Checks for an API](#checks-for-an-api).
 
-The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, protects nothing, and neither does a check on Node (`process.versions.node`), which Bun and Deno answer too.
+The `else` branch of such a check runs on every other runtime, and a guard clause such as `if (typeof Deno === 'undefined') return` covers the rest of the block. Deno Deploy counts as Deno, and Netlify Edge Functions count as both Deno and Netlify. A check that leaves the runtime open, such as `typeof Deno !== 'undefined' || typeof Bun !== 'undefined'`, says only that the runtime is one of them, so its code does not run on the other runtimes. A check on Node (`process.versions.node`) names no runtime, since Bun and Deno answer it too, so it protects nothing by itself.
+
+The `else` branch of a chain of checks with `&&` runs when any one of them fails. When the target's data decides every check of the chain and all of them hold there, the `else` branch does not run on the target. This is the Emscripten test for Node.js:
+
+```js
+var ENVIRONMENT_IS_NODE =
+  typeof process == 'object' &&
+  typeof process.versions == 'object' &&
+  typeof process.versions.node == 'string';
+
+if (ENVIRONMENT_IS_NODE) {
+  // …
+} else {
+  WebAssembly.instantiateStreaming(fetch(url)); // Guarded on Workers with nodejs_compat
+}
+```
+
+On Workers with `nodejs_compat`, `process.versions.node` exists, so the `else` branch is guarded. Without the flag, `process` is missing, and the branch is reported. A check that the data cannot decide, such as a call of a helper (`!h()`) or a test of an option, ends this, so the `else` branch is reported. The same holds for a true `||` chain, as above: it runs when any one of the checks holds.
 
 These checks also work through a `const` that holds the global object, as in `const g = globalThis; if (typeof g.Bun !== 'undefined') { … }`. The `const` can hold `globalThis`, `self`, `global`, another such `const`, or a conditional of them, where `window` can be one of the results, as in `typeof window !== 'undefined' ? window : globalThis`. A `let`, a `var`, a parameter, a name from another file, a name from a destructuring and `window` on its own are not read as the global object, so a check through them guards nothing. A `let` or a `var` does not count even when the code never writes it again. A `const` that copies one of them does not count either. See [Limitations](/guide/limitations).
 

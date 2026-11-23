@@ -3,6 +3,7 @@ import path from 'node:path';
 import process from 'node:process';
 
 import type { CliIo } from '@/cli/io.ts';
+import { displayApi } from '@/data/builtins.ts';
 import type { LookupResult } from '@/data/dump.ts';
 import { EdgefitError } from '@/errors.ts';
 import { extractUsages } from '@/extract/index.ts';
@@ -55,6 +56,24 @@ function runtimeTags(usage: Usage): string {
     .join('');
 }
 
+/** A failed check as `[unless a, b]`: the code runs unless all of `a` and `b` hold. */
+function failedTags(usage: Usage): string {
+  return (usage.failedChecks ?? [])
+    .map(conditions => {
+      const facts = conditions.map(condition => {
+        const not = condition.present ? '' : 'no ';
+        if (condition.kind === 'runtime') {
+          return `${not}${condition.runtime}`;
+        }
+        return condition.kind === 'global'
+          ? `${not}global ${condition.name}`
+          : `${not}${displayApi(condition.ref.module, condition.ref.path)}`;
+      });
+      return ` [unless ${facts.join(', ')}]`;
+    })
+    .join('');
+}
+
 function globalTags(usage: Usage): string {
   return (usage.globals ?? [])
     .map(({ name, present }) => ` [${present ? 'has' : 'no'} ${name}]`)
@@ -86,7 +105,7 @@ export function usagesOf(
 ): string[] {
   return extractUsages(file, source, { globals, nodeEnv: 'production', ...options }).map(
     usage =>
-      `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${usage.afterLoad === true ? ' [after load]' : ''}${polyfillTag(usage)}${runtimeTags(usage)}${optionTag(usage)}${usage.atLoad === true ? ' [at load]' : ''}${usage.bare === true ? ' [bare]' : ''}`,
+      `${usage.kind} ${usage.display}${usage.guarded === true ? ' [guarded]' : ''}${usage.afterLoad === true ? ' [after load]' : ''}${polyfillTag(usage)}${runtimeTags(usage)}${failedTags(usage)}${optionTag(usage)}${usage.atLoad === true ? ' [at load]' : ''}${usage.bare === true ? ' [bare]' : ''}`,
   );
 }
 

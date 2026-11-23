@@ -2,6 +2,7 @@ import type { Node } from 'oxc-parser';
 
 import {
   absentGuard,
+  failedGuards,
   globalGuard,
   guardFor,
   isNullish,
@@ -240,10 +241,7 @@ function callGuards(
   return node.optional && truth ? guardsWhen(node.callee, true, context) : undefined;
 }
 
-/**
- * Both sides of `a && b` or `a || b` are known only when they all had to hold: `a && b` true,
- * `a || b` false. A nullish `a || b` has a falsy `a` and a nullish `b`.
- */
+/** Both sides are known when both hold (`a && b` true, `a || b` false), else see `failedGuards`. */
 function logicalGuards(
   node: NodeOf<'LogicalExpression'>,
   truth: boolean,
@@ -252,7 +250,7 @@ function logicalGuards(
 ): Guard[] {
   return truth === (node.operator === '&&')
     ? [...guardsWhen(node.left, truth, context), ...guardsWhen(node.right, truth, context, nullish)]
-    : [];
+    : failedGuards(node, context, guardsWhen);
 }
 
 /**

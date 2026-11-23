@@ -21,6 +21,7 @@ import { group } from './finding-groups.ts';
 import {
   isAfterMissingModule,
   isAfterThrowingCall,
+  isFailedCheck,
   isOtherGlobal,
   isOtherRuntime,
   isShadowedPolyfill,
@@ -179,6 +180,7 @@ function isGuarded(
     isAfterThrowingCall(usage, target) ||
     isOtherRuntime(usage, target) ||
     isOtherGlobal(usage, target) ||
+    isFailedCheck(usage, target) ||
     isShadowedPolyfill(usage, target) ||
     usage.options !== undefined ||
     unreached
