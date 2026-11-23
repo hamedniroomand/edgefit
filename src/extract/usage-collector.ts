@@ -245,9 +245,11 @@ export class UsageCollector {
     const runtimes = unique([...(usage.runtimes ?? []), ...this.guards.runtimes()]);
     const globals = unique([...(usage.globals ?? []), ...this.guards.globals()]);
     const options = unique([...(usage.options ?? []), ...this.guards.options()]);
+    // The stores around the function and those in it all hold the usage.
+    const polyfills = unique([...(usage.polyfills ?? []), ...this.guards.polyfills()]);
     Object.assign(
       usage,
-      usage.polyfills === undefined ? this.#polyfills() : {},
+      polyfills.length === 0 ? {} : { polyfills },
       runtimes.length === 0 ? {} : { runtimes },
       globals.length === 0 ? {} : { globals },
       options.length === 0 ? {} : { options },

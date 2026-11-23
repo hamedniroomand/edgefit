@@ -40,6 +40,7 @@ describe('the value of a polyfill store on workerd', () => {
     'store-nested-inner.mjs',
     'helper.mjs',
     'helper-nested.mjs',
+    'helper-inner-store.mjs',
   ])('is guarded when the target has the global: %s', async entry => {
     const report = await run(entry);
     expect(watches(report?.findings)).toEqual([]);
