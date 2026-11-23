@@ -150,6 +150,15 @@ function comparisonGuard(
   if (told !== undefined) {
     return told;
   }
+  return nullishGuard(node, equal, context);
+}
+
+/** What a compare with `null` or `undefined` tells, such as `x != null`. */
+function nullishGuard(
+  node: NodeOf<'BinaryExpression'>,
+  equal: boolean,
+  context: BindingContext,
+): Guard[] | undefined {
   const left = isNullish(node.left);
   if (!left && !isNullish(node.right)) {
     return undefined;
@@ -160,8 +169,11 @@ function comparisonGuard(
   );
   // `!= null`, `!= undefined` and `!== null` rule out `null`; `!== undefined` does not.
   const loose = node.operator === '==' || node.operator === '!=';
-  const rulesOutNull = loose || strip(left ? node.left : node.right).type === 'Literal';
-  return !equal && rulesOutNull ? [...known, ...moduleGuards(known)] : known;
+  if (!loose && strip(left ? node.left : node.right).type === 'Literal') {
+    // `undefined === null` is false, so `x !== null` holds for a missing `x` too.
+    return equal ? known : moduleGuards(known);
+  }
+  return !equal && loose ? [...known, ...moduleGuards(known)] : known;
 }
 
 /** What a call of a helper, or a read of a `const`, tells: the facts of the check it holds. */

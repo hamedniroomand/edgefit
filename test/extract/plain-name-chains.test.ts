@@ -123,7 +123,7 @@ const kept: [string, string[]][] = [
   ],
   [
     'var _a;\nconst v = (_a = X === null || X === void 0 ? void 0 : X.y.z) === null || _a === void 0 ? void 0 : _a.w;',
-    ['api X.y.z [guarded]', 'X.y.z [has X] [has X]'],
+    ['api X.y.z [guarded]', 'X.y.z [has X]'],
   ],
   [
     'var _a;\n(_a = X == null ? void 0 : X.y.z) == null ? void 0 : _a.w();',
