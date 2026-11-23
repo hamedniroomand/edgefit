@@ -12,6 +12,10 @@ describe('an operand of an && or || chain that is only tested', () => {
     ['a mixed chain', 'if (a && (b || fs.watch) && c) {}'],
     ['a conditional test', 'const x = a && fs.watch && b ? 1 : 2;'],
     ['a while test', 'while (a && fs.watch && b) {}'],
+    ['a whole while test', 'while (fs.watch) {}'],
+    ['a whole do test', 'do {} while (fs.watch);'],
+    ['a whole for test', 'for (; fs.watch; ) {}'],
+    ['an operand of || in a loop test', 'for (; a || fs.watch; ) {}'],
     ['a negation', 'const x = !(a && fs.watch && b);'],
     ['a wrapped chain', 'if ((a && (fs.watch as any) && b) as boolean) {}'],
   ])('records nothing for %s', (_name, test) => {

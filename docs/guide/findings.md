@@ -136,7 +136,7 @@ A check does not protect an API that exists and throws or does nothing, such as 
 
 These checks are understood:
 
-- `if (x.y)`, `typeof x.y === 'function'`, `x.y !== undefined` and `'y' in x`, for the code they protect
+- `if (x.y)`, `typeof x.y === 'function'`, `x.y !== undefined` and `'y' in x`, for the code they protect. `x.y` as the test of a `while`, `do` or `for` loop is a check too, as in `while (x.y) …`
 - `x.y && x.y()`, `!x.y || x.y()` and `x.y ? x.y() : fallback`
 - `x.y` in any place of an `&&` or `||` chain that is the test of an `if`, a loop or `?:`, or the operand of `!`, such as `if (a && x.y && b)`
 - `x.y?.()`, and `if (x.y?.z)` or `if (x.y?.z?.())`, which also protect `x.y`. `x.y?.()` protects only the call itself: a use of its result that throws on `undefined`, such as destructuring it, `new`, calling it, `for … of`, a spread into a list or a call, or a member read after the chain, as in `(x.y?.()).z`, stays a finding
@@ -432,11 +432,11 @@ A global that the target lacks is `undefined` on the global object. So these use
 
 A `?.` right behind the global guards the rest of the chain, as in `globalThis.Deno?.env.toObject()`. The global object can be `globalThis`, `self`, `global` or a `const` that holds one of them, see [Runtime checks](#runtime-checks). The chain stops when `Deno` is missing, so the call does not run. The use is guarded when the value of the chain goes into one of these places:
 
-- the test of an `if` or `?:`, the left side of `&&`, the operand of `typeof` or `!`, or a comparison with `undefined` or `null`
-- an operand of `||` or `??`. The right operand counts when the left one is an API, see [Checks for an API](#checks-for-an-api)
-- a place where nothing reads the value. These places are a statement of its own, an item of a list joined with commas that is not the last item, the operand of `void`, and the init and the update of a `for` loop. They are also the last item of such a list, the right side of `&&`, `||` or `??`, and a branch of `?:`, when the expression around it is one of these places. A call with `await` before it counts too, as in `await globalThis.Deno?.core.read();`. The list is closed. A use in the test of a `for`, `while` or `do` loop is a finding. A use in a declaration in the init of a `for` loop, as in `for (let i = globalThis.Deno?.core.read(); ; )`, is a finding too, because the declaration assigns the value
+- the test of an `if`, `?:` or a `while`, `do` or `for` loop, the left side of `&&`, the operand of `typeof` or `!`, or a comparison with `undefined` or `null`
+- an operand of `||` or `??`. Where the value is used, the right operand counts when the left one is an API, see [Checks for an API](#checks-for-an-api). In a test, such as `if (n || globalThis.Deno?.core.read())`, either operand of `||` counts, because only its truth is read
+- a place where nothing reads the value. These places are a statement of its own, an item of a list joined with commas that is not the last item, the operand of `void`, and the init and the update of a `for` loop. They are also the last item of such a list, the right side of `&&`, `||` or `??`, and a branch of `?:`, when the expression around it is one of these places. A call with `await` before it counts too, as in `await globalThis.Deno?.core.read();`. The list is closed. A use in a declaration in the init of a `for` loop, as in `for (let i = globalThis.Deno?.core.read(); ; )`, is a finding too, because the declaration assigns the value
 
-The right side of an `&&` goes to the same place as the `&&`. So `if (n && globalThis.Deno?.core.read())` is guarded. `const v = n && globalThis.Deno?.core.read()` and `while (n && globalThis.Deno?.core.read())` are findings.
+The right side of an `&&`, and either side of an `||`, goes to the same place as the whole. So `if (n && globalThis.Deno?.core.read())` and `while (n || globalThis.Deno?.core.read())` are guarded. `const v = n && globalThis.Deno?.core.read()` is a finding. A minifier writes `if (n || X) h()` as the statement `(n || X) && h()`, where the `||` is the left side of `&&`, so it is guarded too.
 
 The use is a finding in these cases:
 

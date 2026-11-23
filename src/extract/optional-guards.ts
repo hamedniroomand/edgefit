@@ -147,7 +147,12 @@ function handlesAbsence(consumer: Consumer, context: BindingContext): boolean {
   ) {
     return true;
   }
-  if (parent.type !== 'LogicalExpression' || parent.operator !== '&&' || parent.right !== value) {
+  // The right side of `&&`, and either side of `||`, goes to the same place as the whole, where
+  // only its truth may count: `if (n || X)`, or `(n || X) && h()` as a minifier writes it.
+  const passes =
+    parent.type === 'LogicalExpression' &&
+    (parent.operator === '||' || (parent.operator === '&&' && parent.right === value));
+  if (!passes) {
     return false;
   }
   const next = throughWrappers(parent, outer);
