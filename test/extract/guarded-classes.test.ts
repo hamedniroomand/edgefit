@@ -55,3 +55,21 @@ describe('a local class that only checked code makes', () => {
     ).toContain('api window.addEventListener');
   });
 });
+
+describe('a local class that its own static code makes', () => {
+  it('gives no check, because static code runs when the class is defined', () => {
+    expect(
+      usages(
+        `class Single {\n  constructor() { window.addEventListener('x', f); }\n  static instance = new Single();\n}\nexport const make = () => (${"typeof window !== 'undefined' ? Single.instance : null"});`,
+      ),
+    ).toContain('api window.addEventListener');
+  });
+
+  it('keeps the check for a use in an instance method', () => {
+    expect(
+      usages(
+        `class Node2 {\n  constructor() { window.addEventListener('x', f); }\n  clone() { return new Node2(); }\n}\nexport const make = () => (typeof window !== 'undefined' ? new Node2() : null);`,
+      ),
+    ).toEqual(['api window.addEventListener [guarded]']);
+  });
+});

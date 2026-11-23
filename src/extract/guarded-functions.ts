@@ -7,9 +7,6 @@ import { declared, isPropertyName } from './local-functions.ts';
 import type { LocalFunction } from './local-functions.ts';
 import { exportedNames } from './main-only.ts';
 
-/** A function or a class: code with a start and an end in the file. */
-type Spanned = { start: number; end: number };
-
 type Reads = { reads: Map<string, number[]>; exported: Set<string>; evaluated: boolean };
 
 function guardKey(guard: Guard): string {
@@ -24,7 +21,10 @@ function shared(lists: readonly (readonly Guard[])[]): Guard[] {
 
 function declaresName(node: Node, parent: Node | undefined): boolean {
   return (
-    (parent?.type === 'VariableDeclarator' || parent?.type === 'FunctionDeclaration') &&
+    (parent?.type === 'VariableDeclarator' ||
+      parent?.type === 'FunctionDeclaration' ||
+      parent?.type === 'ClassDeclaration' ||
+      parent?.type === 'ClassExpression') &&
     parent.id === node
   );
 }
@@ -44,6 +44,10 @@ function isExportTarget(node: Node): boolean {
   return false;
 }
 
+/** The code that the guards of `functionGuards` hold for: a function, or the instance code of a class. */
+export const codeOf = (fn: LocalFunction | Class): readonly Node[] =>
+  fn.type === 'ClassDeclaration' || fn.type === 'ClassExpression' ? instanceCode(fn) : [fn];
+
 /** The names that `node` or a node below it reads. */
 function namesBelow(node: Node): string[] {
   return node.type === 'Identifier'
@@ -62,7 +66,10 @@ function exportsOf(node: Node): string[] {
 }
 
 /** Where the file reads the name of each local function outside its body, and which names it exports. */
-function findReads(body: readonly Node[], functions: ReadonlyMap<string, Spanned>): Reads {
+function findReads(
+  body: readonly Node[],
+  functions: ReadonlyMap<string, LocalFunction | Class>,
+): Reads {
   const result: Reads = { reads: new Map(), exported: new Set(), evaluated: false };
   const visit = (node: Node, parent?: Node): void => {
     result.evaluated ||=
@@ -78,7 +85,7 @@ function findReads(body: readonly Node[], functions: ReadonlyMap<string, Spanned
       named &&
       !isPropertyName(node, parent) &&
       !declaresName(node, parent) &&
-      (node.start < fn.start || node.start >= fn.end)
+      !codeOf(fn).some(part => node.start >= part.start && node.start < part.end)
     ) {
       const reads = result.reads.get(node.name) ?? [];
       reads.push(node.start);
@@ -98,7 +105,7 @@ function findReads(body: readonly Node[], functions: ReadonlyMap<string, Spanned
  * ponytail: a read inside another function does not get the guards of that function, so a guard
  * reaches one function only. Upgrade: repeat until no function gets a new guard.
  */
-export function functionGuards<TCode extends Spanned>(
+export function functionGuards<TCode extends LocalFunction | Class>(
   body: readonly Node[],
   functions: ReadonlyMap<string, TCode>,
   seen: ReadonlyMap<number, readonly Guard[]>,
@@ -118,7 +125,3 @@ export function functionGuards<TCode extends Spanned>(
   }
   return result;
 }
-
-/** The code that the guards of `functionGuards` hold for: a function, or the instance code of a class. */
-export const codeOf = (fn: LocalFunction | Class): readonly Node[] =>
-  fn.type === 'ClassDeclaration' || fn.type === 'ClassExpression' ? instanceCode(fn) : [fn];

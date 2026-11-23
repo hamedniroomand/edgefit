@@ -591,7 +591,7 @@ export const monitor = () =>
   typeof window !== 'undefined' ? new BrowserMonitor() : new NoopMonitor();
 ```
 
-A static member, a static block, a computed key and the parent class run when the class is defined, so they get no checks.
+A static member, a static block, a computed key and the parent class run when the class is defined, so they get no checks. A use of the class in them, such as `static instance = new Monitor()`, counts as a use with the checks around the class.
 
 ## Clean runs
 
