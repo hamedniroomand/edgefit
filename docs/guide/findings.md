@@ -504,6 +504,23 @@ if (hasWatch() && !isDeno) fs.watch(dir, onChange);
 if (reading) reader = new FileReader();
 ```
 
+A helper can also return a string behind each check, as a list of `if (check) return 'name';` and a last `return 'other';`. Then a comparison of its result with one of the strings holds the check behind that string, also through a `const` that holds the call:
+
+```js
+function detectPlatform() {
+  if (typeof Deno !== 'undefined') return 'deno';
+  if (typeof EdgeRuntime !== 'undefined') return 'edge';
+  return 'unknown';
+}
+
+const platform = detectPlatform();
+if (platform === 'deno') console.log(Deno.build.os);
+```
+
+A string counts only when one `if` alone returns it, so a string that two returns give, or that the last `return` gives, holds no check. Only the branch where the result equals the string is guarded, since the other branch tells nothing about which check failed.
+
+A `static` method of a class in the same file counts like a helper, as in `Monitor.isAvailable()`, when it has no parameters and the file does not set it again with `Monitor.isAvailable = …`.
+
 A helper can also test the check in one `if` and return `true` or `false`. The `if` and one `return` after it are its only statements, or the `if` has an `else` (not an `else if`) and is its only statement. The two returns must have different values. So `if (check) { return true; } return false;` holds the check, and `if (check) { return false; } return true;` holds the opposite check.
 
 edgefit does not follow a `let` that its block sets again, or a `var` that its function sets again, because the check may no longer hold. A `var` belongs to the whole function, so a write outside the block of the `var` counts too. At the top level of a file, a write anywhere in the file counts. A write is an `=`, a `++`, a loop over the name, a second `var` with a value, or a function declaration with the same name. A write in a nested function or block that declares its own variable with the same name does not count. See [Limitations](/guide/limitations).
