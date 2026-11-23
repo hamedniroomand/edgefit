@@ -40,12 +40,75 @@ export const visitLogical: Visitor<NodeOf<'LogicalExpression'>> = (node, context
   });
 };
 
-/** The callee of `x.y?.()` is only used when it exists. */
+/** The nodes that pass the value of an optional chain on unchanged. */
+const passThrough = new Set([
+  'ChainExpression',
+  'ParenthesizedExpression',
+  'TSAsExpression',
+  'TSNonNullExpression',
+  'TSSatisfiesExpression',
+  'TSTypeAssertion',
+]);
+
+/** Whether `parent` uses `child` in a way that throws when it is `undefined`. */
+function throwsAt(child: Node, parent: Node, grandparent: Node | undefined): boolean {
+  if (parent.type === 'VariableDeclarator') {
+    return parent.init === child && parent.id.type !== 'Identifier';
+  }
+  if (parent.type === 'AssignmentExpression') {
+    return (
+      parent.right === child &&
+      parent.operator === '=' &&
+      (parent.left.type === 'ObjectPattern' || parent.left.type === 'ArrayPattern')
+    );
+  }
+  if (parent.type === 'NewExpression' || parent.type === 'CallExpression') {
+    return parent.callee === child && !(parent.type === 'CallExpression' && parent.optional);
+  }
+  if (parent.type === 'ForOfStatement') {
+    return parent.right === child;
+  }
+  if (parent.type === 'SpreadElement') {
+    // `{ ...undefined }` gives `{}`. A spread into a list or a call throws.
+    return grandparent?.type !== 'ObjectExpression';
+  }
+  // `x.y?.().z` stops at `?.` inside the chain. After the chain, as in `(x.y?.()).z`, it throws.
+  return (
+    parent.type === 'MemberExpression' &&
+    parent.object === child &&
+    !parent.optional &&
+    child.type !== 'CallExpression'
+  );
+}
+
+/**
+ * Whether the code uses the value of `node`, the call `x.y?.()`, in a way that throws when it is
+ * `undefined`: destructuring, `new`, a call, `for … of`, a spread into a list or a call, or a plain
+ * member read after the chain has ended.
+ */
+function throwsOnUndefined(node: Node, ancestors: readonly Node[]): boolean {
+  let child = node;
+  for (const [index, parent] of ancestors.entries()) {
+    if (!passThrough.has(parent.type)) {
+      return throwsAt(child, parent, ancestors[index + 1]);
+    }
+    child = parent;
+  }
+  return false;
+}
+
+/**
+ * The callee of `x.y?.()` is only used when it exists. A use of the result that throws on
+ * `undefined` is not protected, so it stays a finding.
+ */
 export function visitOptionalCallee(
   node: NodeOf<'CallExpression'>,
   context: VisitContext,
 ): boolean {
   if (!node.optional || !isTracked(resolveBinding(node.callee, context))) {
+    return false;
+  }
+  if (throwsOnUndefined(node, context.ancestors())) {
     return false;
   }
   context.collector.guards.within(guardsWhen(node.callee, true, context), () => {
