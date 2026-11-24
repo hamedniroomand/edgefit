@@ -2,7 +2,7 @@
   "version": 2,
   "package": "yup",
   "resolved": "1.7.1",
-  "checkedAt": "2026-11-23T11:35:49.374Z",
+  "checkedAt": "2026-11-24T15:19:47.080Z",
   "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1412,
+  "durationMs": 1383,
   "verified": {
     "bun": {
       "outcome": "verified",

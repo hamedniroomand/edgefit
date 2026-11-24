@@ -2,7 +2,7 @@
   "version": 2,
   "package": "pino",
   "resolved": "10.4.0",
-  "checkedAt": "2026-11-23T11:34:43.358Z",
+  "checkedAt": "2026-11-24T15:18:10.515Z",
   "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1072,
+  "durationMs": 1483,
   "verified": {
     "bun": {
       "outcome": "verified",

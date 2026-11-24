@@ -2,7 +2,7 @@
   "version": 2,
   "package": "ioredis",
   "resolved": "6.1.0",
-  "checkedAt": "2026-11-23T11:33:15.932Z",
+  "checkedAt": "2026-11-24T15:15:39.347Z",
   "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1776,
+  "durationMs": 2740,
   "verified": {
     "bun": {
       "outcome": "verified",

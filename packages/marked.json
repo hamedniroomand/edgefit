@@ -1,8 +1,8 @@
 {
   "version": 2,
   "package": "marked",
-  "resolved": "18.2.1",
-  "checkedAt": "2026-11-23T11:33:20.897Z",
+  "resolved": "18.3.0",
+  "checkedAt": "2026-11-24T15:15:45.730Z",
   "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -89,8 +89,8 @@
             }
           ],
           "notes": [
-            "loads a module the user names (main.js:181)",
-            "loads a module the user names (main.js:187)"
+            "loads a module the user names (main.js:192)",
+            "loads a module the user names (main.js:198)"
           ]
         },
         "bun": {
@@ -98,8 +98,8 @@
           "errors": 0,
           "warnings": 0,
           "notes": [
-            "loads a module the user names (main.js:181)",
-            "loads a module the user names (main.js:187)"
+            "loads a module the user names (main.js:192)",
+            "loads a module the user names (main.js:198)"
           ]
         },
         "deno": {
@@ -107,14 +107,14 @@
           "errors": 0,
           "warnings": 0,
           "notes": [
-            "loads a module the user names (main.js:181)",
-            "loads a module the user names (main.js:187)"
+            "loads a module the user names (main.js:192)",
+            "loads a module the user names (main.js:198)"
           ]
         }
       }
     }
   ],
-  "durationMs": 1885,
+  "durationMs": 1282,
   "verified": {
     "bun": {
       "outcome": "verified",

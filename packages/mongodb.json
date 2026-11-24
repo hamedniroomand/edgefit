@@ -2,7 +2,7 @@
   "version": 2,
   "package": "mongodb",
   "resolved": "7.9.1",
-  "checkedAt": "2026-11-23T11:35:34.454Z",
+  "checkedAt": "2026-11-24T15:17:36.165Z",
   "edgefit": "0.16.8",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 9877,
+  "durationMs": 7147,
   "verified": {
     "bun": {
       "outcome": "verified",
