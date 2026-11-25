@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.16.9
+
+### Patch Changes
+
+- [#522](https://github.com/hamedniroomand/edgefit/pull/522) [`f1dcaf7`](https://github.com/hamedniroomand/edgefit/commit/f1dcaf76d23f6fd269c7ea7055ff867dfab862bf) - Guard the `else` branch of a chain of checks with `&&` on a target where every check holds, such as the Emscripten test for Node.js on Workers with `nodejs_compat`.
+
+- [#525](https://github.com/hamedniroomand/edgefit/pull/525) [`3b60e80`](https://github.com/hamedniroomand/edgefit/commit/3b60e800a941232daa606f85f0fc3296451e88a0) - A local class that only checked code makes, as in `typeof window !== 'undefined' ? new BrowserMonitor() : new NoopMonitor()`, now gives the check to its constructor, instance methods and instance fields, as a local function that only checked code calls does.
+
+- [#526](https://github.com/hamedniroomand/edgefit/pull/526) [`61a679d`](https://github.com/hamedniroomand/edgefit/commit/61a679da350d47f76b3ab846ca739420ba065834) - A helper function declaration that the file sets again, as in `isDeno = () => true`, is no longer read as a check, as a `var` is not. A test with `typeof f < 'undefined'`, `>`, `<=` or `>=` no longer counts as a test that `f` is missing before a fallback.
+
+- [#524](https://github.com/hamedniroomand/edgefit/pull/524) [`d106a0e`](https://github.com/hamedniroomand/edgefit/commit/d106a0e8b008a0b736212b0d7af479c18969a11b) - Read the test of a `while`, `do` or `for` loop, and either side of `||` in a test, as a check, as in an `if`. `while (globalThis.Deno.core)` and `if (n || globalThis.Deno?.core.read())` no longer give a finding on a target without `Deno`.
+
+- [#527](https://github.com/hamedniroomand/edgefit/pull/527) [`91cd932`](https://github.com/hamedniroomand/edgefit/commit/91cd932f2bc410bd899d6cd927aeaee81dfc8836) - The `EDGEFIT_DEBUG_TRACE` environment variable prints how the trace reaches the code of an export: the files that it loads, what it asks of each one, the file that first asked for all of one, and the live units. Set it to `*`, or to an export name for `edgefit package`.
+
 ## 0.16.8
 
 ### Patch Changes
