@@ -122,7 +122,7 @@ Colors are on when stdout is a terminal. They are off when `--no-color` is passe
 
 ## Tracing exports
 
-To see why a finding reaches an export, set the `EDGEFIT_DEBUG_TRACE` environment variable. edgefit then prints to stderr, for each run of the trace, the files that it loads. For each file, it prints what is asked of it, the file that first asked for all of it, and the units that are live: the code that runs at load and the named functions and classes that something uses. A file that edgefit cannot trace is marked `opaque` and counts in full. Set the variable to `*` for every run, or to an export name for the runs of `package` that ask for that export alone:
+To see why a finding reaches an export, set the `EDGEFIT_DEBUG_TRACE` environment variable. edgefit then prints to stderr, for each run of the trace, the files that it loads. For each file, it prints what is asked of it, the file that first asked for all of it, and the units that are live: the count of the units that run at load, then the name of each declared unit that something uses, such as a function, a class, a variable or an imported name. A file that edgefit cannot trace is marked `opaque` and counts in full. Set the variable to `*` for every run, or to an export name for the runs of `package` that ask for that export alone:
 
 ```sh
 EDGEFIT_DEBUG_TRACE=errors edgefit package undici --target workerd

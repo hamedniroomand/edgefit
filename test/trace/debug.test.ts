@@ -53,6 +53,19 @@ describe('the debug output of the trace', () => {
     );
   });
 
+  it('marks a file that cannot be traced as opaque', () => {
+    vi.stubEnv(debugVariable, '*');
+    const write = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    const { graph, modules } = build({
+      'index.js': entry("import './cjs.js';", { './cjs.js': 'cjs.js' }),
+      'cjs.js': { code: 'fill(module.exports);\n' },
+    });
+    reachedUsages(graph, modules);
+    expect(write.mock.calls.map(([text]) => String(text)).join('')).toContain(
+      '  cjs.js  opaque  asked: nothing',
+    );
+  });
+
   it('prints only the trace that asks for the named export', () => {
     expect(printed('b', ['a'])).toBe('');
     expect(printed('b', ['b'])).toContain('edgefit trace: b\n');
