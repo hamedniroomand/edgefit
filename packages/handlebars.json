@@ -2,8 +2,8 @@
   "version": 2,
   "package": "handlebars",
   "resolved": "4.7.10",
-  "checkedAt": "2026-11-24T15:18:02.421Z",
-  "edgefit": "0.16.8",
+  "checkedAt": "2026-11-25T01:01:11.001Z",
+  "edgefit": "0.16.9",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1440,
+  "durationMs": 1685,
   "verified": {
     "bun": {
       "outcome": "verified",

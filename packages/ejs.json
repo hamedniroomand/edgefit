@@ -2,8 +2,8 @@
   "version": 2,
   "package": "ejs",
   "resolved": "7.0.2",
-  "checkedAt": "2026-11-24T15:19:13.647Z",
-  "edgefit": "0.16.8",
+  "checkedAt": "2026-11-25T01:01:09.324Z",
+  "edgefit": "0.16.9",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 868,
+  "durationMs": 877,
   "verified": {
     "bun": {
       "outcome": "verified",

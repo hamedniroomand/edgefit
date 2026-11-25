@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@clickhouse/client",
   "resolved": "1.25.0",
-  "checkedAt": "2026-11-24T15:19:07.757Z",
-  "edgefit": "0.16.8",
+  "checkedAt": "2026-11-25T01:00:18.800Z",
+  "edgefit": "0.16.9",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -67,7 +67,7 @@
       }
     }
   ],
-  "durationMs": 1593,
+  "durationMs": 1276,
   "verified": {
     "bun": {
       "outcome": "verified",

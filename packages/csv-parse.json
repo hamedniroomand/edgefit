@@ -2,8 +2,8 @@
   "version": 2,
   "package": "csv-parse",
   "resolved": "7.0.3",
-  "checkedAt": "2026-11-24T15:19:16.197Z",
-  "edgefit": "0.16.8",
+  "checkedAt": "2026-11-25T01:01:39.161Z",
+  "edgefit": "0.16.9",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -151,7 +151,7 @@
       }
     }
   ],
-  "durationMs": 3015,
+  "durationMs": 3190,
   "verified": {
     "bun": {
       "outcome": "verified",

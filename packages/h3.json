@@ -2,8 +2,8 @@
   "version": 2,
   "package": "h3",
   "resolved": "2.0.8",
-  "checkedAt": "2026-11-24T15:15:46.264Z",
-  "edgefit": "0.16.8",
+  "checkedAt": "2026-11-25T00:57:32.980Z",
+  "edgefit": "0.16.9",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -321,7 +321,7 @@
       }
     }
   ],
-  "durationMs": 9992,
+  "durationMs": 11570,
   "verified": {
     "bun": {
       "outcome": "verified",

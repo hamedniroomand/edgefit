@@ -2,8 +2,8 @@
   "version": 2,
   "package": "amqplib",
   "resolved": "2.4.1",
-  "checkedAt": "2026-11-24T15:19:44.078Z",
-  "edgefit": "0.16.8",
+  "checkedAt": "2026-11-25T00:59:00.421Z",
+  "edgefit": "0.16.9",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -88,7 +88,7 @@
       }
     }
   ],
-  "durationMs": 2862,
+  "durationMs": 2794,
   "verified": {
     "bun": {
       "outcome": "verified",

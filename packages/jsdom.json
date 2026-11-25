@@ -2,8 +2,8 @@
   "version": 2,
   "package": "jsdom",
   "resolved": "31.0.1",
-  "checkedAt": "2026-11-24T15:16:20.185Z",
-  "edgefit": "0.16.8",
+  "checkedAt": "2026-11-25T00:58:44.408Z",
+  "edgefit": "0.16.9",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -160,7 +160,7 @@
     }
   ],
   "notes": "jsdom runs scripts with node:vm and starts workers with node:worker_threads, which workerd does not implement; use cheerio or linkedom on Workers.",
-  "durationMs": 23910,
+  "durationMs": 20080,
   "verified": {
     "workerd": {
       "outcome": "confirmed",

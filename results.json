@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "generatedAt": "2026-11-24T15:24:02.205Z",
-  "edgefit": "0.16.8",
+  "generatedAt": "2026-11-25T01:06:01.239Z",
+  "edgefit": "0.16.9",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -25,7 +25,7 @@
     {
       "name": "hono",
       "file": "hono",
-      "resolved": "4.13.21",
+      "resolved": "4.13.22",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
@@ -38,7 +38,7 @@
           "status": "fail"
         }
       },
-      "durationMs": 15098,
+      "durationMs": 12126,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -55,7 +55,7 @@
         "deno": "pass"
       },
       "subpaths": 19,
-      "durationMs": 2476,
+      "durationMs": 1795,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -72,7 +72,7 @@
         "deno": "pass"
       },
       "subpaths": 30,
-      "durationMs": 40729,
+      "durationMs": 39135,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -95,7 +95,7 @@
           "status": "fail"
         }
       },
-      "durationMs": 9992,
+      "durationMs": 11570,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -112,7 +112,7 @@
         "deno": "pass"
       },
       "subpaths": 10,
-      "durationMs": 17402,
+      "durationMs": 11060,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -129,7 +129,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1761,
+      "durationMs": 1373,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -146,7 +146,7 @@
         "deno": "pass"
       },
       "subpaths": 9,
-      "durationMs": 2355,
+      "durationMs": 1915,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -163,7 +163,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 874,
+      "durationMs": 1073,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -180,7 +180,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 848,
+      "durationMs": 864,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -197,7 +197,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 2129,
+      "durationMs": 2280,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -214,7 +214,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1750,
+      "durationMs": 2109,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -231,7 +231,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1485,
+      "durationMs": 1365,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -248,7 +248,7 @@
         "deno": "pass"
       },
       "subpaths": 447,
-      "durationMs": 194954,
+      "durationMs": 201134,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -272,7 +272,7 @@
           "status": "warn"
         }
       },
-      "durationMs": 7620,
+      "durationMs": 6866,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -289,7 +289,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 2740,
+      "durationMs": 2183,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -306,7 +306,7 @@
         "deno": "pass"
       },
       "subpaths": 8,
-      "durationMs": 10050,
+      "durationMs": 6321,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -323,7 +323,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1205,
+      "durationMs": 1172,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -340,7 +340,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 3299,
+      "durationMs": 3266,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -350,14 +350,14 @@
     {
       "name": "openai",
       "file": "openai",
-      "resolved": "7.63.0",
+      "resolved": "7.64.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 38,
-      "durationMs": 51533,
+      "durationMs": 35745,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -367,14 +367,14 @@
     {
       "name": "@anthropic-ai/sdk",
       "file": "anthropic-ai__sdk",
-      "resolved": "1.13.0",
+      "resolved": "1.14.0",
       "summary": {
         "workerd": "pass",
         "bun": "warn",
         "deno": "warn"
       },
       "subpaths": 33,
-      "durationMs": 45198,
+      "durationMs": 42932,
       "verified": {
         "workerd": "verified"
       }
@@ -389,7 +389,7 @@
         "deno": "pass"
       },
       "subpaths": 3,
-      "durationMs": 21067,
+      "durationMs": 25125,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -399,14 +399,14 @@
     {
       "name": "@ai-sdk/openai",
       "file": "ai-sdk__openai",
-      "resolved": "4.0.122",
+      "resolved": "4.0.123",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 2,
-      "durationMs": 10486,
+      "durationMs": 11048,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -416,14 +416,14 @@
     {
       "name": "@aws-sdk/client-s3",
       "file": "aws-sdk__client-s3",
-      "resolved": "3.1176.0",
+      "resolved": "3.1177.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 6346,
+      "durationMs": 7239,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -433,14 +433,14 @@
     {
       "name": "@aws-sdk/client-dynamodb",
       "file": "aws-sdk__client-dynamodb",
-      "resolved": "3.1176.0",
+      "resolved": "3.1177.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 6851,
+      "durationMs": 6961,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -457,7 +457,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1971,
+      "durationMs": 1268,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -474,7 +474,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 6028,
+      "durationMs": 4242,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -491,7 +491,7 @@
         "deno": "pass"
       },
       "subpaths": 740,
-      "durationMs": 64404,
+      "durationMs": 80796,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -508,7 +508,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 650,
+      "durationMs": 885,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -525,7 +525,7 @@
         "deno": "pass"
       },
       "subpaths": 2,
-      "durationMs": 773,
+      "durationMs": 779,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -542,7 +542,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 888,
+      "durationMs": 611,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -565,7 +565,7 @@
           "status": "fail"
         }
       },
-      "durationMs": 7929,
+      "durationMs": 9689,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -582,7 +582,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1744,
+      "durationMs": 1392,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -599,7 +599,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1153,
+      "durationMs": 1178,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -617,7 +617,7 @@
       },
       "subpaths": 1,
       "notes": "Native addon.",
-      "durationMs": 2721,
+      "durationMs": 2527,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -635,7 +635,7 @@
       },
       "subpaths": 1,
       "notes": "Native addon; bcryptjs is the pure-JS alternative.",
-      "durationMs": 880,
+      "durationMs": 725,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -653,7 +653,7 @@
       },
       "subpaths": 1,
       "notes": "Watches the file system.",
-      "durationMs": 1392,
+      "durationMs": 1560,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -670,7 +670,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 3022,
+      "durationMs": 2857,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -687,7 +687,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 7689,
+      "durationMs": 5468,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -704,7 +704,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1766,
+      "durationMs": 1637,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -721,7 +721,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 855,
+      "durationMs": 774,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -738,7 +738,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 555,
+      "durationMs": 795,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -755,7 +755,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1810,
+      "durationMs": 2041,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -772,7 +772,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 512,
+      "durationMs": 604,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -790,7 +790,7 @@
       },
       "subpaths": 1,
       "notes": "jsdom runs scripts with node:vm and starts workers with node:worker_threads, which workerd does not implement; use cheerio or linkedom on Workers.",
-      "durationMs": 23910,
+      "durationMs": 20080,
       "verified": {
         "workerd": "confirmed"
       }
@@ -805,7 +805,7 @@
         "deno": "pass"
       },
       "subpaths": 3,
-      "durationMs": 5970,
+      "durationMs": 4655,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -823,7 +823,7 @@
       },
       "subpaths": 1,
       "notes": "puppeteer starts the browser as a child process, which workerd does not implement; use @cloudflare/puppeteer with Browser Run on Workers.",
-      "durationMs": 9027,
+      "durationMs": 7358,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -846,7 +846,7 @@
           "status": "fail"
         }
       },
-      "durationMs": 1282,
+      "durationMs": 1578,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -863,7 +863,7 @@
         "deno": "pass"
       },
       "subpaths": 2,
-      "durationMs": 2282,
+      "durationMs": 2566,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -880,7 +880,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1216,
+      "durationMs": 1143,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -897,7 +897,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 938,
+      "durationMs": 770,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -914,7 +914,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1259,
+      "durationMs": 853,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -932,7 +932,7 @@
       },
       "subpaths": 1,
       "notes": "With the http2 option, got calls node:tls.connect with options that Workers reject, and the default options work.",
-      "durationMs": 2735,
+      "durationMs": 1859,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -950,7 +950,7 @@
       },
       "subpaths": 1,
       "notes": "undici fails on workerd because node:tls.connect rejects its ALPNProtocols option; use the global fetch on Workers.",
-      "durationMs": 3862,
+      "durationMs": 3618,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -967,7 +967,7 @@
         "deno": "pass"
       },
       "subpaths": 7,
-      "durationMs": 9401,
+      "durationMs": 12346,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -984,7 +984,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 8395,
+      "durationMs": 6611,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1001,7 +1001,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 2728,
+      "durationMs": 2160,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1011,14 +1011,14 @@
     {
       "name": "@trpc/server",
       "file": "trpc__server",
-      "resolved": "11.31.2",
+      "resolved": "11.31.3",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 15,
-      "durationMs": 10052,
+      "durationMs": 8698,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1035,7 +1035,7 @@
         "deno": "pass"
       },
       "subpaths": 3,
-      "durationMs": 4010,
+      "durationMs": 3299,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1068,7 +1068,7 @@
         }
       },
       "notes": "The SDK is for clients: the ai audio and messaging/sw subpaths need browser APIs, and server code uses firebase-admin.",
-      "durationMs": 209330,
+      "durationMs": 179229,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1086,7 +1086,7 @@
       },
       "subpaths": 6,
       "notes": "The Node SDK needs node:child_process, node:worker_threads and node:perf_hooks, which workerd does not implement; use @sentry/cloudflare or @sentry/bun.",
-      "durationMs": 119051,
+      "durationMs": 127733,
       "verified": {
         "workerd": "verified"
       }
@@ -1101,7 +1101,7 @@
         "deno": "pass"
       },
       "subpaths": 4,
-      "durationMs": 29471,
+      "durationMs": 34103,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1118,7 +1118,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 7147,
+      "durationMs": 6464,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1128,14 +1128,14 @@
     {
       "name": "mongoose",
       "file": "mongoose",
-      "resolved": "9.13.0",
+      "resolved": "9.13.1",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 7864,
+      "durationMs": 9928,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1153,7 +1153,7 @@
       },
       "subpaths": 9,
       "notes": "Native addon. On workerd, process.report.getReport() returns an empty object with no header. The package reads header.glibcVersionRuntime, so the run throws a TypeError before it reaches the native addon.",
-      "durationMs": 2095,
+      "durationMs": 2897,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1171,7 +1171,7 @@
       },
       "subpaths": 1,
       "notes": "Native addon.",
-      "durationMs": 2111,
+      "durationMs": 2380,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1188,7 +1188,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 5798,
+      "durationMs": 5401,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1219,7 +1219,7 @@
           "status": "warn"
         }
       },
-      "durationMs": 6072,
+      "durationMs": 6258,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1242,7 +1242,7 @@
           "status": "fail"
         }
       },
-      "durationMs": 4896,
+      "durationMs": 5816,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1259,7 +1259,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 808,
+      "durationMs": 728,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1276,7 +1276,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 2189,
+      "durationMs": 2108,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1293,7 +1293,7 @@
         "deno": "pass"
       },
       "subpaths": 21,
-      "durationMs": 6732,
+      "durationMs": 8315,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1310,7 +1310,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1483,
+      "durationMs": 1682,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1327,7 +1327,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 2291,
+      "durationMs": 2376,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1344,7 +1344,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 2529,
+      "durationMs": 2114,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1361,7 +1361,7 @@
         "deno": "pass"
       },
       "subpaths": 8,
-      "durationMs": 6487,
+      "durationMs": 5002,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1378,7 +1378,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 730,
+      "durationMs": 707,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1395,7 +1395,7 @@
         "deno": "pass"
       },
       "subpaths": 3,
-      "durationMs": 1010,
+      "durationMs": 811,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1412,7 +1412,7 @@
         "deno": "pass"
       },
       "subpaths": 2,
-      "durationMs": 1268,
+      "durationMs": 1326,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1429,7 +1429,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1460,
+      "durationMs": 1783,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1446,7 +1446,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 817,
+      "durationMs": 795,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1465,7 +1465,7 @@
       "subpaths": 17,
       "main": "./sha2.js",
       "notes": "The root entry throws on purpose and asks for an import of a submodule, so the row checks sha2, the most used one.",
-      "durationMs": 4034,
+      "durationMs": 3414,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1484,7 +1484,7 @@
       "subpaths": 23,
       "main": "./secp256k1.js",
       "notes": "The root entry throws on purpose and asks for an import of a submodule, so the row checks secp256k1, the most used one.",
-      "durationMs": 8785,
+      "durationMs": 10465,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1507,7 +1507,7 @@
           "status": "fail"
         }
       },
-      "durationMs": 63342,
+      "durationMs": 47689,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1524,7 +1524,7 @@
         "deno": "pass"
       },
       "subpaths": 73,
-      "durationMs": 180777,
+      "durationMs": 113386,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1541,7 +1541,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1593,
+      "durationMs": 1276,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1558,7 +1558,7 @@
         "deno": "pass"
       },
       "subpaths": 4,
-      "durationMs": 3697,
+      "durationMs": 3973,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1575,7 +1575,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 861,
+      "durationMs": 1063,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1585,14 +1585,14 @@
     {
       "name": "@clerk/backend",
       "file": "clerk__backend",
-      "resolved": "3.32.0",
+      "resolved": "3.33.0",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 6,
-      "durationMs": 4825,
+      "durationMs": 4759,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1602,14 +1602,14 @@
     {
       "name": "better-auth",
       "file": "better-auth",
-      "resolved": "1.7.27",
+      "resolved": "1.7.28",
       "summary": {
         "workerd": "pass",
         "bun": "pass",
         "deno": "pass"
       },
       "subpaths": 57,
-      "durationMs": 153820,
+      "durationMs": 189738,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1626,7 +1626,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 22887,
+      "durationMs": 20947,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1643,7 +1643,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 2627,
+      "durationMs": 3808,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1660,7 +1660,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 2000,
+      "durationMs": 1865,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1677,7 +1677,7 @@
         "deno": "warn"
       },
       "subpaths": 5,
-      "durationMs": 8410,
+      "durationMs": 5941,
       "verified": {
         "workerd": "verified"
       }
@@ -1692,7 +1692,7 @@
         "deno": "pass"
       },
       "subpaths": 2,
-      "durationMs": 2862,
+      "durationMs": 2794,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1709,7 +1709,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 3545,
+      "durationMs": 2903,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1727,7 +1727,7 @@
       },
       "subpaths": 1,
       "notes": "bullmq runs a processor file in a child process or a worker thread, which workerd does not implement; use Cloudflare Queues on Workers.",
-      "durationMs": 6274,
+      "durationMs": 5522,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1745,7 +1745,7 @@
       },
       "subpaths": 1,
       "notes": "A node-cron task that names a file runs in a child process, which workerd does not implement; use a Cron Trigger on Workers.",
-      "durationMs": 1165,
+      "durationMs": 754,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1762,7 +1762,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 805,
+      "durationMs": 868,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1779,7 +1779,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1036,
+      "durationMs": 1010,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1796,7 +1796,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 2056,
+      "durationMs": 2401,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1813,7 +1813,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 3184,
+      "durationMs": 2740,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1830,7 +1830,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1735,
+      "durationMs": 1824,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1847,7 +1847,7 @@
         "deno": "pass"
       },
       "subpaths": 5,
-      "durationMs": 3015,
+      "durationMs": 3190,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1864,7 +1864,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 868,
+      "durationMs": 877,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1881,7 +1881,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1440,
+      "durationMs": 1685,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1898,7 +1898,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1593,
+      "durationMs": 1350,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1915,7 +1915,7 @@
         "deno": "pass"
       },
       "subpaths": 2,
-      "durationMs": 2549,
+      "durationMs": 2571,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1932,7 +1932,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1924,
+      "durationMs": 1539,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1949,7 +1949,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1609,
+      "durationMs": 1260,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1966,7 +1966,7 @@
         "deno": "pass"
       },
       "subpaths": 6,
-      "durationMs": 6524,
+      "durationMs": 4062,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -1983,7 +1983,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1733,
+      "durationMs": 1623,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2000,7 +2000,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1383,
+      "durationMs": 1316,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2017,7 +2017,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1829,
+      "durationMs": 1773,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2034,7 +2034,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 2655,
+      "durationMs": 2555,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2051,7 +2051,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1033,
+      "durationMs": 822,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2068,7 +2068,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 797,
+      "durationMs": 774,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2085,7 +2085,7 @@
         "deno": "pass"
       },
       "subpaths": 4,
-      "durationMs": 1161,
+      "durationMs": 1096,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2102,7 +2102,7 @@
         "deno": "pass"
       },
       "subpaths": 1,
-      "durationMs": 1122,
+      "durationMs": 1278,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2119,7 +2119,7 @@
         "deno": "pass"
       },
       "subpaths": 3,
-      "durationMs": 1119,
+      "durationMs": 1129,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2137,7 +2137,7 @@
       },
       "subpaths": 18,
       "notes": "On Workers the default credentials of google-auth-library start the gcloud command with child_process.",
-      "durationMs": 90291,
+      "durationMs": 90726,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2155,7 +2155,7 @@
       },
       "subpaths": 1,
       "notes": "The default credentials of google-auth-library start the gcloud command with child_process, which a Worker cannot run.",
-      "durationMs": 5453,
+      "durationMs": 5827,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2173,7 +2173,7 @@
       },
       "subpaths": 1,
       "notes": "On Workers, @azure/core-xml loads its browser build, which needs document, DOMParser, Node and XMLSerializer as it loads, and workerd has none of them; use the Blob REST API with fetch on Workers.",
-      "durationMs": 8148,
+      "durationMs": 9438,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2191,7 +2191,7 @@
       },
       "subpaths": 1,
       "notes": "The tedious driver uses UDP for a named instance, and @azure/identity starts a browser with child_process, and a Worker cannot do either. Tedious calls an @azure/identity credential only after a SQL Server accepts the login, so a run without one cannot reach the child_process calls. The UDP lookup for a named instance does not throw on workerd, and the connection times out.",
-      "durationMs": 10501,
+      "durationMs": 13615,
       "verified": {
         "bun": "verified",
         "deno": "verified"
@@ -2208,7 +2208,7 @@
       },
       "subpaths": 1,
       "notes": "argon2 is a native addon, so use bcryptjs or a WebAssembly hash on Workers.",
-      "durationMs": 1160,
+      "durationMs": 1031,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2232,7 +2232,7 @@
         }
       },
       "notes": "PGlite calls WebAssembly.instantiateStreaming only in its browser branch. With nodejs_compat at the date of the table, PGlite takes its Node branch on workerd, so this call does not run. The Node branch reads its files from disk, and the Worker bundle has none, so PGlite.create() fails before it uses WebAssembly or reaches node:process.binding. The multi-tab worker of PGlite uses navigator.locks, which Bun and workerd do not have.",
-      "durationMs": 14465,
+      "durationMs": 11671,
       "verified": {
         "bun": "verified"
       }
@@ -2248,7 +2248,7 @@
       },
       "subpaths": 1,
       "notes": "On Workers the browser build of engine.io-parser reads a Blob with FileReader, which Workers do not have.",
-      "durationMs": 3101,
+      "durationMs": 2455,
       "verified": {
         "bun": "verified",
         "deno": "verified"
@@ -2264,7 +2264,7 @@
         "deno": "pass"
       },
       "subpaths": 3,
-      "durationMs": 950,
+      "durationMs": 1056,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2281,7 +2281,7 @@
         "deno": "pass"
       },
       "subpaths": 2,
-      "durationMs": 1326,
+      "durationMs": 1442,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2298,7 +2298,7 @@
         "deno": "pass"
       },
       "subpaths": 2,
-      "durationMs": 741,
+      "durationMs": 1165,
       "verified": {
         "bun": "verified",
         "deno": "verified",
@@ -2316,7 +2316,7 @@
       },
       "subpaths": 1,
       "notes": "The client sends requests with undici, and workerd rejects the ALPNProtocols option of node:tls.connect that undici sets; call the Elasticsearch REST API with fetch on Workers.",
-      "durationMs": 7195,
+      "durationMs": 9706,
       "verified": {
         "bun": "verified",
         "deno": "verified",

@@ -2,8 +2,8 @@
   "version": 2,
   "package": "@noble/hashes",
   "resolved": "2.4.0",
-  "checkedAt": "2026-11-24T15:19:06.150Z",
-  "edgefit": "0.16.8",
+  "checkedAt": "2026-11-25T01:01:00.008Z",
+  "edgefit": "0.16.9",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -405,7 +405,7 @@
     }
   ],
   "notes": "The root entry throws on purpose and asks for an import of a submodule, so the row checks sha2, the most used one.",
-  "durationMs": 4034,
+  "durationMs": 3414,
   "verified": {
     "bun": {
       "outcome": "verified",

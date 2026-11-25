@@ -2,8 +2,8 @@
   "version": 2,
   "package": "axios",
   "resolved": "1.21.1",
-  "checkedAt": "2026-11-24T15:15:56.358Z",
-  "edgefit": "0.16.8",
+  "checkedAt": "2026-11-25T00:57:52.468Z",
+  "edgefit": "0.16.9",
   "data": {
     "node": "20.20.2, 22.22.2, 24.15.0",
     "workerd": "1.20261121.1",
@@ -349,7 +349,7 @@
       }
     }
   ],
-  "durationMs": 7929,
+  "durationMs": 9689,
   "verified": {
     "bun": {
       "outcome": "verified",
